@@ -1,4 +1,4 @@
-package ch.yass.config.contract
+package ch.yass.core.contract
 
 import io.javalin.apibuilder.EndpointGroup
 

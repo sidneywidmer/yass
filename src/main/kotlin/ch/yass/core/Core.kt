@@ -1,4 +1,4 @@
-package ch.yass.config
+package ch.yass.core
 
 import com.typesafe.config.ConfigFactory
 import org.kodein.di.DI
@@ -10,11 +10,12 @@ import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import java.sql.DriverManager
 
-object Config {
-    val module = DI.Module("Config module") {
+object Core {
+    val module = DI.Module("Core module") {
         bindSingleton { ConfigFactory.load() }
         bindSingleton { createDSLContext(instance()) }
         bindSingleton { Bootstrap(instance()) }
+        bindSingleton { MDCMiddleware() }
     }
 
     private fun createDSLContext(config: ConfigSettings): DSLContext {

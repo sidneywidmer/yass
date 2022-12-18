@@ -1,6 +1,6 @@
 package ch.yass
 
-import ch.yass.auth.dto.Player
+import ch.yass.game.dto.Player
 import ch.yass.data.*
 import ch.yass.db.tables.references.GAME
 import ch.yass.db.tables.references.HAND

@@ -20,10 +20,19 @@
         </encoder>
     </appender>
 
-    <root level="INFO">
-        <appender-ref ref="Logtail"/>
-        <appender-ref ref="Console"/>
-    </root>
+    <if condition='property("ENVIRONMENT").contains("development")'>
+        <then>
+            <root level="INFO">
+                <appender-ref ref="Console"/>
+            </root>
+        </then>
+        <else>
+            <root level="INFO">
+                <appender-ref ref="Logtail"/>
+                <appender-ref ref="Console"/>
+            </root>
+        </else>
+    </if>
 
     <!-- Ignore all the logback gedoens at the beginning -->
     <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>

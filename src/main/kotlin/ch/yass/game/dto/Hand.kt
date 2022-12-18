@@ -1,6 +1,5 @@
 package ch.yass.game.dto
 
-import ch.yass.auth.dto.Player
 import java.time.LocalDateTime
 import java.util.*
 

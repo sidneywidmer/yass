@@ -1,6 +1,6 @@
 package ch.yass
 
-import ch.yass.config.allModules
+import ch.yass.core.allModules
 import org.junit.Rule
 import org.koin.test.KoinTest
 import org.koin.test.KoinTestRule

@@ -1,8 +1,8 @@
 package ch.yass
 
-import ch.yass.auth.Auth
-import ch.yass.config.Bootstrap
-import ch.yass.config.Config
+import ch.yass.identity.Identity
+import ch.yass.core.Bootstrap
+import ch.yass.core.Core
 import ch.yass.game.Game
 import org.kodein.di.DI
 import org.kodein.di.instance
@@ -10,8 +10,8 @@ import org.kodein.di.instance
 
 fun main() {
     val di = DI {
-        import(Config.module)
-        import(Auth.module)
+        import(Core.module)
+        import(Identity.module)
         import(Game.module)
     }
 
