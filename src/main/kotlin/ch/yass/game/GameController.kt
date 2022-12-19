@@ -1,7 +1,7 @@
 package ch.yass.game
 
 import ch.yass.core.contract.Controller
-import ch.yass.utils.logger
+import ch.yass.core.logger
 import com.typesafe.config.Config
 import io.javalin.apibuilder.ApiBuilder.get
 import io.javalin.apibuilder.EndpointGroup

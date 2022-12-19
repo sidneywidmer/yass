@@ -1,7 +1,16 @@
 package ch.yass.core
 
+import sh.ory.ApiException
+
 sealed class DomainError {
-    data class OryError(val msg: String, val exception: Throwable) : DomainError()
-    data class RequestError(val msg: String, val validation: HashMap<String, Any?>? = null) : DomainError()
-    data class TbdError(val msg: String) : DomainError()
+    data class OryError(val code: String, val exception: Throwable) : DomainError() {
+        override fun toString(): String {
+            return when (exception) {
+                is ApiException -> exception.responseBody?.trim() ?: exception.toString()
+                else -> exception.toString()
+            }
+        }
+    }
+
+    data class RequestError(val code: String, val validation: HashMap<String, Any?>? = null) : DomainError()
 }

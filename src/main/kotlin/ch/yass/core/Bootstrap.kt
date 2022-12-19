@@ -34,7 +34,7 @@ class Bootstrap(private val config: ConfigSettings) {
         // We want a clean shutdown
         Runtime.getRuntime().addShutdownHook(Thread { app.stop() })
 
-        // app.exception(Exception::class.java, HandlerError::handlerErrorException)
+        app.exception(DomainException::class.java) { exception, ctx -> exceptionHandler(exception, ctx) }
 
         app.start(config.getInt("server.port"))
     }

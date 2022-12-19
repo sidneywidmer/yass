@@ -14,7 +14,15 @@ class PlayerService {
         // --> If yes, updated player.name and player.updatedAt
         // -> If no, create a new player in the db
         // -> Return a Player DTO
-        return Either.Right(Player(1, UUID.randomUUID(), "Messi", LocalDateTime.now(), LocalDateTime.now()))
+        return Either.Right(
+            Player(
+                1,
+                UUID.fromString(session.identity.id),
+                "Messi",
+                LocalDateTime.now(),
+                LocalDateTime.now()
+            )
+        )
         //return Either.Left(DomainError.TbdError("foo"))
     }
 }

@@ -1,4 +1,4 @@
-package ch.yass.utils
+package ch.yass.core
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
