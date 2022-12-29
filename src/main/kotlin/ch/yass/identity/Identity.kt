@@ -9,7 +9,7 @@ import sh.ory.api.FrontendApi
 
 object Identity {
     val module = DI.Module("Auth module") {
-        bindSingleton { AuthController(instance()) }
+        bindSingleton { AuthController(instance(), instance()) }
         bindSingleton { AuthMiddleware(instance(), instance()) }
         bindSingleton { createOryClient(instance()) }
     }

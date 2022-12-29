@@ -4,11 +4,32 @@
 package ch.yass.db
 
 
-import ch.yass.db.tables.FlywaySchemaHistory
+import ch.yass.db.tables.ContinuityContainers
+import ch.yass.db.tables.CourierMessages
 import ch.yass.db.tables.Game
 import ch.yass.db.tables.Hand
+import ch.yass.db.tables.Identities
+import ch.yass.db.tables.IdentityCredentialIdentifiers
+import ch.yass.db.tables.IdentityCredentialTypes
+import ch.yass.db.tables.IdentityCredentials
+import ch.yass.db.tables.IdentityRecoveryAddresses
+import ch.yass.db.tables.IdentityRecoveryCodes
+import ch.yass.db.tables.IdentityRecoveryTokens
+import ch.yass.db.tables.IdentityVerifiableAddresses
+import ch.yass.db.tables.IdentityVerificationCodes
+import ch.yass.db.tables.IdentityVerificationTokens
+import ch.yass.db.tables.Networks
 import ch.yass.db.tables.Player
+import ch.yass.db.tables.SchemaVersion
 import ch.yass.db.tables.Seat
+import ch.yass.db.tables.SelfserviceErrors
+import ch.yass.db.tables.SelfserviceLoginFlows
+import ch.yass.db.tables.SelfserviceRecoveryFlows
+import ch.yass.db.tables.SelfserviceRegistrationFlows
+import ch.yass.db.tables.SelfserviceSettingsFlows
+import ch.yass.db.tables.SelfserviceVerificationFlows
+import ch.yass.db.tables.SessionDevices
+import ch.yass.db.tables.Sessions
 import ch.yass.db.tables.Trick
 
 import kotlin.collections.List
@@ -32,9 +53,14 @@ open class Public : SchemaImpl("public", DefaultCatalog.DEFAULT_CATALOG) {
     }
 
     /**
-     * The table <code>public.flyway_schema_history</code>.
+     * The table <code>public.continuity_containers</code>.
      */
-    val FLYWAY_SCHEMA_HISTORY: FlywaySchemaHistory get() = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY
+    val CONTINUITY_CONTAINERS: ContinuityContainers get() = ContinuityContainers.CONTINUITY_CONTAINERS
+
+    /**
+     * The table <code>public.courier_messages</code>.
+     */
+    val COURIER_MESSAGES: CourierMessages get() = CourierMessages.COURIER_MESSAGES
 
     /**
      * The table <code>public.game</code>.
@@ -47,14 +73,114 @@ open class Public : SchemaImpl("public", DefaultCatalog.DEFAULT_CATALOG) {
     val HAND: Hand get() = Hand.HAND
 
     /**
+     * The table <code>public.identities</code>.
+     */
+    val IDENTITIES: Identities get() = Identities.IDENTITIES
+
+    /**
+     * The table <code>public.identity_credential_identifiers</code>.
+     */
+    val IDENTITY_CREDENTIAL_IDENTIFIERS: IdentityCredentialIdentifiers get() = IdentityCredentialIdentifiers.IDENTITY_CREDENTIAL_IDENTIFIERS
+
+    /**
+     * The table <code>public.identity_credential_types</code>.
+     */
+    val IDENTITY_CREDENTIAL_TYPES: IdentityCredentialTypes get() = IdentityCredentialTypes.IDENTITY_CREDENTIAL_TYPES
+
+    /**
+     * The table <code>public.identity_credentials</code>.
+     */
+    val IDENTITY_CREDENTIALS: IdentityCredentials get() = IdentityCredentials.IDENTITY_CREDENTIALS
+
+    /**
+     * The table <code>public.identity_recovery_addresses</code>.
+     */
+    val IDENTITY_RECOVERY_ADDRESSES: IdentityRecoveryAddresses get() = IdentityRecoveryAddresses.IDENTITY_RECOVERY_ADDRESSES
+
+    /**
+     * The table <code>public.identity_recovery_codes</code>.
+     */
+    val IDENTITY_RECOVERY_CODES: IdentityRecoveryCodes get() = IdentityRecoveryCodes.IDENTITY_RECOVERY_CODES
+
+    /**
+     * The table <code>public.identity_recovery_tokens</code>.
+     */
+    val IDENTITY_RECOVERY_TOKENS: IdentityRecoveryTokens get() = IdentityRecoveryTokens.IDENTITY_RECOVERY_TOKENS
+
+    /**
+     * The table <code>public.identity_verifiable_addresses</code>.
+     */
+    val IDENTITY_VERIFIABLE_ADDRESSES: IdentityVerifiableAddresses get() = IdentityVerifiableAddresses.IDENTITY_VERIFIABLE_ADDRESSES
+
+    /**
+     * The table <code>public.identity_verification_codes</code>.
+     */
+    val IDENTITY_VERIFICATION_CODES: IdentityVerificationCodes get() = IdentityVerificationCodes.IDENTITY_VERIFICATION_CODES
+
+    /**
+     * The table <code>public.identity_verification_tokens</code>.
+     */
+    val IDENTITY_VERIFICATION_TOKENS: IdentityVerificationTokens get() = IdentityVerificationTokens.IDENTITY_VERIFICATION_TOKENS
+
+    /**
+     * The table <code>public.networks</code>.
+     */
+    val NETWORKS: Networks get() = Networks.NETWORKS
+
+    /**
      * The table <code>public.player</code>.
      */
     val PLAYER: Player get() = Player.PLAYER
 
     /**
+     * The table <code>public.schema_version</code>.
+     */
+    val SCHEMA_VERSION: SchemaVersion get() = SchemaVersion.SCHEMA_VERSION
+
+    /**
      * The table <code>public.seat</code>.
      */
     val SEAT: Seat get() = Seat.SEAT
+
+    /**
+     * The table <code>public.selfservice_errors</code>.
+     */
+    val SELFSERVICE_ERRORS: SelfserviceErrors get() = SelfserviceErrors.SELFSERVICE_ERRORS
+
+    /**
+     * The table <code>public.selfservice_login_flows</code>.
+     */
+    val SELFSERVICE_LOGIN_FLOWS: SelfserviceLoginFlows get() = SelfserviceLoginFlows.SELFSERVICE_LOGIN_FLOWS
+
+    /**
+     * The table <code>public.selfservice_recovery_flows</code>.
+     */
+    val SELFSERVICE_RECOVERY_FLOWS: SelfserviceRecoveryFlows get() = SelfserviceRecoveryFlows.SELFSERVICE_RECOVERY_FLOWS
+
+    /**
+     * The table <code>public.selfservice_registration_flows</code>.
+     */
+    val SELFSERVICE_REGISTRATION_FLOWS: SelfserviceRegistrationFlows get() = SelfserviceRegistrationFlows.SELFSERVICE_REGISTRATION_FLOWS
+
+    /**
+     * The table <code>public.selfservice_settings_flows</code>.
+     */
+    val SELFSERVICE_SETTINGS_FLOWS: SelfserviceSettingsFlows get() = SelfserviceSettingsFlows.SELFSERVICE_SETTINGS_FLOWS
+
+    /**
+     * The table <code>public.selfservice_verification_flows</code>.
+     */
+    val SELFSERVICE_VERIFICATION_FLOWS: SelfserviceVerificationFlows get() = SelfserviceVerificationFlows.SELFSERVICE_VERIFICATION_FLOWS
+
+    /**
+     * The table <code>public.session_devices</code>.
+     */
+    val SESSION_DEVICES: SessionDevices get() = SessionDevices.SESSION_DEVICES
+
+    /**
+     * The table <code>public.sessions</code>.
+     */
+    val SESSIONS: Sessions get() = Sessions.SESSIONS
 
     /**
      * The table <code>public.trick</code>.
@@ -64,11 +190,32 @@ open class Public : SchemaImpl("public", DefaultCatalog.DEFAULT_CATALOG) {
     override fun getCatalog(): Catalog = DefaultCatalog.DEFAULT_CATALOG
 
     override fun getTables(): List<Table<*>> = listOf(
-        FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY,
+        ContinuityContainers.CONTINUITY_CONTAINERS,
+        CourierMessages.COURIER_MESSAGES,
         Game.GAME,
         Hand.HAND,
+        Identities.IDENTITIES,
+        IdentityCredentialIdentifiers.IDENTITY_CREDENTIAL_IDENTIFIERS,
+        IdentityCredentialTypes.IDENTITY_CREDENTIAL_TYPES,
+        IdentityCredentials.IDENTITY_CREDENTIALS,
+        IdentityRecoveryAddresses.IDENTITY_RECOVERY_ADDRESSES,
+        IdentityRecoveryCodes.IDENTITY_RECOVERY_CODES,
+        IdentityRecoveryTokens.IDENTITY_RECOVERY_TOKENS,
+        IdentityVerifiableAddresses.IDENTITY_VERIFIABLE_ADDRESSES,
+        IdentityVerificationCodes.IDENTITY_VERIFICATION_CODES,
+        IdentityVerificationTokens.IDENTITY_VERIFICATION_TOKENS,
+        Networks.NETWORKS,
         Player.PLAYER,
+        SchemaVersion.SCHEMA_VERSION,
         Seat.SEAT,
+        SelfserviceErrors.SELFSERVICE_ERRORS,
+        SelfserviceLoginFlows.SELFSERVICE_LOGIN_FLOWS,
+        SelfserviceRecoveryFlows.SELFSERVICE_RECOVERY_FLOWS,
+        SelfserviceRegistrationFlows.SELFSERVICE_REGISTRATION_FLOWS,
+        SelfserviceSettingsFlows.SELFSERVICE_SETTINGS_FLOWS,
+        SelfserviceVerificationFlows.SELFSERVICE_VERIFICATION_FLOWS,
+        SessionDevices.SESSION_DEVICES,
+        Sessions.SESSIONS,
         Trick.TRICK
     )
 }

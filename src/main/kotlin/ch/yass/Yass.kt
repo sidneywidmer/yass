@@ -8,14 +8,18 @@ import org.kodein.di.DI
 import org.kodein.di.instance
 
 
-fun main() {
-    val di = DI {
-        import(Core.module)
-        import(Identity.module)
-        import(Game.module)
+class Yass {
+    companion object {
+        val container = DI {
+            import(Core.module)
+            import(Identity.module)
+            import(Game.module)
+        }
+
+        @JvmStatic
+        fun main(args: Array<String>) {
+            val bootstrap: Bootstrap by container.instance()
+            bootstrap.start(container)
+        }
     }
-
-    val bootstrap: Bootstrap by di.instance()
-    bootstrap.start(di)
 }
-

@@ -11,12 +11,12 @@
         <dependency>
             <groupId>io.javalin</groupId>
             <artifactId>javalin-bundle</artifactId>
-            <version>5.1.4</version>
+            <version>5.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.kodein.di</groupId>
             <artifactId>kodein-di-jvm</artifactId>
-            <version>7.8.0</version>
+            <version>7.15.1</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe</groupId>
@@ -26,24 +26,39 @@
         <dependency>
             <groupId>sh.ory</groupId>
             <artifactId>ory-client</artifactId>
-            <version>1.1.1</version>
+            <version>1.1.4</version>
         </dependency>
         <dependency>
             <groupId>io.arrow-kt</groupId>
             <artifactId>arrow-core</artifactId>
             <version>1.1.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.14.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-kotlin</artifactId>
+            <version>2.14.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.14.1</version>
+        </dependency>
 
         <!-- Database -->
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq</artifactId>
-            <version>3.17.5</version>
+            <version>3.17.6</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.5.0</version>
+            <version>42.5.1</version>
         </dependency>
 
         <!-- Testing -->
@@ -135,6 +150,36 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Flyway migrations -->
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>3.0</version>
+
+                <!-- Note that we're executing the Flyway plugin in the "generate-sources" phase -->
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>migrate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+                <!-- Note that we need to prefix the db/migration path with filesystem: to prevent Flyway
+                     from looking for our migration scripts only on the classpath -->
+                <configuration>
+                    <url>${env.DB_URL}</url>
+                    <user>${env.DB_USER}</user>
+                    <password>${env.DB_PASSWORD}</password>
+                    <locations>
+                        <location>filesystem:src/main/resources/db/migration</location>
+                    </locations>
+                    <initOnMigrate>true</initOnMigrate>
+                </configuration>
+            </plugin>
+
             <!-- The jOOQ code generator plugin -->
             <plugin>
                 <groupId>org.jooq</groupId>

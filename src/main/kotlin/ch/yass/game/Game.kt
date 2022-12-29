@@ -7,6 +7,6 @@ import org.kodein.di.instance
 object Game {
     val module = DI.Module("Game module") {
         bindSingleton { GameController(instance()) }
-        bindSingleton { PlayerService() }
+        bindSingleton { PlayerService(instance()) }
     }
 }

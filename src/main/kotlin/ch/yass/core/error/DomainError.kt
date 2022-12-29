@@ -1,4 +1,4 @@
-package ch.yass.core
+package ch.yass.core.error
 
 import sh.ory.ApiException
 
@@ -12,5 +12,7 @@ sealed class DomainError {
         }
     }
 
-    data class RequestError(val code: String, val validation: HashMap<String, Any?>? = null) : DomainError()
+    data class RequestError(val code: String, val payload: HashMap<String, Any?>? = null) : DomainError()
+    data class DbError(val code: String) : DomainError()
+    data class UnexpectedError(val code: String, val exception: Throwable? = null) : DomainError()
 }

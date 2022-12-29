@@ -1,4 +1,4 @@
-package ch.yass.core
+package ch.yass.core.error
 
 /**
  * Sometimes - e.g. from before/after handler we can't just abort a request

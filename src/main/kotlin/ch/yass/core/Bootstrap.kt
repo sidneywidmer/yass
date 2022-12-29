@@ -4,6 +4,9 @@ import ch.qos.logback.classic.LoggerContext
 import ch.yass.identity.AuthMiddleware
 import ch.yass.core.contract.Controller
 import ch.yass.core.contract.Middleware
+import ch.yass.core.error.DomainException
+import ch.yass.core.error.domainExceptionHandler
+import ch.yass.core.error.globalExceptionHandler
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.path
 import io.javalin.event.EventListener
@@ -34,7 +37,8 @@ class Bootstrap(private val config: ConfigSettings) {
         // We want a clean shutdown
         Runtime.getRuntime().addShutdownHook(Thread { app.stop() })
 
-        app.exception(DomainException::class.java) { exception, ctx -> exceptionHandler(exception, ctx) }
+        app.exception(DomainException::class.java) { exception, ctx -> domainExceptionHandler(exception, ctx) }
+        app.exception(Exception::class.java) { exception, ctx -> globalExceptionHandler(exception, ctx) }
 
         app.start(config.getInt("server.port"))
     }

@@ -1,15 +1,17 @@
 package ch.yass.identity
 
-import ch.yass.core.CtxAttributes
 import ch.yass.core.contract.Controller
+import ch.yass.core.contract.CtxAttributes
 import ch.yass.game.dto.Player
+import ch.yass.identity.api.WhoAmI
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.typesafe.config.Config
 import io.javalin.apibuilder.ApiBuilder.get
 import io.javalin.apibuilder.EndpointGroup
 import io.javalin.http.Context
-import sh.ory.model.Session
 
-class AuthController(private val config: Config) : Controller {
+
+class AuthController(private val config: Config, private val mapper: ObjectMapper) : Controller {
     override val path = "/auth"
 
     override val endpoints = EndpointGroup {
@@ -17,8 +19,8 @@ class AuthController(private val config: Config) : Controller {
     }
 
     private fun whoami(ctx: Context) {
-        ctx.json(object {
-            val player = ctx.attribute<Player>(CtxAttributes.PLAYER.name)
-        })
+        val player = ctx.attribute<Player>(CtxAttributes.PLAYER.name)
+
+        ctx.json(mapper.writeValueAsString(WhoAmI.from(player!!)))
     }
 }

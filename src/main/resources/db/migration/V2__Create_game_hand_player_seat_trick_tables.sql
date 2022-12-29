@@ -15,7 +15,11 @@ CREATE TABLE hand (
    starting_player_id INTEGER,
    trump INTEGER,
    gschobe BOOLEAN NOT NULL,
-   points INTEGER NOT NULL
+   points INTEGER NOT NULL,
+   north json NOT NULL,
+   east json NOT NULL,
+   south json NOT NULL,
+   west json NOT NULL
 );
 
 CREATE TABLE player (
