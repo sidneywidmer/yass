@@ -45,6 +45,7 @@ class AuthMiddleware(
         try {
             oryClient.frontend.toSession(sessionId, null).right()
         } catch (exception: java.lang.Exception) {
+            // TODO: Can we remove the stack trace? We don't need it...
             DomainError.OryError("frontend.toSession.exception", exception).left()
         }
 }

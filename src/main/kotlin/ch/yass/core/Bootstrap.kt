@@ -10,6 +10,7 @@ import ch.yass.core.error.globalExceptionHandler
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.path
 import io.javalin.event.EventListener
+import io.javalin.json.JavalinJackson
 import org.kodein.di.*
 import org.slf4j.LoggerFactory
 import com.typesafe.config.Config as ConfigSettings
@@ -19,6 +20,7 @@ class Bootstrap(private val config: ConfigSettings) {
     fun start(di: DI) {
         val app = Javalin.create { config ->
             config.showJavalinBanner = false
+            config.jsonMapper(JavalinJackson(di.direct.instance()))
         }
 
         // Register all middlewares here. We're doing this manually to ensure

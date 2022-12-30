@@ -1,9 +1,9 @@
 package ch.yass.identity
 
 import ch.yass.core.contract.Controller
-import ch.yass.core.contract.CtxAttributes
-import ch.yass.game.dto.Player
-import ch.yass.identity.api.WhoAmI
+import ch.yass.core.helper.response
+import ch.yass.identity.api.WhoAmIResponse
+import ch.yass.identity.helper.player
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.typesafe.config.Config
 import io.javalin.apibuilder.ApiBuilder.get
@@ -19,8 +19,6 @@ class AuthController(private val config: Config, private val mapper: ObjectMappe
     }
 
     private fun whoami(ctx: Context) {
-        val player = ctx.attribute<Player>(CtxAttributes.PLAYER.name)
-
-        ctx.json(mapper.writeValueAsString(WhoAmI.from(player!!)))
+        response(ctx, WhoAmIResponse.from(player(ctx)))
     }
 }

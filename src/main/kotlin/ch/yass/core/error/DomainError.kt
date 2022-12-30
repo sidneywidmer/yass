@@ -1,5 +1,6 @@
 package ch.yass.core.error
 
+import org.valiktor.ConstraintViolation
 import sh.ory.ApiException
 
 sealed class DomainError {
@@ -12,6 +13,7 @@ sealed class DomainError {
         }
     }
 
+    data class ValidationError(val code: String, val payload: Set<ConstraintViolation>) : DomainError()
     data class RequestError(val code: String, val payload: HashMap<String, Any?>? = null) : DomainError()
     data class DbError(val code: String) : DomainError()
     data class UnexpectedError(val code: String, val exception: Throwable? = null) : DomainError()

@@ -1,4 +1,4 @@
-package ch.yass.game.dto
+package ch.yass.game.dto.action
 
 data class NewPlayer(
     val uuid: String,

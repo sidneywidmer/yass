@@ -4,9 +4,9 @@ import arrow.core.*
 import arrow.core.continuations.either
 import ch.yass.core.error.DomainError
 import ch.yass.db.tables.references.PLAYER
-import ch.yass.game.dto.NewPlayer
+import ch.yass.game.dto.action.NewPlayer
 import ch.yass.game.dto.Player
-import ch.yass.game.dto.UpdatePlayer
+import ch.yass.game.dto.action.UpdatePlayer
 import com.google.gson.internal.LinkedTreeMap
 import org.jooq.DSLContext
 import sh.ory.model.Identity
