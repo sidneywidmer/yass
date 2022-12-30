@@ -1,11 +1,9 @@
 package ch.yass.game
 
-import arrow.core.Either
 import arrow.core.continuations.either
 import ch.yass.core.contract.Controller
-import ch.yass.core.contract.CtxAttributes
-import ch.yass.core.error.DomainException
-import ch.yass.core.helper.response
+import ch.yass.core.helper.errorResponse
+import ch.yass.core.helper.successResponse
 import ch.yass.core.helper.validate
 import ch.yass.game.api.JoinGameRequest
 import ch.yass.identity.helper.player
@@ -20,14 +18,11 @@ class GameController(private val gameService: GameService) : Controller {
         get("/join", ::join)
     }
 
-    private fun join(ctx: Context) {
-        // - [ ] Validate user and game
-        // - [ ] Add user to game in db if there's still free space
-        // - [ ] Return: Game uuid, seat position, all other players and their eventually played
-        //          card in this trick, own hand of cards
-        validate<JoinGameRequest>(ctx.body()).fold(
-            { error -> response(ctx, error) },
-            { request -> response(ctx, gameService.join(request.code, player(ctx))) }
-        )
-    }
+    private fun join(ctx: Context) = either.eager {
+        val request = validate<JoinGameRequest>(ctx.body()).bind()
+        gameService.join(request.code, player(ctx)).bind()
+    }.fold(
+        { errorResponse(ctx, it) },
+        { successResponse(ctx, it) }
+    )
 }

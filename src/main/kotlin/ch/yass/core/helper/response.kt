@@ -1,17 +1,58 @@
 package ch.yass.core.helper
 
-import ch.yass.Yass
-import com.fasterxml.jackson.databind.ObjectMapper
+import ch.yass.core.error.DomainError
 import io.javalin.http.Context
-import org.kodein.di.direct
-import org.kodein.di.instance
+import org.valiktor.i18n.mapToMessage
+import java.util.*
+
+data class ErrorResponse(
+    val code: String, val message: String = "", val payload: Any? = null
+)
+
+data class Path(
+    val path: String, val violations: List<Violation>
+)
+
+data class Violation(
+    val code: String, val message: String = ""
+)
+
 
 /**
  * Helper to json encode given data with jackson and add the result
  * to the context.
  */
-fun response(ctx: Context, data: Any): Context {
-    val mapper = Yass.container.direct.instance<ObjectMapper>()
+fun successResponse(ctx: Context, data: Any): Context {
+    return ctx.status(200).json(data)
+}
 
-    return ctx.status(200).json(mapper.writeValueAsString(data))
+fun errorResponse(ctx: Context, error: DomainError): Context {
+    logger().info("DomainError '${error.javaClass.name}' encountered: $error")
+    return when (error) {
+        is DomainError.RequestError -> ctx.status(400).json(ErrorResponse(error.code))
+        is DomainError.OryError -> ctx.status(401).json(ErrorResponse(error.code))
+        is DomainError.ValidationError -> ctx.status(422).json(groupValiktorViolations(error))
+        else -> {
+            logger().error("DomainError '${error.javaClass.name}' encountered: $error - this should have been caught before!")
+            ctx.status(500).json(ErrorResponse("ouch"))
+        }
+    }
+}
+
+/**
+ * {
+ *     "code": "constraint.violations",
+ *     "message": "invalid data",
+ *     "payload": [
+ *         {"path" : "firstname", "violations": ["code": "NotEmpty", "message": "firstname cannot be empty"]}
+ *     ]
+ * }
+ */
+private fun groupValiktorViolations(error: DomainError.ValidationError): ErrorResponse {
+    val payload = error.payload
+        .mapToMessage("messages", Locale.ENGLISH)
+        .groupBy { it.property }
+        .map { Path(it.key, it.value.map { violation -> Violation(violation.constraint.name, violation.message) }) }
+
+    return ErrorResponse(error.code, "", payload)
 }

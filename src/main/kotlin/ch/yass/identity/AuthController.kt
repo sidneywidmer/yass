@@ -1,7 +1,7 @@
 package ch.yass.identity
 
 import ch.yass.core.contract.Controller
-import ch.yass.core.helper.response
+import ch.yass.core.helper.successResponse
 import ch.yass.identity.api.WhoAmIResponse
 import ch.yass.identity.helper.player
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -19,6 +19,6 @@ class AuthController(private val config: Config, private val mapper: ObjectMappe
     }
 
     private fun whoami(ctx: Context) {
-        response(ctx, WhoAmIResponse.from(player(ctx)))
+        successResponse(ctx, WhoAmIResponse.from(player(ctx)))
     }
 }

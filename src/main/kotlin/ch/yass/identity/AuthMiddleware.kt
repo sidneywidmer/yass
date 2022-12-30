@@ -40,12 +40,10 @@ class AuthMiddleware(
     private fun getTokenFromHeader(token: String?): Either<DomainError, String> =
         token?.right() ?: DomainError.RequestError("header.token.missing").left()
 
-
     private fun getSession(oryClient: OryClient, sessionId: String?): Either<DomainError, Session> =
         try {
             oryClient.frontend.toSession(sessionId, null).right()
         } catch (exception: java.lang.Exception) {
-            // TODO: Can we remove the stack trace? We don't need it...
             DomainError.OryError("frontend.toSession.exception", exception).left()
         }
 }

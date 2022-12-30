@@ -1,8 +1,6 @@
 package ch.yass.game.api
 
-import org.valiktor.functions.contains
-import org.valiktor.functions.hasSize
-import org.valiktor.functions.isNotEmpty
+import org.valiktor.functions.*
 import org.valiktor.validate
 
 data class JoinGameRequest(
@@ -10,7 +8,7 @@ data class JoinGameRequest(
 ) {
     init {
         validate(this) {
-            validate(JoinGameRequest::code).isNotEmpty().hasSize(5, 5).contains(Regex("([A-Z\\d]+)"))
+            validate(JoinGameRequest::code).isNotEmpty().hasSize(5, 5).matches(Regex("([A-Z\\d]+)"))
         }
     }
 }
