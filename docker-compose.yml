@@ -2,7 +2,6 @@ version: '3.8'
 services:
   db:
     image: postgres:14.1-alpine
-    restart: always
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -23,17 +22,16 @@ services:
         source: ./.docker/kratos/email-password
         target: /etc/config/kratos
     command: -c /etc/config/kratos/kratos.yml migrate sql -e --yes
-    restart: on-failure
 
   kratos-self-service-ui-node:
+    depends_on:
+      - kratos-migrate
     image: oryd/kratos-selfservice-ui-node:v0.11.0
     environment:
       - KRATOS_PUBLIC_URL=http://kratos:4433/
       - KRATOS_BROWSER_URL=http://127.0.0.1:4433/
     ports:
       - '4455:3000'
-
-    restart: on-failure
 
   kratos:
     depends_on:
@@ -42,7 +40,6 @@ services:
     ports:
       - '4433:4433' # public
       - '4434:4434' # admin
-    restart: unless-stopped
     environment:
       - DSN=postgres://postgres:postgres@db:5432/yass
     command: serve -c /etc/config/kratos/kratos.yml --dev --watch-courier

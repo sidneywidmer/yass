@@ -8,7 +8,6 @@ import io.javalin.http.Context
  * Transform DomainExceptions to correct responses.
  */
 fun domainExceptionHandler(ctx: Context, exception: DomainException) {
-    logger().info("DomainError '${exception.domainError.javaClass.name}' encountered: ${exception.domainError}")
     errorResponse(ctx, exception.domainError)
 }
 
