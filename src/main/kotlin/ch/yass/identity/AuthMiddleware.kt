@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.continuations.either
 import arrow.core.left
 import arrow.core.right
-import arrow.core.toOption
 import ch.yass.core.contract.CtxAttributes.PLAYER
 import ch.yass.core.error.DomainError
 import ch.yass.core.error.DomainException
@@ -25,7 +24,7 @@ class AuthMiddleware(
         val player = either.eager {
             val token = getTokenFromHeader(ctx.header("X-Session-Token")).bind()
             val session = getSession(oryClient, token).bind()
-            val player = playerService.playerFromSession(session).bind()
+            val player = playerService.fromSession(session).bind()
             player
         }
 

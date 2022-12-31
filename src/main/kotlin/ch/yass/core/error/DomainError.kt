@@ -24,6 +24,10 @@ sealed class DomainError {
 
     // Valiktor validation related errors. The list of ConstraintViolations gets cleaned up
     // before we return the errorResponse -> results in a 422
+    data class ValiktorError(val code: String, val payload: Set<ConstraintViolation>) : DomainError()
+
+    // Valiktor validation related errors. The list of ConstraintViolations gets cleaned up
+    // before we return the errorResponse -> results in a 422
     data class ValidationError(val code: String, val payload: Set<ConstraintViolation>) : DomainError()
 
     // Something, anything related to a malformed request. Be either missing but required properties, missing

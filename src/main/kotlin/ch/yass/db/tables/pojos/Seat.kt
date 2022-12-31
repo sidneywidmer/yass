@@ -19,7 +19,7 @@ data class Seat(
     var updatedAt: LocalDateTime? = null,
     var playerId: Int? = null,
     var gameId: Int? = null,
-    var position: Int? = null
+    var position: String? = null
 ): Serializable {
 
 

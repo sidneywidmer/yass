@@ -16,6 +16,7 @@ import ch.yass.db.tables.IdentityRecoveryTokens
 import ch.yass.db.tables.IdentityVerifiableAddresses
 import ch.yass.db.tables.IdentityVerificationCodes
 import ch.yass.db.tables.IdentityVerificationTokens
+import ch.yass.db.tables.SchemaMigration
 import ch.yass.db.tables.SchemaVersion
 import ch.yass.db.tables.SelfserviceErrors
 import ch.yass.db.tables.SelfserviceLoginFlows
@@ -77,6 +78,8 @@ val IDENTITY_VERIFICATION_TOKENS_TOKEN_NID_USED_FLOW_ID_IDX: Index = Internal.cr
 val IDENTITY_VERIFICATION_TOKENS_TOKEN_UQ_IDX: Index = Internal.createIndex(DSL.name("identity_verification_tokens_token_uq_idx"), IdentityVerificationTokens.IDENTITY_VERIFICATION_TOKENS, arrayOf(IdentityVerificationTokens.IDENTITY_VERIFICATION_TOKENS.TOKEN), true)
 val IDENTITY_VERIFICATION_TOKENS_VERIFIABLE_ADDRESS_ID_IDX: Index = Internal.createIndex(DSL.name("identity_verification_tokens_verifiable_address_id_idx"), IdentityVerificationTokens.IDENTITY_VERIFICATION_TOKENS, arrayOf(IdentityVerificationTokens.IDENTITY_VERIFICATION_TOKENS.IDENTITY_VERIFIABLE_ADDRESS_ID), false)
 val IDENTITY_VERIFICATION_TOKENS_VERIFICATION_FLOW_ID_IDX: Index = Internal.createIndex(DSL.name("identity_verification_tokens_verification_flow_id_idx"), IdentityVerificationTokens.IDENTITY_VERIFICATION_TOKENS, arrayOf(IdentityVerificationTokens.IDENTITY_VERIFICATION_TOKENS.SELFSERVICE_VERIFICATION_FLOW_ID), false)
+val SCHEMA_MIGRATION_VERSION_IDX: Index = Internal.createIndex(DSL.name("schema_migration_version_idx"), SchemaMigration.SCHEMA_MIGRATION, arrayOf(SchemaMigration.SCHEMA_MIGRATION.VERSION), true)
+val SCHEMA_MIGRATION_VERSION_SELF_IDX: Index = Internal.createIndex(DSL.name("schema_migration_version_self_idx"), SchemaMigration.SCHEMA_MIGRATION, arrayOf(SchemaMigration.SCHEMA_MIGRATION.VERSION_SELF), false)
 val SCHEMA_VERSION_IR_IDX: Index = Internal.createIndex(DSL.name("schema_version_ir_idx"), SchemaVersion.SCHEMA_VERSION, arrayOf(SchemaVersion.SCHEMA_VERSION.INSTALLED_RANK), false)
 val SCHEMA_VERSION_S_IDX: Index = Internal.createIndex(DSL.name("schema_version_s_idx"), SchemaVersion.SCHEMA_VERSION, arrayOf(SchemaVersion.SCHEMA_VERSION.SUCCESS), false)
 val SCHEMA_VERSION_VR_IDX: Index = Internal.createIndex(DSL.name("schema_version_vr_idx"), SchemaVersion.SCHEMA_VERSION, arrayOf(SchemaVersion.SCHEMA_VERSION.VERSION_RANK), false)

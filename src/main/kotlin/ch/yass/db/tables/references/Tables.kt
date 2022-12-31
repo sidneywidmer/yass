@@ -20,6 +20,7 @@ import ch.yass.db.tables.IdentityVerificationCodes
 import ch.yass.db.tables.IdentityVerificationTokens
 import ch.yass.db.tables.Networks
 import ch.yass.db.tables.Player
+import ch.yass.db.tables.SchemaMigration
 import ch.yass.db.tables.SchemaVersion
 import ch.yass.db.tables.Seat
 import ch.yass.db.tables.SelfserviceErrors
@@ -113,6 +114,11 @@ val NETWORKS: Networks = Networks.NETWORKS
  * The table <code>public.player</code>.
  */
 val PLAYER: Player = Player.PLAYER
+
+/**
+ * The table <code>public.schema_migration</code>.
+ */
+val SCHEMA_MIGRATION: SchemaMigration = SchemaMigration.SCHEMA_MIGRATION
 
 /**
  * The table <code>public.schema_version</code>.

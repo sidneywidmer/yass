@@ -20,7 +20,7 @@ class GameController(private val gameService: GameService) : Controller {
 
     private fun join(ctx: Context) = either.eager {
         val request = validate<JoinGameRequest>(ctx.body()).bind()
-        gameService.join(request.code, player(ctx)).bind()
+        gameService.takeASeat(request.code, player(ctx)).bind()
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }

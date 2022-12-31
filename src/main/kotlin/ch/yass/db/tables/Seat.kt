@@ -80,27 +80,27 @@ open class Seat(
     /**
      * The column <code>public.seat.created_at</code>.
      */
-    val CREATED_AT: TableField<SeatRecord, LocalDateTime?> = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(6), this, "")
+    val CREATED_AT: TableField<SeatRecord, LocalDateTime?> = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "")
 
     /**
      * The column <code>public.seat.updated_at</code>.
      */
-    val UPDATED_AT: TableField<SeatRecord, LocalDateTime?> = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(6), this, "")
+    val UPDATED_AT: TableField<SeatRecord, LocalDateTime?> = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "")
 
     /**
      * The column <code>public.seat.player_id</code>.
      */
-    val PLAYER_ID: TableField<SeatRecord, Int?> = createField(DSL.name("player_id"), SQLDataType.INTEGER.nullable(false), this, "")
+    val PLAYER_ID: TableField<SeatRecord, Int?> = createField(DSL.name("player_id"), SQLDataType.INTEGER, this, "")
 
     /**
      * The column <code>public.seat.game_id</code>.
      */
-    val GAME_ID: TableField<SeatRecord, Int?> = createField(DSL.name("game_id"), SQLDataType.INTEGER.nullable(false), this, "")
+    val GAME_ID: TableField<SeatRecord, Int?> = createField(DSL.name("game_id"), SQLDataType.INTEGER, this, "")
 
     /**
      * The column <code>public.seat.position</code>.
      */
-    val POSITION: TableField<SeatRecord, Int?> = createField(DSL.name("position"), SQLDataType.INTEGER, this, "")
+    val POSITION: TableField<SeatRecord, String?> = createField(DSL.name("position"), SQLDataType.VARCHAR(10).nullable(false), this, "")
 
     private constructor(alias: Name, aliased: Table<SeatRecord>?): this(alias, null, null, aliased, null)
     private constructor(alias: Name, aliased: Table<SeatRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, aliased, parameters)
@@ -176,16 +176,16 @@ open class Seat(
     // -------------------------------------------------------------------------
     // Row7 type methods
     // -------------------------------------------------------------------------
-    override fun fieldsRow(): Row7<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?> = super.fieldsRow() as Row7<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?>
+    override fun fieldsRow(): Row7<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, String?> = super.fieldsRow() as Row7<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, String?>
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    fun <U> mapping(from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
+    fun <U> mapping(from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, String?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    fun <U> mapping(toType: Class<U>, from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
+    fun <U> mapping(toType: Class<U>, from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, String?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
 }

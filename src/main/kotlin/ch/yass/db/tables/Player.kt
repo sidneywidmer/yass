@@ -76,12 +76,12 @@ open class Player(
     /**
      * The column <code>public.player.created_at</code>.
      */
-    val CREATED_AT: TableField<PlayerRecord, LocalDateTime?> = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(6), this, "")
+    val CREATED_AT: TableField<PlayerRecord, LocalDateTime?> = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "")
 
     /**
      * The column <code>public.player.updated_at</code>.
      */
-    val UPDATED_AT: TableField<PlayerRecord, LocalDateTime?> = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(6), this, "")
+    val UPDATED_AT: TableField<PlayerRecord, LocalDateTime?> = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "")
 
     /**
      * The column <code>public.player.name</code>.

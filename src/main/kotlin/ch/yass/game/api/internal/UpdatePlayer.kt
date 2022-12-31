@@ -1,4 +1,4 @@
-package ch.yass.game.dto.action
+package ch.yass.game.api.internal
 
 data class UpdatePlayer(
     val name: String,

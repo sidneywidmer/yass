@@ -1,6 +1,7 @@
 package ch.yass.core.helper
 
 import ch.yass.core.error.DomainError
+import ch.yass.core.error.DomainError.*
 import io.javalin.http.Context
 import org.valiktor.i18n.mapToMessage
 import java.util.*
@@ -29,9 +30,9 @@ fun successResponse(ctx: Context, data: Any): Context {
 fun errorResponse(ctx: Context, error: DomainError): Context {
     logger().info("DomainError '${error.javaClass.name}' encountered: $error")
     return when (error) {
-        is DomainError.RequestError -> ctx.status(400).json(ErrorResponse(error.code))
-        is DomainError.OryError -> ctx.status(401).json(ErrorResponse(error.code))
-        is DomainError.ValidationError -> ctx.status(422).json(groupValiktorViolations(error))
+        is RequestError -> ctx.status(400).json(ErrorResponse(error.code))
+        is OryError -> ctx.status(401).json(ErrorResponse(error.code))
+        is ValiktorError -> ctx.status(422).json(groupValiktorViolations(error))
         else -> {
             logger().error("DomainError '${error.javaClass.name}' encountered: $error - this should have been caught before!")
             ctx.status(500).json(ErrorResponse("ouch"))
@@ -48,7 +49,7 @@ fun errorResponse(ctx: Context, error: DomainError): Context {
  *     ]
  * }
  */
-private fun groupValiktorViolations(error: DomainError.ValidationError): ErrorResponse {
+private fun groupValiktorViolations(error: ValiktorError): ErrorResponse {
     val payload = error.payload
         .mapToMessage("messages", Locale.ENGLISH)
         .groupBy { it.property }

@@ -76,17 +76,17 @@ open class Hand(
     /**
      * The column <code>public.hand.uuid</code>.
      */
-    val UUID: TableField<HandRecord, String?> = createField(DSL.name("uuid"), SQLDataType.VARCHAR(37), this, "")
+    val UUID: TableField<HandRecord, String?> = createField(DSL.name("uuid"), SQLDataType.VARCHAR(37).nullable(false), this, "")
 
     /**
      * The column <code>public.hand.created_at</code>.
      */
-    val CREATED_AT: TableField<HandRecord, LocalDateTime?> = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(6), this, "")
+    val CREATED_AT: TableField<HandRecord, LocalDateTime?> = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "")
 
     /**
      * The column <code>public.hand.updated_at</code>.
      */
-    val UPDATED_AT: TableField<HandRecord, LocalDateTime?> = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(6), this, "")
+    val UPDATED_AT: TableField<HandRecord, LocalDateTime?> = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "")
 
     /**
      * The column <code>public.hand.game_id</code>.
@@ -96,7 +96,7 @@ open class Hand(
     /**
      * The column <code>public.hand.starting_player_id</code>.
      */
-    val STARTING_PLAYER_ID: TableField<HandRecord, Int?> = createField(DSL.name("starting_player_id"), SQLDataType.INTEGER, this, "")
+    val STARTING_PLAYER_ID: TableField<HandRecord, Int?> = createField(DSL.name("starting_player_id"), SQLDataType.INTEGER.nullable(false), this, "")
 
     /**
      * The column <code>public.hand.trump</code>.
