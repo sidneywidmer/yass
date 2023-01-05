@@ -101,7 +101,7 @@ open class Hand(
     /**
      * The column <code>public.hand.trump</code>.
      */
-    val TRUMP: TableField<HandRecord, Int?> = createField(DSL.name("trump"), SQLDataType.INTEGER, this, "")
+    val TRUMP: TableField<HandRecord, String?> = createField(DSL.name("trump"), SQLDataType.VARCHAR(10), this, "")
 
     /**
      * The column <code>public.hand.gschobe</code>.
@@ -207,16 +207,16 @@ open class Hand(
     // -------------------------------------------------------------------------
     // Row13 type methods
     // -------------------------------------------------------------------------
-    override fun fieldsRow(): Row13<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?, Boolean?, Int?, JSON?, JSON?, JSON?, JSON?> = super.fieldsRow() as Row13<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?, Boolean?, Int?, JSON?, JSON?, JSON?, JSON?>
+    override fun fieldsRow(): Row13<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, String?, Boolean?, Int?, JSON?, JSON?, JSON?, JSON?> = super.fieldsRow() as Row13<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, String?, Boolean?, Int?, JSON?, JSON?, JSON?, JSON?>
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    fun <U> mapping(from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?, Boolean?, Int?, JSON?, JSON?, JSON?, JSON?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
+    fun <U> mapping(from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, String?, Boolean?, Int?, JSON?, JSON?, JSON?, JSON?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    fun <U> mapping(toType: Class<U>, from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?, Boolean?, Int?, JSON?, JSON?, JSON?, JSON?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
+    fun <U> mapping(toType: Class<U>, from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, String?, Boolean?, Int?, JSON?, JSON?, JSON?, JSON?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
 }

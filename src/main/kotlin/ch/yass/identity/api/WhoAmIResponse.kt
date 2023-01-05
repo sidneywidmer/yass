@@ -1,6 +1,6 @@
 package ch.yass.identity.api
 
-import ch.yass.game.dto.Player
+import ch.yass.game.dto.db.Player
 import java.util.*
 
 data class WhoAmIResponse(

@@ -2,6 +2,7 @@ package ch.yass.game
 
 import arrow.core.continuations.either
 import ch.yass.core.contract.Controller
+import ch.yass.core.error.DomainError
 import ch.yass.core.helper.errorResponse
 import ch.yass.core.helper.successResponse
 import ch.yass.core.helper.validate
@@ -20,7 +21,12 @@ class GameController(private val gameService: GameService) : Controller {
 
     private fun join(ctx: Context) = either.eager {
         val request = validate<JoinGameRequest>(ctx.body()).bind()
-        gameService.takeASeat(request.code, player(ctx)).bind()
+        val maybeGame = gameService.get(request.code).bind()
+        val game = maybeGame.toEither { DomainError.ValidationError("game.take-a-seat.empty") }.bind()
+        val seat = gameService.takeASeat(game, player(ctx)).bind()
+        val gameState = gameService.getState(game, player(ctx)).bind()
+
+        gameState
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }

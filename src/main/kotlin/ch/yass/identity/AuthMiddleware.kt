@@ -22,13 +22,13 @@ class AuthMiddleware(
 ) : Middleware {
     override fun before(ctx: Context) {
         val player = either.eager {
-            val token = getTokenFromHeader(ctx.header("X-Session-Token")).bind()
+            val token = getTokenFromHeader(ctx.headerMap()).bind()
             val session = getSession(oryClient, token).bind()
             val player = playerService.fromSession(session).bind()
             player
         }
 
-        player.tap {  }
+        player.tap { }
 
         when (player) {
             is Either.Left -> throw DomainException(player.value)
@@ -38,8 +38,8 @@ class AuthMiddleware(
 
     override fun after(ctx: Context) {}
 
-    private fun getTokenFromHeader(token: String?): Either<DomainError, String> =
-        token?.right() ?: DomainError.RequestError("header.token.missing").left()
+    private fun getTokenFromHeader(headerMap: Map<String, String>): Either<DomainError, String> =
+        headerMap["X-Session-Token"]?.right() ?: DomainError.RequestError("header.token.missing").left()
 
     private fun getSession(oryClient: OryClient, sessionId: String?): Either<DomainError, Session> =
         try {

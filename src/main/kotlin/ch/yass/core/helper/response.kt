@@ -28,7 +28,6 @@ fun successResponse(ctx: Context, data: Any): Context {
 }
 
 fun errorResponse(ctx: Context, error: DomainError): Context {
-    logger().info("DomainError '${error.javaClass.name}' encountered: $error")
     return when (error) {
         is RequestError -> ctx.status(400).json(ErrorResponse(error.code))
         is OryError -> ctx.status(401).json(ErrorResponse(error.code))

@@ -7,7 +7,7 @@ import ch.yass.core.error.DomainError
 import ch.yass.core.helper.toUUID
 import ch.yass.db.tables.references.PLAYER
 import ch.yass.game.api.internal.NewPlayer
-import ch.yass.game.dto.Player
+import ch.yass.game.dto.db.Player
 import ch.yass.game.api.internal.UpdatePlayer
 import com.google.gson.internal.LinkedTreeMap
 import org.jooq.DSLContext
@@ -40,7 +40,7 @@ class PlayerService(private val db: DSLContext) {
             .set(PLAYER.NAME, updatePlayer.name)
             .set(PLAYER.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
             .where(PLAYER.UUID.eq(uuid.toString()))
-            .returningResult(PLAYER.asterisk())
+            .returningResult(PLAYER)
             .fetchOneInto(Player::class.java)
 
         return updatedPlayer?.right() ?: DbError("user.update.empty").left()
@@ -51,8 +51,7 @@ class PlayerService(private val db: DSLContext) {
     }
 
     fun get(uuid: UUID): Either<DbError, Option<Player>> = Either.catch {
-        db.select()
-            .from(PLAYER)
+        db.selectFrom(PLAYER)
             .where(PLAYER.UUID.eq(uuid.toString()))
             .fetchOneInto(Player::class.java)
             .toOption()
@@ -67,7 +66,7 @@ class PlayerService(private val db: DSLContext) {
                 LocalDateTime.now(ZoneOffset.UTC),
                 LocalDateTime.now(ZoneOffset.UTC)
             )
-            .returningResult(PLAYER.asterisk())
+            .returningResult(PLAYER)
             .fetchOneInto(Player::class.java)
 
         return createdPlayer?.right() ?: DbError("user.create.empty").left()

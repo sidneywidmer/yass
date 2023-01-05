@@ -21,7 +21,7 @@ data class Hand(
     var updatedAt: LocalDateTime? = null,
     var gameId: Int? = null,
     var startingPlayerId: Int? = null,
-    var trump: Int? = null,
+    var trump: String? = null,
     var gschobe: Boolean? = null,
     var points: Int? = null,
     var north: JSON? = null,
