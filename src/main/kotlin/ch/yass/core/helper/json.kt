@@ -19,3 +19,8 @@ inline fun <reified T> listFromDbJson(json: JSON?): List<T> {
     val mapper = Yass.container.direct.instance<ObjectMapper>()
     return mapper.readerForListOf(T::class.java).readValue(json.toString())
 }
+
+inline fun <reified T> fromDbJson(json: JSON?): T {
+    val mapper = Yass.container.direct.instance<ObjectMapper>()
+    return mapper.readValue(json.toString(), T::class.java)
+}

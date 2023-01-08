@@ -10,4 +10,6 @@ enum class Rank(value: Int) {
     QUEEN(12),
     KING(13),
     ACE(14),
+
+    HELLO(0),
 }

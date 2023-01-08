@@ -1,5 +1,5 @@
 package ch.yass.game.dto
 
-enum class Position() {
+enum class Position {
     NORTH, EAST, SOUTH, WEST
 }

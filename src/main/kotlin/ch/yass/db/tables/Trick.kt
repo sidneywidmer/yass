@@ -18,10 +18,11 @@ import kotlin.collections.List
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.Identity
+import org.jooq.JSON
 import org.jooq.Name
 import org.jooq.Record
 import org.jooq.Records
-import org.jooq.Row7
+import org.jooq.Row11
 import org.jooq.Schema
 import org.jooq.SelectField
 import org.jooq.Table
@@ -102,6 +103,26 @@ open class Trick(
      */
     val POINTS: TableField<TrickRecord, Int?> = createField(DSL.name("points"), SQLDataType.INTEGER.nullable(false), this, "")
 
+    /**
+     * The column <code>public.trick.north</code>.
+     */
+    val NORTH: TableField<TrickRecord, JSON?> = createField(DSL.name("north"), SQLDataType.JSON, this, "")
+
+    /**
+     * The column <code>public.trick.east</code>.
+     */
+    val EAST: TableField<TrickRecord, JSON?> = createField(DSL.name("east"), SQLDataType.JSON, this, "")
+
+    /**
+     * The column <code>public.trick.south</code>.
+     */
+    val SOUTH: TableField<TrickRecord, JSON?> = createField(DSL.name("south"), SQLDataType.JSON, this, "")
+
+    /**
+     * The column <code>public.trick.west</code>.
+     */
+    val WEST: TableField<TrickRecord, JSON?> = createField(DSL.name("west"), SQLDataType.JSON, this, "")
+
     private constructor(alias: Name, aliased: Table<TrickRecord>?): this(alias, null, null, aliased, null)
     private constructor(alias: Name, aliased: Table<TrickRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, aliased, parameters)
 
@@ -174,18 +195,18 @@ open class Trick(
     override fun rename(name: Table<*>): Trick = Trick(name.getQualifiedName(), null)
 
     // -------------------------------------------------------------------------
-    // Row7 type methods
+    // Row11 type methods
     // -------------------------------------------------------------------------
-    override fun fieldsRow(): Row7<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?> = super.fieldsRow() as Row7<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?>
+    override fun fieldsRow(): Row11<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?, JSON?, JSON?, JSON?, JSON?> = super.fieldsRow() as Row11<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?, JSON?, JSON?, JSON?, JSON?>
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    fun <U> mapping(from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
+    fun <U> mapping(from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?, JSON?, JSON?, JSON?, JSON?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    fun <U> mapping(toType: Class<U>, from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
+    fun <U> mapping(toType: Class<U>, from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?, JSON?, JSON?, JSON?, JSON?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
 }

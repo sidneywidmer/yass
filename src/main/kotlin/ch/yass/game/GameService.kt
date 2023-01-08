@@ -5,17 +5,14 @@ import arrow.core.continuations.either
 import ch.yass.core.error.DomainError
 import ch.yass.core.error.DomainError.*
 import ch.yass.core.helper.toDbJson
-import ch.yass.db.tables.references.GAME
-import ch.yass.db.tables.references.HAND
-import ch.yass.db.tables.references.SEAT
-import ch.yass.game.api.GameState
-import ch.yass.game.api.GameStatePlayer
+import ch.yass.db.tables.references.*
+import ch.yass.game.api.internal.GameState
 import ch.yass.game.api.internal.NewHand
+import ch.yass.game.api.internal.NewSeat
 import ch.yass.game.dto.*
-import ch.yass.game.dto.db.Player
+import ch.yass.game.dto.db.*
 import ch.yass.game.dto.db.Game
-import ch.yass.game.dto.db.Hand
-import ch.yass.game.dto.db.Seat
+import ch.yass.game.engine.*
 import org.jooq.DSLContext
 import org.jooq.Records.mapping
 import java.time.LocalDateTime
@@ -28,76 +25,75 @@ class GameService(private val db: DSLContext) {
         val maybeAlreadySeated = seats.firstOrNull { it.playerId == player.id }.toOption()
         maybeAlreadySeated.fold(
             {
-                val position = getFreePosition(seats).bind()
-                createSeat(player, game, position).bind()
+                val position = freePosition(seats).bind()
+                createSeat(NewSeat(game, player, position)).bind()
             },
             { rejoinSeat(it).bind() }
         )
     }
 
-    fun createSeat(player: Player, game: Game, position: Position): Either<DbError, Seat> = Either.catch {
-        val createdSeat = db
-            .insertInto(SEAT, SEAT.UUID, SEAT.PLAYER_ID, SEAT.GAME_ID, SEAT.POSITION, SEAT.CREATED_AT, SEAT.UPDATED_AT)
-            .values(
-                UUID.randomUUID().toString(),
-                player.id,
-                game.id,
-                position.toString(),
-                LocalDateTime.now(ZoneOffset.UTC),
-                LocalDateTime.now(ZoneOffset.UTC)
-            )
-            .returningResult(SEAT)
-            .fetchOneInto(Seat::class.java)
+    /**
+     * Collect all the info we have about a game and pass it to the engine which is responsible
+     * to interpret the given data.
+     */
+    fun getState(game: Game, player: Player): Either<DomainError, GameState> = either.eager {
+        val seats = getSeats(game).bind()
 
-        return createdSeat?.right() ?: DbError("seat.create.empty").left()
-    }.mapLeft { DbError("seat.create.error", it) }
+        // Currently the first player to join a room is also starting the game, maybe randomize?
+        // I also don't like that we pass the player just to create the first hand...
+        var hands = getHands(game).bind()
+        if (hands.isEmpty()) {
+            val newHand = createHand(NewHand(game, player, welcomeHand())).bind()
+            createTrick(newHand).bind()
+            hands = listOf(newHand)
+        }
 
-    fun getSeats(game: Game): Either<DbError, List<Seat>> = Either.catch {
+        val tricks = getTricks(hands.map { it.id }).bind()
+        val players = getPlayers(seats).bind()
+
+        GameState(game, players, seats, hands, tricks)
+    }
+
+    fun getByCode(code: String): Either<DbError, Option<Game>> = Either.catch {
+        db.selectFrom(GAME)
+            .where(GAME.CODE.eq(code))
+            .fetchOneInto(Game::class.java)
+            .toOption()
+    }.mapLeft { DbError("game.get-by-code.error", it) }
+
+    fun getByUUID(uuid: String): Either<DomainError, Game> = Either.catch {
+        val game = db.selectFrom(GAME)
+            .where(GAME.UUID.eq(uuid))
+            .fetchOneInto(Game::class.java)
+
+        return game?.right() ?: ValidationError("game.get-by-uuid.uuid.invalid").left()
+    }.mapLeft { DbError("game.get-by-uuid.error", it) }
+
+    private fun getPlayers(seats: List<Seat>): Either<DbError, List<Player>> = Either.catch {
+        db.selectFrom(PLAYER)
+            .where(PLAYER.ID.`in`(seats.map { it.playerId }))
+            .fetchInto(Player::class.java)
+    }.mapLeft { DbError("players.get.error", it) }
+
+    private fun getSeats(game: Game): Either<DbError, List<Seat>> = Either.catch {
         db.selectFrom(SEAT)
             .where(SEAT.GAME_ID.eq(game.id))
             .fetchInto(Seat::class.java)
     }.mapLeft { DbError("seats.get.error", it) }
 
-    fun get(code: String): Either<DbError, Option<Game>> = Either.catch {
-        db.selectFrom(GAME)
-            .where(GAME.CODE.eq(code))
-            .fetchOneInto(Game::class.java)
-            .toOption()
-    }.mapLeft { DbError("game.get.error", it) }
+    private fun getTricks(handIds: List<Int>): Either<DbError, List<Trick>> = Either.catch {
+        db.selectFrom(TRICK)
+            .where(TRICK.HAND_ID.`in`(handIds))
+            .orderBy(TRICK.CREATED_AT.desc())
+            .fetch(Trick::fromRecord)
+    }.mapLeft { DbError("tricks.get.error", it) }
 
-    fun getState(game: Game, player: Player): Either<DomainError, GameState> = either.eager {
-        val seats = getSeats(game).bind()
-        val playerSeat = seats.first { it.playerId == player.id }
-
-        val maybeHand = getCurrentHand(game).bind()
-        val hand: Hand = maybeHand.fold(
-            {
-                val positions = mapOf(
-                    Position.NORTH to listOf(Card(Suit.CLUBS, Rank.ACE, "french")),
-                    Position.EAST to listOf(Card(Suit.CLUBS, Rank.ACE, "french")),
-                    Position.SOUTH to listOf(Card(Suit.CLUBS, Rank.ACE, "french")),
-                    Position.WEST to listOf(Card(Suit.CLUBS, Rank.ACE, "french")),
-                )
-                createHand(NewHand(game, player, positions)).bind()
-            },
-            { it }
-        )
-
-        val trick = getCurrentTrick().bind()
-
-        // get the latest hand of game -> if not exists create with `player` as staring player
-        // based on `player` position -> get this players hand
-        // get all other players currently sitting at the game table
-        // get the latest trick of this hand to indicate what was already played -> map to GameStatePlayer (other players -> played card)
-        GameState(
-            game.uuid,
-            listOf(GameStatePlayer("Hansi")),
-            hand.trump,
-            hand.cardsOf(playerSeat.position),
-            playerSeat.position,
-            playerSeat.rejoinedAt
-        )
-    }
+    private fun getHands(game: Game): Either<DbError, List<Hand>> = Either.catch {
+        db.selectFrom(HAND)
+            .where(HAND.GAME_ID.eq(game.id))
+            .orderBy(HAND.CREATED_AT.desc())
+            .fetch(Hand::fromRecord)
+    }.mapLeft { DbError("hand.get.error", it) }
 
     private fun createHand(hand: NewHand): Either<DbError, Hand> = Either.catch {
         val createdHand = db
@@ -136,24 +132,37 @@ class GameService(private val db: DSLContext) {
         return createdHand?.right() ?: DbError("hand.create.empty").left()
     }.mapLeft { DbError("hand.create.error", it) }
 
-    private fun getCurrentHand(game: Game): Either<DbError, Option<Hand>> = Either.catch {
-        db.selectFrom(HAND)
-            .where(HAND.GAME_ID.eq(game.id))
-            .orderBy(HAND.CREATED_AT.desc())
-            .fetchOne(Hand::fromRecord)
-            .toOption()
-    }.mapLeft { DbError("hand.get-current.error", it) }
+    private fun createSeat(seat: NewSeat): Either<DbError, Seat> = Either.catch {
+        val createdSeat = db
+            .insertInto(SEAT, SEAT.UUID, SEAT.PLAYER_ID, SEAT.GAME_ID, SEAT.POSITION, SEAT.CREATED_AT, SEAT.UPDATED_AT)
+            .values(
+                UUID.randomUUID().toString(),
+                seat.player.id,
+                seat.game.id,
+                seat.position.toString(),
+                LocalDateTime.now(ZoneOffset.UTC),
+                LocalDateTime.now(ZoneOffset.UTC)
+            )
+            .returningResult(SEAT)
+            .fetchOneInto(Seat::class.java)
 
+        return createdSeat?.right() ?: DbError("seat.create.empty").left()
+    }.mapLeft { DbError("seat.create.error", it) }
 
-    private fun getFreePosition(occupiedSeats: List<Seat>): Either<ValidationError, Position> {
-        val occupied = occupiedSeats.map { it.position }.toSet()
-        val all = Position.values().toSet()
-        val maybePosition = all
-            .minus(occupied)
-            .randomOrNull()
+    private fun createTrick(hand: Hand): Either<DbError, Trick> = Either.catch {
+        val createdTrick = db
+            .insertInto(TRICK, TRICK.UUID, TRICK.CREATED_AT, TRICK.UPDATED_AT, TRICK.HAND_ID)
+            .values(
+                UUID.randomUUID().toString(),
+                LocalDateTime.now(ZoneOffset.UTC),
+                LocalDateTime.now(ZoneOffset.UTC),
+                hand.id
+            )
+            .returningResult(TRICK)
+            .fetchOneInto(Trick::class.java)
 
-        return maybePosition?.right() ?: ValidationError("game.take-a-seat.full").left()
-    }
+        return createdTrick?.right() ?: DbError("trick.create.empty").left()
+    }.mapLeft { DbError("trick.create.error", it) }
 
     private fun rejoinSeat(seat: Seat): Either<DbError, Seat> = Either.catch {
         val updatedSeat = db.update(SEAT)
@@ -165,4 +174,5 @@ class GameService(private val db: DSLContext) {
 
         return updatedSeat?.right() ?: DbError("seat.create.empty").left()
     }.mapLeft { DbError("seat.rejoin.error", it) }
+
 }
