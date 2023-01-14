@@ -1,33 +1,32 @@
 package ch.yass.game.engine
 
-import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Card
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.Rank
 import ch.yass.game.dto.Suit
-import ch.yass.game.dto.db.Hand
-import ch.yass.game.dto.db.Player
 
 /**
- * Check if the current player was ever dealt and has not yet
- * played * the given card.
+ * Get the order of a round based on a position. So if it's EAST's turn we
+ * know the next player is SOUTH. I bet there's a million clever
+ * implementations of this but probably none is a simple.
  */
-fun playerOwnsCard(player: Player, card: Card, state: GameState): Boolean {
-    val hand = currentHand(state)
-    val seat = playerSeat(player, state)
-
-    val allCards = hand.cardsOf(seat.position)
-
-    val tricks = state.tricks.filter { it.handId == hand.id }
-    val playedCards = tricks.map { it.cardOf(seat.position) }
-    val unplayedCards = allCards.minus(playedCards)
-
-    return unplayedCards.any { it == card }
+fun positionsOrderedWithStart(position: Position): List<Position> {
+    return when (position) {
+        Position.NORTH -> listOf(Position.NORTH, Position.EAST, Position.SOUTH, Position.WEST)
+        Position.EAST -> listOf(Position.EAST, Position.SOUTH, Position.WEST, Position.NORTH)
+        Position.SOUTH -> listOf(Position.SOUTH, Position.WEST, Position.NORTH, Position.EAST)
+        Position.WEST -> listOf(Position.WEST, Position.NORTH, Position.EAST, Position.SOUTH)
+    }
 }
 
-
-fun currentHand(state: GameState): Hand {
-    return state.hands.first()
+fun randomHand(): Map<Position, List<Card>> {
+    val deck = Suit.values().zip(Rank.values()).shuffled()
+    return mapOf(
+        Position.NORTH to deck.subList(0, 8).map { Card(it.first, it.second, "french") },
+        Position.EAST to deck.subList(9, 17).map { Card(it.first, it.second, "french") },
+        Position.SOUTH to deck.subList(18, 26).map { Card(it.first, it.second, "french") },
+        Position.WEST to deck.subList(27, 35).map { Card(it.first, it.second, "french") },
+    )
 }
 
 fun welcomeHand(): Map<Position, List<Card>> {

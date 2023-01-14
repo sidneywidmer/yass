@@ -4,6 +4,7 @@ import arrow.core.*
 import arrow.core.continuations.either
 import ch.yass.core.error.DomainError
 import ch.yass.core.error.DomainError.*
+import ch.yass.core.helper.logger
 import ch.yass.core.helper.toDbJson
 import ch.yass.db.tables.references.*
 import ch.yass.game.api.internal.GameState
@@ -28,7 +29,10 @@ class GameService(private val db: DSLContext) {
                 val position = freePosition(seats).bind()
                 createSeat(NewSeat(game, player, position)).bind()
             },
-            { rejoinSeat(it).bind() }
+            {
+                logger().info("Player ${player.uuid} rejoined Game ${game.uuid}")
+                rejoinSeat(it).bind()
+            }
         )
     }
 
@@ -36,18 +40,12 @@ class GameService(private val db: DSLContext) {
      * Collect all the info we have about a game and pass it to the engine which is responsible
      * to interpret the given data.
      */
-    fun getState(game: Game, player: Player): Either<DomainError, GameState> = either.eager {
+    fun getState(game: Game): Either<DomainError, GameState> = either.eager {
         val seats = getSeats(game).bind()
 
         // Currently the first player to join a room is also starting the game, maybe randomize?
         // I also don't like that we pass the player just to create the first hand...
-        var hands = getHands(game).bind()
-        if (hands.isEmpty()) {
-            val newHand = createHand(NewHand(game, player, welcomeHand())).bind()
-            createTrick(newHand).bind()
-            hands = listOf(newHand)
-        }
-
+        val hands = getHands(game).bind()
         val tricks = getTricks(hands.map { it.id }).bind()
         val players = getPlayers(seats).bind()
 
@@ -95,7 +93,7 @@ class GameService(private val db: DSLContext) {
             .fetch(Hand::fromRecord)
     }.mapLeft { DbError("hand.get.error", it) }
 
-    private fun createHand(hand: NewHand): Either<DbError, Hand> = Either.catch {
+    fun createHand(hand: NewHand): Either<DbError, Hand> = Either.catch {
         val createdHand = db
             .insertInto(
                 HAND,
@@ -146,10 +144,11 @@ class GameService(private val db: DSLContext) {
             .returningResult(SEAT)
             .fetchOneInto(Seat::class.java)
 
-        return createdSeat?.right() ?: DbError("seat.create.empty").left()
+        return createdSeat?.right().also { logger().info("Player ${seat.player.uuid} joined Game ${seat.game.uuid}") }
+            ?: DbError("seat.create.empty").left()
     }.mapLeft { DbError("seat.create.error", it) }
 
-    private fun createTrick(hand: Hand): Either<DbError, Trick> = Either.catch {
+    fun createTrick(hand: Hand): Either<DbError, Trick> = Either.catch {
         val createdTrick = db
             .insertInto(TRICK, TRICK.UUID, TRICK.CREATED_AT, TRICK.UPDATED_AT, TRICK.HAND_ID)
             .values(
@@ -175,4 +174,14 @@ class GameService(private val db: DSLContext) {
         return updatedSeat?.right() ?: DbError("seat.create.empty").left()
     }.mapLeft { DbError("seat.rejoin.error", it) }
 
+    fun playCard(card: Card, trick: Trick, seat: Seat): Either<DbError, Trick> = Either.catch {
+        val updatedTrick = db.update(TRICK)
+            .set(TRICK.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
+            .set(seat.trickColumn(), toDbJson(card))
+            .where(TRICK.ID.eq(trick.id))
+            .returningResult(TRICK)
+            .fetchOneInto(Trick::class.java)
+
+        return updatedTrick?.right() ?: DbError("trick.play-card.empty").left()
+    }.mapLeft { DbError("trick.play-card.error", it) }
 }

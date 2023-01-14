@@ -28,8 +28,6 @@ class AuthMiddleware(
             player
         }
 
-        player.tap { }
-
         when (player) {
             is Either.Left -> throw DomainException(player.value)
             is Either.Right -> ctx.attribute(PLAYER.name, player.value)

@@ -1,15 +1,20 @@
 package ch.yass.game.dto
 
-enum class Rank(value: Int) {
-    SIX(6),
-    SEVEN(7),
-    EIGHT(8),
-    NINE(9),
-    TEN(10),
-    JACK(11),
-    QUEEN(12),
-    KING(13),
-    ACE(14),
+enum class RankType {
+    SPECIAL,
+    NORMAL
+}
 
-    HELLO(0),
+enum class Rank(type: RankType) {
+    SIX(RankType.NORMAL),
+    SEVEN(RankType.NORMAL),
+    EIGHT(RankType.NORMAL),
+    NINE(RankType.NORMAL),
+    TEN(RankType.NORMAL),
+    JACK(RankType.NORMAL),
+    QUEEN(RankType.NORMAL),
+    KING(RankType.NORMAL),
+    ACE(RankType.NORMAL),
+
+    HELLO(RankType.SPECIAL)
 }

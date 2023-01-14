@@ -1,9 +1,16 @@
 package ch.yass.game.dto
 
-enum class Suit {
-    CLUBS,
-    DIAMONDS,
-    HEARTS,
-    SPADES,
-    WELCOME,
+
+enum class SuitType {
+    SPECIAL,
+    NORMAL
+}
+
+enum class Suit(type: SuitType) {
+    CLUBS(SuitType.NORMAL),
+    DIAMONDS(SuitType.NORMAL),
+    HEARTS(SuitType.NORMAL),
+    SPADES(SuitType.NORMAL),
+
+    WELCOME(SuitType.SPECIAL);
 }

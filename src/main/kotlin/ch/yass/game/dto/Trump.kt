@@ -1,6 +1,6 @@
 package ch.yass.game.dto
 
-enum class Trump() {
+enum class Trump {
     CLUBS,
     DIAMONDS,
     HEARTS,

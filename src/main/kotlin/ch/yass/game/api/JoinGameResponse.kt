@@ -4,6 +4,7 @@ import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Card
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.Trump
+import ch.yass.game.dto.db.Player
 import ch.yass.game.engine.currentHand
 import ch.yass.game.engine.playerSeat
 import java.time.LocalDateTime
@@ -18,8 +19,8 @@ data class JoinGameResponse(
     val rejoinedAt: LocalDateTime?
 ) {
     companion object {
-        fun from(state: GameState): JoinGameResponse {
-            val playerSeat = playerSeat(state)
+        fun from(state: GameState, player: Player): JoinGameResponse {
+            val playerSeat = playerSeat(player, state)
             val hand = currentHand(state)
 
             return JoinGameResponse(
