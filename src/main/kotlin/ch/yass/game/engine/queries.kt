@@ -27,6 +27,11 @@ fun playerSeat(player: Player, state: GameState): Seat {
 fun nextState(state: GameState): State {
     val trick = currentTrick(state)
 
+    // Special case for "welcome" trick, only one card is played
+    if (trick.cards().count() == 4 && state.hands.count() == 1) {
+        return State.NEW_HAND
+    }
+
     if (trick.cards().count() == 4) {
         return State.NEW_TRICK
     }
@@ -35,7 +40,7 @@ fun nextState(state: GameState): State {
         return State.NEW_HAND
     }
 
-    return State.NEW_TRICK
+    return State.PLAY_CARD
 }
 
 fun nextTrickStartingPlayer(state: GameState): Player {

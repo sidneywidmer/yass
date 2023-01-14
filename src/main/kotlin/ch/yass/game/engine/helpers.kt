@@ -1,9 +1,18 @@
 package ch.yass.game.engine
 
+import ch.yass.core.helper.cartesianProduct
 import ch.yass.game.dto.Card
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.Rank
 import ch.yass.game.dto.Suit
+
+fun ranks(): List<Rank> {
+    return listOf(Rank.SIX, Rank.SEVEN, Rank.EIGHT, Rank.NINE, Rank.TEN, Rank.JACK, Rank.QUEEN, Rank.KING, Rank.ACE)
+}
+
+fun suits(): List<Suit> {
+    return listOf(Suit.CLUBS, Suit.DIAMONDS, Suit.HEARTS, Suit.SPADES)
+}
 
 /**
  * Get the order of a round based on a position. So if it's EAST's turn we
@@ -19,13 +28,15 @@ fun positionsOrderedWithStart(position: Position): List<Position> {
     }
 }
 
+fun deck(): List<Pair<Rank, Suit>> = cartesianProduct(ranks(), suits()).shuffled()
+
 fun randomHand(): Map<Position, List<Card>> {
-    val deck = Suit.values().zip(Rank.values()).shuffled()
+    val deck = deck()
     return mapOf(
-        Position.NORTH to deck.subList(0, 8).map { Card(it.first, it.second, "french") },
-        Position.EAST to deck.subList(9, 17).map { Card(it.first, it.second, "french") },
-        Position.SOUTH to deck.subList(18, 26).map { Card(it.first, it.second, "french") },
-        Position.WEST to deck.subList(27, 35).map { Card(it.first, it.second, "french") },
+        Position.NORTH to deck.subList(0, 9).map { Card(it.second, it.first, "french") },
+        Position.EAST to deck.subList(9, 18).map { Card(it.second, it.first, "french") },
+        Position.SOUTH to deck.subList(18, 27).map { Card(it.second, it.first, "french") },
+        Position.WEST to deck.subList(27, 36).map { Card(it.second, it.first, "french") },
     )
 }
 

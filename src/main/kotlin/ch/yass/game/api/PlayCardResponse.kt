@@ -1,8 +1,5 @@
 package ch.yass.game.api
 
-import ch.yass.core.valiktor.isRank
-import ch.yass.core.valiktor.isSuit
-import org.valiktor.functions.*
-import org.valiktor.validate
+import ch.yass.game.dto.Card
 
-data class PlayCardResponse(val foo: Boolean)
+data class PlayCardResponse(val card: Card)

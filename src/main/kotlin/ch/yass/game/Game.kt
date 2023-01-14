@@ -8,6 +8,7 @@ object Game {
     val module = DI.Module("Game module") {
         bindSingleton { GameController(instance()) }
         bindSingleton { PlayerService(instance()) }
+        bindSingleton { GameRepository(instance()) }
         bindSingleton { GameService(instance()) }
     }
 }
