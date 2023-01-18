@@ -50,7 +50,7 @@ fun cardIsPlayable(card: Card, player: Player, state: GameState): Boolean {
     val lead = trick.cardOf(startingPlayerSeat.position) ?: return true
 
     // Something went wrong
-    if (hand.trump == null) {
+    if (hand.trump != Trump.FREESTYLE && hand.trump == null) {
         logger().error("Tried to play card before trump was chosen. Card $card, Player: $player, Trick: $trick")
         return false
     }

@@ -24,6 +24,11 @@ fun playerSeat(player: Player, state: GameState): Seat {
     return state.seats.first { it.playerId == player.id }
 }
 
+fun playerAtPosition(position: Position, state: GameState): Player {
+    val seat = state.seats.first { it.position == position }
+    return state.allPlayers.first { it.id == seat.playerId }
+}
+
 fun nextState(state: GameState): State {
     val trick = currentTrick(state)
 

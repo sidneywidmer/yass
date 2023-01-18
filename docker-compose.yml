@@ -1,5 +1,13 @@
 version: '3.8'
 services:
+  db-test:
+    image: postgres:14.1-alpine
+    environment:
+      - POSTGRES_USER=postgres-test
+      - POSTGRES_PASSWORD=postgres-test
+      - POSTGRES_DB=yass-test
+    ports:
+      - '5433:5432'
   db:
     image: postgres:14.1-alpine
     environment:

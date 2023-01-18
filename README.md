@@ -1,14 +1,9 @@
 # Yass
 
-- [x] Setup Flyaway & Jooq
-- [ ] Add first jooq tests (insert, insert many to many, read, e.t.c)
-- [ ] Setup Arrow
-- [ ] Error handling architecture
-- [ ] I18n
-- [ ] Auth
-- [ ] Business Logic
-- [ ] WS/Eventsystem
-
+## DB Changes
+- Add migration to resources
+- Manually trigger flyaway:migrate
+- Manually trigger jooq-codegen:generate
 
 ## Error / Error-Codes
 

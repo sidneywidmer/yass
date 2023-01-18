@@ -6,6 +6,10 @@
     <groupId>ch.yass</groupId>
     <artifactId>server</artifactId>
     <version>1.0.0-SNAPSHOT</version>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <dependencies>
         <!-- Framework -->
         <dependency>
@@ -140,6 +144,11 @@
     <build>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
@@ -167,10 +176,9 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>3.0</version>
 
-                <!-- Note that we're executing the Flyway plugin in the "generate-sources" phase -->
                 <executions>
                     <execution>
-                        <phase>generate-sources</phase>
+                        <phase>generate-test-sources</phase>
                         <goals>
                             <goal>migrate</goal>
                         </goals>
@@ -195,13 +203,6 @@
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-codegen-maven</artifactId>
                 <version>3.17.5</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
                 <configuration>
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
