@@ -1,8 +1,14 @@
 package ch.yass.dsl
 
+import ch.yass.Yass
+import ch.yass.core.helper.toDbJson
+import ch.yass.db.tables.references.*
+import ch.yass.game.GameRepository
 import ch.yass.game.api.internal.GameState
-import ch.yass.game.dto.db.*
-import ch.yass.helper.*
+import org.jooq.DSLContext
+import org.kodein.di.direct
+import org.kodein.di.instance
+import java.lang.Exception
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
@@ -10,86 +16,85 @@ import java.util.*
 
 /**
  * Quick and dirty, convert ad GameStateDSL to a correct GameState
- * with "db" id's, dates, uuids, e.t.c
+ * by persisting everything in the DB.
  */
 fun game(lambda: GameStateBuilder.() -> Unit): GameState {
-    val state = GameStateBuilder().apply(lambda).build()
-    val game = Game(
-        1,
-        UUID.randomUUID(),
-        LocalDateTime.now(ZoneOffset.UTC),
-        LocalDateTime.now(ZoneOffset.UTC),
-        "ABCDE"
-    )
-    val players = state.players.mapIndexed { i, p ->
-        Player(
-            i + 1,
-            UUID.randomUUID(),
-            p.name,
-            LocalDateTime.now(ZoneOffset.UTC),
-            LocalDateTime.now(ZoneOffset.UTC)
-        )
-    }
-    val seats = state.players.mapIndexed { i, p ->
-        Seat(
-            i + 1,
-            UUID.randomUUID(),
-            LocalDateTime.now(ZoneOffset.UTC),
-            LocalDateTime.now(ZoneOffset.UTC),
-            i + 1,
-            1,
-            p.position,
-            null
-        )
-    }
-    val tricks = mutableListOf<Trick>()
-    val hands = state.hands.mapIndexed { i, h ->
-        val startPosition = h.positions().first { it.start }
-        val startPlayer = state.players.first { it.position == startPosition.position }
-        val hand = Hand(
-            i + 1,
-            UUID.randomUUID(),
-            LocalDateTime.now(ZoneOffset.UTC),
-            LocalDateTime.now(ZoneOffset.UTC),
-            state.players.indexOf(startPlayer) + 1,
-            1,
-            h.trump,
-            false, // TODO, maybe add to same as start?
-            0,
-            interpretCards(h.north.cards),
-            interpretCards(h.east.cards),
-            interpretCards(h.south.cards),
-            interpretCards(h.west.cards),
-        )
+    // Dependencies
+    val db: DSLContext = Yass.container.direct.instance()
+    val repo: GameRepository = Yass.container.direct.instance()
 
-        h.tricks.forEachIndexed { ti, t ->
-            tricks.add(
-                Trick(
-                    ti + 1,
-                    UUID.randomUUID(),
-                    LocalDateTime.now(ZoneOffset.UTC),
-                    LocalDateTime.now(ZoneOffset.UTC),
-                    hand.id,
-                    null,
-                    0,
-                    interpretCard(t.north),
-                    interpretCard(t.east),
-                    interpretCard(t.south),
-                    interpretCard(t.west)
-                )
-            )
+    // DSL
+    val state = GameStateBuilder().apply(lambda).build()
+
+    // Persist game, players, seats, hands, tricks
+    val gameRecord = db.newRecord(GAME).apply {
+        uuid = UUID.randomUUID().toString()
+        createdAt = LocalDateTime.now(ZoneOffset.UTC)
+        updatedAt = LocalDateTime.now(ZoneOffset.UTC)
+        code = "ABCDE"
+        store()
+    }
+    val game = repo.getByUUID(gameRecord.uuid!!).fold({ throw Exception("Could not find game") }, { it })
+
+    val playerMap = state.players.map { p ->
+        val player = db.newRecord(PLAYER).apply {
+            uuid = UUID.randomUUID().toString()
+            createdAt = LocalDateTime.now(ZoneOffset.UTC)
+            updatedAt = LocalDateTime.now(ZoneOffset.UTC)
+            name = p.name
+            store()
         }
 
+        db.newRecord(SEAT).apply {
+            uuid = UUID.randomUUID().toString()
+            createdAt = LocalDateTime.now(ZoneOffset.UTC)
+            updatedAt = LocalDateTime.now(ZoneOffset.UTC)
+            playerId = player.id
+            gameId = game.id
+            position = p.position.name
+            rejoinedAt = null
+            store()
+        }
 
-        hand
+        player.id!! to p.position
     }
 
-    persistGame(game)
-    persistPlayers(players)
-    persistSeats(seats)
-    persistHands(hands)
-    persistTricks(tricks)
+    state.hands.map { h ->
+        val startPosition = h.positions().first { it.start }
+        val startPlayer = state.players.first { it.position == startPosition.position }
+        val hand = db.newRecord(HAND).apply {
+            uuid = UUID.randomUUID().toString()
+            createdAt = LocalDateTime.now(ZoneOffset.UTC)
+            updatedAt = LocalDateTime.now(ZoneOffset.UTC)
+            startingPlayerId = playerMap.first { pair -> startPlayer.position == pair.second }.first
+            gameId = game.id
+            trump = h.trump?.name
+            gschobe = false // TODO
+            points = 0
+            north = toDbJson(interpretCards(h.north.cards))
+            east = toDbJson(interpretCards(h.east.cards))
+            south = toDbJson(interpretCards(h.south.cards))
+            west = toDbJson(interpretCards(h.west.cards))
+            store()
+        }
 
-    return GameState(game, players, seats, hands, emptyList())
+        h.tricks.forEach { t ->
+            db.newRecord(TRICK).apply {
+                uuid = UUID.randomUUID().toString()
+                createdAt = LocalDateTime.now(ZoneOffset.UTC)
+                updatedAt = LocalDateTime.now(ZoneOffset.UTC)
+                handId = hand.id
+                winnerId = null
+                points = 0
+                north = toDbJson(interpretCard(t.north))
+                east = toDbJson(interpretCard(t.east))
+                south = toDbJson(interpretCard(t.south))
+                west = toDbJson(interpretCard(t.west))
+                store()
+            }
+        }
+    }
+
+    return repo.getState(game).fold({ throw Exception("Invalid state") }, { it })
 }
 
