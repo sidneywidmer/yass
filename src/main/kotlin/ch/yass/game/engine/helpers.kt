@@ -5,6 +5,7 @@ import ch.yass.game.dto.Card
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.Rank
 import ch.yass.game.dto.Suit
+import kotlin.time.measureTime
 
 fun ranks(): List<Rank> {
     return listOf(Rank.SIX, Rank.SEVEN, Rank.EIGHT, Rank.NINE, Rank.TEN, Rank.JACK, Rank.QUEEN, Rank.KING, Rank.ACE)
@@ -33,11 +34,15 @@ fun deck(): List<Pair<Rank, Suit>> = cartesianProduct(ranks(), suits()).shuffled
 fun randomHand(): Map<Position, List<Card>> {
     val deck = deck()
     return mapOf(
-        Position.NORTH to deck.subList(0, 9).map { Card(it.second, it.first, "french") },
-        Position.EAST to deck.subList(9, 18).map { Card(it.second, it.first, "french") },
-        Position.SOUTH to deck.subList(18, 27).map { Card(it.second, it.first, "french") },
-        Position.WEST to deck.subList(27, 36).map { Card(it.second, it.first, "french") },
+        Position.NORTH to sort(deck.subList(0, 9).map { Card(it.second, it.first, "french") }),
+        Position.EAST to sort(deck.subList(9, 18).map { Card(it.second, it.first, "french") }),
+        Position.SOUTH to sort(deck.subList(18, 27).map { Card(it.second, it.first, "french") }),
+        Position.WEST to sort(deck.subList(27, 36).map { Card(it.second, it.first, "french") }),
     )
+}
+
+fun sort(cards: List<Card>): List<Card> {
+    return cards.sortedWith(compareBy<Card> { it.suit }.thenBy { it.rank })
 }
 
 fun welcomeHand(): Map<Position, List<Card>> {

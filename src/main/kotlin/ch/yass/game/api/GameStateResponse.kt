@@ -10,7 +10,7 @@ import ch.yass.game.engine.playerSeat
 import java.time.LocalDateTime
 import java.util.*
 
-data class JoinGameResponse(
+data class GameStateResponse(
     val gameUUID: UUID,
     val players: List<JoinGameResponsePlayer>,
     val trump: Trump?,
@@ -19,11 +19,11 @@ data class JoinGameResponse(
     val rejoinedAt: LocalDateTime?
 ) {
     companion object {
-        fun from(state: GameState, player: Player): JoinGameResponse {
+        fun from(state: GameState, player: Player): GameStateResponse {
             val playerSeat = playerSeat(player, state)
             val hand = currentHand(state)
 
-            return JoinGameResponse(
+            return GameStateResponse(
                 state.game.uuid,
                 JoinGameResponsePlayer.from(state),
                 hand.trump,

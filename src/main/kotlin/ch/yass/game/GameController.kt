@@ -2,18 +2,13 @@ package ch.yass.game
 
 import arrow.core.continuations.either
 import ch.yass.core.contract.Controller
-import ch.yass.core.error.DomainError.*
 import ch.yass.core.helper.errorResponse
 import ch.yass.core.helper.logger
 import ch.yass.core.helper.successResponse
 import ch.yass.core.helper.validate
 import ch.yass.game.api.JoinGameRequest
-import ch.yass.game.api.JoinGameResponse
+import ch.yass.game.api.GameStateResponse
 import ch.yass.game.api.PlayCardRequest
-import ch.yass.game.api.PlayCardResponse
-import ch.yass.game.api.internal.NewHand
-import ch.yass.game.dto.Card
-import ch.yass.game.dto.State
 import ch.yass.game.engine.*
 import ch.yass.identity.helper.player
 import io.javalin.apibuilder.ApiBuilder.get
@@ -41,7 +36,7 @@ class GameController(private val service: GameService) : Controller {
             .tap { logger().info("Player ${player.uuid} joined Game ${it.game.uuid}") }
             .bind()
 
-        JoinGameResponse.from(gameState, player)
+        GameStateResponse.from(gameState, player)
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }
@@ -51,9 +46,14 @@ class GameController(private val service: GameService) : Controller {
         val request = validate<PlayCardRequest>(ctx.body()).bind()
         val player = player(ctx)
 
-        service.play(request, player)
-            .tap { logger().info("Player ${player.uuid} played Card ${it.card}") }
+        val gameState = service.play(request, player)
+            .tap {
+                val card = lastCardOfPlayer(player, it).fold({ "unknown" }, { card -> card.toString() })
+                logger().info("Player ${player.uuid} played Card $card")
+            }
             .bind()
+
+        GameStateResponse.from(gameState, player)
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }

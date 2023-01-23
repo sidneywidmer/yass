@@ -25,12 +25,11 @@ class GameService(private val repo: GameRepository) {
         repo.getState(game).bind()
     }
 
-    fun play(request: PlayCardRequest, player: Player, recursion: Int = 0): Either<DomainError, PlayCardResponse> =
+    fun play(request: PlayCardRequest, player: Player): Either<DomainError, GameState> =
         either.eager {
             val game = repo.getByUUID(request.game).bind()
             val state = repo.getState(game).bind()
             val playedCard = Card.from(request.card)
-            val response = PlayCardResponse(playedCard)
             val nextState = nextState(state)
 
             ensure(nextState == State.PLAY_CARD) {
@@ -45,20 +44,15 @@ class GameService(private val repo: GameRepository) {
 
             val updatedState = repo.getState(game).bind()
             when (nextState(updatedState)) {
-                State.PLAY_CARD -> response
-                State.NEW_TRICK -> {
-                    repo.createTrick(currentHand(state)).bind()
-                    response
-                }
-
+                State.PLAY_CARD -> {}
+                State.NEW_TRICK -> repo.createTrick(currentHand(state)).bind()
                 State.NEW_HAND -> {
                     val startingPlayer = nextTrickStartingPlayer(updatedState)
                     val newHand = repo.createHand(NewHand(game, startingPlayer, randomHand())).bind()
                     repo.createTrick(newHand).bind()
-                    response
                 }
-
-                else -> shift(DomainError.UnexpectedError("game.state.invalid"))
             }
+
+            repo.getState(game).bind()
         }
 }

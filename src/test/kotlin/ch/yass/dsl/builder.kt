@@ -58,8 +58,8 @@ class HandBuilder(
     }
 
     fun tricks(lambda: TricksBuilder.() -> Unit) {
-        val trick = TricksBuilder().apply(lambda).build()
-        this.tricks.add(trick)
+        val tricks = TricksBuilder().apply(lambda).build()
+        this.tricks = tricks
     }
 
     fun build(): HandDSL {
@@ -69,14 +69,14 @@ class HandBuilder(
 }
 
 class TricksBuilder(
-    private var trick: TrickDSL? = null
+    private var tricks: MutableList<TrickDSL> = mutableListOf()
 ) {
     fun trick(north: String?, east: String?, south: String?, west: String?) {
-        this.trick = TrickDSL(north, east, south, west)
+        this.tricks.add(TrickDSL(north, east, south, west))
     }
 
-    fun build(): TrickDSL {
-        return trick!!
+    fun build(): MutableList<TrickDSL> {
+        return tricks
     }
 }
 

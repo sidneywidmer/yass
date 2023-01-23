@@ -1,10 +1,9 @@
 package ch.yass.game.engine
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
+import arrow.core.*
 import ch.yass.core.error.DomainError
 import ch.yass.game.api.internal.GameState
+import ch.yass.game.dto.Card
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.State
 import ch.yass.game.dto.db.Hand
@@ -12,11 +11,11 @@ import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.dto.db.Trick
 
-fun currentTrick(state: GameState): Trick {
-    return state.tricks.first()
+fun currentTrick(tricks: List<Trick>): Trick {
+    return tricks.first()
 }
 
-fun currentHand(state: GameState): Hand {
+fun currentHand(hand: List<Hand>): Hand {
     return state.hands.first()
 }
 
@@ -24,6 +23,9 @@ fun playerSeat(player: Player, state: GameState): Seat {
     return state.seats.first { it.playerId == player.id }
 }
 
+/**
+ * Get the player sitting at the given position.
+ */
 fun playerAtPosition(position: Position, state: GameState): Player {
     val seat = state.seats.first { it.position == position }
     return state.allPlayers.first { it.id == seat.playerId }
@@ -41,13 +43,26 @@ fun nextState(state: GameState): State {
         return State.NEW_TRICK
     }
 
-    if (state.tricks.count() == 10) {
+    if (state.tricks.count() == 9) {
         return State.NEW_HAND
     }
 
     return State.PLAY_CARD
 }
 
+/**
+ * What's the last card thet was played by given player?
+ */
+fun lastCardOfPlayer(player: Player, state: GameState): Option<Card> {
+    val trick = currentTrick(state)
+    val seat = playerSeat(player, state)
+
+    return trick.cardOf(seat.position).toOption()
+}
+
+/**
+ * Find the player who starts the next trick.
+ */
 fun nextTrickStartingPlayer(state: GameState): Player {
     val seat = startingPlayerSeat(state)
     val positions = positionsOrderedWithStart(seat.position)
@@ -83,6 +98,9 @@ fun freePosition(occupiedSeats: List<Seat>): Either<DomainError.ValidationError,
     return maybePosition?.right() ?: DomainError.ValidationError("game.take-a-seat.full").left()
 }
 
+/**
+ * Find at which seat the player of the current hand sits.
+ */
 fun startingPlayerSeat(state: GameState): Seat {
     val hand = currentHand(state)
     val startingPlayer = state.allPlayers.first { it.id == hand.startingPlayerId }

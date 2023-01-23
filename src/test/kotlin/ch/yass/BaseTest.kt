@@ -4,6 +4,7 @@ import ch.yass.core.Core
 import ch.yass.db.tables.references.*
 import ch.yass.game.Game
 import ch.yass.identity.Identity
+import junit.framework.AssertionFailedError
 import org.jooq.DSLContext
 import org.junit.Before
 import org.kodein.di.DI
@@ -32,4 +33,5 @@ open class BaseTest {
             db.execute("TRUNCATE TABLE ${it.name} RESTART IDENTITY CASCADE")
         }
     }
+
 }

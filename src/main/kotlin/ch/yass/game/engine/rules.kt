@@ -40,9 +40,10 @@ fun playerHasTurn(player: Player, state: GameState): Boolean {
 fun cardIsPlayable(card: Card, player: Player, state: GameState): Boolean {
     val trick = currentTrick(state)
     val hand = currentHand(state)
+    // TODO: Take the winner of the last trick, not the starting player of the hand
     val startingPlayerSeat = startingPlayerSeat(state)
     val seat = playerSeat(player, state)
-    val cards = hand.cardsOf(seat.position)
+    val cards = hand.cardsOf(seat.position).filter { playerOwnsCard(player, it, state) }
 
     var playableCards = cards
 
@@ -65,13 +66,13 @@ fun cardIsPlayable(card: Card, player: Player, state: GameState): Boolean {
         return true
     }
 
+    // If it's a "suit" trump, all cards must follow suit except the Trump Jack a.k.a Buur
     if (hand.trump in listOf(Trump.CLUBS, Trump.DIAMONDS, Trump.HEARTS, Trump.SPADES)) {
-        // TODO: Ohhh - are we trying to undertrump?
-        playableCards = cards.filter { it.suit != hand.trumpSuit() && it.rank != Rank.JACK }
+        // TODO: Also filter out cards that would `undertrump`
+        playableCards = cards.filterNot { it.suit != hand.trumpSuit() && it.rank == Rank.JACK }
     }
 
     // If you still have cards that can follow suit, please do so and don't use the just played card...
-    // The exception to the rule: The trump jack (a.k.a trumpf buur) must never be played.
     if (playableCards.any { it.suit == lead.suit }) {
         return false
     }

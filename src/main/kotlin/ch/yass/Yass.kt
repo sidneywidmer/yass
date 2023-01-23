@@ -1,5 +1,6 @@
 package ch.yass
 
+import ch.yass.admin.Admin
 import ch.yass.identity.Identity
 import ch.yass.core.Bootstrap
 import ch.yass.core.Core
@@ -12,6 +13,7 @@ class Yass {
     companion object {
         val container = DI {
             import(Core.module)
+            import(Admin.module)
             import(Identity.module)
             import(Game.module)
         }

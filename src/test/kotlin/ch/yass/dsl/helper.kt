@@ -3,13 +3,17 @@ package ch.yass.dsl
 import ch.yass.game.dto.Card
 import ch.yass.game.dto.Rank
 import ch.yass.game.dto.Suit
+import ch.yass.game.engine.notationToCard
 
 fun interpretCard(card: String?): Card? {
     if (card == null) {
         return null
     }
 
-    return Card(Suit.WELCOME, Rank.HELLO, "french")
+    val suit = card.substring(1)
+    val rank = card.first().toString()
+
+    return notationToCard(suit, rank)
 }
 
 fun interpretCards(cards: String?): List<Card> {
@@ -17,10 +21,17 @@ fun interpretCards(cards: String?): List<Card> {
         return emptyList()
     }
 
-    return listOf(
-        Card(Suit.WELCOME, Rank.HELLO, "french"),
-        Card(Suit.WELCOME, Rank.HELLO, "french"),
-        Card(Suit.WELCOME, Rank.HELLO, "french"),
-        Card(Suit.WELCOME, Rank.HELLO, "french")
-    )
+    // Special for welcome hand
+    if (cards == "welcome") {
+        return listOf(
+            Card(Suit.WELCOME, Rank.HELLO, "french"),
+            Card(Suit.WELCOME, Rank.HELLO, "french"),
+            Card(Suit.WELCOME, Rank.HELLO, "french"),
+            Card(Suit.WELCOME, Rank.HELLO, "french")
+        )
+    }
+
+    val cardList = cards.split(",")
+
+    return cardList.mapNotNull { interpretCard(it) }
 }
