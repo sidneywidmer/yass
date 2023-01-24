@@ -57,7 +57,7 @@ class PlayCardTest : BaseTest() {
     fun testPlayerCantPlayCardTwice() {
         val state = getState()
 
-        val player = playerAtPosition(Position.WEST, state)
+        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
         val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("CLUBS", "SEVEN", "french"))
 
         assertLeftCodeEquals(service.play(request, player), "card.play.not-owned")
