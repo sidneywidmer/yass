@@ -68,8 +68,7 @@ fun lastCardOfPlayer(player: Player, tricks: List<Trick>, seats: List<Seat>): Op
 fun nextTrickStartingPlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Option<Player> =
     option.eager {
         val seat = startingPlayerSeat(hands, players, seats).bind()
-        val positions = positionsOrderedWithStart(seat.position)
-        val nextTrickStartingPosition = positions[1]
+        val nextTrickStartingPosition = positionsOrderedWithStart(seat.position)[1]
         val startingSeat = seats.firstOrNull { it.position == nextTrickStartingPosition }.toOption().bind()
 
         players.firstOrNull { it.id == startingSeat.playerId }.toOption().bind()

@@ -22,13 +22,12 @@ sealed class DomainError {
         }
     }
 
-    // Valiktor validation related errors. The list of ConstraintViolations gets cleaned up
-    // before we return the errorResponse -> results in a 422
-    data class ValiktorError(val code: String, val payload: Set<ConstraintViolation>) : DomainError()
+    // If a specific game engine rule is unfulfilled, e.g. the player doesn't own a card.
+    data class RuleUnfulfilled(val code: String) : DomainError()
 
     // Valiktor validation related errors. The list of ConstraintViolations gets cleaned up
     // before we return the errorResponse -> results in a 422
-    data class ValidationError(val code: String, val payload: Set<ConstraintViolation>? = null) : DomainError()
+    data class ValiktorError(val code: String, val payload: Set<ConstraintViolation>) : DomainError()
 
     // Something, anything related to a malformed request. Be either missing but required properties, missing
     // headers, malformed json or whatever -> results in a 400

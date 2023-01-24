@@ -1,6 +1,9 @@
 package ch.yass.game.engine
 
+import arrow.core.Either
+import arrow.core.continuations.either
 import arrow.core.toOption
+import ch.yass.core.error.DomainError.*
 import ch.yass.core.helper.logger
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Card
@@ -13,9 +16,9 @@ import ch.yass.game.dto.db.*
  * Check if the current player was ever dealt and has not yet
  * played * the given card.
  */
-fun playerOwnsCard(player: Player, card: Card, state: GameState): Boolean {
-    val hand = currentHand(state)
-    val seat = playerSeat(player, state)
+fun playerOwnsCard(player: Player, card: Card, state: GameState): Either<RuleUnfulfilled, Boolean> = either.eager {
+    val hand = currentHand(state.hands).toEither { RuleUnfulfilled("card.play.current-hand.empty") }.bind()
+    val seat = playerSeat(player, state.seats).toEither { RuleUnfulfilled("card.play.player.seat.empty") }.bind()
 
     val allCards = hand.cardsOf(seat.position)
 
