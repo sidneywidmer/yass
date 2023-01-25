@@ -22,8 +22,9 @@ sealed class DomainError {
         }
     }
 
-    // If a specific game engine rule is unfulfilled, e.g. the player doesn't own a card.
-    data class RuleUnfulfilled(val code: String) : DomainError()
+    // Valiktor validation related errors. The list of ConstraintViolations gets cleaned up
+    // before we return the errorResponse -> results in a 422
+    data class ValidationError(val code: String, val payload: Set<ConstraintViolation>? = null) : DomainError()
 
     // Valiktor validation related errors. The list of ConstraintViolations gets cleaned up
     // before we return the errorResponse -> results in a 422

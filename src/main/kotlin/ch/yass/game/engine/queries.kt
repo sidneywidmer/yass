@@ -1,8 +1,9 @@
 package ch.yass.game.engine
 
 import arrow.core.*
+import arrow.core.continuations.either
 import arrow.core.continuations.option
-import ch.yass.core.error.DomainError
+import ch.yass.core.error.DomainError.*
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Card
 import ch.yass.game.dto.Position
@@ -32,24 +33,23 @@ fun playerAtPosition(position: Position, seats: List<Seat>, players: List<Player
     return seat.mapNotNull { players.firstOrNull { seat -> seat.id == it.playerId } }
 }
 
-fun nextState(state: GameState): Option<State> = option.eager {
-    val trick = currentTrick(state.tricks).bind()
-    var nextState: State = State.PLAY_CARD
+fun nextState(state: GameState): State {
+    val trick = currentTrick(state.tricks).fold({ null }, { it }) ?: return State.PLAY_CARD
 
     // Special case for "welcome" trick, only one card is played
     if (trick.cards().count() == 4 && state.hands.count() == 1) {
-        nextState = State.NEW_HAND
+        return State.NEW_HAND
     }
 
     if (trick.cards().count() == 4) {
-        nextState = State.NEW_TRICK
+        return State.NEW_TRICK
     }
 
     if (state.tricks.count() == 9) {
-        nextState = State.NEW_HAND
+        return State.NEW_HAND
     }
 
-    nextState
+    return State.PLAY_CARD
 }
 
 /**
@@ -79,10 +79,7 @@ fun nextTrickStartingPlayer(hands: List<Hand>, players: List<Player>, seats: Lis
  * first overall * position that has no card played in the current trick.
  */
 fun currentTurnPosition(
-    hands: List<Hand>,
-    players: List<Player>,
-    seats: List<Seat>,
-    tricks: List<Trick>
+    hands: List<Hand>, players: List<Player>, seats: List<Seat>, tricks: List<Trick>
 ): Option<Position> = option.eager {
     val seat = startingPlayerSeat(hands, players, seats).bind()
     val trick = currentTrick(tricks).bind()
@@ -95,14 +92,12 @@ fun currentTurnPosition(
 /**
  * Get a random free seat.
  */
-fun freePosition(occupiedSeats: List<Seat>): Either<DomainError.ValidationError, Position> {
+fun freePosition(occupiedSeats: List<Seat>): Either<ValidationError, Position> {
     val occupied = occupiedSeats.map { it.position }.toSet()
     val all = Position.values().toSet()
-    val maybePosition = all
-        .minus(occupied)
-        .randomOrNull()
+    val maybePosition = all.minus(occupied).randomOrNull()
 
-    return maybePosition?.right() ?: DomainError.ValidationError("game.take-a-seat.full").left()
+    return maybePosition?.right() ?: ValidationError("game.take-a-seat.full").left()
 }
 
 /**
