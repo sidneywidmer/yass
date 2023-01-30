@@ -16,12 +16,12 @@ data class JoinGameResponsePlayer(
         fun from(state: GameState): List<JoinGameResponsePlayer> {
             return state.seats.map { seat ->
                 val player = state.allPlayers.first { it.id == seat.playerId }
-                val currentTrick = currentTrick(state)
+                val currentTrick = currentTrick(state.tricks)
                 JoinGameResponsePlayer(
                     player.uuid,
                     player.name,
                     seat.position,
-                    currentTrick.cardOf(seat.position)
+                    currentTrick.fold({ null }, { it.cardOf(seat.position) })
                 )
             }
         }

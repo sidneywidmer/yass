@@ -57,7 +57,7 @@ class PlayCardTest : BaseTest() {
     fun testPlayerCantPlayCardTwice() {
         val state = getState()
 
-        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
+        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers).unnest()
         val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("CLUBS", "SEVEN", "french"))
 
         assertLeftCodeEquals(service.play(request, player), "card.play.not-owned")
@@ -67,7 +67,7 @@ class PlayCardTest : BaseTest() {
     fun testPlayerMustFollowSuitIfPossible() {
         val state = getState()
 
-        val player = playerAtPosition(Position.WEST, state)
+        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers).unnest()
         val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "JACK", "french"))
 
         assertLeftCodeEquals(service.play(request, player), "card.play.not-playable")
@@ -77,7 +77,7 @@ class PlayCardTest : BaseTest() {
     fun testPlayerCanPlayValidCard() {
         val state = getState()
 
-        val player = playerAtPosition(Position.WEST, state)
+        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers).unnest()
         val playedCard = PlayedCard("SPADES", "SIX", "french")
         val request = PlayCardRequest(state.game.uuid.toString(), playedCard)
         val result = service.play(request, player)

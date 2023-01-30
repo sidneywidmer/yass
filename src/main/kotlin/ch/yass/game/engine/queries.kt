@@ -5,9 +5,7 @@ import arrow.core.continuations.either
 import arrow.core.continuations.option
 import ch.yass.core.error.DomainError.*
 import ch.yass.game.api.internal.GameState
-import ch.yass.game.dto.Card
-import ch.yass.game.dto.Position
-import ch.yass.game.dto.State
+import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Hand
 import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Seat
@@ -109,3 +107,19 @@ fun startingPlayerSeat(hands: List<Hand>, players: List<Player>, seats: List<Sea
 
     seats.firstOrNull { it.playerId == startingPlayer.id }.toOption().bind()
 }
+
+/**
+ * If it's a "suit" trump, all cards must follow suit except the Trump Jack a.k.a Buur.
+ * TODO: How to handle undertrump?
+ */
+fun playableCards(hand: Hand, cards: List<Card>): List<Card> =
+    when (hand.trump) {
+        in listOf(
+            Trump.CLUBS,
+            Trump.DIAMONDS,
+            Trump.HEARTS,
+            Trump.SPADES
+        ) -> cards.filterNot { it.suit != hand.trumpSuit() && it.rank == Rank.JACK }
+
+        else -> cards
+    }
