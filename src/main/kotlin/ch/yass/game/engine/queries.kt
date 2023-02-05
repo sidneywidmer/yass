@@ -4,6 +4,7 @@ import arrow.core.*
 import arrow.core.continuations.either
 import arrow.core.continuations.option
 import ch.yass.core.error.DomainError.*
+import ch.yass.core.helper.logger
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Hand
@@ -23,6 +24,10 @@ fun playerSeat(player: Player, seats: List<Seat>): Option<Seat> {
     return seats.firstOrNull { it.playerId == player.id }.toOption()
 }
 
+fun tricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> {
+    return tricks.filter { it.handId == hand.id }
+}
+
 /**
  * Get the player sitting at the given position.
  */
@@ -32,22 +37,27 @@ fun playerAtPosition(position: Position, seats: List<Seat>, players: List<Player
 }
 
 fun nextState(state: GameState): State {
-    val trick = currentTrick(state.tricks).fold({ null }, { it }) ?: return State.PLAY_CARD
+    val trick = currentTrick(state.tricks).getOrElse { null }
+    val hand = currentHand(state.hands)
+    val player = currentTurnPlayer(state.hands, state.allPlayers, state.seats, state.tricks).getOrElse { null }
+    val tricks = hand.map { tricksOfHand(state.tricks, it) }
+        .tapNone { logger().error("Defaulting to empty list for tricks, State: $state.") }
+        .getOrElse { emptyList() }
 
-    // Special case for "welcome" trick, only one card is played
-    if (trick.cards().count() == 4 && state.hands.count() == 1) {
-        return State.NEW_HAND
+    return when {
+        trick == null -> State.NEW_TRICK
+        player == null -> {
+            logger().error("Could not find player for state $state. Praying and falling back to PLAY_CARD.")
+            State.PLAY_CARD
+        }
+        // Special case for "welcome" trick, only one card is played per player
+        isWelcomeHandFinished(trick, state.hands) -> State.NEW_HAND
+        isHandFinished(tricks) -> State.NEW_HAND
+        isTrickFinished(trick) -> State.NEW_TRICK
+        isGameFinished(state.hands) -> State.FINISHED
+        isTrumpSet(hand) -> if (player.bot) State.TRUMP_BOT else State.TRUMP
+        else -> if (player.bot) State.PLAY_CARD_BOT else State.PLAY_CARD
     }
-
-    if (trick.cards().count() == 4) {
-        return State.NEW_TRICK
-    }
-
-    if (state.tricks.count() == 9) {
-        return State.NEW_HAND
-    }
-
-    return State.PLAY_CARD
 }
 
 /**
@@ -77,7 +87,10 @@ fun nextTrickStartingPlayer(hands: List<Hand>, players: List<Player>, seats: Lis
  * first overall position that has no card played in the current trick.
  */
 fun currentTurnPosition(
-    hands: List<Hand>, players: List<Player>, seats: List<Seat>, tricks: List<Trick>
+    hands: List<Hand>,
+    players: List<Player>,
+    seats: List<Seat>,
+    tricks: List<Trick>
 ): Option<Position> = option.eager {
     val seat = startingPlayerSeat(hands, players, seats).bind()
     val trick = currentTrick(tricks).bind()
@@ -86,6 +99,14 @@ fun currentTurnPosition(
 
     positions.firstOrNull { trick.cardOf(it) == null }.toOption().bind()
 }
+
+fun currentTurnPlayer(
+    hands: List<Hand>,
+    players: List<Player>,
+    seats: List<Seat>,
+    tricks: List<Trick>
+): Option<Player> =
+    currentTurnPosition(hands, players, seats, tricks).flatMap { playerAtPosition(it, seats, players) }
 
 /**
  * Get a random free seat.
@@ -99,7 +120,7 @@ fun freePosition(occupiedSeats: List<Seat>): Either<ValidationError, Position> {
 }
 
 /**
- * Find at which seat the player of the current hand sits.
+ * Find at which seat the starting player of the current hand sits.
  */
 fun startingPlayerSeat(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Option<Seat> = option.eager {
     val hand = currentHand(hands).bind()

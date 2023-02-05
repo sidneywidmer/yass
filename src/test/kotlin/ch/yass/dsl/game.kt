@@ -42,6 +42,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
             createdAt = LocalDateTime.now(ZoneOffset.UTC)
             updatedAt = LocalDateTime.now(ZoneOffset.UTC)
             name = p.name
+            bot = p.bot
             store()
         }
 
@@ -76,6 +77,19 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
             south = toDbJson(interpretCards(h.south.cards))
             west = toDbJson(interpretCards(h.west.cards))
             store()
+        }
+
+        // hand without a single trick is invalid state
+        if (h.tricks.isEmpty()) {
+            db.newRecord(TRICK).apply {
+                uuid = UUID.randomUUID().toString()
+                createdAt = LocalDateTime.now(ZoneOffset.UTC)
+                updatedAt = LocalDateTime.now(ZoneOffset.UTC)
+                handId = hand.id
+                winnerId = null
+                points = 0
+                store()
+            }
         }
 
         h.tricks.forEach { t ->

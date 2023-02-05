@@ -21,7 +21,7 @@ fun <L, R> assertLeftEquals(either: Either<L, R>, string: String): Boolean {
 }
 
 fun <L, R> getRightOrThrow(either: Either<L, R>): R {
-    return either.fold({ throw AssertionFailedError("Expected a Either.Right, got Either.Left") }, { it })
+    return either.fold({ throw AssertionFailedError("Expected a Either.Right, got Either.Left: $either") }, { it })
 }
 
 fun <T : Any> Option<T>.unnest(): T =

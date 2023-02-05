@@ -4,6 +4,7 @@
 - Add migration to resources
 - Manually trigger flyaway:migrate
 - Manually trigger jooq-codegen:generate
+- flyway:migrate automatically gets triggered for unit tests, make sure th db url is correct in the env vars
 
 ## Error / Error-Codes
 

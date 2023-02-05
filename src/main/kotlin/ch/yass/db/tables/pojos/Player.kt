@@ -17,7 +17,8 @@ data class Player(
     var uuid: String? = null,
     var createdAt: LocalDateTime? = null,
     var updatedAt: LocalDateTime? = null,
-    var name: String? = null
+    var name: String? = null,
+    var bot: Boolean? = null
 ): Serializable {
 
 
@@ -59,6 +60,12 @@ data class Player(
         }
         else if (this.name != o.name)
             return false
+        if (this.bot === null) {
+            if (o.bot !== null)
+                return false
+        }
+        else if (this.bot != o.bot)
+            return false
         return true
     }
 
@@ -70,6 +77,7 @@ data class Player(
         result = prime * result + (if (this.createdAt === null) 0 else this.createdAt.hashCode())
         result = prime * result + (if (this.updatedAt === null) 0 else this.updatedAt.hashCode())
         result = prime * result + (if (this.name === null) 0 else this.name.hashCode())
+        result = prime * result + (if (this.bot === null) 0 else this.bot.hashCode())
         return result
     }
 
@@ -81,6 +89,7 @@ data class Player(
         sb.append(", ").append(createdAt)
         sb.append(", ").append(updatedAt)
         sb.append(", ").append(name)
+        sb.append(", ").append(bot)
 
         sb.append(")")
         return sb.toString()

@@ -1,0 +1,3 @@
+ALTER TABLE player
+    ADD bot BOOLEAN NOT NULL DEFAULT false;
+

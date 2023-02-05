@@ -176,6 +176,7 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>3.0</version>
 
+                <!-- automatic migration only for tests, otherwise we trigger this manually -->
                 <executions>
                     <execution>
                         <phase>generate-test-sources</phase>

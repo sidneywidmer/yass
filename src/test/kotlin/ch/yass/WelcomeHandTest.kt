@@ -48,7 +48,7 @@ class WelcomeHandTest : BaseTest() {
     fun testPlayerLocked() {
         val state = getState()
 
-        val player = playerAtPosition(Position.NORTH, state)
+        val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers).unnest()
         val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "HELLO", "french"))
 
         assertLeftEquals(service.play(request, player), "card.play.player.locked")
@@ -58,7 +58,7 @@ class WelcomeHandTest : BaseTest() {
     fun testCantPlayNotOwnedCard() {
         val state = getState()
 
-        val player = playerAtPosition(Position.WEST, state)
+        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers).unnest()
         val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("CLUBS", "TEN", "french"))
 
         assertLeftEquals(service.play(request, player), "card.play.not-owned")
@@ -69,7 +69,7 @@ class WelcomeHandTest : BaseTest() {
     fun testNewHandCreated() {
         val state = getState()
 
-        val player = playerAtPosition(Position.WEST, state)
+        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers).unnest()
         val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "HELLO", "french"))
 
         val result = service.play(request, player)
@@ -83,7 +83,7 @@ class WelcomeHandTest : BaseTest() {
     fun testPlayCardInInvalidGame() {
         val state = getState()
 
-        val player = playerAtPosition(Position.WEST, state)
+        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers).unnest()
         val request = PlayCardRequest("b562227b-cc63-48cc-919e-9a115bbf7c6e", PlayedCard("WELCOME", "HELLO", "french"))
 
         assertLeftEquals(service.play(request, player), "game.get-by-uuid.uuid.invalid")

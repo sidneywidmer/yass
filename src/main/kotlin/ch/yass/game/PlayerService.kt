@@ -44,7 +44,7 @@ class PlayerService(private val db: DSLContext) {
             .fetchOneInto(Player::class.java)
 
         return updatedPlayer?.right() ?: DbError().left()
-    }.mapLeft { DbError( it) }
+    }.mapLeft { DbError(it) }
 
     fun getOrCreate(uuid: UUID, newPlayer: NewPlayer): Either<DbError, Player> = either.eager {
         get(uuid).bind().getOrElse { create(newPlayer).bind() }
@@ -55,22 +55,24 @@ class PlayerService(private val db: DSLContext) {
             .where(PLAYER.UUID.eq(uuid.toString()))
             .fetchOneInto(Player::class.java)
             .toOption()
-    }.mapLeft { DbError( it) }
+    }.mapLeft { DbError(it) }
 
 
     fun create(player: NewPlayer): Either<DbError, Player> = Either.catch {
-        val createdPlayer = db.insertInto(PLAYER, PLAYER.UUID, PLAYER.NAME, PLAYER.CREATED_AT, PLAYER.UPDATED_AT)
-            .values(
-                player.uuid.toString(),
-                player.name,
-                LocalDateTime.now(ZoneOffset.UTC),
-                LocalDateTime.now(ZoneOffset.UTC)
-            )
-            .returningResult(PLAYER)
-            .fetchOneInto(Player::class.java)
+        val createdPlayer =
+            db.insertInto(PLAYER, PLAYER.UUID, PLAYER.NAME, PLAYER.BOT, PLAYER.CREATED_AT, PLAYER.UPDATED_AT)
+                .values(
+                    player.uuid.toString(),
+                    player.name,
+                    false,
+                    LocalDateTime.now(ZoneOffset.UTC),
+                    LocalDateTime.now(ZoneOffset.UTC),
+                )
+                .returningResult(PLAYER)
+                .fetchOneInto(Player::class.java)
 
         return createdPlayer?.right() ?: DbError().left()
-    }.mapLeft { DbError( it) }
+    }.mapLeft { DbError(it) }
 
     private fun getNameFromIdentity(identity: Identity): Either<UnexpectedError, String> {
         val email = with(identity.traits as LinkedTreeMap<*, *>) { get("name") as String? }
