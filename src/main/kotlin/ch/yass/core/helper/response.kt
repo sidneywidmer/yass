@@ -34,7 +34,7 @@ fun errorResponse(ctx: Context, error: DomainError): Context {
         is ValiktorError -> ctx.status(422).json(groupValiktorViolations(error))
         is ValidationError -> ctx.status(422).json(ErrorResponse(error.code))
         else -> {
-            logger().error("DomainError '${error.javaClass.name}' encountered: $error - this should have been caught before!")
+            logger().error("DomainError `${error.javaClass.name}` encountered: $error")
             ctx.status(500).json(ErrorResponse("ouch"))
         }
     }

@@ -60,7 +60,7 @@ class PlayCardTest : BaseTest() {
         val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers).unnest()
         val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("CLUBS", "SEVEN", "french"))
 
-        assertLeftCodeEquals(service.play(request, player), "card.play.not-owned")
+        assertLeftEquals(service.play(request, player), "card.play.not-owned")
     }
 
     @Test
@@ -70,7 +70,7 @@ class PlayCardTest : BaseTest() {
         val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers).unnest()
         val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "JACK", "french"))
 
-        assertLeftCodeEquals(service.play(request, player), "card.play.not-playable")
+        assertLeftEquals(service.play(request, player), "card.play.not-playable")
     }
 
     @Test

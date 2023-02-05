@@ -19,8 +19,8 @@ import ch.yass.game.dto.db.*
  * played the given card.
  */
 fun playerOwnsCard(player: Player, card: Card, state: GameState): Either<UnexpectedError, Boolean> = either.eager {
-    val hand = currentHand(state.hands).bind { UnexpectedError("rules.player-owns-card.current-hand.empty") }
-    val seat = playerSeat(player, state.seats).bind { UnexpectedError("rules.player-owns-card.seat.empty") }
+    val hand = currentHand(state.hands).bind { UnexpectedError("current hand is empty") }
+    val seat = playerSeat(player, state.seats).bind { UnexpectedError("${player.uuid} has no seat") }
 
     val allCards = hand.cardsOf(seat.position)
 
@@ -37,7 +37,7 @@ fun playerHasTurn(player: Player, state: GameState): Either<UnexpectedError, Boo
         state.allPlayers,
         state.seats,
         state.tricks
-    ).bind { UnexpectedError("rules.player-has-turn.active-position.empty") }
+    ).bind { UnexpectedError("current turn position is empty") }
     val activeSeat = state.seats.firstOrNull { it.position == activePosition }.toOption()
 
     // Could _in theory_ be null if a game is not full and someone already plays a card
@@ -54,9 +54,9 @@ fun couldNotFollowLead(hand: Hand, cards: List<Card>, lead: Card?): Boolean =
     !playableCards(hand, cards).any { it.suit == lead?.suit }
 
 fun cardIsPlayable(card: Card, player: Player, state: GameState): Either<UnexpectedError, Boolean> = either.eager {
-    val trick = currentTrick(state.tricks).bind { UnexpectedError("rules.card-is-playable.current-trick.empty") }
-    val hand = currentHand(state.hands).bind { UnexpectedError("rules.card-is-playable.current-hand.empty") }
-    val seat = playerSeat(player, state.seats).bind { UnexpectedError("rules.card-is-playable.player-seat.empty") }
+    val trick = currentTrick(state.tricks).bind { UnexpectedError("current trick is empty") }
+    val hand = currentHand(state.hands).bind { UnexpectedError("current hand is empty") }
+    val seat = playerSeat(player, state.seats).bind { UnexpectedError("${player.uuid} has no seat") }
     val cards = hand.cardsOf(seat.position).filter { playerOwnsCard(player, it, state).bind() }
 
     // TODO: Take the winner of the last trick, not the starting player of the hand
@@ -64,12 +64,11 @@ fun cardIsPlayable(card: Card, player: Player, state: GameState): Either<Unexpec
         state.hands,
         state.allPlayers,
         state.seats,
-    ).bind { UnexpectedError("rules.card-is-playable.starting-player-seat.empty") }
+    ).bind { UnexpectedError("starting player seat is empty") }
     val lead = trick.cardOf(startingPlayerSeat.position)
 
     if (hand.trump != Trump.FREESTYLE && hand.trump == null) {
-        logger().error("Tried to play card before trump was chosen. Card $card, Player: $player, Trick: $trick")
-        shift<UnexpectedError>(UnexpectedError("rules.card-is-playable.trump.invalid"))
+        shift<UnexpectedError>(UnexpectedError("player ${player.uuid} tried to play $card before trump was chosen"))
     }
 
     when {

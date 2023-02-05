@@ -7,4 +7,4 @@ import java.util.*
 
 fun String.toUUID(): Either<UnexpectedError, UUID> = Either.catch {
     UUID.fromString(this)
-}.mapLeft { UnexpectedError("string.to.uuid.exception", it) }
+}.mapLeft { UnexpectedError("could not convert $this to uuid", it) }

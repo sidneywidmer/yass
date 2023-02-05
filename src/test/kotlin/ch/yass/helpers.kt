@@ -7,17 +7,15 @@ import arrow.core.Some
 import ch.yass.core.error.DomainError
 import junit.framework.AssertionFailedError
 
-fun <L, R> assertLeftCodeEquals(either: Either<L, R>, code: String): Boolean {
+fun <L, R> assertLeftEquals(either: Either<L, R>, string: String): Boolean {
     val value = either.fold({ it }, { throw AssertionFailedError("Expected a Either.Left, got Either.Right") })
 
     return when (value) {
-        is DomainError.DbError -> value.code == code
-        is DomainError.OryError -> value.code == code
-        is DomainError.ValiktorError -> value.code == code
-        is DomainError.ValidationError -> value.code == code
-        is DomainError.RequestError -> value.code == code
-        is DomainError.DbError -> value.code == code
-        is DomainError.UnexpectedError -> value.code == code
+        is DomainError.OryError -> value.code == string
+        is DomainError.ValiktorError -> value.code == string
+        is DomainError.ValidationError -> value.code == string
+        is DomainError.RequestError -> value.code == string
+        is DomainError.UnexpectedError -> value.message == string
         else -> throw AssertionFailedError("Unknown DomainError")
     }
 }

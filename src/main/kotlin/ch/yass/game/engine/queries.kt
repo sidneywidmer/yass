@@ -74,7 +74,7 @@ fun nextTrickStartingPlayer(hands: List<Hand>, players: List<Player>, seats: Lis
 
 /**
  * Who's turn is it? Based on the starting player's position we can take the
- * first overall * position that has no card played in the current trick.
+ * first overall position that has no card played in the current trick.
  */
 fun currentTurnPosition(
     hands: List<Hand>, players: List<Player>, seats: List<Seat>, tricks: List<Trick>

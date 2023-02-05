@@ -36,9 +36,9 @@ sealed class DomainError {
 
     // Something wrong with the DB? Did you expect a result but didn't get anything? DbError will take
     // care of it -> results in a 500 but _should_ never bubble up to the errorResponse
-    data class DbError(val code: String, val exception: Throwable? = null) : DomainError()
+    data class DbError(val exception: Throwable? = null) : DomainError()
 
     // BAM! - that was unexpected, right? Used liberally all over the code as an easy way out and
     // obviously shouldn't bubble up to the errorResponse -> results in a 500
-    data class UnexpectedError(val code: String, val exception: Throwable? = null) : DomainError()
+    data class UnexpectedError(val message: String, val exception: Throwable? = null) : DomainError()
 }

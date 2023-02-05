@@ -43,8 +43,8 @@ class PlayerService(private val db: DSLContext) {
             .returningResult(PLAYER)
             .fetchOneInto(Player::class.java)
 
-        return updatedPlayer?.right() ?: DbError("user.update.empty").left()
-    }.mapLeft { DbError("user.update.error", it) }
+        return updatedPlayer?.right() ?: DbError().left()
+    }.mapLeft { DbError( it) }
 
     fun getOrCreate(uuid: UUID, newPlayer: NewPlayer): Either<DbError, Player> = either.eager {
         get(uuid).bind().getOrElse { create(newPlayer).bind() }
@@ -55,7 +55,7 @@ class PlayerService(private val db: DSLContext) {
             .where(PLAYER.UUID.eq(uuid.toString()))
             .fetchOneInto(Player::class.java)
             .toOption()
-    }.mapLeft { DbError("user.get.error", it) }
+    }.mapLeft { DbError( it) }
 
 
     fun create(player: NewPlayer): Either<DbError, Player> = Either.catch {
@@ -69,13 +69,13 @@ class PlayerService(private val db: DSLContext) {
             .returningResult(PLAYER)
             .fetchOneInto(Player::class.java)
 
-        return createdPlayer?.right() ?: DbError("user.create.empty").left()
-    }.mapLeft { DbError("user.create.error", it) }
+        return createdPlayer?.right() ?: DbError().left()
+    }.mapLeft { DbError( it) }
 
     private fun getNameFromIdentity(identity: Identity): Either<UnexpectedError, String> {
         val email = with(identity.traits as LinkedTreeMap<*, *>) { get("name") as String? }
 
-        return email?.right() ?: UnexpectedError("ory.identity.name.missing").left()
+        return email?.right() ?: UnexpectedError("ori identity $identity did not contain `name`").left()
     }
 }
 

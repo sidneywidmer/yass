@@ -26,13 +26,13 @@ inline fun <reified T> validate(json: String): Either<DomainError, T> {
         mapper.readValue(json, T::class.java).right()
     } catch (exception: ValueInstantiationException) {
         exception.cause.toOption().fold(
-            { UnexpectedError("request.body.json.invalid").left() },
+            { UnexpectedError("could not map $json to ${T::class.java}", exception).left() },
             { cause -> handleInstantiationCause(cause).left() }
         )
     } catch (exception: MissingKotlinParameterException) {
         RequestError("body.json.parameter.missing").left()
     } catch (exception: Exception) {
-        UnexpectedError("request.body.json.invalid").left()
+        UnexpectedError("could not map $json to ${T::class.java}", exception).left()
     }
 }
 
@@ -43,6 +43,6 @@ fun handleInstantiationCause(cause: Throwable): DomainError {
             cause.constraintViolations
         )
 
-        else -> UnexpectedError("request.body.json.invalid", cause)
+        else -> UnexpectedError("invalid json given", cause)
     }
 }

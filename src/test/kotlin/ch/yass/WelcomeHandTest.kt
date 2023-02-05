@@ -51,7 +51,7 @@ class WelcomeHandTest : BaseTest() {
         val player = playerAtPosition(Position.NORTH, state)
         val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "HELLO", "french"))
 
-        assertLeftCodeEquals(service.play(request, player), "card.play.player.locked")
+        assertLeftEquals(service.play(request, player), "card.play.player.locked")
     }
 
     @Test
@@ -61,7 +61,7 @@ class WelcomeHandTest : BaseTest() {
         val player = playerAtPosition(Position.WEST, state)
         val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("CLUBS", "TEN", "french"))
 
-        assertLeftCodeEquals(service.play(request, player), "card.play.not-owned")
+        assertLeftEquals(service.play(request, player), "card.play.not-owned")
     }
 
 
@@ -86,6 +86,6 @@ class WelcomeHandTest : BaseTest() {
         val player = playerAtPosition(Position.WEST, state)
         val request = PlayCardRequest("b562227b-cc63-48cc-919e-9a115bbf7c6e", PlayedCard("WELCOME", "HELLO", "french"))
 
-        assertLeftCodeEquals(service.play(request, player), "game.get-by-uuid.uuid.invalid")
+        assertLeftEquals(service.play(request, player), "game.get-by-uuid.uuid.invalid")
     }
 }

@@ -36,7 +36,7 @@ class GameController(private val service: GameService) : Controller {
             .tap { logger().info("Player ${player.uuid} joined Game ${it.game.uuid}") }
             .bind()
 
-        GameStateResponse.from(gameState, player)
+        GameStateResponse.from(gameState, player).bind()
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }
@@ -48,12 +48,13 @@ class GameController(private val service: GameService) : Controller {
 
         val gameState = service.play(request, player)
             .tap {
-                val card = lastCardOfPlayer(player, it).fold({ "unknown" }, { card -> card.toString() })
-                logger().info("Player ${player.uuid} played Card $card")
+                lastCardOfPlayer(player, it.tricks, it.seats)
+                    .fold({ "unknown" }, { card -> card.toString() })
+                    .also { c -> logger().info("Player ${player.uuid} played Card $c") }
             }
             .bind()
 
-        GameStateResponse.from(gameState, player)
+        GameStateResponse.from(gameState, player).bind()
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }

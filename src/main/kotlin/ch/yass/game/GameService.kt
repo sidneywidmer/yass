@@ -31,20 +31,19 @@ class GameService(private val repo: GameRepository) {
         val nextState = nextState(state)
 
         ensure(nextState == State.PLAY_CARD) {
-            logger().error("Invalid game state, should have been ${State.PLAY_CARD} but was $nextState")
-            UnexpectedError("play.state.invalid")
+            UnexpectedError("invalid game state, should have been ${State.PLAY_CARD} but was $nextState")
         }
         ensure(playerHasTurn(player, state).bind()) { ValidationError("play.player.locked") }
         ensure(playerOwnsCard(player, playedCard, state).bind()) { ValidationError("play.not-owned") }
         ensure(cardIsPlayable(playedCard, player, state).bind()) { ValidationError("play.not-playable") }
 
-        val currentTrick = currentTrick(state.tricks).bind { UnexpectedError("play.next-state.empty") }
-        val playerSeat = playerSeat(player, state.seats).bind { UnexpectedError("play.next-state.empty") }
+        val currentTrick = currentTrick(state.tricks).bind { UnexpectedError("current trick is empty") }
+        val playerSeat = playerSeat(player, state.seats).bind { UnexpectedError("player seat is empty") }
 
         repo.playCard(playedCard, currentTrick, playerSeat).bind()
 
         val updatedState = repo.getState(game).bind()
-        val currentHand = currentHand(updatedState.hands).bind { UnexpectedError("play.current-hand.empty") }
+        val currentHand = currentHand(updatedState.hands).bind { UnexpectedError("current hand is empty") }
         when (nextState(updatedState)) {
             State.PLAY_CARD -> {}
             State.NEW_TRICK -> repo.createTrick(currentHand).bind()
@@ -53,7 +52,7 @@ class GameService(private val repo: GameRepository) {
                     updatedState.hands,
                     updatedState.allPlayers,
                     updatedState.seats
-                ).bind { UnexpectedError("play.next-state.empty") }
+                ).bind { UnexpectedError("starting player is empty") }
                 val newHand = repo.createHand(NewHand(game, startingPlayer, randomHand())).bind()
                 repo.createTrick(newHand).bind()
             }
