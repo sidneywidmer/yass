@@ -38,13 +38,12 @@ fun playerOwnsCard(player: Player, card: Card, state: GameState): Either<Unexpec
 }
 
 fun playerHasTurn(player: Player, state: GameState): Either<UnexpectedError, Boolean> = either.eager {
-    val activePosition = currentTurnPosition(
+    val activePlayer = currentTurnPlayer(
         state.hands, state.allPlayers, state.seats, state.tricks
-    ).bind { UnexpectedError("current turn position is empty") }
-    val activeSeat = state.seats.firstOrNull { it.position == activePosition }.toOption()
+    ).bind { UnexpectedError("active player is empty") }
 
     // Could _in theory_ be null if a game is not full and someone already plays a card
-    activeSeat.fold({ false }, { it.playerId == player.id })
+    activePlayer.id == player.id
 }
 
 fun isLeadPlayed(trick: Trick, seat: Seat): Boolean = trick.cardOf(seat.position) != null

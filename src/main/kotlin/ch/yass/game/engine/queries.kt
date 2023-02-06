@@ -1,7 +1,6 @@
 package ch.yass.game.engine
 
 import arrow.core.*
-import arrow.core.continuations.either
 import arrow.core.continuations.option
 import ch.yass.core.error.DomainError.*
 import ch.yass.core.helper.logger
@@ -73,7 +72,7 @@ fun lastCardOfPlayer(player: Player, tricks: List<Trick>, seats: List<Seat>): Op
 /**
  * Find the player who starts the next trick.
  */
-fun nextTrickStartingPlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Option<Player> =
+fun nextHandStartingPlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Option<Player> =
     option.eager {
         val seat = startingPlayerSeat(hands, players, seats).bind()
         val nextTrickStartingPosition = positionsOrderedWithStart(seat.position)[1]

@@ -2,7 +2,6 @@ package ch.yass.game
 
 import arrow.core.Either
 import arrow.core.continuations.either
-import arrow.core.continuations.ensureNotNull
 import ch.yass.core.error.DomainError
 import ch.yass.core.error.DomainError.*
 import ch.yass.game.api.JoinGameRequest
@@ -57,12 +56,12 @@ class GameService(private val repo: GameRepository) {
             when (nextStateLoop) {
                 State.FINISHED -> {}
                 State.PLAY_CARD -> {}
+                State.TRUMP -> {}
                 State.PLAY_CARD_BOT -> playAsBot(updatedState).bind()
-                State.TRUMP -> chooseTrumpAsBot(updatedState).bind()
-                State.TRUMP_BOT -> {}
+                State.TRUMP_BOT -> chooseTrumpAsBot(updatedState).bind()
                 State.NEW_TRICK -> repo.createTrick(currentHand).bind()
                 State.NEW_HAND -> {
-                    val startingPlayer = nextTrickStartingPlayer(
+                    val startingPlayer = nextHandStartingPlayer(
                         updatedState.hands,
                         updatedState.allPlayers,
                         updatedState.seats
@@ -87,9 +86,12 @@ class GameService(private val repo: GameRepository) {
             state.tricks
         ).bind { UnexpectedError("player is not a bot") }
 
+        if (!botPlayer.bot) {
+            shift<UnexpectedError>(UnexpectedError("player ${botPlayer.uuid} is not a bot"))
+        }
+
         // TODO: Get a good card to play
         val card = chooseCardForBot(botPlayer, state).bind()
-        ensureNotNull(card) { UnexpectedError("player ${botPlayer.uuid} has no valid card left to play") }
 
         val request = PlayCardRequest(
             state.game.uuid.toString(),
