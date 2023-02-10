@@ -38,9 +38,8 @@ fun playerOwnsCard(player: Player, card: Card, state: GameState): Either<Unexpec
 }
 
 fun playerHasTurn(player: Player, state: GameState): Either<UnexpectedError, Boolean> = either.eager {
-    val activePlayer = currentTurnPlayer(
-        state.hands, state.allPlayers, state.seats, state.tricks
-    ).bind { UnexpectedError("active player is empty") }
+    val activePlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)
+        .bind { UnexpectedError("active player is empty") }
 
     // Could _in theory_ be null if a game is not full and someone already plays a card
     activePlayer.id == player.id
@@ -57,14 +56,19 @@ fun couldNotFollowLead(hand: Hand, cards: List<Card>, lead: Card?): Boolean =
 
 fun isWelcomeHandFinished(trick: Trick, hands: List<Hand>): Boolean = trick.cards().count() == 4 && hands.count() == 1
 
-fun isHandFinished(tricks: List<Trick>): Boolean = tricks.count() == 9
+fun isHandFinished(tricks: List<Trick>): Boolean = tricks.count() == 9 && tricks.first().cards().count() == 4
 
 fun isTrickFinished(trick: Trick): Boolean = trick.cards().count() == 4
 
 /**
  * TODO: Should be a total of points and not a total of hands
  */
-fun isGameFinished(hands: List<Hand>): Boolean = hands.count() == 5
+fun isGameFinished(hands: List<Hand>, tricks: List<Trick>): Boolean {
+    val tricksOfHand = tricksOfHand(tricks, hands.first())
+    val lastTrick = tricksOfHand.first()
+
+    return hands.count() == 5 && tricksOfHand.size == 9 && lastTrick.cards().count() == 4
+}
 
 fun isTrumpSet(hand: Option<Hand>): Boolean = hand.map { it.trump == null }.getOrElse { false }
 
@@ -75,7 +79,7 @@ fun cardIsPlayable(card: Card, player: Player, state: GameState): Either<Unexpec
     val cards = hand.cardsOf(seat.position).filter { playerOwnsCard(player, it, state).bind() }
 
     // TODO: Take the winner of the last trick, not the starting player of the hand
-    val startingPlayerSeat = startingPlayerSeat(
+    val startingPlayerSeat = startingPlayersSeatOfCurrentHand(
         state.hands,
         state.allPlayers,
         state.seats,

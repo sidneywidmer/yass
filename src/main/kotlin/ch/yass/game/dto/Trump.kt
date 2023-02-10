@@ -7,5 +7,5 @@ enum class Trump {
     SPADES,
     OBEABE,
     UNEUFE,
-    FREESTYLE,
+    FREESTYLE;
 }

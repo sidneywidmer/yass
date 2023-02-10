@@ -38,7 +38,7 @@ fun playerAtPosition(position: Position, seats: List<Seat>, players: List<Player
 fun nextState(state: GameState): State {
     val trick = currentTrick(state.tricks).getOrElse { null }
     val hand = currentHand(state.hands)
-    val player = currentTurnPlayer(state.hands, state.allPlayers, state.seats, state.tricks).getOrElse { null }
+    val player = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks).getOrElse { null }
     val tricks = hand.map { tricksOfHand(state.tricks, it) }
         .tapNone { logger().error("Defaulting to empty list for tricks, State: $state.") }
         .getOrElse { emptyList() }
@@ -49,11 +49,11 @@ fun nextState(state: GameState): State {
             logger().error("Could not find player for state $state. Praying and falling back to PLAY_CARD.")
             State.PLAY_CARD
         }
+        isGameFinished(state.hands, state.tricks) -> State.FINISHED
         // Special case for "welcome" trick, only one card is played per player
         isWelcomeHandFinished(trick, state.hands) -> State.NEW_HAND
         isHandFinished(tricks) -> State.NEW_HAND
         isTrickFinished(trick) -> State.NEW_TRICK
-        isGameFinished(state.hands) -> State.FINISHED
         isTrumpSet(hand) -> if (player.bot) State.TRUMP_BOT else State.TRUMP
         else -> if (player.bot) State.PLAY_CARD_BOT else State.PLAY_CARD
     }
@@ -74,7 +74,7 @@ fun lastCardOfPlayer(player: Player, tricks: List<Trick>, seats: List<Seat>): Op
  */
 fun nextHandStartingPlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Option<Player> =
     option.eager {
-        val seat = startingPlayerSeat(hands, players, seats).bind()
+        val seat = startingPlayersSeatOfCurrentHand(hands, players, seats).bind()
         val nextTrickStartingPosition = positionsOrderedWithStart(seat.position)[1]
         val startingSeat = seats.firstOrNull { it.position == nextTrickStartingPosition }.toOption().bind()
 
@@ -82,30 +82,45 @@ fun nextHandStartingPlayer(hands: List<Hand>, players: List<Player>, seats: List
     }
 
 /**
- * Who's turn is it? Based on the starting player's position we can take the
- * first overall position that has no card played in the current trick.
+ * Which player is expected to take the next action? If there are no tricks played yet it's the
+ * starting player of the hand. If the current trick is "complete", aka 4 cards have been
+ * played, it's the winner of the last trick. If not, it's the neighbor of the player
+ * who * played a card last.
  */
-fun currentTurnPosition(
+fun activePosition(
     hands: List<Hand>,
     players: List<Player>,
     seats: List<Seat>,
     tricks: List<Trick>
 ): Option<Position> = option.eager {
-    val seat = startingPlayerSeat(hands, players, seats).bind()
-    val trick = currentTrick(tricks).bind()
+    val trick = currentTrick(tricks).orNull()
+    when {
+        trick == null -> startingPlayersSeatOfCurrentHand(hands, players, seats).bind().position
+        trick.cards().size < 4 -> {
+            val seat = startingPlayersSeatOfCurrentHand(hands, players, seats).bind()
+            val positions = positionsOrderedWithStart(seat.position)
 
-    val positions = positionsOrderedWithStart(seat.position)
+            positions.firstOrNull { trick.cardOf(it) == null }.toOption().bind()
+        }
 
-    positions.firstOrNull { trick.cardOf(it) == null }.toOption().bind()
+        else -> winningSeatOfCurrentTrick(seats).bind().position
+    }
 }
 
-fun currentTurnPlayer(
-    hands: List<Hand>,
-    players: List<Player>,
-    seats: List<Seat>,
-    tricks: List<Trick>
-): Option<Player> =
-    currentTurnPosition(hands, players, seats, tricks).flatMap { playerAtPosition(it, seats, players) }
+/**
+ * Who won the current trick.
+ */
+fun winningSeatOfCurrentTrick(seats: List<Seat>): Option<Seat> =
+    option.eager {
+        // We need: Trump of current hand, who played the first card, e.t.c
+        seats.shuffled().first()
+    }
+
+/**
+ * See activePosition, this is just a helper to map a player to a position.
+ */
+fun activePlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>, tricks: List<Trick>): Option<Player> =
+    activePosition(hands, players, seats, tricks).flatMap { playerAtPosition(it, seats, players) }
 
 /**
  * Get a random free seat.
@@ -118,15 +133,13 @@ fun freePosition(occupiedSeats: List<Seat>): Either<ValidationError, Position> {
     return maybePosition?.right() ?: ValidationError("game.take-a-seat.full").left()
 }
 
-/**
- * Find at which seat the starting player of the current hand sits.
- */
-fun startingPlayerSeat(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Option<Seat> = option.eager {
-    val hand = currentHand(hands).bind()
-    val startingPlayer = players.firstOrNull { it.id == hand.startingPlayerId }.toOption().bind()
+fun startingPlayersSeatOfCurrentHand(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Option<Seat> =
+    option.eager {
+        val hand = currentHand(hands).bind()
+        val startingPlayer = players.firstOrNull { it.id == hand.startingPlayerId }.toOption().bind()
 
-    seats.firstOrNull { it.playerId == startingPlayer.id }.toOption().bind()
-}
+        seats.firstOrNull { it.playerId == startingPlayer.id }.toOption().bind()
+    }
 
 /**
  * If it's a "suit" trump, all cards must follow suit except the Trump Jack a.k.a Buur.

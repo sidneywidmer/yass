@@ -6,6 +6,7 @@ import ch.yass.core.helper.errorResponse
 import ch.yass.core.helper.logger
 import ch.yass.core.helper.successResponse
 import ch.yass.core.helper.validate
+import ch.yass.game.api.ChooseTrumpRequest
 import ch.yass.game.api.JoinGameRequest
 import ch.yass.game.api.GameStateResponse
 import ch.yass.game.api.PlayCardRequest
@@ -22,6 +23,7 @@ class GameController(private val service: GameService) : Controller {
         get("/create", ::create)
         get("/join", ::join)
         get("/play", ::play)
+        get("/trump", ::trump)
     }
 
     // Save new Game to DB
@@ -52,6 +54,20 @@ class GameController(private val service: GameService) : Controller {
                     .fold({ "unknown" }, { card -> card.toString() })
                     .also { c -> logger().info("Player ${player.uuid} played Card $c") }
             }
+            .bind()
+
+        GameStateResponse.from(gameState, player).bind()
+    }.fold(
+        { errorResponse(ctx, it) },
+        { successResponse(ctx, it) }
+    )
+
+    private fun trump(ctx: Context) = either.eager {
+        val request = validate<ChooseTrumpRequest>(ctx.body()).bind()
+        val player = player(ctx)
+
+        val gameState = service.trump(request, player)
+            .tap { logger().info("Player ${player.uuid} chose trump TBD") }
             .bind()
 
         GameStateResponse.from(gameState, player).bind()

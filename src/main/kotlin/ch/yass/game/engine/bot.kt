@@ -6,6 +6,7 @@ import arrow.core.toOption
 import ch.yass.core.error.DomainError.*
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Card
+import ch.yass.game.dto.Trump
 import ch.yass.game.dto.db.Player
 
 fun chooseCardForBot(botPlayer: Player, state: GameState): Either<UnexpectedError, Card> = either.eager {
@@ -20,4 +21,8 @@ fun chooseCardForBot(botPlayer: Player, state: GameState): Either<UnexpectedErro
         .firstOrNull { cardIsPlayable(it, botPlayer, state).bind() }
         .toOption()
         .bind { UnexpectedError("player ${botPlayer.uuid} has no valid card left to play") }
+}
+
+fun chooseTrumpForBot(botPlayer: Player, state: GameState): Either<UnexpectedError, Trump> = either.eager {
+    trumps().shuffled().first()
 }

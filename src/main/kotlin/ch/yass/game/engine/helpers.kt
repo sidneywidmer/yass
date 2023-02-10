@@ -1,10 +1,7 @@
 package ch.yass.game.engine
 
 import ch.yass.core.helper.cartesianProduct
-import ch.yass.game.dto.Card
-import ch.yass.game.dto.Position
-import ch.yass.game.dto.Rank
-import ch.yass.game.dto.Suit
+import ch.yass.game.dto.*
 import kotlin.time.measureTime
 
 fun ranks(): List<Rank> {
@@ -15,10 +12,14 @@ fun suits(): List<Suit> {
     return listOf(Suit.CLUBS, Suit.DIAMONDS, Suit.HEARTS, Suit.SPADES)
 }
 
+fun trumps(): List<Trump> {
+    return listOf(Trump.CLUBS, Trump.SPADES, Trump.HEARTS, Trump.DIAMONDS, Trump.UNEUFE, Trump.OBEABE)
+}
+
 /**
  * Get the order of a round based on a position. So if it's EAST's turn we
  * know the next player is SOUTH. I bet there's a million clever
- * implementations of this but probably none is a simple.
+ * implementations of this but probably none is as readable.
  */
 fun positionsOrderedWithStart(position: Position): List<Position> {
     return when (position) {

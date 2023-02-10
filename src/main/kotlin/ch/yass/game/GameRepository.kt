@@ -63,30 +63,43 @@ class GameRepository(private val db: DSLContext) {
         return game?.right() ?: ValidationError("game.get-by-uuid.uuid.invalid").left()
     }.mapLeft { DbError(it) }
 
-    private fun getPlayers(seats: List<Seat>): Either<DbError, List<Player>> = Either.catch {
-        db.selectFrom(PLAYER)
-            .where(PLAYER.ID.`in`(seats.map { it.playerId }))
-            .fetchInto(Player::class.java)
+    fun chooseTrump(trump: Trump, hand: Hand): Either<DbError, Hand> = Either.catch {
+        val updatedHand = db.update(HAND)
+            .set(HAND.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
+            .set(HAND.TRUMP, trump.name)
+            .where(HAND.ID.eq(hand.id))
+            .returningResult(HAND)
+            .fetchOneInto(Hand::class.java)
+
+        return updatedHand?.right() ?: DbError().left()
     }.mapLeft { DbError(it) }
 
-    private fun getSeats(game: Game): Either<DbError, List<Seat>> = Either.catch {
-        db.selectFrom(SEAT)
-            .where(SEAT.GAME_ID.eq(game.id))
-            .fetchInto(Seat::class.java)
+    fun playCard(card: Card, trick: Trick, seat: Seat): Either<DbError, Trick> = Either.catch {
+        val updatedTrick = db.update(TRICK)
+            .set(TRICK.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
+            .set(seat.trickColumn(), toDbJson(card))
+            .where(TRICK.ID.eq(trick.id))
+            .returningResult(TRICK)
+            .fetchOneInto(Trick::class.java)
+
+        return updatedTrick?.right() ?: DbError().left()
     }.mapLeft { DbError(it) }
 
-    private fun getTricks(handIds: List<Int>): Either<DbError, List<Trick>> = Either.catch {
-        db.selectFrom(TRICK)
-            .where(TRICK.HAND_ID.`in`(handIds))
-            .orderBy(TRICK.CREATED_AT.desc())
-            .fetch(Trick::fromRecord)
-    }.mapLeft { DbError(it) }
 
-    private fun getHands(game: Game): Either<DbError, List<Hand>> = Either.catch {
-        db.selectFrom(HAND)
-            .where(HAND.GAME_ID.eq(game.id))
-            .orderBy(HAND.CREATED_AT.desc())
-            .fetch(Hand::fromRecord)
+    fun createTrick(hand: Hand): Either<DbError, Trick> = Either.catch {
+        val createdTrick = db
+            .insertInto(TRICK, TRICK.UUID, TRICK.CREATED_AT, TRICK.UPDATED_AT, TRICK.POINTS, TRICK.HAND_ID)
+            .values(
+                UUID.randomUUID().toString(),
+                LocalDateTime.now(ZoneOffset.UTC),
+                LocalDateTime.now(ZoneOffset.UTC),
+                0,
+                hand.id
+            )
+            .returningResult(TRICK)
+            .fetchOneInto(Trick::class.java)
+
+        return createdTrick?.right() ?: DbError().left()
     }.mapLeft { DbError(it) }
 
     fun createHand(hand: NewHand): Either<DbError, Hand> = Either.catch {
@@ -126,6 +139,34 @@ class GameRepository(private val db: DSLContext) {
         return createdHand?.right() ?: DbError().left()
     }.mapLeft { DbError(it) }
 
+
+    private fun getPlayers(seats: List<Seat>): Either<DbError, List<Player>> = Either.catch {
+        db.selectFrom(PLAYER)
+            .where(PLAYER.ID.`in`(seats.map { it.playerId }))
+            .fetchInto(Player::class.java)
+    }.mapLeft { DbError(it) }
+
+    private fun getSeats(game: Game): Either<DbError, List<Seat>> = Either.catch {
+        db.selectFrom(SEAT)
+            .where(SEAT.GAME_ID.eq(game.id))
+            .fetchInto(Seat::class.java)
+    }.mapLeft { DbError(it) }
+
+    private fun getTricks(handIds: List<Int>): Either<DbError, List<Trick>> = Either.catch {
+        db.selectFrom(TRICK)
+            .where(TRICK.HAND_ID.`in`(handIds))
+            .orderBy(TRICK.CREATED_AT.desc())
+            .fetch(Trick::fromRecord)
+    }.mapLeft { DbError(it) }
+
+    private fun getHands(game: Game): Either<DbError, List<Hand>> = Either.catch {
+        db.selectFrom(HAND)
+            .where(HAND.GAME_ID.eq(game.id))
+            .orderBy(HAND.CREATED_AT.desc())
+            .fetch(Hand::fromRecord)
+    }.mapLeft { DbError(it) }
+
+
     private fun createSeat(seat: NewSeat): Either<DbError, Seat> = Either.catch {
         val createdSeat = db
             .insertInto(SEAT, SEAT.UUID, SEAT.PLAYER_ID, SEAT.GAME_ID, SEAT.POSITION, SEAT.CREATED_AT, SEAT.UPDATED_AT)
@@ -143,22 +184,6 @@ class GameRepository(private val db: DSLContext) {
         return createdSeat?.right() ?: DbError().left()
     }.mapLeft { DbError(it) }
 
-    fun createTrick(hand: Hand): Either<DbError, Trick> = Either.catch {
-        val createdTrick = db
-            .insertInto(TRICK, TRICK.UUID, TRICK.CREATED_AT, TRICK.UPDATED_AT, TRICK.POINTS, TRICK.HAND_ID)
-            .values(
-                UUID.randomUUID().toString(),
-                LocalDateTime.now(ZoneOffset.UTC),
-                LocalDateTime.now(ZoneOffset.UTC),
-                0,
-                hand.id
-            )
-            .returningResult(TRICK)
-            .fetchOneInto(Trick::class.java)
-
-        return createdTrick?.right() ?: DbError().left()
-    }.mapLeft { DbError(it) }
-
     private fun rejoinSeat(seat: Seat): Either<DbError, Seat> = Either.catch {
         val updatedSeat = db.update(SEAT)
             .set(SEAT.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
@@ -170,14 +195,4 @@ class GameRepository(private val db: DSLContext) {
         return updatedSeat?.right() ?: DbError().left()
     }.mapLeft { DbError(it) }
 
-    fun playCard(card: Card, trick: Trick, seat: Seat): Either<DbError, Trick> = Either.catch {
-        val updatedTrick = db.update(TRICK)
-            .set(TRICK.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
-            .set(seat.trickColumn(), toDbJson(card))
-            .where(TRICK.ID.eq(trick.id))
-            .returningResult(TRICK)
-            .fetchOneInto(Trick::class.java)
-
-        return updatedTrick?.right() ?: DbError().left()
-    }.mapLeft { DbError(it) }
 }
