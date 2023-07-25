@@ -8,4 +8,8 @@ enum class Trump {
     OBEABE,
     UNEUFE,
     FREESTYLE;
+
+    fun equalsSuit(suit: Suit): Boolean {
+        return this.toString() == suit.toString()
+    }
 }

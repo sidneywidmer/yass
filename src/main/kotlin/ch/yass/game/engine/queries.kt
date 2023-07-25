@@ -49,12 +49,13 @@ fun nextState(state: GameState): State {
             logger().error("Could not find player for state $state. Praying and falling back to PLAY_CARD.")
             State.PLAY_CARD
         }
+
         isGameFinished(state.hands, state.tricks) -> State.FINISHED
         // Special case for "welcome" trick, only one card is played per player
         isWelcomeHandFinished(trick, state.hands) -> State.NEW_HAND
         isHandFinished(tricks) -> State.NEW_HAND
         isTrickFinished(trick) -> State.NEW_TRICK
-        isTrumpSet(hand) -> if (player.bot) State.TRUMP_BOT else State.TRUMP
+        !isTrumpSet(hand) -> if (player.bot) State.TRUMP_BOT else State.TRUMP
         else -> if (player.bot) State.PLAY_CARD_BOT else State.PLAY_CARD
     }
 }
@@ -85,7 +86,7 @@ fun nextHandStartingPlayer(hands: List<Hand>, players: List<Player>, seats: List
  * Which player is expected to take the next action? If there are no tricks played yet it's the
  * starting player of the hand. If the current trick is "complete", aka 4 cards have been
  * played, it's the winner of the last trick. If not, it's the neighbor of the player
- * who * played a card last.
+ * who played a card last.
  */
 fun activePosition(
     hands: List<Hand>,
@@ -94,6 +95,7 @@ fun activePosition(
     tricks: List<Trick>
 ): Option<Position> = option.eager {
     val trick = currentTrick(tricks).orNull()
+    val hand = currentHand(hands).bind()
     when {
         trick == null -> startingPlayersSeatOfCurrentHand(hands, players, seats).bind().position
         trick.cards().size < 4 -> {
@@ -103,18 +105,66 @@ fun activePosition(
             positions.firstOrNull { trick.cardOf(it) == null }.toOption().bind()
         }
 
-        else -> winningSeatOfCurrentTrick(seats).bind().position
+        else -> winningPositionOfLastTrick(hand, tricksOfHand(tricks, hand), seats).bind()
     }
 }
 
 /**
- * Who won the current trick.
+ * Who won the given trick. Assumes all players have played a card in given - complete - trick.
+ * To figure this out we need to recursively loop all played tricks in the given hand.
  */
-fun winningSeatOfCurrentTrick(seats: List<Seat>): Option<Seat> =
-    option.eager {
-        // We need: Trump of current hand, who played the first card, e.t.c
-        seats.shuffled().first()
+fun winningPositionOfLastTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Option<Position> = option.eager {
+    if (hand.trump == null) {
+        none<Position>()
     }
+
+    var startPosition = seats.firstOrNull { it.playerId == hand.startingPlayerId }.toOption().bind().position
+    for (trick in tricks) {
+        val suitLed = trick.cardOf(startPosition).toOption().bind().suit
+        val winningCard = trick.cards()
+            .filter { it.suit == suitLed || it.suit == hand.trumpSuit() }
+            .maxBy { getCardValue(it, hand.trump!!) }
+
+        startPosition = when (winningCard) {
+            trick.north -> Position.NORTH
+            trick.east -> Position.EAST
+            trick.south -> Position.SOUTH
+            trick.west -> Position.WEST
+            else -> Position.NORTH  // since trick.cards are just cards from these positions we don't care
+        }
+    }
+
+    startPosition
+}
+
+/**
+ * Get card value to compare which card is better - this has nothing to do with the
+ * actual point values the players get.
+ *
+ * TODO: Uneufe/Obenabe
+ */
+fun getCardValue(card: Card, trump: Trump): Int = when {
+    trump.equalsSuit(card.suit) && card.rank == Rank.JACK -> 200 // Trump Buur
+    trump.equalsSuit(card.suit) && card.rank == Rank.NINE -> 150 // Trump Nell
+    trump.equalsSuit(card.suit) -> 100 + getRankValue(card.rank, trump)
+    else -> getRankValue(card.rank, trump)
+}
+
+/**
+ * TODO: Uneufe/Obenabe
+ */
+fun getRankValue(rank: Rank, trump: Trump): Int = when (rank) {
+    Rank.SIX -> 1
+    Rank.SEVEN -> 2
+    Rank.EIGHT -> 3
+    Rank.NINE -> 4
+    Rank.TEN -> 5
+    Rank.JACK -> 6
+    Rank.QUEEN -> 7
+    Rank.KING -> 8
+    Rank.ACE -> 9
+    else -> 0
+}
 
 /**
  * See activePosition, this is just a helper to map a player to a position.

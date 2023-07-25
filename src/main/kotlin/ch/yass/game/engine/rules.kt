@@ -6,6 +6,7 @@ import arrow.core.continuations.option
 import ch.yass.core.error.DomainError.*
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Card
+import ch.yass.game.dto.Position
 import ch.yass.game.dto.Trump
 import ch.yass.game.dto.db.*
 
@@ -45,11 +46,11 @@ fun playerHasTurn(player: Player, state: GameState): Either<UnexpectedError, Boo
     activePlayer.id == player.id
 }
 
-fun isLeadPlayed(trick: Trick, seat: Seat): Boolean = trick.cardOf(seat.position) != null
+fun isLeadPlayed(trick: Trick, position: Position): Boolean = trick.cardOf(position) != null
 
 fun isLastCard(cards: List<Card>) = cards.count() == 1
 
-fun isFollowingLead(trick: Trick, seat: Seat, card: Card) = trick.cardOf(seat.position)?.suit == card.suit
+fun isFollowingLead(trick: Trick, position: Position, card: Card) = trick.cardOf(position)?.suit == card.suit
 
 fun couldNotFollowLead(hand: Hand, cards: List<Card>, lead: Card?): Boolean =
     !playableCards(hand, cards).any { it.suit == lead?.suit }
@@ -70,7 +71,7 @@ fun isGameFinished(hands: List<Hand>, tricks: List<Trick>): Boolean {
     return hands.count() == 5 && tricksOfHand.size == 9 && lastTrick.cards().count() == 4
 }
 
-fun isTrumpSet(hand: Option<Hand>): Boolean = hand.map { it.trump == null }.getOrElse { false }
+fun isTrumpSet(hand: Option<Hand>): Boolean = hand.map { it.trump != null }.getOrElse { false }
 
 fun cardIsPlayable(card: Card, player: Player, state: GameState): Either<UnexpectedError, Boolean> = either.eager {
     val trick = currentTrick(state.tricks).bind { UnexpectedError("current trick is empty") }
@@ -78,22 +79,21 @@ fun cardIsPlayable(card: Card, player: Player, state: GameState): Either<Unexpec
     val seat = playerSeat(player, state.seats).bind { UnexpectedError("${player.uuid} has no seat") }
     val cards = hand.cardsOf(seat.position).filter { playerOwnsCard(player, it, state).bind() }
 
-    // TODO: Take the winner of the last trick, not the starting player of the hand
-    val startingPlayerSeat = startingPlayersSeatOfCurrentHand(
-        state.hands,
-        state.allPlayers,
-        state.seats,
-    ).bind { UnexpectedError("starting player seat is empty") }
-    val lead = trick.cardOf(startingPlayerSeat.position)
+    val lastTricksWinnerPosition = winningPositionOfLastTrick(
+        hand,
+        state.tricks,
+        state.seats
+    ).bind { UnexpectedError("no winner of last trick found") }
+    val lead = trick.cardOf(lastTricksWinnerPosition)
 
     if (hand.trump != Trump.FREESTYLE && hand.trump == null) {
         shift<UnexpectedError>(UnexpectedError("player ${player.uuid} tried to play $card before trump was chosen"))
     }
 
     when {
-        !isLeadPlayed(trick, startingPlayerSeat) -> true
+        !isLeadPlayed(trick, lastTricksWinnerPosition) -> true
         isLastCard(cards) -> true
-        isFollowingLead(trick, startingPlayerSeat, card) -> true
+        isFollowingLead(trick, lastTricksWinnerPosition, card) -> true
         couldNotFollowLead(hand, cards, lead) -> true
         else -> false
     }

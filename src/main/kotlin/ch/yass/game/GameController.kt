@@ -48,14 +48,7 @@ class GameController(private val service: GameService) : Controller {
         val request = validate<PlayCardRequest>(ctx.body()).bind()
         val player = player(ctx)
 
-        val gameState = service.play(request, player)
-            .tap {
-                lastCardOfPlayer(player, it.tricks, it.seats)
-                    .fold({ "unknown" }, { card -> card.toString() })
-                    .also { c -> logger().info("Player ${player.uuid} played Card $c") }
-            }
-            .bind()
-
+        val gameState = service.play(request, player).bind()
         GameStateResponse.from(gameState, player).bind()
     }.fold(
         { errorResponse(ctx, it) },
@@ -66,10 +59,7 @@ class GameController(private val service: GameService) : Controller {
         val request = validate<ChooseTrumpRequest>(ctx.body()).bind()
         val player = player(ctx)
 
-        val gameState = service.trump(request, player)
-            .tap { logger().info("Player ${player.uuid} chose trump TBD") }
-            .bind()
-
+        val gameState = service.trump(request, player).bind()
         GameStateResponse.from(gameState, player).bind()
     }.fold(
         { errorResponse(ctx, it) },

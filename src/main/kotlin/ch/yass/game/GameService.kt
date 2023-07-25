@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.continuations.either
 import ch.yass.core.error.DomainError
 import ch.yass.core.error.DomainError.*
+import ch.yass.core.helper.logger
 import ch.yass.game.api.ChooseTrumpRequest
 import ch.yass.game.api.JoinGameRequest
 import ch.yass.game.api.PlayCardRequest
@@ -42,6 +43,8 @@ class GameService(private val repo: GameRepository) {
         val currentTrick = currentTrick(state.tricks).bind { UnexpectedError("current trick is empty") }
         val playerSeat = playerSeat(player, state.seats).bind { UnexpectedError("player seat is empty") }
 
+        logger().info("Player ${player.uuid} (bot:${player.bot}) played $playedCard")
+
         repo.playCard(playedCard, currentTrick, playerSeat).bind()
         gameLoop(game)
         repo.getState(game).bind()
@@ -59,6 +62,8 @@ class GameService(private val repo: GameRepository) {
         }
         ensure(playerHasTurn(player, state).bind()) { ValidationError("trump.player.wrong") }
         ensure(trumps().contains(chosenTrump)) { ValidationError("trump.invalid") }
+
+        logger().info("Player ${player.uuid} (bot:${player.bot}) choose trump $chosenTrump")
 
         repo.chooseTrump(chosenTrump, currentHand).bind()
         gameLoop(game)
