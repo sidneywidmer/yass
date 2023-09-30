@@ -1,16 +1,15 @@
 package ch.yass.game
 
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import ch.yass.core.contract.Controller
 import ch.yass.core.helper.errorResponse
 import ch.yass.core.helper.logger
 import ch.yass.core.helper.successResponse
 import ch.yass.core.helper.validate
 import ch.yass.game.api.ChooseTrumpRequest
-import ch.yass.game.api.JoinGameRequest
 import ch.yass.game.api.GameStateResponse
+import ch.yass.game.api.JoinGameRequest
 import ch.yass.game.api.PlayCardRequest
-import ch.yass.game.engine.*
 import ch.yass.identity.helper.player
 import io.javalin.apibuilder.ApiBuilder.get
 import io.javalin.apibuilder.EndpointGroup
@@ -31,36 +30,36 @@ class GameController(private val service: GameService) : Controller {
     // Create first welcome hand
     private fun create(ctx: Context): Nothing = TODO()
 
-    private fun join(ctx: Context) = either.eager {
-        val request = validate<JoinGameRequest>(ctx.body()).bind()
+    private fun join(ctx: Context) = either {
+        val request = validate<JoinGameRequest>(ctx.body())
         val player = player(ctx)
         val gameState = service.join(request, player)
-            .tap { logger().info("Player ${player.uuid} joined Game ${it.game.uuid}") }
-            .bind()
 
-        GameStateResponse.from(gameState, player).bind()
+        logger().info("Player ${player.uuid} joined Game ${gameState.game.uuid}")
+
+        GameStateResponse.from(gameState, player)
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }
     )
 
-    private fun play(ctx: Context) = either.eager {
-        val request = validate<PlayCardRequest>(ctx.body()).bind()
+    private fun play(ctx: Context) = either {
+        val request = validate<PlayCardRequest>(ctx.body())
         val player = player(ctx)
 
-        val gameState = service.play(request, player).bind()
-        GameStateResponse.from(gameState, player).bind()
+        val gameState = service.play(request, player)
+        GameStateResponse.from(gameState, player)
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }
     )
 
-    private fun trump(ctx: Context) = either.eager {
-        val request = validate<ChooseTrumpRequest>(ctx.body()).bind()
+    private fun trump(ctx: Context) = either {
+        val request = validate<ChooseTrumpRequest>(ctx.body())
         val player = player(ctx)
 
-        val gameState = service.trump(request, player).bind()
-        GameStateResponse.from(gameState, player).bind()
+        val gameState = service.trump(request, player)
+        GameStateResponse.from(gameState, player)
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }

@@ -1,44 +1,41 @@
 package ch.yass.core.error
 
+import ch.yass.game.api.internal.GameState
+import ch.yass.game.dto.Card
+import ch.yass.game.dto.State
+import ch.yass.game.dto.Trump
+import ch.yass.game.dto.db.Game
+import ch.yass.game.dto.db.Player
 import org.valiktor.ConstraintViolation
-import sh.ory.ApiException
+import sh.ory.model.Identity
 
-/**
- * Overall error class for the whole project. Whenever something can/goes wrong some
- * kind of DomainError needs to be returned right. We're avoiding to throw
- * exceptions whenever possible.
- */
-sealed class DomainError {
-    // Related to the ory service. If something goes south this error wraps ory's exception.
-    // In case it's an ApiException we're also cleaning up the to string a little to avoid
-    // the whole stacktrace. This usually means the user is not correctly authorized
-    // -> results in a 401
-    data class OryError(val code: String, val exception: Throwable) : DomainError() {
-        override fun toString(): String {
-            return when (exception) {
-                is ApiException -> exception.responseBody?.trim() ?: exception.toString()
-                else -> exception.toString()
-            }
-        }
-    }
+sealed interface DomainError
 
-    // Valiktor validation related errors. The list of ConstraintViolations gets cleaned up
-    // before we return the errorResponse -> results in a 422
-    data class ValidationError(val code: String, val payload: Set<ConstraintViolation>? = null) : DomainError()
 
-    // Valiktor validation related errors. The list of ConstraintViolations gets cleaned up
-    // before we return the errorResponse -> results in a 422
-    data class ValiktorError(val code: String, val payload: Set<ConstraintViolation>) : DomainError()
+// Misc Errors
+data class StringNoValidUUID(val string: String) : DomainError
 
-    // Something, anything related to a malformed request. Be either missing but required properties, missing
-    // headers, malformed json or whatever -> results in a 400
-    data class RequestError(val code: String, val payload: HashMap<String, Any?>? = null) : DomainError()
+// Request-Validation related Errors
+sealed interface ValidationError : DomainError
+data class JsonNotMappable(val targetClass: String?, val exception: Throwable?) : ValidationError
+data class ValiktorError(val violations: Set<ConstraintViolation>) : ValidationError
 
-    // Something wrong with the DB? Did you expect a result but didn't get anything? DbError will take
-    // care of it -> results in a 500 but _should_ never bubble up to the errorResponse
-    data class DbError(val exception: Throwable? = null) : DomainError()
+// Auth related Errors
+sealed interface AuthError : DomainError
+data object SessionTokenMissing : AuthError
+data class OryIdentityWithoutName(val identity: Identity) : AuthError
 
-    // BAM! - that was unexpected, right? Used liberally all over the code as an easy way out and
-    // obviously shouldn't bubble up to the errorResponse -> results in a 500
-    data class UnexpectedError(val message: String, val exception: Throwable? = null) : DomainError()
-}
+// Game or Game-State related Errors
+sealed interface GameError : DomainError
+data object GameAlreadyFull : GameError
+data class PlayerIsLocked(val player: Player, val state: GameState) : GameError
+data class PlayerDoesNotOwnCard(val player: Player, val card: Card, val state: GameState) : GameError
+data class CardNotPlayable(val card: Card, val player: Player, val state: GameState) : GameError
+data class InvalidState(val nextState: State, val state: GameState) : GameError
+data class TrumpNotChosen(val state: GameState) : GameError
+data class TrumpInvalid(val trump: Trump) : GameError
+data class PlayerIsNotBot(val player: Player, val state: GameState) : GameError
+
+// Db related Errors
+sealed interface DbError : DomainError
+data class GameWithCodeNotFound(val code: String) : DbError

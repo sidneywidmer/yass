@@ -1,27 +1,21 @@
 package ch.yass.game.engine
 
-import arrow.core.*
-import arrow.core.continuations.option
-import ch.yass.core.error.DomainError.*
-import ch.yass.core.helper.logger
+import arrow.core.raise.Raise
+import ch.yass.core.error.GameAlreadyFull
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Hand
 import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.dto.db.Trick
+import kotlin.collections.contains
 
-fun currentTrick(tricks: List<Trick>): Option<Trick> {
-    return tricks.firstOrNull().toOption()
-}
+fun currentTrick(tricks: List<Trick>): Trick? = tricks.firstOrNull()
 
-fun currentHand(hands: List<Hand>): Option<Hand> {
-    return hands.firstOrNull().toOption()
-}
+fun currentHand(hands: List<Hand>): Hand? = hands.firstOrNull()
 
-fun playerSeat(player: Player, seats: List<Seat>): Option<Seat> {
-    return seats.firstOrNull { it.playerId == player.id }.toOption()
-}
+fun playerSeat(player: Player, seats: List<Seat>): Seat? =
+    seats.firstOrNull { it.playerId == player.id }
 
 fun tricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> {
     return tricks.filter { it.handId == hand.id }
@@ -30,29 +24,24 @@ fun tricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> {
 /**
  * Get the player sitting at the given position.
  */
-fun playerAtPosition(position: Position, seats: List<Seat>, players: List<Player>): Option<Player> {
-    val seat = seats.firstOrNull { it.position == position }.toOption()
-    return seat.mapNotNull { players.firstOrNull { seat -> seat.id == it.playerId } }
+fun playerAtPosition(position: Position, seats: List<Seat>, players: List<Player>): Player? {
+    return seats.firstOrNull { it.position == position }
+        .let { players.firstOrNull { seat -> seat.id == it?.playerId } }
 }
 
 fun nextState(state: GameState): State {
-    val trick = currentTrick(state.tricks).getOrElse { null }
+    val trick = currentTrick(state.tricks)
     val hand = currentHand(state.hands)
-    val player = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks).getOrElse { null }
-    val tricks = hand.map { tricksOfHand(state.tricks, it) }
-        .tapNone { logger().error("Defaulting to empty list for tricks, State: $state.") }
-        .getOrElse { emptyList() }
+    val player = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)!!
+    val tricks = hand?.let { tricksOfHand(state.tricks, it) } ?: emptyList()
 
     return when {
         trick == null -> State.NEW_TRICK
-        player == null -> {
-            logger().error("Could not find player for state $state. Praying and falling back to PLAY_CARD.")
-            State.PLAY_CARD
-        }
-
         isGameFinished(state.hands, state.tricks) -> State.FINISHED
+
         // Special case for "welcome" trick, only one card is played per player
         isWelcomeHandFinished(trick, state.hands) -> State.NEW_HAND
+
         isHandFinished(tricks) -> State.NEW_HAND
         isTrickFinished(trick) -> State.NEW_TRICK
         !isTrumpSet(hand) -> if (player.bot) State.TRUMP_BOT else State.TRUMP
@@ -61,26 +50,15 @@ fun nextState(state: GameState): State {
 }
 
 /**
- * What's the last card that was played by given player?
- */
-fun lastCardOfPlayer(player: Player, tricks: List<Trick>, seats: List<Seat>): Option<Card> = option.eager {
-    val trick = currentTrick(tricks).bind()
-    val seat = playerSeat(player, seats).bind()
-
-    trick.cardOf(seat.position).toOption().bind()
-}
-
-/**
  * Find the player who starts the next trick.
  */
-fun nextHandStartingPlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Option<Player> =
-    option.eager {
-        val seat = startingPlayersSeatOfCurrentHand(hands, players, seats).bind()
-        val nextTrickStartingPosition = positionsOrderedWithStart(seat.position)[1]
-        val startingSeat = seats.firstOrNull { it.position == nextTrickStartingPosition }.toOption().bind()
+fun nextHandStartingPlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Player {
+    val seat = startingPlayersSeatOfCurrentHand(hands, players, seats)!!
+    val nextTrickStartingPosition = positionsOrderedWithStart(seat.position)[1]
+    val startingSeat = seats.first { it.position == nextTrickStartingPosition }
 
-        players.firstOrNull { it.id == startingSeat.playerId }.toOption().bind()
-    }
+    return players.first { it.id == startingSeat.playerId }
+}
 
 /**
  * Which player is expected to take the next action? If there are no tricks played yet it's the
@@ -93,37 +71,44 @@ fun activePosition(
     players: List<Player>,
     seats: List<Seat>,
     tricks: List<Trick>
-): Option<Position> = option.eager {
-    val trick = currentTrick(tricks).orNull()
-    val hand = currentHand(hands).bind()
-    when {
-        trick == null -> startingPlayersSeatOfCurrentHand(hands, players, seats).bind().position
+): Position? {
+    val trick = currentTrick(tricks)
+    val hand = currentHand(hands)!!
+    return when {
+        trick == null -> startingPlayersSeatOfCurrentHand(hands, players, seats)!!.position
         trick.cards().size < 4 -> {
-            val seat = startingPlayersSeatOfCurrentHand(hands, players, seats).bind()
+            val seat = startingPlayersSeatOfCurrentHand(hands, players, seats)!!
             val positions = positionsOrderedWithStart(seat.position)
 
-            positions.firstOrNull { trick.cardOf(it) == null }.toOption().bind()
+            positions.firstOrNull { trick.cardOf(it) == null }
         }
 
-        else -> winningPositionOfLastTrick(hand, tricksOfHand(tricks, hand), seats).bind()
+        else -> winningPositionOfLastTrick(hand, tricksOfHand(tricks, hand), seats)
     }
 }
 
 /**
- * Who won the given trick. Assumes all players have played a card in given - complete - trick.
+ * Who won the last trick. Assumes all players have played a card in given - complete - trick.
  * To figure this out we need to recursively loop all played tricks in the given hand.
  */
-fun winningPositionOfLastTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Option<Position> = option.eager {
+
+fun winningPositionOfLastTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position? {
     if (hand.trump == null) {
-        none<Position>()
+        return null
     }
 
-    var startPosition = seats.firstOrNull { it.playerId == hand.startingPlayerId }.toOption().bind().position
-    for (trick in tricks) {
-        val suitLed = trick.cardOf(startPosition).toOption().bind().suit
+    if (tricks.count() < 2) {
+        return null
+    }
+
+    var startPosition = seats.first { it.playerId == hand.startingPlayerId }.position
+
+    // We want to calculate until the last trick and not the current one
+    for (trick in tricks.reversed().dropLast(1)) {
+        val suitLed = trick.cardOf(startPosition)!!.suit
         val winningCard = trick.cards()
             .filter { it.suit == suitLed || it.suit == hand.trumpSuit() }
-            .maxBy { getCardValue(it, hand.trump!!) }
+            .maxBy { cardValue(it, hand.trump) }
 
         startPosition = when (winningCard) {
             trick.north -> Position.NORTH
@@ -134,7 +119,7 @@ fun winningPositionOfLastTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat
         }
     }
 
-    startPosition
+    return startPosition
 }
 
 /**
@@ -143,17 +128,17 @@ fun winningPositionOfLastTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat
  *
  * TODO: Uneufe/Obenabe
  */
-fun getCardValue(card: Card, trump: Trump): Int = when {
+fun cardValue(card: Card, trump: Trump): Int = when {
     trump.equalsSuit(card.suit) && card.rank == Rank.JACK -> 200 // Trump Buur
     trump.equalsSuit(card.suit) && card.rank == Rank.NINE -> 150 // Trump Nell
-    trump.equalsSuit(card.suit) -> 100 + getRankValue(card.rank, trump)
-    else -> getRankValue(card.rank, trump)
+    trump.equalsSuit(card.suit) -> 100 + rankValue(card.rank, trump)
+    else -> rankValue(card.rank, trump)
 }
 
 /**
  * TODO: Uneufe/Obenabe
  */
-fun getRankValue(rank: Rank, trump: Trump): Int = when (rank) {
+fun rankValue(rank: Rank, trump: Trump): Int = when (rank) {
     Rank.SIX -> 1
     Rank.SEVEN -> 2
     Rank.EIGHT -> 3
@@ -169,27 +154,23 @@ fun getRankValue(rank: Rank, trump: Trump): Int = when (rank) {
 /**
  * See activePosition, this is just a helper to map a player to a position.
  */
-fun activePlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>, tricks: List<Trick>): Option<Player> =
-    activePosition(hands, players, seats, tricks).flatMap { playerAtPosition(it, seats, players) }
+fun activePlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>, tricks: List<Trick>): Player? =
+    activePosition(hands, players, seats, tricks)?.let { playerAtPosition(it, seats, players) }
 
-/**
- * Get a random free seat.
- */
-fun freePosition(occupiedSeats: List<Seat>): Either<ValidationError, Position> {
+context(Raise<GameAlreadyFull>)
+fun randomFreePosition(occupiedSeats: List<Seat>): Position {
     val occupied = occupiedSeats.map { it.position }.toSet()
-    val all = Position.values().toSet()
-    val maybePosition = all.minus(occupied).randomOrNull()
+    val all = Position.entries.toSet()
 
-    return maybePosition?.right() ?: ValidationError("game.take-a-seat.full").left()
+    return all.minus(occupied).randomOrNull() ?: raise(GameAlreadyFull)
 }
 
-fun startingPlayersSeatOfCurrentHand(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Option<Seat> =
-    option.eager {
-        val hand = currentHand(hands).bind()
-        val startingPlayer = players.firstOrNull { it.id == hand.startingPlayerId }.toOption().bind()
+fun startingPlayersSeatOfCurrentHand(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Seat? {
+    val hand = currentHand(hands)!!
+    val startingPlayer = players.firstOrNull { it.id == hand.startingPlayerId }!!
 
-        seats.firstOrNull { it.playerId == startingPlayer.id }.toOption().bind()
-    }
+    return seats.firstOrNull { it.playerId == startingPlayer.id }
+}
 
 /**
  * If it's a "suit" trump, all cards must follow suit except the Trump Jack a.k.a Buur.

@@ -15,12 +15,12 @@
         <dependency>
             <groupId>io.javalin</groupId>
             <artifactId>javalin-bundle</artifactId>
-            <version>5.2.0</version>
+            <version>5.4.2</version>
         </dependency>
         <dependency>
             <groupId>org.kodein.di</groupId>
             <artifactId>kodein-di-jvm</artifactId>
-            <version>7.15.1</version>
+            <version>7.17.0</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe</groupId>
@@ -30,27 +30,32 @@
         <dependency>
             <groupId>sh.ory</groupId>
             <artifactId>ory-client</artifactId>
-            <version>1.1.4</version>
+            <version>1.1.27</version>
         </dependency>
         <dependency>
             <groupId>io.arrow-kt</groupId>
             <artifactId>arrow-core</artifactId>
-            <version>1.1.2</version>
+            <version>1.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.arrow-kt</groupId>
+            <artifactId>arrow-fx-coroutines</artifactId>
+            <version>1.2.1</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.14.1</version>
+            <version>2.14.2</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-kotlin</artifactId>
-            <version>2.14.1</version>
+            <version>2.14.2</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.14.1</version>
+            <version>2.14.2</version>
         </dependency>
         <dependency>
             <groupId>org.valiktor</groupId>
@@ -60,26 +65,26 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
-            <version>1.7.21</version>
+            <version>1.9.10</version>
         </dependency>
 
         <!-- Database -->
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq</artifactId>
-            <version>3.17.6</version>
+            <version>3.18.0</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.5.1</version>
+            <version>42.5.4</version>
         </dependency>
 
         <!-- Testing -->
         <dependency>
             <groupId>io.mockk</groupId>
             <artifactId>mockk</artifactId>
-            <version>1.13.2</version>
+            <version>1.13.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -103,12 +108,12 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.4.5</version>
+            <version>1.4.7</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-            <version>1.4.5</version>
+            <version>1.4.7</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.janino</groupId>
@@ -128,17 +133,17 @@
         <dependency>
             <groupId>jakarta.activation</groupId>
             <artifactId>jakarta.activation-api</artifactId>
-            <version>2.1.0</version>
+            <version>2.1.2</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>
-            <version>3.1.0</version>
+            <version>3.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.inject</groupId>
             <artifactId>jersey-hk2</artifactId>
-            <version>3.1.0</version>
+            <version>3.1.1</version>
         </dependency>
     </dependencies>
     <build>
@@ -153,13 +158,18 @@
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
-                <version>1.7.21</version>
+                <version>1.9.10</version>
                 <executions>
                     <execution>
                         <id>compile</id>
                         <goals>
                             <goal>compile</goal>
                         </goals>
+                        <configuration>
+                            <args>
+                                <arg>-Xcontext-receivers</arg>
+                            </args>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>test-compile</id>
@@ -240,6 +250,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.10.1</version>
+
                 <configuration>
                     <source>19</source>
                     <target>19</target>

@@ -1,9 +1,8 @@
 package ch.yass.game
 
-import arrow.core.Either
-import arrow.core.continuations.either
-import ch.yass.core.error.DomainError
-import ch.yass.core.error.DomainError.*
+import arrow.core.raise.Raise
+import arrow.core.raise.ensure
+import ch.yass.core.error.*
 import ch.yass.core.helper.logger
 import ch.yass.game.api.ChooseTrumpRequest
 import ch.yass.game.api.JoinGameRequest
@@ -19,115 +18,118 @@ import ch.yass.game.dto.db.Player
 import ch.yass.game.engine.*
 
 class GameService(private val repo: GameRepository) {
-    fun join(request: JoinGameRequest, player: Player): Either<DomainError, GameState> = either.eager {
-        val maybeGame = repo.getByCode(request.code).bind()
-        val game = maybeGame.toEither { ValidationError("game.take-a-seat.empty") }.bind()
 
-        repo.takeASeat(game, player).bind()
-        repo.getState(game).bind()
+    context(Raise<GameWithCodeNotFound>, Raise<GameAlreadyFull>)
+    fun join(request: JoinGameRequest, player: Player): GameState {
+        val game = repo.getByCode(request.code)
+
+        repo.takeASeat(game, player)
+
+        return repo.getState(game)
     }
 
-    fun play(request: PlayCardRequest, player: Player): Either<DomainError, GameState> = either.eager {
-        val game = repo.getByUUID(request.game).bind()
-        val state = repo.getState(game).bind()
+    context(Raise<GameError>)
+    fun play(request: PlayCardRequest, player: Player): GameState {
+        val game = repo.getByUUID(request.game)
+        val state = repo.getState(game)
         val playedCard = Card.from(request.card)
         val nextState = nextState(state)
 
-        ensure(listOf(State.PLAY_CARD, State.PLAY_CARD_BOT).contains(nextState)) {
-            UnexpectedError("invalid game state, should have been ${State.PLAY_CARD} or ${State.PLAY_CARD_BOT} but was $nextState")
+        ensure(expectedState(listOf(State.PLAY_CARD, State.PLAY_CARD_BOT), nextState)) {
+            InvalidState(nextState, state)
         }
-        ensure(playerHasTurn(player, state).bind()) { ValidationError("play.player.locked") }
-        ensure(playerOwnsCard(player, playedCard, state).bind()) { ValidationError("play.not-owned") }
-        ensure(cardIsPlayable(playedCard, player, state).bind()) { ValidationError("play.not-playable") }
+        ensure(playerHasTurn(player, state)) { PlayerIsLocked(player, state) }
+        ensure(playerOwnsCard(player, playedCard, state)) { PlayerDoesNotOwnCard(player, playedCard, state) }
+        ensure(isTrumpSet(currentHand(state.hands)!!)) { TrumpNotChosen(state) }
+        ensure(cardIsPlayable(playedCard, player, state)) { CardNotPlayable(playedCard, player, state) }
 
-        val currentTrick = currentTrick(state.tricks).bind { UnexpectedError("current trick is empty") }
-        val playerSeat = playerSeat(player, state.seats).bind { UnexpectedError("player seat is empty") }
+        val currentTrick = currentTrick(state.tricks)!!
+        val playerSeat = playerSeat(player, state.seats)!!
 
         logger().info("Player ${player.uuid} (bot:${player.bot}) played $playedCard")
 
-        repo.playCard(playedCard, currentTrick, playerSeat).bind()
+        repo.playCard(playedCard, currentTrick, playerSeat)
         gameLoop(game)
-        repo.getState(game).bind()
+
+        return repo.getState(game)
     }
 
-    fun trump(request: ChooseTrumpRequest, player: Player): Either<DomainError, GameState> = either.eager {
-        val game = repo.getByUUID(request.game).bind()
-        val state = repo.getState(game).bind()
+    context(Raise<GameError>)
+    fun trump(request: ChooseTrumpRequest, player: Player): GameState {
+        val game = repo.getByUUID(request.game)
+        val state = repo.getState(game)
         val chosenTrump = Trump.valueOf(request.trump)
         val nextState = nextState(state)
-        val currentHand = currentHand(state.hands).bind { UnexpectedError("current hand is empty") }
+        val currentHand = currentHand(state.hands)!!
 
-        ensure(listOf(State.TRUMP, State.TRUMP_BOT).contains(nextState)) {
-            UnexpectedError("invalid game state, should have been ${State.TRUMP} or ${State.TRUMP_BOT} but was $nextState")
-        }
-        ensure(playerHasTurn(player, state).bind()) { ValidationError("trump.player.wrong") }
-        ensure(trumps().contains(chosenTrump)) { ValidationError("trump.invalid") }
+        ensure(expectedState(listOf(State.TRUMP, State.TRUMP_BOT), nextState)) { InvalidState(nextState, state) }
+        ensure(playerHasTurn(player, state)) { PlayerIsLocked(player, state) }
+        ensure(trumps().contains(chosenTrump)) { TrumpInvalid(chosenTrump) }
 
         logger().info("Player ${player.uuid} (bot:${player.bot}) choose trump $chosenTrump")
 
-        repo.chooseTrump(chosenTrump, currentHand).bind()
+        repo.chooseTrump(chosenTrump, currentHand)
         gameLoop(game)
-        repo.getState(game).bind()
+
+        return repo.getState(game)
     }
 
-    private fun gameLoop(game: Game): Either<DomainError, Unit> = either.eager {
+    context(Raise<GameError>)
+    private fun gameLoop(game: Game) {
         do {
-            val updatedState = repo.getState(game).bind()
-            val currentHand = currentHand(updatedState.hands).bind { UnexpectedError("current hand is empty") }
+            val updatedState = repo.getState(game)
+            val currentHand = currentHand(updatedState.hands)!!
             val nextStateLoop = nextState(updatedState)
 
             when (nextStateLoop) {
                 State.FINISHED -> {}
                 State.PLAY_CARD -> {}
                 State.TRUMP -> {}
-                State.PLAY_CARD_BOT -> playAsBot(updatedState).bind()
-                State.TRUMP_BOT -> trumpAsBot(updatedState).bind()
-                State.NEW_TRICK -> repo.createTrick(currentHand).bind()
+                State.PLAY_CARD_BOT -> playAsBot(updatedState)
+                State.TRUMP_BOT -> trumpAsBot(updatedState)
+                State.NEW_TRICK -> repo.createTrick(currentHand)
                 State.NEW_HAND -> {
                     val startingPlayer = nextHandStartingPlayer(
                         updatedState.hands,
                         updatedState.allPlayers,
                         updatedState.seats
-                    ).bind { UnexpectedError("starting player is empty") }
-                    val newHand = repo.createHand(NewHand(game, startingPlayer, randomHand())).bind()
-                    repo.createTrick(newHand).bind()
+                    )
+                    val newHand = repo.createHand(NewHand(game, startingPlayer, randomHand()))
+                    repo.createTrick(newHand)
                 }
             }
-        } while (listOf(State.NEW_TRICK, State.NEW_HAND).contains(nextStateLoop))
+        } while (expectedState(listOf(State.NEW_TRICK, State.NEW_HAND), nextStateLoop))
     }
 
-    private fun trumpAsBot(state: GameState): Either<DomainError, GameState> = either.eager {
-        val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)
-            .bind { UnexpectedError("player is not a bot") }
-
+    context(Raise<GameError>)
+    private fun trumpAsBot(state: GameState): GameState {
+        val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)!!
         if (!botPlayer.bot) {
-            shift<UnexpectedError>(UnexpectedError("player ${botPlayer.uuid} is not a bot"))
+            raise(PlayerIsNotBot(botPlayer, state))
         }
 
         // TODO: Get a good trump to choose
-        val trump = chooseTrumpForBot(botPlayer, state).bind()
+        val trump = chooseTrumpForBot(botPlayer, state)
         val request = ChooseTrumpRequest(state.game.uuid.toString(), trump.name)
 
-        trump(request, botPlayer).bind()
+        return trump(request, botPlayer)
     }
 
-    private fun playAsBot(state: GameState): Either<DomainError, GameState> = either.eager {
-        val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)
-            .bind { UnexpectedError("player is not a bot") }
-
+    context(Raise<GameError>)
+    private fun playAsBot(state: GameState): GameState {
+        val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)!!
         if (!botPlayer.bot) {
-            shift<UnexpectedError>(UnexpectedError("player ${botPlayer.uuid} is not a bot"))
+            raise(PlayerIsNotBot(botPlayer, state))
         }
 
         // TODO: Get a good card to play
-        val card = chooseCardForBot(botPlayer, state).bind()
-
+        val card = chooseCardForBot(botPlayer, state)
         val request = PlayCardRequest(
             state.game.uuid.toString(),
             PlayedCard(card.suit.toString(), card.rank.toString(), card.skin)
         )
 
-        // Possible recursion? Naahhh, never...
-        play(request, botPlayer).bind()
+
+        return play(request, botPlayer)
     }
 }

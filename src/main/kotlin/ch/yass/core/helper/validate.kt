@@ -1,48 +1,33 @@
 package ch.yass.core.helper
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
-import arrow.core.toOption
+import arrow.core.raise.Raise
 import ch.yass.Yass
-import ch.yass.core.error.DomainError.*
-import ch.yass.core.error.DomainError
+import ch.yass.core.error.JsonNotMappable
+import ch.yass.core.error.ValidationError
+import ch.yass.core.error.ValiktorError
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.exc.ValueInstantiationException
-import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import org.kodein.di.direct
 import org.kodein.di.instance
 import org.valiktor.ConstraintViolationException
 
 /**
- * Try to map given string to object of type T. If this object as a valikor init
+ * Try to map given string to object of type T. If this object has a valikor init
  * validation defined this will automatically get triggered by jackson. If
  * anything goes wrong, an appropriate DomainError will be returned.
  */
-inline fun <reified T> validate(json: String): Either<DomainError, T> {
+context(Raise<ValidationError>)
+inline fun <reified T> validate(json: String): T {
     val mapper = Yass.container.direct.instance<ObjectMapper>()
 
     return try {
-        mapper.readValue(json, T::class.java).right()
+        mapper.readValue(json, T::class.java)
     } catch (exception: ValueInstantiationException) {
-        exception.cause.toOption().fold(
-            { UnexpectedError("could not map $json to ${T::class.java}", exception).left() },
-            { cause -> handleInstantiationCause(cause).left() }
-        )
-    } catch (exception: MissingKotlinParameterException) {
-        RequestError("body.json.parameter.missing").left()
+        when (exception.cause) {
+            is ConstraintViolationException -> raise(ValiktorError((exception.cause as ConstraintViolationException).constraintViolations))
+            else -> raise(JsonNotMappable(null, exception.cause))
+        }
     } catch (exception: Exception) {
-        UnexpectedError("could not map $json to ${T::class.java}", exception).left()
-    }
-}
-
-fun handleInstantiationCause(cause: Throwable): DomainError {
-    return when (cause) {
-        is ConstraintViolationException -> ValiktorError(
-            "constraint.violations",
-            cause.constraintViolations
-        )
-
-        else -> UnexpectedError("invalid json given", cause)
+        raise(JsonNotMappable(T::class.java.toString(), exception))
     }
 }

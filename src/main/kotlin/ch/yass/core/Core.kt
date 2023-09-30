@@ -4,23 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.util.StdDateFormat
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-//import com.fasterxml.jackson.databind.SerializationFeature
-//import com.fasterxml.jackson.databind.util.StdDateFormat
-//import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.typesafe.config.ConfigFactory
-import org.kodein.di.DI
-import org.kodein.di.bindSingleton
-import org.kodein.di.instance
-import com.typesafe.config.Config as ConfigSettings
 import org.jooq.DSLContext
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
-import org.jooq.tools.jdbc.MockConnection
-import org.jooq.tools.jdbc.MockFileDatabase
+import org.kodein.di.DI
+import org.kodein.di.bindSingleton
+import org.kodein.di.instance
 import org.slf4j.LoggerFactory
-import java.io.File
 import java.sql.DriverManager
+import com.typesafe.config.Config as ConfigSettings
 
 object Core {
     val module = DI.Module("Core module") {

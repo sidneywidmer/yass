@@ -1,5 +1,5 @@
 package ch.yass.core.contract
 
-enum class CtxAttributes() {
+enum class CtxAttributes {
     PLAYER
 }

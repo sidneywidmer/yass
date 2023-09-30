@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import ch.yass.core.error.DomainError
+import ch.yass.core.errorold.DomainError
 import junit.framework.AssertionFailedError
 
 fun <L, R> assertLeftEquals(either: Either<L, R>, string: String): Boolean {

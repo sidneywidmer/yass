@@ -12,12 +12,9 @@ fun domainExceptionHandler(ctx: Context, exception: DomainException) {
 }
 
 /**
- * Something awful happened - so much for "no side effects" :D
+ * Something awful happened :(
  */
 fun globalExceptionHandler(exception: Exception, ctx: Context) {
     logger().error("Unhandled exception thrown.", exception)
-    ctx.status(500).json(object {
-        val code = "unexpected"
-        val payload = null
-    })
+    ctx.status(500)
 }

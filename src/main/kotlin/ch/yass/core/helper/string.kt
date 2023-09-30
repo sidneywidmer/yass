@@ -1,10 +1,11 @@
 package ch.yass.core.helper
 
-import arrow.core.Either
-import ch.yass.core.error.DomainError.UnexpectedError
+import arrow.core.raise.Raise
+import arrow.core.raise.catch
+import ch.yass.core.error.StringNoValidUUID
 import java.util.*
 
 
-fun String.toUUID(): Either<UnexpectedError, UUID> = Either.catch {
-    UUID.fromString(this)
-}.mapLeft { UnexpectedError("could not convert $this to uuid", it) }
+context(Raise<StringNoValidUUID>)
+fun String.toUUID(): UUID = catch({ UUID.fromString(this) }) { raise(StringNoValidUUID(this)) }
+

@@ -1,22 +1,16 @@
 package ch.yass.core.helper
 
 import ch.yass.core.error.DomainError
-import ch.yass.core.error.DomainError.*
+import ch.yass.core.error.ValiktorError
 import io.javalin.http.Context
 import org.valiktor.i18n.mapToMessage
 import java.util.*
 
-data class ErrorResponse(
-    val code: String, val message: String = "", val payload: Any? = null
-)
+data class ErrorResponse(val message: String = "", val payload: Any? = null)
 
-data class Path(
-    val path: String, val violations: List<Violation>
-)
+data class Path(val path: String, val violations: List<Violation>)
 
-data class Violation(
-    val code: String, val message: String = ""
-)
+data class Violation(val code: String, val message: String = "")
 
 
 /**
@@ -29,10 +23,7 @@ fun successResponse(ctx: Context, data: Any): Context {
 
 fun errorResponse(ctx: Context, error: DomainError): Context {
     return when (error) {
-        is RequestError -> ctx.status(400).json(ErrorResponse(error.code))
-        is OryError -> ctx.status(401).json(ErrorResponse(error.code))
         is ValiktorError -> ctx.status(422).json(groupValiktorViolations(error))
-        is ValidationError -> ctx.status(422).json(ErrorResponse(error.code))
         else -> {
             logger().error("DomainError `${error.javaClass.name}` encountered: $error")
             ctx.status(500).json(ErrorResponse("ouch"))
@@ -50,10 +41,10 @@ fun errorResponse(ctx: Context, error: DomainError): Context {
  * }
  */
 private fun groupValiktorViolations(error: ValiktorError): ErrorResponse {
-    val payload = error.payload
+    val payload = error.violations
         .mapToMessage("messages", Locale.ENGLISH)
         .groupBy { it.property }
         .map { Path(it.key, it.value.map { violation -> Violation(violation.constraint.name, violation.message) }) }
 
-    return ErrorResponse(error.code, "", payload)
+    return ErrorResponse("constraint violations found", payload)
 }
