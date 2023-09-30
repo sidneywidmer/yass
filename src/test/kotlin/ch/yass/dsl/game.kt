@@ -34,7 +34,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
         code = "ABCDE"
         store()
     }
-    val game = repo.getByUUID(gameRecord.uuid!!).fold({ throw Exception("Could not find game") }, { it })
+    val game = repo.getByUUID(gameRecord.uuid!!)
 
     val playerMap = state.players.map { p ->
         val player = db.newRecord(PLAYER).apply {
@@ -109,6 +109,6 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
         }
     }
 
-    return repo.getState(game).fold({ throw Exception("Invalid state") }, { it })
+    return repo.getState(game)
 }
 

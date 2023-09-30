@@ -1,6 +1,6 @@
 package ch.yass
 
-import org.junit.Test
+import arrow.core.raise.fold
 import ch.yass.dsl.game
 import ch.yass.game.GameService
 import ch.yass.game.api.PlayCardRequest
@@ -8,12 +8,13 @@ import ch.yass.game.api.PlayedCard
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.*
 import ch.yass.game.engine.playerAtPosition
-import junit.framework.TestCase.assertEquals
+import org.junit.jupiter.api.Assertions.fail
+import org.junit.jupiter.api.Test
 import org.kodein.di.direct
 import org.kodein.di.instance
 
 class BotTest : BaseTest() {
-    private val service: GameService = container.direct.instance()
+    private val service: GameService = Yass.container.direct.instance()
 
     /**
      * 4 Players in the game and the welcome hand is already played. Clubs is trump and in the first
@@ -54,13 +55,17 @@ class BotTest : BaseTest() {
     fun testBotsPlayAFullGame() {
         val state = getState()
 
-        val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers).unnest()
+        val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)!!
         val playedCard = PlayedCard("CLUBS", "NINE", "french")
         val request = PlayCardRequest(state.game.uuid.toString(), playedCard)
-        val result = service.play(request, player)
-        val gameState = getRightOrThrow(result)
 
-        val foo = "bar"
+        fold(
+            { service.play(request, player) },
+            { fail() },
+            {
+                val foo = "bar"
+            }
+        )
     }
 
 }

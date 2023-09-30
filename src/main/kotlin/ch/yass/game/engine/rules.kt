@@ -67,26 +67,24 @@ fun isGameFinished(hands: List<Hand>, tricks: List<Trick>): Boolean {
     return hands.count() == 5 && tricksOfHand.size == 9 && lastTrick.cards().count() == 4
 }
 
+
 fun cardIsPlayable(card: Card, player: Player, state: GameState): Boolean {
     val trick = currentTrick(state.tricks)!!
     val hand = currentHand(state.hands)!!
     val seat = playerSeat(player, state.seats)!!
     val cards = hand.cardsOf(seat.position).filter { playerOwnsCard(player, it, state) }
 
-    // This seems to be the first card played in the first trick of a new hand.
+    // This seems to be the first card played in the first trick of a new hand and the player currently trying
+    // to play a card is the starting player
     val isFirstTrick = tricksOfHand(state.tricks, hand).count() == 1
     if (trick.cards().isEmpty() && isFirstTrick && hand.startingPlayerId == player.id) {
         return true
     }
 
-    val lastTricksWinnerPosition = winningPositionOfLastTrick(hand, state.tricks, state.seats)!!
-    val lead = trick.cardOf(lastTricksWinnerPosition)!!
-
+    val lead = currentLead(state)
 
     // Hier gehts weiter: isFollowingLead muss im aktuellen trick die karte des ersten spielers nehmen
-
     return when {
-        !isLeadPlayed(trick, lastTricksWinnerPosition) -> true
         isLastCard(cards) -> true
         isFollowingLead(lead, card) -> true
         couldNotFollowLead(hand, cards, lead) -> true

@@ -14,10 +14,15 @@ import io.javalin.json.JavalinJackson
 import org.kodein.di.*
 import org.slf4j.LoggerFactory
 import com.typesafe.config.Config as ConfigSettings
+import org.flywaydb.core.Flyway
 
 
 class Bootstrap(private val config: ConfigSettings) {
     fun start(di: DI) {
+        if (config.getBoolean("db.migrate")) {
+            migrateDB()
+        }
+
         val app = Javalin.create { config ->
             config.showJavalinBanner = false
             config.jsonMapper(JavalinJackson(di.direct.instance()))
@@ -41,8 +46,15 @@ class Bootstrap(private val config: ConfigSettings) {
 
         app.exception(DomainException::class.java) { exception, ctx -> domainExceptionHandler(ctx, exception) }
         app.exception(Exception::class.java) { exception, ctx -> globalExceptionHandler(exception, ctx) }
+    }
 
-        app.start(config.getInt("server.port"))
+    private fun migrateDB() {
+        Flyway.configure()
+            .dataSource(config.getString("db.url"), config.getString("db.username"), config.getString("db.password"))
+            .locations("filesystem:src/main/resources/db/migration")
+            .baselineOnMigrate(true)
+            .load()
+            .migrate()
     }
 
     private fun registerEvents(app: Javalin) {

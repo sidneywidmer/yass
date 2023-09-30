@@ -14,8 +14,8 @@ fun currentTrick(tricks: List<Trick>): Trick? = tricks.firstOrNull()
 
 fun currentHand(hands: List<Hand>): Hand? = hands.firstOrNull()
 
-fun playerSeat(player: Player, seats: List<Seat>): Seat? =
-    seats.firstOrNull { it.playerId == player.id }
+fun playerSeat(player: Player, seats: List<Seat>): Seat =
+    seats.first { it.playerId == player.id }
 
 fun tricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> {
     return tricks.filter { it.handId == hand.id }
@@ -27,6 +27,22 @@ fun tricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> {
 fun playerAtPosition(position: Position, seats: List<Seat>, players: List<Player>): Player? {
     return seats.firstOrNull { it.position == position }
         .let { players.firstOrNull { seat -> seat.id == it?.playerId } }
+}
+
+/**
+ * If we don't have a winner of the last trick, it means this is the first trick in the current hand. If this is
+ * the case the starting player of the current hands card is the lead.
+ */
+fun currentLead(state: GameState): Card {
+    val hand = currentHand(state.hands)!!
+    val trick = currentTrick(state.tricks)!!
+    val lastTricksWinnerPosition = winningPositionOfLastTrick(hand, state.tricks, state.seats)
+    if (lastTricksWinnerPosition != null) {
+        return trick.cardOf(lastTricksWinnerPosition)!!
+    }
+
+    val startingPlayer = startingPlayersSeatOfCurrentHand(state.hands, state.allPlayers, state.seats)
+    return trick.cardOf(startingPlayer.position)!!
 }
 
 fun nextState(state: GameState): State {
@@ -53,7 +69,7 @@ fun nextState(state: GameState): State {
  * Find the player who starts the next trick.
  */
 fun nextHandStartingPlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Player {
-    val seat = startingPlayersSeatOfCurrentHand(hands, players, seats)!!
+    val seat = startingPlayersSeatOfCurrentHand(hands, players, seats)
     val nextTrickStartingPosition = positionsOrderedWithStart(seat.position)[1]
     val startingSeat = seats.first { it.position == nextTrickStartingPosition }
 
@@ -75,36 +91,43 @@ fun activePosition(
     val trick = currentTrick(tricks)
     val hand = currentHand(hands)!!
     return when {
-        trick == null -> startingPlayersSeatOfCurrentHand(hands, players, seats)!!.position
+        trick == null -> startingPlayersSeatOfCurrentHand(hands, players, seats).position
         trick.cards().size < 4 -> {
-            val seat = startingPlayersSeatOfCurrentHand(hands, players, seats)!!
+            val seat = startingPlayersSeatOfCurrentHand(hands, players, seats)
             val positions = positionsOrderedWithStart(seat.position)
 
-            positions.firstOrNull { trick.cardOf(it) == null }
+            positions.first { trick.cardOf(it) == null }
         }
 
-        else -> winningPositionOfLastTrick(hand, tricksOfHand(tricks, hand), seats)
+        else -> winningPositionOfCurrentTrick(hand, tricksOfHand(tricks, hand), seats)
     }
 }
 
-/**
- * Who won the last trick. Assumes all players have played a card in given - complete - trick.
- * To figure this out we need to recursively loop all played tricks in the given hand.
- */
+fun winningPositionOfCurrentTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position? =
+    winningPositionOfTrick(hand, tricks, seats)
 
 fun winningPositionOfLastTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position? {
-    if (hand.trump == null) {
+    if (tricks.count() < 2) {
         return null
     }
 
-    if (tricks.count() < 2) {
+    // Index 0 is the current trick, so we remove it to get data up to the last one
+    return winningPositionOfTrick(hand, tricks.drop(1), seats)
+}
+
+/**
+ * To figure this out we need to recursively loop all played tricks in the given hand. Figures out
+ * the winner of the last trick in the tricks list.
+ */
+fun winningPositionOfTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position? {
+    if (hand.trump == null) {
         return null
     }
 
     var startPosition = seats.first { it.playerId == hand.startingPlayerId }.position
 
-    // We want to calculate until the last trick and not the current one
-    for (trick in tricks.reversed().dropLast(1)) {
+    // Tricks are order where index 0 is the newest trick, we need to start at the oldest so we reverse the list
+    for (trick in tricks.reversed()) {
         val suitLed = trick.cardOf(startPosition)!!.suit
         val winningCard = trick.cards()
             .filter { it.suit == suitLed || it.suit == hand.trumpSuit() }
@@ -165,11 +188,11 @@ fun randomFreePosition(occupiedSeats: List<Seat>): Position {
     return all.minus(occupied).randomOrNull() ?: raise(GameAlreadyFull)
 }
 
-fun startingPlayersSeatOfCurrentHand(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Seat? {
+fun startingPlayersSeatOfCurrentHand(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Seat {
     val hand = currentHand(hands)!!
     val startingPlayer = players.firstOrNull { it.id == hand.startingPlayerId }!!
 
-    return seats.firstOrNull { it.playerId == startingPlayer.id }
+    return seats.first { it.playerId == startingPlayer.id }
 }
 
 /**

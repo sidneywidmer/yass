@@ -6,16 +6,11 @@
 - Manually trigger jooq-codegen:generate
 - flyway:migrate automatically gets triggered for unit tests, make sure th db url is correct in the env vars
 
-## Error / Error-Codes
+## Error handling
+We strongly differentiate between logical failures and exceptions. Anything that is out of the scope of our 
+domain, or we can't handle it anyway because it's an _unexpected_ state, returns an exception. Anything that
+we _can_ handle should be solved via arrow `raise`-DSL and context receivers.
 
-Types: 
-- DomainError
-  - OryError
-  - RequestError
-  - DbError
-
-Codes: Error class indicates _where_ something when wrong - e.g Request, an API client, DB. 
-The where references a system component. The specifies again where in the component something went wrong and 
-ends with _what_ went wrong.
-
-RequestError("header.token.missing") - where? Something with a request, header. what? token is missing
+## Config
+Config file is under resources/application.conf. The environment variables need to be provided otherwise the application
+won't start.

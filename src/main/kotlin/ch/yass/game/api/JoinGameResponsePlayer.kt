@@ -4,7 +4,7 @@ import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Card
 import ch.yass.game.dto.Position
 import ch.yass.game.engine.currentTrick
-import java.util.UUID
+import java.util.*
 
 data class JoinGameResponsePlayer(
     val uuid: UUID,
@@ -21,7 +21,7 @@ data class JoinGameResponsePlayer(
                     player.uuid,
                     player.name,
                     seat.position,
-                    currentTrick.fold({ null }, { it.cardOf(seat.position) })
+                    currentTrick?.cardOf(seat.position)
                 )
             }
         }

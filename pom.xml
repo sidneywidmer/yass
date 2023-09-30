@@ -10,6 +10,18 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.10.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <!-- Framework -->
         <dependency>
@@ -79,6 +91,11 @@
             <artifactId>postgresql</artifactId>
             <version>42.5.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>9.21.0</version>
+        </dependency>
 
         <!-- Testing -->
         <dependency>
@@ -88,9 +105,14 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-suite</artifactId>
+            <version>1.10.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -154,7 +176,18 @@
                 <directory>src/test/resources</directory>
             </testResource>
         </testResources>
+
         <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <includes>
+                        <include>**/YassSuite.class</include>
+                    </includes>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
@@ -176,37 +209,13 @@
                         <goals>
                             <goal>test-compile</goal>
                         </goals>
+                        <configuration>
+                            <args>
+                                <arg>-Xcontext-receivers</arg>
+                            </args>
+                        </configuration>
                     </execution>
                 </executions>
-            </plugin>
-
-            <!-- Flyway migrations -->
-            <plugin>
-                <groupId>org.flywaydb</groupId>
-                <artifactId>flyway-maven-plugin</artifactId>
-                <version>3.0</version>
-
-                <!-- automatic migration only for tests, otherwise we trigger this manually -->
-                <executions>
-                    <execution>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>migrate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-
-                <!-- Note that we need to prefix the db/migration path with filesystem: to prevent Flyway
-                     from looking for our migration scripts only on the classpath -->
-                <configuration>
-                    <url>${env.DB_URL}</url>
-                    <user>${env.DB_USER}</user>
-                    <password>${env.DB_PASSWORD}</password>
-                    <locations>
-                        <location>filesystem:src/main/resources/db/migration</location>
-                    </locations>
-                    <initOnMigrate>true</initOnMigrate>
-                </configuration>
             </plugin>
 
             <!-- The jOOQ code generator plugin -->

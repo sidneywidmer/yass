@@ -1,27 +1,14 @@
 package ch.yass
 
-import ch.yass.core.Core
 import ch.yass.db.tables.references.*
-import ch.yass.game.Game
-import ch.yass.identity.Identity
-import junit.framework.AssertionFailedError
+import org.junit.jupiter.api.*
 import org.jooq.DSLContext
-import org.junit.Before
-import org.kodein.di.DI
 import org.kodein.di.direct
 import org.kodein.di.instance
 
 
 open class BaseTest {
-    companion object {
-        val container = DI {
-            import(Core.module)
-            import(Identity.module)
-            import(Game.module)
-        }
-    }
-
-    @Before
+    @BeforeEach
     fun before() {
         cleanDB()
     }

@@ -1,10 +1,5 @@
 package ch.yass.game.api
 
-import arrow.core.Either
-import arrow.core.raise.Raise
-import arrow.core.raise.either
-import arrow.core.raise.ensureNotNull
-import ch.yass.core.errorold.DomainError.*
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Card
 import ch.yass.game.dto.Position
@@ -24,11 +19,11 @@ data class GameStateResponse(
     val rejoinedAt: LocalDateTime?
 ) {
     companion object {
-        fun from(state: GameState, player: Player): Either<UnexpectedError, GameStateResponse> = either {
+        fun from(state: GameState, player: Player): GameStateResponse {
             val hand = currentHand(state.hands)!!
             val playerSeat = playerSeat(player, state.seats)!!
 
-            GameStateResponse(
+            return GameStateResponse(
                 state.game.uuid,
                 JoinGameResponsePlayer.from(state),
                 hand.trump,
