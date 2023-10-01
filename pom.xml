@@ -27,7 +27,7 @@
         <dependency>
             <groupId>io.javalin</groupId>
             <artifactId>javalin-bundle</artifactId>
-            <version>5.4.2</version>
+            <version>5.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.kodein.di</groupId>
@@ -57,17 +57,17 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.14.2</version>
+            <version>2.15.1</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-kotlin</artifactId>
-            <version>2.14.2</version>
+            <version>2.15.1</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.14.2</version>
+            <version>2.15.1</version>
         </dependency>
         <dependency>
             <groupId>org.valiktor</groupId>
@@ -169,11 +169,11 @@
         </dependency>
     </dependencies>
     <build>
-        <sourceDirectory>src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
+        <sourceDirectory>server/main/kotlin</sourceDirectory>
+        <testSourceDirectory>server/test/kotlin</testSourceDirectory>
         <testResources>
             <testResource>
-                <directory>src/test/resources</directory>
+                <directory>server/test/resources</directory>
             </testResource>
         </testResources>
 
@@ -250,7 +250,7 @@
                         </generate>
                         <target>
                             <packageName>ch.yass.db</packageName>
-                            <directory>src/main/kotlin</directory>
+                            <directory>server/main/kotlin</directory>
                         </target>
                     </generator>
                 </configuration>
