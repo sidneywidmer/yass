@@ -1,6 +1,7 @@
 package ch.yass.core.helper
 
 import ch.yass.core.error.DomainError
+import ch.yass.core.error.GameWithCodeNotFound
 import ch.yass.core.error.Unauthorized
 import ch.yass.core.error.ValiktorError
 import io.javalin.http.Context
@@ -23,6 +24,7 @@ fun errorResponse(ctx: Context, error: DomainError): Context {
     return when (error) {
         is ValiktorError -> ctx.status(422).json(groupValiktorViolations(error))
         is Unauthorized -> ctx.status(401).json(ErrorResponse("ory authentication failed", error.exception.responseBody))
+        is GameWithCodeNotFound -> ctx.status(404).json(ErrorResponse("no game with code ${error.code} found"))
         else -> {
             logger().error("DomainError `${error.javaClass.name}` encountered: $error")
             ctx.status(500).json(ErrorResponse("something went wrong", object {

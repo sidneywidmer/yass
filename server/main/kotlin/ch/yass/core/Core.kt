@@ -22,6 +22,7 @@ object Core {
         bindSingleton { createDSLContext(instance()) }
         bindSingleton { Bootstrap(instance()) }
         bindSingleton { MDCMiddleware() }
+        bindSingleton { CORSMiddleware() }
         bindSingleton { LoggerFactory.getLogger("Yass") }
         bindSingleton { createJsonMapper() }
     }

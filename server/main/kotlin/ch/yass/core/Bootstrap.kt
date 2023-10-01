@@ -23,15 +23,15 @@ class Bootstrap(private val config: ConfigSettings) {
     fun start(di: DI) {
         setupFlyway()
 
-        val app = Javalin.create { config ->
-            config.showJavalinBanner = false
-            config.jsonMapper(JavalinJackson(di.direct.instance()))
-            config.plugins.enableCors { cors -> cors.add { it.allowHost("127.0.0.1") } }
+        val app = Javalin.create { javalinConfig ->
+            javalinConfig.showJavalinBanner = false
+            javalinConfig.jsonMapper(JavalinJackson(di.direct.instance()))
         }
 
         // Register all middlewares here. We're doing this manually to ensure
         // the correct order (opposed to just also use di.allInstances()).
         val middlewares: List<Middleware> = listOf(
+            di.direct.instance<CORSMiddleware>(),
             di.direct.instance<MDCMiddleware>(),
             di.direct.instance<AuthMiddleware>(),
         )
@@ -48,7 +48,7 @@ class Bootstrap(private val config: ConfigSettings) {
         app.exception(DomainException::class.java) { exception, ctx -> domainExceptionHandler(ctx, exception) }
         app.exception(Exception::class.java) { exception, ctx -> globalExceptionHandler(exception, ctx) }
 
-        app.start(config.getInt("server.port"))
+        app.start("127.0.0.1", config.getInt("server.port"))
     }
 
     private fun setupFlyway() {

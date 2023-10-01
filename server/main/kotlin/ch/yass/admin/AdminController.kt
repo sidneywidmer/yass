@@ -2,6 +2,7 @@ package ch.yass.admin
 
 import arrow.core.raise.either
 import arrow.core.raise.recover
+import ch.yass.admin.api.AnalyzeGameStateResponse
 import ch.yass.admin.api.GenerateHandResponse
 import ch.yass.admin.dsl.game
 import ch.yass.core.contract.Controller
@@ -31,7 +32,9 @@ class AdminController(private val gameService: GameService) : Controller {
     }
 
     private fun analyzeGame(ctx: Context) = either {
-        gameService.getStateByCode(ctx.pathParam("code"))
+        val state = gameService.getStateByCode(ctx.pathParam("code"))
+
+        AnalyzeGameStateResponse.from(state)
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }
