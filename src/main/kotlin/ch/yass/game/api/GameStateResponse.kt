@@ -21,7 +21,7 @@ data class GameStateResponse(
     companion object {
         fun from(state: GameState, player: Player): GameStateResponse {
             val hand = currentHand(state.hands)!!
-            val playerSeat = playerSeat(player, state.seats)!!
+            val playerSeat = playerSeat(player, state.seats)
 
             return GameStateResponse(
                 state.game.uuid,

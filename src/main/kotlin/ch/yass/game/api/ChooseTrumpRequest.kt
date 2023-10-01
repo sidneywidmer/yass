@@ -1,7 +1,5 @@
 package ch.yass.game.api
 
-import ch.yass.core.valiktor.isRank
-import ch.yass.core.valiktor.isSuit
 import ch.yass.core.valiktor.isTrump
 import org.valiktor.functions.*
 import org.valiktor.validate

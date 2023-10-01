@@ -7,11 +7,8 @@ import org.valiktor.i18n.mapToMessage
 import java.util.*
 
 data class ErrorResponse(val message: String = "", val payload: Any? = null)
-
 data class Path(val path: String, val violations: List<Violation>)
-
 data class Violation(val code: String, val message: String = "")
-
 
 /**
  * Helper to json encode given data with jackson and add the result

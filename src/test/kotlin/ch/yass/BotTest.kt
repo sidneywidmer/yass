@@ -63,7 +63,7 @@ class BotTest : BaseTest() {
             { service.play(request, player) },
             { fail() },
             {
-                val foo = "bar"
+                // we passed, yay!
             }
         )
     }

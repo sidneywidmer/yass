@@ -13,7 +13,7 @@ import ch.yass.game.dto.db.*
  */
 fun unplayedCardsOfPlayer(player: Player, hands: List<Hand>, seats: List<Seat>, tricks: List<Trick>): List<Card> {
     val hand = currentHand(hands)!!
-    val seat = playerSeat(player, seats)!!
+    val seat = playerSeat(player, seats)
 
     val allCards = hand.cardsOf(seat.position)
     val relevantTricks = tricksOfHand(tricks, hand)
@@ -42,11 +42,9 @@ fun playerHasTurn(player: Player, state: GameState): Boolean {
     return activePlayer.id == player.id
 }
 
-fun isLeadPlayed(trick: Trick, startPosition: Position): Boolean = trick.cardOf(startPosition) != null
-
 fun isLastCard(cards: List<Card>) = cards.count() == 1
 
-fun isFollowingLead(lead: Card, card: Card) = lead.suit == card.suit
+fun isFollowingLead(lead: Card?, card: Card) = lead?.suit == card.suit
 
 fun couldNotFollowLead(hand: Hand, cards: List<Card>, lead: Card?): Boolean =
     !playableCards(hand, cards).any { it.suit == lead?.suit }
@@ -71,20 +69,14 @@ fun isGameFinished(hands: List<Hand>, tricks: List<Trick>): Boolean {
 fun cardIsPlayable(card: Card, player: Player, state: GameState): Boolean {
     val trick = currentTrick(state.tricks)!!
     val hand = currentHand(state.hands)!!
-    val seat = playerSeat(player, state.seats)!!
+    val seat = playerSeat(player, state.seats)
     val cards = hand.cardsOf(seat.position).filter { playerOwnsCard(player, it, state) }
 
-    // This seems to be the first card played in the first trick of a new hand and the player currently trying
-    // to play a card is the starting player
-    val isFirstTrick = tricksOfHand(state.tricks, hand).count() == 1
-    if (trick.cards().isEmpty() && isFirstTrick && hand.startingPlayerId == player.id) {
-        return true
-    }
+    val leadPosition = currentLeadPosition(state)
+    val lead = trick.cardOf(leadPosition)
 
-    val lead = currentLead(state)
-
-    // Hier gehts weiter: isFollowingLead muss im aktuellen trick die karte des ersten spielers nehmen
     return when {
+        leadPosition == seat.position -> true  // the player is leading, so let him play
         isLastCard(cards) -> true
         isFollowingLead(lead, card) -> true
         couldNotFollowLead(hand, cards, lead) -> true

@@ -30,7 +30,7 @@ data class Hand(
                 hand.updatedAt!!,
                 hand.startingPlayerId!!,
                 hand.gameId!!,
-                Trump.values().firstOrNull { it.name == hand.trump },
+                Trump.entries.firstOrNull { it.name == hand.trump },
                 hand.gschobe!!,
                 hand.points!!,
                 listFromDbJson<Card>(hand.north),
@@ -59,6 +59,6 @@ data class Hand(
             return null
         }
 
-        return Suit.values().firstOrNull { it.name == this.trump.name }
+        return Suit.entries.firstOrNull { it.name == this.trump.name }
     }
 }

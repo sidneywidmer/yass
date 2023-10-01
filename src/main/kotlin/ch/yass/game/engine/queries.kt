@@ -33,16 +33,15 @@ fun playerAtPosition(position: Position, seats: List<Seat>, players: List<Player
  * If we don't have a winner of the last trick, it means this is the first trick in the current hand. If this is
  * the case the starting player of the current hands card is the lead.
  */
-fun currentLead(state: GameState): Card {
+fun currentLeadPosition(state: GameState): Position {
     val hand = currentHand(state.hands)!!
-    val trick = currentTrick(state.tricks)!!
     val lastTricksWinnerPosition = winningPositionOfLastTrick(hand, state.tricks, state.seats)
     if (lastTricksWinnerPosition != null) {
-        return trick.cardOf(lastTricksWinnerPosition)!!
+        return lastTricksWinnerPosition
     }
 
     val startingPlayer = startingPlayersSeatOfCurrentHand(state.hands, state.allPlayers, state.seats)
-    return trick.cardOf(startingPlayer.position)!!
+    return startingPlayer.position
 }
 
 fun nextState(state: GameState): State {

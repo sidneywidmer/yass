@@ -1,5 +1,6 @@
 package ch.yass.dsl
 
+import arrow.core.raise.recover
 import ch.yass.Yass
 import ch.yass.core.helper.toDbJson
 import ch.yass.db.tables.references.*
@@ -34,7 +35,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
         code = "ABCDE"
         store()
     }
-    val game = repo.getByUUID(gameRecord.uuid!!)
+    val game = recover({ repo.getByUUID(gameRecord.uuid!!) }, { throw Exception("invalid uuid") })
 
     val playerMap = state.players.map { p ->
         val player = db.newRecord(PLAYER).apply {

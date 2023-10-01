@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory
 import com.typesafe.config.Config as ConfigSettings
 import org.flywaydb.core.Flyway
 
-
 class Bootstrap(private val config: ConfigSettings) {
     fun start(di: DI) {
         if (config.getBoolean("db.migrate")) {

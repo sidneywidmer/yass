@@ -20,10 +20,6 @@ class Yass {
 
         @JvmStatic
         fun main(args: Array<String>) {
-            bootstrap()
-        }
-
-        fun bootstrap() {
             val bootstrap: Bootstrap by container.instance()
             bootstrap.start(container)
         }

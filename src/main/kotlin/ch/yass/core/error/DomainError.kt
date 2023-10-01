@@ -4,13 +4,11 @@ import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Card
 import ch.yass.game.dto.State
 import ch.yass.game.dto.Trump
-import ch.yass.game.dto.db.Game
 import ch.yass.game.dto.db.Player
 import org.valiktor.ConstraintViolation
 import sh.ory.model.Identity
 
 sealed interface DomainError
-
 
 // Misc Errors
 data class StringNoValidUUID(val string: String) : DomainError
@@ -28,6 +26,7 @@ data class OryIdentityWithoutName(val identity: Identity) : AuthError
 // Game or Game-State related Errors
 sealed interface GameError : DomainError
 data object GameAlreadyFull : GameError
+data class GameNotFound(val uuid: String) : GameError
 data class PlayerIsLocked(val player: Player, val state: GameState) : GameError
 data class PlayerDoesNotOwnCard(val player: Player, val card: Card, val state: GameState) : GameError
 data class CardNotPlayable(val card: Card, val player: Player, val state: GameState) : GameError

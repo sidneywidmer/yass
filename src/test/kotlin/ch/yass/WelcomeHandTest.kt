@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.kodein.di.direct
 import org.kodein.di.instance
+import java.lang.Exception
 
 class WelcomeHandTest : BaseTest() {
     private val service: GameService = Yass.container.direct.instance()
@@ -102,10 +103,14 @@ class WelcomeHandTest : BaseTest() {
         val request = PlayCardRequest("b562227b-cc63-48cc-919e-9a115bbf7c6e", PlayedCard("WELCOME", "HELLO", "french"))
 
         // TODO: currently always failes - do we need a call by uuid that doesn't resolve? currenlty its !!
-        /*fold(
+        fold(
             { service.play(request, player) },
-            { fail() },
-            { fail() }
-        )*/
+            {
+                assertTrue(it is Exception)
+            },
+            {
+                fail()
+            }
+        )
     }
 }

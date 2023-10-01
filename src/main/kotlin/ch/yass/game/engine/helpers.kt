@@ -2,17 +2,16 @@ package ch.yass.game.engine
 
 import ch.yass.core.helper.cartesianProduct
 import ch.yass.game.dto.*
-import kotlin.time.measureTime
 
-fun ranks(): List<Rank> {
+fun regularRanks(): List<Rank> {
     return listOf(Rank.SIX, Rank.SEVEN, Rank.EIGHT, Rank.NINE, Rank.TEN, Rank.JACK, Rank.QUEEN, Rank.KING, Rank.ACE)
 }
 
-fun suits(): List<Suit> {
+fun regularSuits(): List<Suit> {
     return listOf(Suit.CLUBS, Suit.DIAMONDS, Suit.HEARTS, Suit.SPADES)
 }
 
-fun trumps(): List<Trump> {
+fun regularTrumps(): List<Trump> {
     return listOf(Trump.CLUBS, Trump.SPADES, Trump.HEARTS, Trump.DIAMONDS, Trump.UNEUFE, Trump.OBEABE)
 }
 
@@ -30,7 +29,7 @@ fun positionsOrderedWithStart(position: Position): List<Position> {
     }
 }
 
-fun deck(): List<Pair<Rank, Suit>> = cartesianProduct(ranks(), suits()).shuffled()
+fun deck(): List<Pair<Rank, Suit>> = cartesianProduct(regularRanks(), regularSuits()).shuffled()
 
 fun randomHand(): Map<Position, List<Card>> {
     val deck = deck()
@@ -44,33 +43,4 @@ fun randomHand(): Map<Position, List<Card>> {
 
 fun sort(cards: List<Card>): List<Card> {
     return cards.sortedWith(compareBy<Card> { it.suit }.thenBy { it.rank })
-}
-
-fun welcomeHand(): Map<Position, List<Card>> {
-    return mapOf(
-        Position.NORTH to listOf(
-            Card(Suit.WELCOME, Rank.HELLO, "french"),
-            Card(Suit.WELCOME, Rank.HELLO, "french"),
-            Card(Suit.WELCOME, Rank.HELLO, "french"),
-            Card(Suit.WELCOME, Rank.HELLO, "french")
-        ),
-        Position.EAST to listOf(
-            Card(Suit.WELCOME, Rank.HELLO, "french"),
-            Card(Suit.WELCOME, Rank.HELLO, "french"),
-            Card(Suit.WELCOME, Rank.HELLO, "french"),
-            Card(Suit.WELCOME, Rank.HELLO, "french")
-        ),
-        Position.SOUTH to listOf(
-            Card(Suit.WELCOME, Rank.HELLO, "french"),
-            Card(Suit.WELCOME, Rank.HELLO, "french"),
-            Card(Suit.WELCOME, Rank.HELLO, "french"),
-            Card(Suit.WELCOME, Rank.HELLO, "french")
-        ),
-        Position.WEST to listOf(
-            Card(Suit.WELCOME, Rank.HELLO, "french"),
-            Card(Suit.WELCOME, Rank.HELLO, "french"),
-            Card(Suit.WELCOME, Rank.HELLO, "french"),
-            Card(Suit.WELCOME, Rank.HELLO, "french")
-        ),
-    )
 }

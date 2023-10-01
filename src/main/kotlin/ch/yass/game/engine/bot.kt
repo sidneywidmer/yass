@@ -11,4 +11,4 @@ fun chooseCardForBot(botPlayer: Player, state: GameState): Card {
     return cards.shuffled().first { cardIsPlayable(it, botPlayer, state) }
 }
 
-fun chooseTrumpForBot(botPlayer: Player, state: GameState): Trump = trumps().shuffled().first()
+fun chooseTrumpForBot(botPlayer: Player, state: GameState): Trump = regularTrumps().shuffled().first()

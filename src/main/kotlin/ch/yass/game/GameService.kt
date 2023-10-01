@@ -44,7 +44,7 @@ class GameService(private val repo: GameRepository) {
         ensure(cardIsPlayable(playedCard, player, state)) { CardNotPlayable(playedCard, player, state) }
 
         val currentTrick = currentTrick(state.tricks)!!
-        val playerSeat = playerSeat(player, state.seats)!!
+        val playerSeat = playerSeat(player, state.seats)
 
         logger().info("Player ${player.uuid} (bot:${player.bot}) played $playedCard")
 
@@ -64,7 +64,7 @@ class GameService(private val repo: GameRepository) {
 
         ensure(expectedState(listOf(State.TRUMP, State.TRUMP_BOT), nextState)) { InvalidState(nextState, state) }
         ensure(playerHasTurn(player, state)) { PlayerIsLocked(player, state) }
-        ensure(trumps().contains(chosenTrump)) { TrumpInvalid(chosenTrump) }
+        ensure(regularTrumps().contains(chosenTrump)) { TrumpInvalid(chosenTrump) }
 
         logger().info("Player ${player.uuid} (bot:${player.bot}) choose trump $chosenTrump")
 
@@ -128,7 +128,6 @@ class GameService(private val repo: GameRepository) {
             state.game.uuid.toString(),
             PlayedCard(card.suit.toString(), card.rank.toString(), card.skin)
         )
-
 
         return play(request, botPlayer)
     }

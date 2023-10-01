@@ -10,7 +10,6 @@ import io.javalin.apibuilder.ApiBuilder.get
 import io.javalin.apibuilder.EndpointGroup
 import io.javalin.http.Context
 
-
 class AuthController(private val config: Config, private val mapper: ObjectMapper) : Controller {
     override val path = "/auth"
 
