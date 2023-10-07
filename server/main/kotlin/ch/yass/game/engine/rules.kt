@@ -2,7 +2,6 @@ package ch.yass.game.engine
 
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Card
-import ch.yass.game.dto.Position
 import ch.yass.game.dto.State
 import ch.yass.game.dto.Trump
 import ch.yass.game.dto.db.*
@@ -72,7 +71,7 @@ fun cardIsPlayable(card: Card, player: Player, state: GameState): Boolean {
     val seat = playerSeat(player, state.seats)
     val cards = hand.cardsOf(seat.position).filter { playerOwnsCard(player, it, state) }
 
-    val leadPosition = currentLeadPosition(state)
+    val leadPosition = currentLeadPositionOfHand(hand, state)
     val lead = trick.cardOf(leadPosition)
 
     return when {

@@ -22,7 +22,8 @@ import io.javalin.apibuilder.EndpointGroup
 import io.javalin.http.Context
 
 
-class AdminController(private val gameService: GameService) : Controller {
+class AdminController(private val analyzeGameService: AnalyzeGameService, private val gameService: GameService) :
+    Controller {
     override val path = "/admin"
 
     override val endpoints = EndpointGroup {
@@ -32,9 +33,7 @@ class AdminController(private val gameService: GameService) : Controller {
     }
 
     private fun analyzeGame(ctx: Context) = either {
-        val state = gameService.getStateByCode(ctx.pathParam("code"))
-
-        AnalyzeGameStateResponse.from(state)
+        analyzeGameService.analyze(ctx.pathParam("code"))
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }
