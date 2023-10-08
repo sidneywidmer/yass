@@ -68,10 +68,11 @@ fun isGameFinished(hands: List<Hand>, tricks: List<Trick>): Boolean {
 fun cardIsPlayable(card: Card, player: Player, state: GameState): Boolean {
     val trick = currentTrick(state.tricks)!!
     val hand = currentHand(state.hands)!!
+    val tricks = tricksOfHand(state.tricks, hand)
     val seat = playerSeat(player, state.seats)
     val cards = hand.cardsOf(seat.position).filter { playerOwnsCard(player, it, state) }
 
-    val leadPosition = currentLeadPositionOfHand(hand, state)
+    val leadPosition = currentLeadPositionOfHand(hand, tricks, state.seats, state.allPlayers)
     val lead = trick.cardOf(leadPosition)
 
     return when {

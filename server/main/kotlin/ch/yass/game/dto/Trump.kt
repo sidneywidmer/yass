@@ -5,8 +5,10 @@ enum class Trump {
     DIAMONDS,
     HEARTS,
     SPADES,
-    OBEABE,
-    UNEUFE,
+
+    //OBEABE,
+    //UNEUFE,
+
     FREESTYLE;
 
     fun equalsSuit(suit: Suit): Boolean {

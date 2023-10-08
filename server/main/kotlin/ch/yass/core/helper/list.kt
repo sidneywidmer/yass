@@ -8,3 +8,12 @@ package ch.yass.core.helper
 fun <T, U> cartesianProduct(c1: Collection<T>, c2: Collection<U>): List<Pair<T, U>> {
     return c1.flatMap { lhsElem -> c2.map { rhsElem -> lhsElem to rhsElem } }
 }
+
+inline fun <T> Iterable<T>.takeWhileInclusive(predicate: (T) -> Boolean): List<T> {
+    var shouldContinue = true
+    return takeWhile {
+        val result = shouldContinue
+        shouldContinue = predicate(it)
+        result
+    }
+}

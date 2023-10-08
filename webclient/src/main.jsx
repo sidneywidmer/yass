@@ -1,26 +1,27 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
-import {
-    createBrowserRouter,
-    RouterProvider,
-} from "react-router-dom";
 import "./index.css";
-import Root from "./routes/root.jsx";
-import Analyze from "./routes/analyze.jsx";
 
-const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <Root/>,
-    },
-    {
-        path: "/analyze/:gameCode",
-        element: <Analyze/>,
-    },
-]);
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+import {CssBaseline} from "@mui/material";
+import App from "./components/App.jsx";
+import GlobalErrorHandling from "./components/GlobalErrorHandling.jsx";
+import ErrorProvider from "./contexts/Error.jsx";
+import LoadingProvider from "./contexts/Loading.jsx";
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(
     <React.StrictMode>
-        <RouterProvider router={router}/>
+        <CssBaseline/>
+        <ErrorProvider>
+            <LoadingProvider>
+                <App/>
+                <GlobalErrorHandling/>
+            </LoadingProvider>
+        </ErrorProvider>
     </React.StrictMode>
 );
+

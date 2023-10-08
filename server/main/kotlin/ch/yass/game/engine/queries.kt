@@ -31,18 +31,11 @@ fun playerAtPosition(position: Position, seats: List<Seat>, players: List<Player
 
 /**
  * If we don't have a winner of the last trick, it means this is the first trick in the current hand. If this is
- * the case the starting player of the current hands card is the lead.
+ * the case the starting player of the current hands card is the lead. We pass in the list of tricks so we can
+ * also use this function the get the lead of an arbitrary trick within a hand and not just the last one.
  */
-fun currentLeadPositionOfHand(hand: Hand, state: GameState): Position {
-    val tricks = tricksOfHand(state.tricks, hand)
-    val lastTricksWinnerPosition = winningPositionOfLastTrick(hand, tricks, state.seats)
-    if (lastTricksWinnerPosition != null) {
-        return lastTricksWinnerPosition
-    }
-
-    val startingPlayer = startingPlayersSeatOfHand(hand, state.allPlayers, state.seats)
-    return startingPlayer.position
-}
+fun currentLeadPositionOfHand(hand: Hand, tricks: List<Trick>, seats: List<Seat>, allPlayers: List<Player>): Position =
+    winningPositionOfLastTrick(hand, tricks, seats) ?: startingPlayersSeatOfHand(hand, allPlayers, seats).position
 
 fun nextState(state: GameState): State {
     val trick = currentTrick(state.tricks)
@@ -88,6 +81,7 @@ fun activePosition(
     seats: List<Seat>,
     tricks: List<Trick>
 ): Position? {
+    --> Hier weitermachen, wenn bots spielen ist immer NORTH die next active position???
     val trick = currentTrick(tricks)
     val hand = currentHand(hands)!!
     return when {
@@ -120,6 +114,7 @@ fun winningPositionOfLastTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat
  * the winner of the last trick in the tricks list.
  */
 fun winningPositionOfTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position? {
+    // TODO: I think we remove this check! This method should assume a valid hand with trump set
     if (hand.trump == null) {
         return null
     }

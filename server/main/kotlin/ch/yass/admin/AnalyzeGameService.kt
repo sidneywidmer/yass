@@ -1,55 +1,60 @@
 package ch.yass.admin
 
 import arrow.core.raise.Raise
-import ch.yass.admin.api.AnalyzeGameStateResponse2
+import ch.yass.admin.api.AnalyzeGameStateResponse
 import ch.yass.admin.api.analzye.PlayedCardWithPlayer
 import ch.yass.admin.api.analzye.PlayerWithCards
 import ch.yass.admin.api.analzye.TrickWithCards
 import ch.yass.core.error.GameWithCodeNotFound
+import ch.yass.core.helper.takeWhileInclusive
 import ch.yass.game.GameService
-import ch.yass.game.api.PlayedCard
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.db.Hand
 import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Trick
-import ch.yass.game.engine.currentLeadPositionOfHand
-import ch.yass.game.engine.playerAtPosition
-import ch.yass.game.engine.tricksOfHand
+import ch.yass.game.engine.*
 import ch.yass.admin.api.analzye.Hand as AnalyzeHand
 
+/**
+ * Mash our GameState in a better format to display it in the FE.
+ */
 class AnalyzeGameService(private val gameService: GameService) {
 
     context(Raise<GameWithCodeNotFound>)
-    fun analyze(code: String): AnalyzeGameStateResponse2 {
+    fun analyze(code: String): AnalyzeGameStateResponse {
         val state = gameService.getStateByCode(code)
-
         val hands = state.hands.reversed().stream().map { mapHand(it, state) }.toList()
 
-
-        // how do we get from the game state to a correctly ordered list of tricks?
-
-        return AnalyzeGameStateResponse2(hands);
+        return AnalyzeGameStateResponse(hands);
     }
 
     private fun mapHand(hand: Hand, state: GameState): ch.yass.admin.api.analzye.Hand {
         val startingPlayer = state.allPlayers.first { it.id == hand.startingPlayerId }
         val players = state.allPlayers.map { mapPlayer(it, hand, state) }.toList()
-        val tricksOfHand = tricksOfHand(state.tricks, hand)
-        val tricks = tricksOfHand.map { mapTrick(it, state) }
+        val tricksOfHand = tricksOfHand(state.tricks, hand) // newest trick is index 0
+        val tricks = tricksOfHand.map { mapTrick(it, state, tricksOfHand, hand) }
 
-        return AnalyzeHand(hand.trump, startingPlayer, players, tricks)
+        return AnalyzeHand(hand.trump, startingPlayer, players, tricks.reversed())
     }
 
-    private fun mapTrick(trick: Trick, state: GameState): TrickWithCards {
+    private fun mapTrick(trick: Trick, state: GameState, tricksOfHand: List<Trick>, hand: Hand): TrickWithCards {
         val cards = Position.entries.map {
             PlayedCardWithPlayer(
                 playerAtPosition(it, state.seats, state.allPlayers)!!,
                 trick.cardOf(it)
             )
         }
-        Hier gehts weiter, TrickWithCards fast alles required
-        return TrickWithCards(cards, null, null, null)
+
+        val tricksUptoGivenTrick = tricksOfHand.reversed().takeWhileInclusive { it.id != trick.id }.reversed()
+        val leadPosition = currentLeadPositionOfHand(hand, tricksUptoGivenTrick, state.seats, state.allPlayers)
+        val leadPlayer = playerAtPosition(leadPosition, state.seats, state.allPlayers)!!
+        val leadCard = trick.cardOf(leadPosition)
+        val winningPlayer = winningPositionOfCurrentTrick(hand, tricksUptoGivenTrick, state.seats)?.let {
+            playerAtPosition(it, state.seats, state.allPlayers)
+        }
+
+        return TrickWithCards(cards, leadPlayer, leadCard?.suit, winningPlayer)
     }
 
     private fun mapPlayer(player: Player, hand: Hand, state: GameState): PlayerWithCards {
