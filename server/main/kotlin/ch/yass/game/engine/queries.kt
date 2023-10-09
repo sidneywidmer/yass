@@ -57,44 +57,39 @@ fun nextState(state: GameState): State {
     }
 }
 
-/**
- * Find the player who starts the next trick.
- */
-fun nextHandStartingPlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Player {
+fun nextHandStartingPosition(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Position {
     val hand = currentHand(hands)!!
     val seat = startingPlayersSeatOfHand(hand, players, seats)
-    val nextTrickStartingPosition = positionsOrderedWithStart(seat.position)[1]
-    val startingSeat = seats.first { it.position == nextTrickStartingPosition }
+    return positionsOrderedWithStart(seat.position)[1]
+}
 
-    return players.first { it.id == startingSeat.playerId }
+fun nextHandStartingPlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Player {
+    return playerAtPosition(nextHandStartingPosition(hands, players, seats), seats, players)!!
 }
 
 /**
- * Which player is expected to take the next action? If there are no tricks played yet it's the
- * starting player of the hand. If the current trick is "complete", aka 4 cards have been
- * played, it's the winner of the last trick. If not, it's the neighbor of the player
- * who played a card last.
+ * Which player is expected to take the next action? If the trick is not complete yet, it's the person sitting
+ * next to the person who has played a card last (starting with the lead player of the trick). If our trick
+ * is complete already it's the starting player of the next hand.
  */
 fun activePosition(
     hands: List<Hand>,
     players: List<Player>,
     seats: List<Seat>,
     tricks: List<Trick>
-): Position? {
-    --> Hier weitermachen, wenn bots spielen ist immer NORTH die next active position???
-    val trick = currentTrick(tricks)
+): Position {
     val hand = currentHand(hands)!!
-    return when {
-        trick == null -> startingPlayersSeatOfHand(hand, players, seats).position
-        trick.cards().size < 4 -> {
-            val seat = startingPlayersSeatOfHand(hand, players, seats)
-            val positions = positionsOrderedWithStart(seat.position)
+    val tricksOfHand = tricksOfHand(tricks, hand)
+    val trick = tricksOfHand(tricks, hand).first()
 
-            positions.first { trick.cardOf(it) == null }
-        }
+    val currentLead = currentLeadPositionOfHand(hand, tricksOfHand, seats, players)
+    val positions = positionsOrderedWithStart(currentLead)
 
-        else -> winningPositionOfCurrentTrick(hand, tricksOfHand(tricks, hand), seats)
+    if (trick.cards().count() < 4) {
+        return positions.first { trick.cardOf(it) == null }
     }
+
+    return nextHandStartingPosition(hands, players, seats)
 }
 
 fun winningPositionOfCurrentTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position? =
@@ -114,11 +109,6 @@ fun winningPositionOfLastTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat
  * the winner of the last trick in the tricks list.
  */
 fun winningPositionOfTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position? {
-    // TODO: I think we remove this check! This method should assume a valid hand with trump set
-    if (hand.trump == null) {
-        return null
-    }
-
     var startPosition = seats.first { it.playerId == hand.startingPlayerId }.position
 
     // Tricks are order where index 0 is the newest trick, we need to start at the oldest so we reverse the list
@@ -126,7 +116,7 @@ fun winningPositionOfTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): 
         val suitLed = trick.cardOf(startPosition)!!.suit
         val winningCard = trick.cards()
             .filter { it.suit == suitLed || it.suit == hand.trumpSuit() }
-            .maxBy { cardValue(it, hand.trump) }
+            .maxBy { cardValue(it, hand.trump!!) }
 
         startPosition = when (winningCard) {
             trick.north -> Position.NORTH
@@ -173,7 +163,7 @@ fun rankValue(rank: Rank, trump: Trump): Int = when (rank) {
  * See activePosition, this is just a helper to map a player to a position.
  */
 fun activePlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>, tricks: List<Trick>): Player? =
-    activePosition(hands, players, seats, tricks)?.let { playerAtPosition(it, seats, players) }
+    playerAtPosition(activePosition(hands, players, seats, tricks), seats, players)
 
 context(Raise<GameAlreadyFull>)
 fun randomFreePosition(occupiedSeats: List<Seat>): Position {

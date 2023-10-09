@@ -1,7 +1,7 @@
 import React from 'react';
 import {useParams} from 'react-router-dom';
 import {fetchGame, useFetchData} from "../helpers/api.jsx";
-import {Accordion, AccordionDetails, AccordionSummary, Typography} from "@mui/material";
+import {Accordion, AccordionDetails, AccordionSummary, Chip, Divider, Typography} from "@mui/material";
 import Player from "../components/analyze/Player.jsx";
 import Trick from "../components/analyze/Trick.jsx";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -33,6 +33,11 @@ const Analyze = (params) => {
                         {hand.players.map((player, playerIndex) => (
                             <Player key={playerIndex} player={player}/>
                         ))}
+                        <div style={{margin: '20px 0'}}>
+                            <Divider>
+                                <Chip label="Tricks"/>
+                            </Divider>
+                        </div>
                         {hand.tricks.map((trick, trickIndex) => (
                             <Trick key={trickIndex} trick={trick}/>
                         ))}

@@ -12,7 +12,8 @@ fun regularSuits(): List<Suit> {
 }
 
 fun regularTrumps(): List<Trump> {
-    return listOf(Trump.CLUBS, Trump.SPADES, Trump.HEARTS, Trump.DIAMONDS, Trump.UNEUFE, Trump.OBEABE)
+    // TODO: Add back Trump.UNEUFE, Trump.OBEABE
+    return listOf(Trump.CLUBS, Trump.SPADES, Trump.HEARTS, Trump.DIAMONDS)
 }
 
 /**

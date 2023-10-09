@@ -39,19 +39,18 @@ class AnalyzeGameService(private val gameService: GameService) {
     }
 
     private fun mapTrick(trick: Trick, state: GameState, tricksOfHand: List<Trick>, hand: Hand): TrickWithCards {
-        val cards = Position.entries.map {
-            PlayedCardWithPlayer(
-                playerAtPosition(it, state.seats, state.allPlayers)!!,
-                trick.cardOf(it)
-            )
-        }
-
         val tricksUptoGivenTrick = tricksOfHand.reversed().takeWhileInclusive { it.id != trick.id }.reversed()
         val leadPosition = currentLeadPositionOfHand(hand, tricksUptoGivenTrick, state.seats, state.allPlayers)
         val leadPlayer = playerAtPosition(leadPosition, state.seats, state.allPlayers)!!
         val leadCard = trick.cardOf(leadPosition)
         val winningPlayer = winningPositionOfCurrentTrick(hand, tricksUptoGivenTrick, state.seats)?.let {
             playerAtPosition(it, state.seats, state.allPlayers)
+        }
+        val cards = positionsOrderedWithStart(leadPosition).map {
+            PlayedCardWithPlayer(
+                playerAtPosition(it, state.seats, state.allPlayers)!!,
+                trick.cardOf(it)
+            )
         }
 
         return TrickWithCards(cards, leadPlayer, leadCard?.suit, winningPlayer)
