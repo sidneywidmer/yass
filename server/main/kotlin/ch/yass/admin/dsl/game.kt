@@ -6,6 +6,7 @@ import ch.yass.core.helper.toDbJson
 import ch.yass.db.tables.references.*
 import ch.yass.game.GameRepository
 import ch.yass.game.api.internal.GameState
+import ch.yass.game.dto.Gschobe
 import org.jooq.DSLContext
 import org.kodein.di.direct
 import org.kodein.di.instance
@@ -71,8 +72,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
             startingPlayerId = playerMap.first { pair -> startPlayer.position == pair.second }.first
             gameId = game.id
             trump = h.trump?.name
-            gschobe = false // TODO
-            points = 0
+            gschobe = Gschobe.NOT_YET.name // TODO: needs to be set via dsl
             north = toDbJson(interpretCards(h.north.cards))
             east = toDbJson(interpretCards(h.east.cards))
             south = toDbJson(interpretCards(h.south.cards))
@@ -87,8 +87,6 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
                 createdAt = LocalDateTime.now(ZoneOffset.UTC)
                 updatedAt = LocalDateTime.now(ZoneOffset.UTC)
                 handId = hand.id
-                winnerId = null
-                points = 0
                 store()
             }
         }
@@ -99,8 +97,6 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
                 createdAt = LocalDateTime.now(ZoneOffset.UTC)
                 updatedAt = LocalDateTime.now(ZoneOffset.UTC)
                 handId = hand.id
-                winnerId = null
-                points = 0
                 north = toDbJson(interpretCard(t.north))
                 east = toDbJson(interpretCard(t.east))
                 south = toDbJson(interpretCard(t.south))

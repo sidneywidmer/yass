@@ -7,6 +7,7 @@ package ch.yass.db.tables
 import ch.yass.db.Public
 import ch.yass.db.indexes.SELFSERVICE_RECOVERY_FLOWS_ID_NID_IDX
 import ch.yass.db.indexes.SELFSERVICE_RECOVERY_FLOWS_NID_ID_IDX
+import ch.yass.db.indexes.SELFSERVICE_RECOVERY_FLOWS_RECOVERED_IDENTITY_ID_NID_IDX
 import ch.yass.db.keys.SELFSERVICE_RECOVERY_FLOWS__SELFSERVICE_RECOVERY_FLOWS_NID_FK_IDX
 import ch.yass.db.keys.SELFSERVICE_RECOVERY_FLOWS__SELFSERVICE_RECOVERY_REQUESTS_RECOVERED_IDENTITY_ID_FKEY
 import ch.yass.db.keys.SELFSERVICE_RECOVERY_REQUESTS_PKEY
@@ -171,7 +172,7 @@ open class SelfserviceRecoveryFlows(
 
     constructor(child: Table<out Record>, key: ForeignKey<out Record, SelfserviceRecoveryFlowsRecord>): this(Internal.createPathAlias(child, key), child, key, SELFSERVICE_RECOVERY_FLOWS, null)
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
-    override fun getIndexes(): List<Index> = listOf(SELFSERVICE_RECOVERY_FLOWS_ID_NID_IDX, SELFSERVICE_RECOVERY_FLOWS_NID_ID_IDX)
+    override fun getIndexes(): List<Index> = listOf(SELFSERVICE_RECOVERY_FLOWS_ID_NID_IDX, SELFSERVICE_RECOVERY_FLOWS_NID_ID_IDX, SELFSERVICE_RECOVERY_FLOWS_RECOVERED_IDENTITY_ID_NID_IDX)
     override fun getPrimaryKey(): UniqueKey<SelfserviceRecoveryFlowsRecord> = SELFSERVICE_RECOVERY_REQUESTS_PKEY
     override fun getReferences(): List<ForeignKey<SelfserviceRecoveryFlowsRecord, *>> = listOf(SELFSERVICE_RECOVERY_FLOWS__SELFSERVICE_RECOVERY_REQUESTS_RECOVERED_IDENTITY_ID_FKEY, SELFSERVICE_RECOVERY_FLOWS__SELFSERVICE_RECOVERY_FLOWS_NID_FK_IDX)
 

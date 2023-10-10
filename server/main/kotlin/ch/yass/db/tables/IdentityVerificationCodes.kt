@@ -7,6 +7,7 @@ package ch.yass.db.tables
 import ch.yass.db.Public
 import ch.yass.db.indexes.IDENTITY_VERIFICATION_CODES_ID_NID_IDX
 import ch.yass.db.indexes.IDENTITY_VERIFICATION_CODES_NID_FLOW_ID_IDX
+import ch.yass.db.indexes.IDENTITY_VERIFICATION_CODES_VERIFIABLE_ADDRESS_NID_IDX
 import ch.yass.db.keys.IDENTITY_VERIFICATION_CODES_PKEY
 import ch.yass.db.keys.IDENTITY_VERIFICATION_CODES__IDENTITY_VERIFICATION_CODES_IDENTITY_VERIFIABLE_ADDRESSES_ID_FK
 import ch.yass.db.keys.IDENTITY_VERIFICATION_CODES__IDENTITY_VERIFICATION_CODES_NETWORKS_ID_FK
@@ -146,7 +147,7 @@ open class IdentityVerificationCodes(
 
     constructor(child: Table<out Record>, key: ForeignKey<out Record, IdentityVerificationCodesRecord>): this(Internal.createPathAlias(child, key), child, key, IDENTITY_VERIFICATION_CODES, null)
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
-    override fun getIndexes(): List<Index> = listOf(IDENTITY_VERIFICATION_CODES_ID_NID_IDX, IDENTITY_VERIFICATION_CODES_NID_FLOW_ID_IDX)
+    override fun getIndexes(): List<Index> = listOf(IDENTITY_VERIFICATION_CODES_ID_NID_IDX, IDENTITY_VERIFICATION_CODES_NID_FLOW_ID_IDX, IDENTITY_VERIFICATION_CODES_VERIFIABLE_ADDRESS_NID_IDX)
     override fun getPrimaryKey(): UniqueKey<IdentityVerificationCodesRecord> = IDENTITY_VERIFICATION_CODES_PKEY
     override fun getReferences(): List<ForeignKey<IdentityVerificationCodesRecord, *>> = listOf(IDENTITY_VERIFICATION_CODES__IDENTITY_VERIFICATION_CODES_IDENTITY_VERIFIABLE_ADDRESSES_ID_FK, IDENTITY_VERIFICATION_CODES__IDENTITY_VERIFICATION_CODES_SELFSERVICE_VERIFICATION_FLOWS_ID_F, IDENTITY_VERIFICATION_CODES__IDENTITY_VERIFICATION_CODES_NETWORKS_ID_FK)
 

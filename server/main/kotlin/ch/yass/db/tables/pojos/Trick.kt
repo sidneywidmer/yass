@@ -20,8 +20,6 @@ data class Trick(
     var createdAt: LocalDateTime? = null,
     var updatedAt: LocalDateTime? = null,
     var handId: Int? = null,
-    var winnerId: Int? = null,
-    var points: Int? = null,
     var north: JSON? = null,
     var east: JSON? = null,
     var south: JSON? = null,
@@ -67,18 +65,6 @@ data class Trick(
         }
         else if (this.handId != o.handId)
             return false
-        if (this.winnerId === null) {
-            if (o.winnerId !== null)
-                return false
-        }
-        else if (this.winnerId != o.winnerId)
-            return false
-        if (this.points === null) {
-            if (o.points !== null)
-                return false
-        }
-        else if (this.points != o.points)
-            return false
         if (this.north === null) {
             if (o.north !== null)
                 return false
@@ -114,8 +100,6 @@ data class Trick(
         result = prime * result + (if (this.createdAt === null) 0 else this.createdAt.hashCode())
         result = prime * result + (if (this.updatedAt === null) 0 else this.updatedAt.hashCode())
         result = prime * result + (if (this.handId === null) 0 else this.handId.hashCode())
-        result = prime * result + (if (this.winnerId === null) 0 else this.winnerId.hashCode())
-        result = prime * result + (if (this.points === null) 0 else this.points.hashCode())
         result = prime * result + (if (this.north === null) 0 else this.north.hashCode())
         result = prime * result + (if (this.east === null) 0 else this.east.hashCode())
         result = prime * result + (if (this.south === null) 0 else this.south.hashCode())
@@ -131,8 +115,6 @@ data class Trick(
         sb.append(", ").append(createdAt)
         sb.append(", ").append(updatedAt)
         sb.append(", ").append(handId)
-        sb.append(", ").append(winnerId)
-        sb.append(", ").append(points)
         sb.append(", ").append(north)
         sb.append(", ").append(east)
         sb.append(", ").append(south)

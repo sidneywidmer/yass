@@ -5,7 +5,9 @@ package ch.yass.db
 
 
 import ch.yass.db.tables.ContinuityContainers
+import ch.yass.db.tables.CourierMessageDispatches
 import ch.yass.db.tables.CourierMessages
+import ch.yass.db.tables.FlywaySchemaHistory
 import ch.yass.db.tables.Game
 import ch.yass.db.tables.Hand
 import ch.yass.db.tables.Identities
@@ -21,7 +23,6 @@ import ch.yass.db.tables.IdentityVerificationTokens
 import ch.yass.db.tables.Networks
 import ch.yass.db.tables.Player
 import ch.yass.db.tables.SchemaMigration
-import ch.yass.db.tables.SchemaVersion
 import ch.yass.db.tables.Seat
 import ch.yass.db.tables.SelfserviceErrors
 import ch.yass.db.tables.SelfserviceLoginFlows
@@ -59,9 +60,19 @@ open class Public : SchemaImpl("public", DefaultCatalog.DEFAULT_CATALOG) {
     val CONTINUITY_CONTAINERS: ContinuityContainers get() = ContinuityContainers.CONTINUITY_CONTAINERS
 
     /**
+     * The table <code>public.courier_message_dispatches</code>.
+     */
+    val COURIER_MESSAGE_DISPATCHES: CourierMessageDispatches get() = CourierMessageDispatches.COURIER_MESSAGE_DISPATCHES
+
+    /**
      * The table <code>public.courier_messages</code>.
      */
     val COURIER_MESSAGES: CourierMessages get() = CourierMessages.COURIER_MESSAGES
+
+    /**
+     * The table <code>public.flyway_schema_history</code>.
+     */
+    val FLYWAY_SCHEMA_HISTORY: FlywaySchemaHistory get() = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY
 
     /**
      * The table <code>public.game</code>.
@@ -139,11 +150,6 @@ open class Public : SchemaImpl("public", DefaultCatalog.DEFAULT_CATALOG) {
     val SCHEMA_MIGRATION: SchemaMigration get() = SchemaMigration.SCHEMA_MIGRATION
 
     /**
-     * The table <code>public.schema_version</code>.
-     */
-    val SCHEMA_VERSION: SchemaVersion get() = SchemaVersion.SCHEMA_VERSION
-
-    /**
      * The table <code>public.seat</code>.
      */
     val SEAT: Seat get() = Seat.SEAT
@@ -197,7 +203,9 @@ open class Public : SchemaImpl("public", DefaultCatalog.DEFAULT_CATALOG) {
 
     override fun getTables(): List<Table<*>> = listOf(
         ContinuityContainers.CONTINUITY_CONTAINERS,
+        CourierMessageDispatches.COURIER_MESSAGE_DISPATCHES,
         CourierMessages.COURIER_MESSAGES,
+        FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY,
         Game.GAME,
         Hand.HAND,
         Identities.IDENTITIES,
@@ -213,7 +221,6 @@ open class Public : SchemaImpl("public", DefaultCatalog.DEFAULT_CATALOG) {
         Networks.NETWORKS,
         Player.PLAYER,
         SchemaMigration.SCHEMA_MIGRATION,
-        SchemaVersion.SCHEMA_VERSION,
         Seat.SEAT,
         SelfserviceErrors.SELFSERVICE_ERRORS,
         SelfserviceLoginFlows.SELFSERVICE_LOGIN_FLOWS,

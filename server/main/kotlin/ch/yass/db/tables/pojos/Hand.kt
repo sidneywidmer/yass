@@ -22,8 +22,7 @@ data class Hand(
     var gameId: Int? = null,
     var startingPlayerId: Int? = null,
     var trump: String? = null,
-    var gschobe: Boolean? = null,
-    var points: Int? = null,
+    var gschobe: String? = null,
     var north: JSON? = null,
     var east: JSON? = null,
     var south: JSON? = null,
@@ -87,12 +86,6 @@ data class Hand(
         }
         else if (this.gschobe != o.gschobe)
             return false
-        if (this.points === null) {
-            if (o.points !== null)
-                return false
-        }
-        else if (this.points != o.points)
-            return false
         if (this.north === null) {
             if (o.north !== null)
                 return false
@@ -131,7 +124,6 @@ data class Hand(
         result = prime * result + (if (this.startingPlayerId === null) 0 else this.startingPlayerId.hashCode())
         result = prime * result + (if (this.trump === null) 0 else this.trump.hashCode())
         result = prime * result + (if (this.gschobe === null) 0 else this.gschobe.hashCode())
-        result = prime * result + (if (this.points === null) 0 else this.points.hashCode())
         result = prime * result + (if (this.north === null) 0 else this.north.hashCode())
         result = prime * result + (if (this.east === null) 0 else this.east.hashCode())
         result = prime * result + (if (this.south === null) 0 else this.south.hashCode())
@@ -150,7 +142,6 @@ data class Hand(
         sb.append(", ").append(startingPlayerId)
         sb.append(", ").append(trump)
         sb.append(", ").append(gschobe)
-        sb.append(", ").append(points)
         sb.append(", ").append(north)
         sb.append(", ").append(east)
         sb.append(", ").append(south)

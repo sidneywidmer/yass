@@ -7,7 +7,6 @@ package ch.yass.db.tables
 import ch.yass.db.Public
 import ch.yass.db.keys.TRICK_PKEY
 import ch.yass.db.keys.TRICK__FK_TRICK_ON_HAND
-import ch.yass.db.keys.TRICK__FK_TRICK_ON_WINNER
 import ch.yass.db.tables.records.TrickRecord
 
 import java.time.LocalDateTime
@@ -22,7 +21,7 @@ import org.jooq.JSON
 import org.jooq.Name
 import org.jooq.Record
 import org.jooq.Records
-import org.jooq.Row11
+import org.jooq.Row9
 import org.jooq.Schema
 import org.jooq.SelectField
 import org.jooq.Table
@@ -94,16 +93,6 @@ open class Trick(
     val HAND_ID: TableField<TrickRecord, Int?> = createField(DSL.name("hand_id"), SQLDataType.INTEGER, this, "")
 
     /**
-     * The column <code>public.trick.winner_id</code>.
-     */
-    val WINNER_ID: TableField<TrickRecord, Int?> = createField(DSL.name("winner_id"), SQLDataType.INTEGER, this, "")
-
-    /**
-     * The column <code>public.trick.points</code>.
-     */
-    val POINTS: TableField<TrickRecord, Int?> = createField(DSL.name("points"), SQLDataType.INTEGER.nullable(false), this, "")
-
-    /**
      * The column <code>public.trick.north</code>.
      */
     val NORTH: TableField<TrickRecord, JSON?> = createField(DSL.name("north"), SQLDataType.JSON, this, "")
@@ -145,10 +134,9 @@ open class Trick(
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
     override fun getIdentity(): Identity<TrickRecord, Int?> = super.getIdentity() as Identity<TrickRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<TrickRecord> = TRICK_PKEY
-    override fun getReferences(): List<ForeignKey<TrickRecord, *>> = listOf(TRICK__FK_TRICK_ON_HAND, TRICK__FK_TRICK_ON_WINNER)
+    override fun getReferences(): List<ForeignKey<TrickRecord, *>> = listOf(TRICK__FK_TRICK_ON_HAND)
 
     private lateinit var _hand: Hand
-    private lateinit var _player: Player
 
     /**
      * Get the implicit join path to the <code>public.hand</code> table.
@@ -162,19 +150,6 @@ open class Trick(
 
     val hand: Hand
         get(): Hand = hand()
-
-    /**
-     * Get the implicit join path to the <code>public.player</code> table.
-     */
-    fun player(): Player {
-        if (!this::_player.isInitialized)
-            _player = Player(this, TRICK__FK_TRICK_ON_WINNER)
-
-        return _player;
-    }
-
-    val player: Player
-        get(): Player = player()
     override fun `as`(alias: String): Trick = Trick(DSL.name(alias), this)
     override fun `as`(alias: Name): Trick = Trick(alias, this)
     override fun `as`(alias: Table<*>): Trick = Trick(alias.getQualifiedName(), this)
@@ -195,18 +170,18 @@ open class Trick(
     override fun rename(name: Table<*>): Trick = Trick(name.getQualifiedName(), null)
 
     // -------------------------------------------------------------------------
-    // Row11 type methods
+    // Row9 type methods
     // -------------------------------------------------------------------------
-    override fun fieldsRow(): Row11<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?, JSON?, JSON?, JSON?, JSON?> = super.fieldsRow() as Row11<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?, JSON?, JSON?, JSON?, JSON?>
+    override fun fieldsRow(): Row9<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, JSON?, JSON?, JSON?, JSON?> = super.fieldsRow() as Row9<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, JSON?, JSON?, JSON?, JSON?>
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    fun <U> mapping(from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?, JSON?, JSON?, JSON?, JSON?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
+    fun <U> mapping(from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, JSON?, JSON?, JSON?, JSON?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    fun <U> mapping(toType: Class<U>, from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, Int?, JSON?, JSON?, JSON?, JSON?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
+    fun <U> mapping(toType: Class<U>, from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, JSON?, JSON?, JSON?, JSON?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
 }

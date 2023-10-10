@@ -5,6 +5,7 @@ package ch.yass.db.tables
 
 
 import ch.yass.db.Public
+import ch.yass.db.indexes.CONTINUITY_CONTAINERS_IDENTITY_ID_NID_IDX
 import ch.yass.db.indexes.CONTINUITY_CONTAINERS_ID_NID_IDX
 import ch.yass.db.indexes.CONTINUITY_CONTAINERS_NID_ID_IDX
 import ch.yass.db.keys.CONTINUITY_CONTAINERS_PKEY
@@ -133,7 +134,7 @@ open class ContinuityContainers(
 
     constructor(child: Table<out Record>, key: ForeignKey<out Record, ContinuityContainersRecord>): this(Internal.createPathAlias(child, key), child, key, CONTINUITY_CONTAINERS, null)
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
-    override fun getIndexes(): List<Index> = listOf(CONTINUITY_CONTAINERS_ID_NID_IDX, CONTINUITY_CONTAINERS_NID_ID_IDX)
+    override fun getIndexes(): List<Index> = listOf(CONTINUITY_CONTAINERS_ID_NID_IDX, CONTINUITY_CONTAINERS_IDENTITY_ID_NID_IDX, CONTINUITY_CONTAINERS_NID_ID_IDX)
     override fun getPrimaryKey(): UniqueKey<ContinuityContainersRecord> = CONTINUITY_CONTAINERS_PKEY
     override fun getReferences(): List<ForeignKey<ContinuityContainersRecord, *>> = listOf(CONTINUITY_CONTAINERS__CONTINUITY_CONTAINERS_IDENTITY_ID_FKEY, CONTINUITY_CONTAINERS__CONTINUITY_CONTAINERS_NID_FK_IDX)
 

@@ -113,7 +113,7 @@ open class Sessions(
     /**
      * The column <code>public.sessions.token</code>.
      */
-    val TOKEN: TableField<SessionsRecord, String?> = createField(DSL.name("token"), SQLDataType.VARCHAR(32), this, "")
+    val TOKEN: TableField<SessionsRecord, String?> = createField(DSL.name("token"), SQLDataType.VARCHAR(39), this, "")
 
     /**
      * The column <code>public.sessions.active</code>.
@@ -128,7 +128,7 @@ open class Sessions(
     /**
      * The column <code>public.sessions.logout_token</code>.
      */
-    val LOGOUT_TOKEN: TableField<SessionsRecord, String?> = createField(DSL.name("logout_token"), SQLDataType.VARCHAR(32), this, "")
+    val LOGOUT_TOKEN: TableField<SessionsRecord, String?> = createField(DSL.name("logout_token"), SQLDataType.VARCHAR(39), this, "")
 
     /**
      * The column <code>public.sessions.aal</code>.

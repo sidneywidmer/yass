@@ -5,6 +5,7 @@ package ch.yass.db.tables
 
 
 import ch.yass.db.Public
+import ch.yass.db.indexes.SELFSERVICE_SETTINGS_FLOWS_IDENTITY_ID_NID_IDX
 import ch.yass.db.indexes.SELFSERVICE_SETTINGS_FLOWS_ID_NID_IDX
 import ch.yass.db.indexes.SELFSERVICE_SETTINGS_FLOWS_NID_ID_IDX
 import ch.yass.db.keys.SELFSERVICE_PROFILE_MANAGEMENT_REQUESTS_PKEY
@@ -160,7 +161,7 @@ open class SelfserviceSettingsFlows(
 
     constructor(child: Table<out Record>, key: ForeignKey<out Record, SelfserviceSettingsFlowsRecord>): this(Internal.createPathAlias(child, key), child, key, SELFSERVICE_SETTINGS_FLOWS, null)
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
-    override fun getIndexes(): List<Index> = listOf(SELFSERVICE_SETTINGS_FLOWS_ID_NID_IDX, SELFSERVICE_SETTINGS_FLOWS_NID_ID_IDX)
+    override fun getIndexes(): List<Index> = listOf(SELFSERVICE_SETTINGS_FLOWS_ID_NID_IDX, SELFSERVICE_SETTINGS_FLOWS_IDENTITY_ID_NID_IDX, SELFSERVICE_SETTINGS_FLOWS_NID_ID_IDX)
     override fun getPrimaryKey(): UniqueKey<SelfserviceSettingsFlowsRecord> = SELFSERVICE_PROFILE_MANAGEMENT_REQUESTS_PKEY
     override fun getReferences(): List<ForeignKey<SelfserviceSettingsFlowsRecord, *>> = listOf(SELFSERVICE_SETTINGS_FLOWS__SELFSERVICE_PROFILE_MANAGEMENT_REQUESTS_IDENTITY_ID_FKEY, SELFSERVICE_SETTINGS_FLOWS__SELFSERVICE_SETTINGS_FLOWS_NID_FK_IDX)
 

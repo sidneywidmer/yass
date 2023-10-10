@@ -5,7 +5,9 @@ package ch.yass.db.tables.references
 
 
 import ch.yass.db.tables.ContinuityContainers
+import ch.yass.db.tables.CourierMessageDispatches
 import ch.yass.db.tables.CourierMessages
+import ch.yass.db.tables.FlywaySchemaHistory
 import ch.yass.db.tables.Game
 import ch.yass.db.tables.Hand
 import ch.yass.db.tables.Identities
@@ -21,7 +23,6 @@ import ch.yass.db.tables.IdentityVerificationTokens
 import ch.yass.db.tables.Networks
 import ch.yass.db.tables.Player
 import ch.yass.db.tables.SchemaMigration
-import ch.yass.db.tables.SchemaVersion
 import ch.yass.db.tables.Seat
 import ch.yass.db.tables.SelfserviceErrors
 import ch.yass.db.tables.SelfserviceLoginFlows
@@ -41,9 +42,19 @@ import ch.yass.db.tables.Trick
 val CONTINUITY_CONTAINERS: ContinuityContainers = ContinuityContainers.CONTINUITY_CONTAINERS
 
 /**
+ * The table <code>public.courier_message_dispatches</code>.
+ */
+val COURIER_MESSAGE_DISPATCHES: CourierMessageDispatches = CourierMessageDispatches.COURIER_MESSAGE_DISPATCHES
+
+/**
  * The table <code>public.courier_messages</code>.
  */
 val COURIER_MESSAGES: CourierMessages = CourierMessages.COURIER_MESSAGES
+
+/**
+ * The table <code>public.flyway_schema_history</code>.
+ */
+val FLYWAY_SCHEMA_HISTORY: FlywaySchemaHistory = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY
 
 /**
  * The table <code>public.game</code>.
@@ -119,11 +130,6 @@ val PLAYER: Player = Player.PLAYER
  * The table <code>public.schema_migration</code>.
  */
 val SCHEMA_MIGRATION: SchemaMigration = SchemaMigration.SCHEMA_MIGRATION
-
-/**
- * The table <code>public.schema_version</code>.
- */
-val SCHEMA_VERSION: SchemaVersion = SchemaVersion.SCHEMA_VERSION
 
 /**
  * The table <code>public.seat</code>.

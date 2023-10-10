@@ -5,7 +5,9 @@ package ch.yass.db.keys
 
 
 import ch.yass.db.tables.ContinuityContainers
+import ch.yass.db.tables.CourierMessageDispatches
 import ch.yass.db.tables.CourierMessages
+import ch.yass.db.tables.FlywaySchemaHistory
 import ch.yass.db.tables.Game
 import ch.yass.db.tables.Hand
 import ch.yass.db.tables.Identities
@@ -20,7 +22,6 @@ import ch.yass.db.tables.IdentityVerificationCodes
 import ch.yass.db.tables.IdentityVerificationTokens
 import ch.yass.db.tables.Networks
 import ch.yass.db.tables.Player
-import ch.yass.db.tables.SchemaVersion
 import ch.yass.db.tables.Seat
 import ch.yass.db.tables.SelfserviceErrors
 import ch.yass.db.tables.SelfserviceLoginFlows
@@ -32,7 +33,9 @@ import ch.yass.db.tables.SessionDevices
 import ch.yass.db.tables.Sessions
 import ch.yass.db.tables.Trick
 import ch.yass.db.tables.records.ContinuityContainersRecord
+import ch.yass.db.tables.records.CourierMessageDispatchesRecord
 import ch.yass.db.tables.records.CourierMessagesRecord
+import ch.yass.db.tables.records.FlywaySchemaHistoryRecord
 import ch.yass.db.tables.records.GameRecord
 import ch.yass.db.tables.records.HandRecord
 import ch.yass.db.tables.records.IdentitiesRecord
@@ -47,7 +50,6 @@ import ch.yass.db.tables.records.IdentityVerificationCodesRecord
 import ch.yass.db.tables.records.IdentityVerificationTokensRecord
 import ch.yass.db.tables.records.NetworksRecord
 import ch.yass.db.tables.records.PlayerRecord
-import ch.yass.db.tables.records.SchemaVersionRecord
 import ch.yass.db.tables.records.SeatRecord
 import ch.yass.db.tables.records.SelfserviceErrorsRecord
 import ch.yass.db.tables.records.SelfserviceLoginFlowsRecord
@@ -71,7 +73,9 @@ import org.jooq.impl.Internal
 // -------------------------------------------------------------------------
 
 val CONTINUITY_CONTAINERS_PKEY: UniqueKey<ContinuityContainersRecord> = Internal.createUniqueKey(ContinuityContainers.CONTINUITY_CONTAINERS, DSL.name("continuity_containers_pkey"), arrayOf(ContinuityContainers.CONTINUITY_CONTAINERS.ID), true)
+val COURIER_MESSAGE_DISPATCHES_PKEY: UniqueKey<CourierMessageDispatchesRecord> = Internal.createUniqueKey(CourierMessageDispatches.COURIER_MESSAGE_DISPATCHES, DSL.name("courier_message_dispatches_pkey"), arrayOf(CourierMessageDispatches.COURIER_MESSAGE_DISPATCHES.ID), true)
 val COURIER_MESSAGES_PKEY: UniqueKey<CourierMessagesRecord> = Internal.createUniqueKey(CourierMessages.COURIER_MESSAGES, DSL.name("courier_messages_pkey"), arrayOf(CourierMessages.COURIER_MESSAGES.ID), true)
+val FLYWAY_SCHEMA_HISTORY_PK: UniqueKey<FlywaySchemaHistoryRecord> = Internal.createUniqueKey(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, DSL.name("flyway_schema_history_pk"), arrayOf(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.INSTALLED_RANK), true)
 val GAME_PKEY: UniqueKey<GameRecord> = Internal.createUniqueKey(Game.GAME, DSL.name("game_pkey"), arrayOf(Game.GAME.ID), true)
 val HAND_PKEY: UniqueKey<HandRecord> = Internal.createUniqueKey(Hand.HAND, DSL.name("hand_pkey"), arrayOf(Hand.HAND.ID), true)
 val IDENTITIES_PKEY: UniqueKey<IdentitiesRecord> = Internal.createUniqueKey(Identities.IDENTITIES, DSL.name("identities_pkey"), arrayOf(Identities.IDENTITIES.ID), true)
@@ -86,7 +90,6 @@ val IDENTITY_VERIFICATION_CODES_PKEY: UniqueKey<IdentityVerificationCodesRecord>
 val IDENTITY_VERIFICATION_TOKENS_PKEY: UniqueKey<IdentityVerificationTokensRecord> = Internal.createUniqueKey(IdentityVerificationTokens.IDENTITY_VERIFICATION_TOKENS, DSL.name("identity_verification_tokens_pkey"), arrayOf(IdentityVerificationTokens.IDENTITY_VERIFICATION_TOKENS.ID), true)
 val NETWORKS_PKEY: UniqueKey<NetworksRecord> = Internal.createUniqueKey(Networks.NETWORKS, DSL.name("networks_pkey"), arrayOf(Networks.NETWORKS.ID), true)
 val PLAYER_PKEY: UniqueKey<PlayerRecord> = Internal.createUniqueKey(Player.PLAYER, DSL.name("player_pkey"), arrayOf(Player.PLAYER.ID), true)
-val SCHEMA_VERSION_PK: UniqueKey<SchemaVersionRecord> = Internal.createUniqueKey(SchemaVersion.SCHEMA_VERSION, DSL.name("schema_version_pk"), arrayOf(SchemaVersion.SCHEMA_VERSION.VERSION), true)
 val SEAT_PKEY: UniqueKey<SeatRecord> = Internal.createUniqueKey(Seat.SEAT, DSL.name("seat_pkey"), arrayOf(Seat.SEAT.ID), true)
 val SELFSERVICE_ERRORS_PKEY: UniqueKey<SelfserviceErrorsRecord> = Internal.createUniqueKey(SelfserviceErrors.SELFSERVICE_ERRORS, DSL.name("selfservice_errors_pkey"), arrayOf(SelfserviceErrors.SELFSERVICE_ERRORS.ID), true)
 val SELFSERVICE_LOGIN_REQUESTS_PKEY: UniqueKey<SelfserviceLoginFlowsRecord> = Internal.createUniqueKey(SelfserviceLoginFlows.SELFSERVICE_LOGIN_FLOWS, DSL.name("selfservice_login_requests_pkey"), arrayOf(SelfserviceLoginFlows.SELFSERVICE_LOGIN_FLOWS.ID), true)
@@ -105,6 +108,8 @@ val TRICK_PKEY: UniqueKey<TrickRecord> = Internal.createUniqueKey(Trick.TRICK, D
 
 val CONTINUITY_CONTAINERS__CONTINUITY_CONTAINERS_IDENTITY_ID_FKEY: ForeignKey<ContinuityContainersRecord, IdentitiesRecord> = Internal.createForeignKey(ContinuityContainers.CONTINUITY_CONTAINERS, DSL.name("continuity_containers_identity_id_fkey"), arrayOf(ContinuityContainers.CONTINUITY_CONTAINERS.IDENTITY_ID), ch.yass.db.keys.IDENTITIES_PKEY, arrayOf(Identities.IDENTITIES.ID), true)
 val CONTINUITY_CONTAINERS__CONTINUITY_CONTAINERS_NID_FK_IDX: ForeignKey<ContinuityContainersRecord, NetworksRecord> = Internal.createForeignKey(ContinuityContainers.CONTINUITY_CONTAINERS, DSL.name("continuity_containers_nid_fk_idx"), arrayOf(ContinuityContainers.CONTINUITY_CONTAINERS.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
+val COURIER_MESSAGE_DISPATCHES__COURIER_MESSAGE_DISPATCHES_MESSAGE_ID_FK: ForeignKey<CourierMessageDispatchesRecord, CourierMessagesRecord> = Internal.createForeignKey(CourierMessageDispatches.COURIER_MESSAGE_DISPATCHES, DSL.name("courier_message_dispatches_message_id_fk"), arrayOf(CourierMessageDispatches.COURIER_MESSAGE_DISPATCHES.MESSAGE_ID), ch.yass.db.keys.COURIER_MESSAGES_PKEY, arrayOf(CourierMessages.COURIER_MESSAGES.ID), true)
+val COURIER_MESSAGE_DISPATCHES__COURIER_MESSAGE_DISPATCHES_NID_FK: ForeignKey<CourierMessageDispatchesRecord, NetworksRecord> = Internal.createForeignKey(CourierMessageDispatches.COURIER_MESSAGE_DISPATCHES, DSL.name("courier_message_dispatches_nid_fk"), arrayOf(CourierMessageDispatches.COURIER_MESSAGE_DISPATCHES.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
 val COURIER_MESSAGES__COURIER_MESSAGES_NID_FK_IDX: ForeignKey<CourierMessagesRecord, NetworksRecord> = Internal.createForeignKey(CourierMessages.COURIER_MESSAGES, DSL.name("courier_messages_nid_fk_idx"), arrayOf(CourierMessages.COURIER_MESSAGES.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
 val HAND__FK_HAND_ON_GAME: ForeignKey<HandRecord, GameRecord> = Internal.createForeignKey(Hand.HAND, DSL.name("fk_hand_on_game"), arrayOf(Hand.HAND.GAME_ID), ch.yass.db.keys.GAME_PKEY, arrayOf(Game.GAME.ID), true)
 val HAND__FK_HAND_ON_STARTING_PLAYER: ForeignKey<HandRecord, PlayerRecord> = Internal.createForeignKey(Hand.HAND, DSL.name("fk_hand_on_starting_player"), arrayOf(Hand.HAND.STARTING_PLAYER_ID), ch.yass.db.keys.PLAYER_PKEY, arrayOf(Player.PLAYER.ID), true)
@@ -148,4 +153,3 @@ val SESSION_DEVICES__SESSION_METADATA_SESSIONS_ID_FK: ForeignKey<SessionDevicesR
 val SESSIONS__SESSIONS_IDENTITY_ID_FKEY: ForeignKey<SessionsRecord, IdentitiesRecord> = Internal.createForeignKey(Sessions.SESSIONS, DSL.name("sessions_identity_id_fkey"), arrayOf(Sessions.SESSIONS.IDENTITY_ID), ch.yass.db.keys.IDENTITIES_PKEY, arrayOf(Identities.IDENTITIES.ID), true)
 val SESSIONS__SESSIONS_NID_FK_IDX: ForeignKey<SessionsRecord, NetworksRecord> = Internal.createForeignKey(Sessions.SESSIONS, DSL.name("sessions_nid_fk_idx"), arrayOf(Sessions.SESSIONS.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
 val TRICK__FK_TRICK_ON_HAND: ForeignKey<TrickRecord, HandRecord> = Internal.createForeignKey(Trick.TRICK, DSL.name("fk_trick_on_hand"), arrayOf(Trick.TRICK.HAND_ID), ch.yass.db.keys.HAND_PKEY, arrayOf(Hand.HAND.ID), true)
-val TRICK__FK_TRICK_ON_WINNER: ForeignKey<TrickRecord, PlayerRecord> = Internal.createForeignKey(Trick.TRICK, DSL.name("fk_trick_on_winner"), arrayOf(Trick.TRICK.WINNER_ID), ch.yass.db.keys.PLAYER_PKEY, arrayOf(Player.PLAYER.ID), true)

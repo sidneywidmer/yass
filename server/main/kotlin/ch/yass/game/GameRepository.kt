@@ -10,6 +10,7 @@ import ch.yass.game.api.internal.GameState
 import ch.yass.game.api.internal.NewHand
 import ch.yass.game.api.internal.NewSeat
 import ch.yass.game.dto.Card
+import ch.yass.game.dto.Gschobe
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.Trump
 import ch.yass.game.dto.db.*
@@ -82,12 +83,11 @@ class GameRepository(private val db: DSLContext) {
             .fetchOneInto(Trick::class.java)!!
 
     fun createTrick(hand: Hand): Trick =
-        db.insertInto(TRICK, TRICK.UUID, TRICK.CREATED_AT, TRICK.UPDATED_AT, TRICK.POINTS, TRICK.HAND_ID)
+        db.insertInto(TRICK, TRICK.UUID, TRICK.CREATED_AT, TRICK.UPDATED_AT, TRICK.HAND_ID)
             .values(
                 UUID.randomUUID().toString(),
                 LocalDateTime.now(ZoneOffset.UTC),
                 LocalDateTime.now(ZoneOffset.UTC),
-                0,
                 hand.id
             )
             .returningResult(TRICK)
@@ -103,7 +103,6 @@ class GameRepository(private val db: DSLContext) {
             HAND.STARTING_PLAYER_ID,
             HAND.TRUMP,
             HAND.GSCHOBE,
-            HAND.POINTS,
             HAND.NORTH,
             HAND.EAST,
             HAND.SOUTH,
@@ -116,8 +115,7 @@ class GameRepository(private val db: DSLContext) {
                 hand.game.id,
                 hand.startingPlayer.id,
                 null,
-                false,
-                0,
+                Gschobe.NOT_YET.name,
                 toDbJson(hand.positions[Position.NORTH]),
                 toDbJson(hand.positions[Position.EAST]),
                 toDbJson(hand.positions[Position.SOUTH]),

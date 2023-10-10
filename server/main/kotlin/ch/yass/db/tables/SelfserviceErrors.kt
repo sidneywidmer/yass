@@ -5,7 +5,7 @@ package ch.yass.db.tables
 
 
 import ch.yass.db.Public
-import ch.yass.db.indexes.SELFSERVICE_ERRORS_NID_IDX
+import ch.yass.db.indexes.SELFSERVICE_ERRORS_ERRORS_NID_ID_IDX
 import ch.yass.db.keys.SELFSERVICE_ERRORS_PKEY
 import ch.yass.db.keys.SELFSERVICE_ERRORS__SELFSERVICE_ERRORS_NID_FK_IDX
 import ch.yass.db.tables.records.SelfserviceErrorsRecord
@@ -129,7 +129,7 @@ open class SelfserviceErrors(
 
     constructor(child: Table<out Record>, key: ForeignKey<out Record, SelfserviceErrorsRecord>): this(Internal.createPathAlias(child, key), child, key, SELFSERVICE_ERRORS, null)
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
-    override fun getIndexes(): List<Index> = listOf(SELFSERVICE_ERRORS_NID_IDX)
+    override fun getIndexes(): List<Index> = listOf(SELFSERVICE_ERRORS_ERRORS_NID_ID_IDX)
     override fun getPrimaryKey(): UniqueKey<SelfserviceErrorsRecord> = SELFSERVICE_ERRORS_PKEY
     override fun getReferences(): List<ForeignKey<SelfserviceErrorsRecord, *>> = listOf(SELFSERVICE_ERRORS__SELFSERVICE_ERRORS_NID_FK_IDX)
 

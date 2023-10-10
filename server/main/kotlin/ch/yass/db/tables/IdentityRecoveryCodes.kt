@@ -5,6 +5,8 @@ package ch.yass.db.tables
 
 
 import ch.yass.db.Public
+import ch.yass.db.indexes.IDENTITY_RECOVERY_CODES_IDENTITY_ID_NID_IDX
+import ch.yass.db.indexes.IDENTITY_RECOVERY_CODES_IDENTITY_RECOVERY_ADDRESS_ID_NID_IDX
 import ch.yass.db.indexes.IDENTITY_RECOVERY_CODES_ID_NID_IDX
 import ch.yass.db.indexes.IDENTITY_RECOVERY_CODES_NID_FLOW_ID_IDX
 import ch.yass.db.keys.IDENTITY_RECOVERY_CODES_PKEY
@@ -156,7 +158,7 @@ open class IdentityRecoveryCodes(
 
     constructor(child: Table<out Record>, key: ForeignKey<out Record, IdentityRecoveryCodesRecord>): this(Internal.createPathAlias(child, key), child, key, IDENTITY_RECOVERY_CODES, null)
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
-    override fun getIndexes(): List<Index> = listOf(IDENTITY_RECOVERY_CODES_ID_NID_IDX, IDENTITY_RECOVERY_CODES_NID_FLOW_ID_IDX)
+    override fun getIndexes(): List<Index> = listOf(IDENTITY_RECOVERY_CODES_ID_NID_IDX, IDENTITY_RECOVERY_CODES_IDENTITY_ID_NID_IDX, IDENTITY_RECOVERY_CODES_IDENTITY_RECOVERY_ADDRESS_ID_NID_IDX, IDENTITY_RECOVERY_CODES_NID_FLOW_ID_IDX)
     override fun getPrimaryKey(): UniqueKey<IdentityRecoveryCodesRecord> = IDENTITY_RECOVERY_CODES_PKEY
     override fun getReferences(): List<ForeignKey<IdentityRecoveryCodesRecord, *>> = listOf(IDENTITY_RECOVERY_CODES__IDENTITY_RECOVERY_CODES_IDENTITY_RECOVERY_ADDRESSES_ID_FK, IDENTITY_RECOVERY_CODES__IDENTITY_RECOVERY_CODES_SELFSERVICE_RECOVERY_FLOWS_ID_FK, IDENTITY_RECOVERY_CODES__IDENTITY_RECOVERY_CODES_NETWORKS_ID_FK, IDENTITY_RECOVERY_CODES__IDENTITY_RECOVERY_CODES_IDENTITY_ID_FK)
 

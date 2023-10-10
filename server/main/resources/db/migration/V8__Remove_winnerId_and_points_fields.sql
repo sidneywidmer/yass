@@ -1,0 +1,7 @@
+ALTER TABLE trick
+    DROP COLUMN IF EXISTS points,
+    DROP COLUMN IF EXISTS winner_id;
+
+ALTER TABLE hand
+    DROP COLUMN IF EXISTS points;
+

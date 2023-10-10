@@ -6,7 +6,10 @@ package ch.yass.db.tables
 
 import ch.yass.db.Public
 import ch.yass.db.indexes.COURIER_MESSAGES_ID_NID_IDX
+import ch.yass.db.indexes.COURIER_MESSAGES_NID_CREATED_AT_ID_IDX
 import ch.yass.db.indexes.COURIER_MESSAGES_NID_ID_IDX
+import ch.yass.db.indexes.COURIER_MESSAGES_NID_RECIPIENT_CREATED_AT_ID_IDX
+import ch.yass.db.indexes.COURIER_MESSAGES_NID_STATUS_CREATED_AT_ID_IDX
 import ch.yass.db.indexes.COURIER_MESSAGES_STATUS_IDX
 import ch.yass.db.keys.COURIER_MESSAGES_PKEY
 import ch.yass.db.keys.COURIER_MESSAGES__COURIER_MESSAGES_NID_FK_IDX
@@ -150,7 +153,7 @@ open class CourierMessages(
 
     constructor(child: Table<out Record>, key: ForeignKey<out Record, CourierMessagesRecord>): this(Internal.createPathAlias(child, key), child, key, COURIER_MESSAGES, null)
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
-    override fun getIndexes(): List<Index> = listOf(COURIER_MESSAGES_ID_NID_IDX, COURIER_MESSAGES_NID_ID_IDX, COURIER_MESSAGES_STATUS_IDX)
+    override fun getIndexes(): List<Index> = listOf(COURIER_MESSAGES_ID_NID_IDX, COURIER_MESSAGES_NID_CREATED_AT_ID_IDX, COURIER_MESSAGES_NID_ID_IDX, COURIER_MESSAGES_NID_RECIPIENT_CREATED_AT_ID_IDX, COURIER_MESSAGES_NID_STATUS_CREATED_AT_ID_IDX, COURIER_MESSAGES_STATUS_IDX)
     override fun getPrimaryKey(): UniqueKey<CourierMessagesRecord> = COURIER_MESSAGES_PKEY
     override fun getReferences(): List<ForeignKey<CourierMessagesRecord, *>> = listOf(COURIER_MESSAGES__COURIER_MESSAGES_NID_FK_IDX)
 
