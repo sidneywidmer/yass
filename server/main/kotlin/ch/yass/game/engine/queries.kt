@@ -52,6 +52,7 @@ fun nextState(state: GameState): State {
 
         isHandFinished(tricks) -> State.NEW_HAND
         isTrickFinished(trick) -> State.NEW_TRICK
+        !isAlreadyGschobe(hand) -> if (player.bot) State.SCHIEBE_BOT else State.SCHIEBE
         !isTrumpSet(hand) -> if (player.bot) State.TRUMP_BOT else State.TRUMP
         else -> if (player.bot) State.PLAY_CARD_BOT else State.PLAY_CARD
     }
@@ -84,6 +85,11 @@ fun activePosition(
 
     val currentLead = currentLeadPositionOfHand(hand, tricksOfHand, seats, players)
     val positions = positionsOrderedWithStart(currentLead)
+
+    // This is the first trick of the hand and the lead player has gschobe, it's their partners turn
+    if (trick.cards().isEmpty() && tricksOfHand.count() == 1 && hand.gschobe == Gschobe.YES) {
+        return positions[2]
+    }
 
     if (trick.cards().count() < 4) {
         return positions.first { trick.cardOf(it) == null }

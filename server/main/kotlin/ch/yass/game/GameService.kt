@@ -4,13 +4,11 @@ import arrow.core.raise.Raise
 import arrow.core.raise.ensure
 import ch.yass.core.error.*
 import ch.yass.core.helper.logger
-import ch.yass.game.api.ChooseTrumpRequest
-import ch.yass.game.api.JoinGameRequest
-import ch.yass.game.api.PlayCardRequest
-import ch.yass.game.api.PlayedCard
+import ch.yass.game.api.*
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.api.internal.NewHand
 import ch.yass.game.dto.Card
+import ch.yass.game.dto.Gschobe
 import ch.yass.game.dto.State
 import ch.yass.game.dto.Trump
 import ch.yass.game.dto.db.Game
@@ -44,7 +42,7 @@ class GameService(private val repo: GameRepository) {
         ensure(expectedState(listOf(State.PLAY_CARD, State.PLAY_CARD_BOT), nextState)) {
             InvalidState(nextState, state)
         }
-        ensure(playerHasTurn(player, state)) { PlayerIsLocked(player, state) }
+        ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
         ensure(playerOwnsCard(player, playedCard, state)) { PlayerDoesNotOwnCard(player, playedCard, state) }
         ensure(isTrumpSet(currentHand(state.hands)!!)) { TrumpNotChosen(state) }
         ensure(cardIsPlayable(playedCard, player, state)) { CardNotPlayable(playedCard, player, state) }
@@ -69,12 +67,31 @@ class GameService(private val repo: GameRepository) {
         val currentHand = currentHand(state.hands)!!
 
         ensure(expectedState(listOf(State.TRUMP, State.TRUMP_BOT), nextState)) { InvalidState(nextState, state) }
-        ensure(playerHasTurn(player, state)) { PlayerIsLocked(player, state) }
+        ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
         ensure(regularTrumps().contains(chosenTrump)) { TrumpInvalid(chosenTrump) }
 
         logger().info("Player ${player.uuid} (bot:${player.bot}) choose trump $chosenTrump")
 
         repo.chooseTrump(chosenTrump, currentHand)
+        gameLoop(game)
+
+        return repo.getState(game)
+    }
+
+    context(Raise<GameError>)
+    fun schiebe(request: SchiebeRequest, player: Player): GameState {
+        val game = repo.getByUUID(request.game)
+        val state = repo.getState(game)
+        val nextState = nextState(state)
+        val gschobe = Gschobe.valueOf(request.gschobe)
+        val currentHand = currentHand(state.hands)!!
+
+        ensure(expectedState(listOf(State.SCHIEBE, State.SCHIEBE_BOT), nextState)) { InvalidState(nextState, state) }
+        ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
+
+        logger().info("Player ${player.uuid} (bot:${player.bot}) schiebt: ${request.gschobe}")
+
+        repo.schiebe(gschobe, currentHand)
         gameLoop(game)
 
         return repo.getState(game)
@@ -91,8 +108,10 @@ class GameService(private val repo: GameRepository) {
                 State.FINISHED -> {}
                 State.PLAY_CARD -> {}
                 State.TRUMP -> {}
+                State.SCHIEBE -> {}
                 State.PLAY_CARD_BOT -> playAsBot(updatedState)
                 State.TRUMP_BOT -> trumpAsBot(updatedState)
+                State.SCHIEBE_BOT -> schiebeAsBot(updatedState)
                 State.NEW_TRICK -> repo.createTrick(currentHand)
                 State.NEW_HAND -> {
                     val startingPlayer = nextHandStartingPlayer(
@@ -136,5 +155,19 @@ class GameService(private val repo: GameRepository) {
         )
 
         return play(request, botPlayer)
+    }
+
+    context(Raise<GameError>)
+    private fun schiebeAsBot(state: GameState): GameState {
+        val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)!!
+        if (!botPlayer.bot) {
+            raise(PlayerIsNotBot(botPlayer, state))
+        }
+
+        // TODO: Better decision
+        val gschobe = chooseGschobeForBot(botPlayer, state)
+        val request = SchiebeRequest(state.game.uuid.toString(), gschobe.name)
+
+        return schiebe(request, botPlayer)
     }
 }
