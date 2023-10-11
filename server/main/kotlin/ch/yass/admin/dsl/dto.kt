@@ -1,5 +1,6 @@
 package ch.yass.admin.dsl
 
+import ch.yass.game.dto.Gschobe
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.Trump
 
@@ -9,6 +10,7 @@ data class TrickDSL(val north: String?, val east: String?, val south: String?, v
 data class HandPositionDSL(val cards: String, val start: Boolean = false, val position: Position)
 data class HandDSL(
     val trump: Trump?,
+    val gschobe: Gschobe,
     val north: HandPositionDSL,
     val east: HandPositionDSL,
     val south: HandPositionDSL,

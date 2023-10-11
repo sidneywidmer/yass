@@ -72,7 +72,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
             startingPlayerId = playerMap.first { pair -> startPlayer.position == pair.second }.first
             gameId = game.id
             trump = h.trump?.name
-            gschobe = Gschobe.NOT_YET.name // TODO: needs to be set via dsl
+            gschobe = h.gschobe.name
             north = toDbJson(interpretCards(h.north.cards))
             east = toDbJson(interpretCards(h.east.cards))
             south = toDbJson(interpretCards(h.south.cards))

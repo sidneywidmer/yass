@@ -10,6 +10,7 @@ import ch.yass.core.helper.successResponse
 import ch.yass.game.GameService
 import ch.yass.game.api.PlayCardRequest
 import ch.yass.game.api.PlayedCard
+import ch.yass.game.dto.Gschobe
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.Trump
 import ch.yass.game.engine.cardToNotation
@@ -49,6 +50,7 @@ class AdminController(private val analyzeGameService: AnalyzeGameService, privat
             hands {
                 hand {
                     trump(Trump.FREESTYLE)
+                    gschobe(Gschobe.NO)
                     north(cards = "welcome", start = true)
                     east(cards = "welcome")
                     south(cards = "welcome")
@@ -59,6 +61,7 @@ class AdminController(private val analyzeGameService: AnalyzeGameService, privat
                 }
                 hand {
                     trump(Trump.CLUBS)
+                    gschobe(Gschobe.NO)
                     north(cards = "C9,D7,D10,DQ,H6,HQ,HK,S9,SJ", start = true)
                     east(cards = "C7,CJ,DA,H7,H10,HA,S8,SQ,SK")
                     south(cards = "C8,C10,CQ,CA,D9,H8,H9,S7,SA")
@@ -87,6 +90,7 @@ class AdminController(private val analyzeGameService: AnalyzeGameService, privat
             hands {
                 hand {
                     trump(Trump.FREESTYLE)
+                    gschobe(Gschobe.NO)
                     north(cards = "welcome", start = true)
                     east(cards = "welcome")
                     south(cards = "welcome")
@@ -97,6 +101,7 @@ class AdminController(private val analyzeGameService: AnalyzeGameService, privat
                 }
                 hand {
                     trump(Trump.SPADES)
+                    gschobe(Gschobe.NO)
                     north(cards = "C9,D7,D10,DQ,H6,HQ,HK,S9,SJ", start = true)
                     east(cards = "C7,CJ,DA,H7,H10,HA,S8,SQ,SK")
                     south(cards = "C8,C10,CQ,CA,D9,H8,H9,S7,SA")

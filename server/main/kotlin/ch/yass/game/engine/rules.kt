@@ -2,6 +2,7 @@ package ch.yass.game.engine
 
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Card
+import ch.yass.game.dto.Gschobe
 import ch.yass.game.dto.State
 import ch.yass.game.dto.Trump
 import ch.yass.game.dto.db.*
@@ -23,6 +24,8 @@ fun unplayedCardsOfPlayer(player: Player, hands: List<Hand>, seats: List<Seat>, 
 
 fun isTrumpSet(hand: Hand?): Boolean = !(hand?.trump != Trump.FREESTYLE && hand?.trump == null)
 
+fun isAlreadyGschobe(hand: Hand?): Boolean = hand?.gschobe != Gschobe.NOT_YET
+
 /**
  * Check if the current player was ever dealt and has not yet played the given card.
  */
@@ -34,7 +37,7 @@ fun playerOwnsCard(player: Player, card: Card, state: GameState): Boolean {
 
 fun expectedState(allowed: List<State>, state: State): Boolean = allowed.contains(state)
 
-fun playerHasTurn(player: Player, state: GameState): Boolean {
+fun playerHasActivePosition(player: Player, state: GameState): Boolean {
     val activePlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks) ?: return false
 
     // Could _in theory_ be null if a game is not full and someone already plays a card

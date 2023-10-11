@@ -9,6 +9,7 @@ import ch.yass.game.GameService
 import ch.yass.game.api.PlayCardRequest
 import ch.yass.game.api.PlayedCard
 import ch.yass.game.api.internal.GameState
+import ch.yass.game.dto.Gschobe
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.Trump
 import ch.yass.game.engine.playerAtPosition
@@ -37,6 +38,7 @@ class WelcomeHandTest : BaseTest() {
             hands {
                 hand {
                     trump(Trump.FREESTYLE)
+                    gschobe(Gschobe.NO)
                     north(cards = "welcome", start = true)
                     east(cards = "welcome")
                     south(cards = "welcome")

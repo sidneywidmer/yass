@@ -6,10 +6,7 @@ import ch.yass.core.helper.errorResponse
 import ch.yass.core.helper.logger
 import ch.yass.core.helper.successResponse
 import ch.yass.core.helper.validate
-import ch.yass.game.api.ChooseTrumpRequest
-import ch.yass.game.api.GameStateResponse
-import ch.yass.game.api.JoinGameRequest
-import ch.yass.game.api.PlayCardRequest
+import ch.yass.game.api.*
 import ch.yass.identity.helper.player
 import io.javalin.apibuilder.ApiBuilder.get
 import io.javalin.apibuilder.EndpointGroup
@@ -23,6 +20,7 @@ class GameController(private val service: GameService) : Controller {
         get("/join", ::join)
         get("/play", ::play)
         get("/trump", ::trump)
+        get("/schiebe", ::schiebe)
     }
 
     // Save new Game to DB
@@ -59,6 +57,17 @@ class GameController(private val service: GameService) : Controller {
         val player = player(ctx)
 
         val gameState = service.trump(request, player)
+        GameStateResponse.from(gameState, player)
+    }.fold(
+        { errorResponse(ctx, it) },
+        { successResponse(ctx, it) }
+    )
+
+    private fun schiebe(ctx: Context) = either {
+        val request = validate<SchiebeRequest>(ctx.body())
+        val player = player(ctx)
+
+        val gameState = service.schiebe(request, player)
         GameStateResponse.from(gameState, player)
     }.fold(
         { errorResponse(ctx, it) },

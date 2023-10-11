@@ -1,5 +1,6 @@
 package ch.yass.admin.dsl
 
+import ch.yass.game.dto.Gschobe
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.Trump
 
@@ -31,6 +32,7 @@ class HandsBuilder(
 
 class HandBuilder(
     private var trump: Trump? = null,
+    private var gschobe: Gschobe = Gschobe.NOT_YET,
     private var north: HandPositionDSL? = null,
     private var east: HandPositionDSL? = null,
     private var south: HandPositionDSL? = null,
@@ -39,6 +41,10 @@ class HandBuilder(
 ) {
     fun trump(trump: Trump?) {
         this.trump = trump
+    }
+
+    fun gschobe(gschobe: Gschobe) {
+        this.gschobe = gschobe
     }
 
     fun north(cards: String, start: Boolean = false) {
@@ -63,7 +69,7 @@ class HandBuilder(
     }
 
     fun build(): HandDSL {
-        return HandDSL(trump, north!!, east!!, south!!, west!!, tricks)
+        return HandDSL(trump, gschobe, north!!, east!!, south!!, west!!, tricks)
     }
 
 }

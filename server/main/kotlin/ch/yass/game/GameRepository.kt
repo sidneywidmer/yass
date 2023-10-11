@@ -74,6 +74,14 @@ class GameRepository(private val db: DSLContext) {
             .returningResult(HAND)
             .fetchOneInto(Hand::class.java)!!
 
+    fun schiebe(gschobe: Gschobe, hand: Hand): Hand =
+        db.update(HAND)
+            .set(HAND.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
+            .set(HAND.GSCHOBE, gschobe.name)
+            .where(HAND.ID.eq(hand.id))
+            .returningResult(HAND)
+            .fetchOneInto(Hand::class.java)!!
+
     fun playCard(card: Card, trick: Trick, seat: Seat): Trick =
         db.update(TRICK)
             .set(TRICK.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
