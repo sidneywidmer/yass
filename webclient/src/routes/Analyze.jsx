@@ -6,6 +6,7 @@ import Player from "../components/analyze/Player.jsx";
 import Trick from "../components/analyze/Trick.jsx";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Trump from "../components/analyze/Trump.jsx";
+import Gschobe from "../components/analyze/Gschobe.jsx";
 
 const Analyze = (params) => {
     let {gameCode} = useParams();
@@ -28,6 +29,7 @@ const Analyze = (params) => {
                             Lead: {hand.startingPlayer.name},
                             Trump: <Trump trump={hand.trump}/>
                         </Typography>
+                        <Gschobe gschobe={hand.gschobe}/>
                     </AccordionSummary>
                     <AccordionDetails>
                         {hand.players.map((player, playerIndex) => (

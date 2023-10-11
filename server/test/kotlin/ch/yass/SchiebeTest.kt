@@ -1,9 +1,6 @@
 package ch.yass
 
-import arrow.core.raise.fold
 import arrow.core.raise.recover
-import ch.yass.core.error.CardNotPlayable
-import ch.yass.core.error.PlayerDoesNotOwnCard
 import ch.yass.admin.dsl.game
 import ch.yass.core.error.InvalidState
 import ch.yass.core.error.PlayerIsLocked
@@ -13,7 +10,10 @@ import ch.yass.game.api.PlayCardRequest
 import ch.yass.game.api.PlayedCard
 import ch.yass.game.api.SchiebeRequest
 import ch.yass.game.api.internal.GameState
-import ch.yass.game.dto.*
+import ch.yass.game.dto.Gschobe
+import ch.yass.game.dto.Position
+import ch.yass.game.dto.State
+import ch.yass.game.dto.Trump
 import ch.yass.game.engine.nextState
 import ch.yass.game.engine.playerAtPosition
 import org.junit.jupiter.api.Assertions.*

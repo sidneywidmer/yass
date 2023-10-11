@@ -43,8 +43,9 @@ class Trick {
 }
 
 class Hand {
-    constructor(trump, startingPlayer, players, tricks) {
+    constructor(trump, gschobe, startingPlayer, players, tricks) {
         this.trump = trump;
+        this.gschobe = gschobe;
         this.startingPlayer = new Player(startingPlayer.id, startingPlayer.uuid, startingPlayer.name, startingPlayer.bot, startingPlayer.createdAt, startingPlayer.updatedAt);
         this.players = players.map((player) => new PlayerWithCards(player.uuid, player.name, player.cards, player.position));
         this.tricks = tricks.map((trick) => new Trick(trick.cards, trick.leadPlayer, trick.leadSuit, trick.winnerPlayer));
@@ -53,7 +54,7 @@ class Hand {
 
 class AnalyzeGame {
     constructor(hands) {
-        this.hands = hands.map((hand) => new Hand(hand.trump, hand.startingPlayer, hand.players, hand.tricks));
+        this.hands = hands.map((hand) => new Hand(hand.trump, hand.gschobe, hand.startingPlayer, hand.players, hand.tricks));
     }
 }
 
