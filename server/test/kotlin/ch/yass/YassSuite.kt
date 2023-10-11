@@ -2,7 +2,9 @@ package ch.yass
 
 import com.typesafe.config.Config
 import org.flywaydb.core.Flyway
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
 import org.junit.platform.suite.api.SelectPackages
 import org.junit.platform.suite.api.Suite
 import org.kodein.di.direct
@@ -16,6 +18,7 @@ class YassSuite {
         @JvmStatic
         @BeforeAll
         fun bootstrap() {
+            println("Initializing application logic...")
             val config: Config = Yass.container.direct.instance()
 
             Flyway.configure()
@@ -29,6 +32,11 @@ class YassSuite {
                 .load()
                 .migrate()
         }
+    }
+
+    @Test
+    fun init() {
+        assertTrue(true)
     }
 
 }
