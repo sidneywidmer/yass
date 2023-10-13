@@ -18,4 +18,11 @@ of errors we currently have.
 Config file is under resources/application.conf. The environment variables need to be provided otherwise the application
 won't start.
 
-## 
+## Ideas / Todo's
+
+Ordered by priority:
+
+- [ ] Uneufe/Obeabe Trump
+- [ ] Points
+- [ ] Introduce TypeScript and Zustand to FE
+- [ ] Build WS communication around centrifugal.dev
