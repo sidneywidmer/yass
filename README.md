@@ -24,5 +24,6 @@ Ordered by priority:
 
 - [ ] Uneufe/Obeabe Trump
 - [ ] Points
+- [ ] Wiise
 - [ ] Introduce TypeScript and Zustand to FE
 - [ ] Build WS communication around centrifugal.dev
