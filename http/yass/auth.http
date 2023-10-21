@@ -1,0 +1,4 @@
+//  @name Whoami
+GET /auth/whoami HTTP/1.1
+Host: {{yassBaseUrl}}
+X-Session-Token: {{orySessionToken}}

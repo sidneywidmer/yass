@@ -1,0 +1,27 @@
+//  @name Get new login flow
+GET /self-service/login/api?refresh=&aal= HTTP/1.1
+Host: {{oryBaseUrl}}
+Accept: application/json
+
+> {%
+    client.global.set("oryAuthFlow", response.body.id);
+%}
+
+###
+
+//  @name Login
+POST /self-service/login?flow={{oryAuthFlow}}
+Host: {{oryBaseUrl}}
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+method = password &
+password = ds%2CvUvwL40jwaX%29Q &
+identifier = hello%40sidney.dev
+
+> {%
+    client.global.set("orySessionToken", response.body.session_token);
+%}
+
+
+

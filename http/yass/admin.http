@@ -1,0 +1,28 @@
+//  @name Generate Hand
+GET /admin/generate/hand HTTP/1.1
+Host: {{yassBaseUrl}}
+X-Session-Token: {{orySessionToken}}
+
+###
+
+//  @name Generate Bot Game
+GET /admin/generate/bot/game HTTP/1.1
+Host: {{yassBaseUrl}}
+X-Session-Token: {{orySessionToken}}
+
+###
+
+//  @name Generate State Game
+GET /admin/generate/state/game HTTP/1.1
+Host: {{yassBaseUrl}}
+X-Session-Token: {{orySessionToken}}
+
+###
+
+//  @name Generate State Game
+< {%
+    request.variables.set("gameCode", "QWDXV")
+%}
+GET /admin/analyze/game/{{gameCode}} HTTP/1.1
+Host: {{yassBaseUrl}}
+X-Session-Token: {{orySessionToken}}
