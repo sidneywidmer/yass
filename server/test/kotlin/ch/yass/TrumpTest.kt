@@ -1,0 +1,102 @@
+package ch.yass
+
+import arrow.core.raise.recover
+import ch.yass.admin.dsl.game
+import ch.yass.core.error.InvalidState
+import ch.yass.core.error.PlayerIsLocked
+import ch.yass.game.GameService
+import ch.yass.game.api.ChooseTrumpRequest
+import ch.yass.game.api.PlayCardRequest
+import ch.yass.game.api.PlayedCard
+import ch.yass.game.api.SchiebeRequest
+import ch.yass.game.api.internal.GameState
+import ch.yass.game.dto.Gschobe
+import ch.yass.game.dto.Position
+import ch.yass.game.dto.State
+import ch.yass.game.dto.Trump
+import ch.yass.game.engine.*
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
+import org.kodein.di.direct
+import org.kodein.di.instance
+
+class TrumpTest : BaseTest() {
+    private val service: GameService = Yass.container.direct.instance()
+
+    private fun getState(): GameState {
+        return game {
+            players {
+                north(name = "ueli", bot = false)
+                east(name = "doris", bot = false)
+                south(name = "christoph", bot = false)
+                west(name = "daniela", bot = false)
+            }
+            hands {
+                hand {
+                    trump(Trump.FREESTYLE)
+                    gschobe(Gschobe.NO)
+                    north(cards = "welcome", start = true)
+                    east(cards = "welcome")
+                    south(cards = "welcome")
+                    west(cards = "welcome")
+                    tricks {
+                        trick(north = "WH", east = "WH", south = "WH", west = "WH")
+                    }
+                }
+                hand {
+                    trump(null)
+                    gschobe(Gschobe.NO)
+                    north(cards = "C9,D7,D10,DQ,H6,HQ,HK,S9,SJ", start = true)
+                    east(cards = "C7,CJ,DA,H7,H10,HA,S8,SQ,SK")
+                    south(cards = "C8,C10,CQ,CA,D9,H8,H9,S7,SA")
+                    west(cards = "C6,CK,D6,D8,DJ,DK,HJ,S6,S10")
+                    tricks {
+                        trick(north = null, east = null, south = null, west = null)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun testPlayerCanPlayUneufeTrump() {
+        val state = getState()
+
+        val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)!!
+        val request = ChooseTrumpRequest(state.game.uuid.toString(), "UNEUFE")
+
+        val newState = recover({ service.trump(request, player) }) { fail() }
+        assertEquals(Trump.UNEUFE, currentHand(newState.hands)!!.trump)
+    }
+
+    @Test
+    fun testCorrectPlayerWinsUneufeTrump() {
+        val state = game {
+            players {
+                north(name = "ueli", bot = false)
+                east(name = "doris", bot = false)
+                south(name = "christoph", bot = false)
+                west(name = "daniela", bot = false)
+            }
+            hands {
+                hand {
+                    trump(Trump.UNEUFE)
+                    gschobe(Gschobe.NO)
+                    north(cards = "C9,D7,D10,DQ,H6,HQ,HK,S9,SJ", start = true)
+                    east(cards = "C7,CJ,DA,H7,H10,HA,S8,SQ,SK")
+                    south(cards = "C8,C10,CQ,CA,D9,H8,H9,S7,SA")
+                    west(cards = "C6,CK,D6,D8,DJ,DK,HJ,S6,S10")
+                    tricks {
+                        trick(north = "C9", east = "C7", south = "CQ", west = "D6")
+                    }
+                }
+            }
+        }
+
+        val currentHand = currentHand(state.hands)!!
+        val currentTrick = tricksOfHand(state.tricks, currentHand)
+        val wp = winningPositionOfCurrentTrick(currentHand, currentTrick, state.seats)
+
+        assertEquals(Position.EAST, wp)
+    }
+}

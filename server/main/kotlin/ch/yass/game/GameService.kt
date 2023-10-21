@@ -68,7 +68,7 @@ class GameService(private val repo: GameRepository) {
 
         ensure(expectedState(listOf(State.TRUMP, State.TRUMP_BOT), nextState)) { InvalidState(nextState, state) }
         ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
-        ensure(regularTrumps().contains(chosenTrump)) { TrumpInvalid(chosenTrump) }
+        ensure(playableTrumps().contains(chosenTrump)) { TrumpInvalid(chosenTrump) }
 
         logger().info("Player ${player.uuid} (bot:${player.bot}) choose trump $chosenTrump")
 
