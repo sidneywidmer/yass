@@ -98,7 +98,7 @@ fun activePosition(
     return nextHandStartingPosition(hands, players, seats)
 }
 
-fun winningPositionOfCurrentTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position? =
+fun winningPositionOfCurrentTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position =
     winningPositionOfTrick(hand, tricks, seats)
 
 fun winningPositionOfLastTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position? {
@@ -114,10 +114,10 @@ fun winningPositionOfLastTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat
  * To figure this out we need to recursively loop all played tricks in the given hand. Figures out
  * the winner of the last trick in the tricks list.
  */
-fun winningPositionOfTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position? {
+fun winningPositionOfTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position {
     var startPosition = seats.first { it.playerId == hand.startingPlayerId }.position
 
-    // Tricks are order where index 0 is the newest trick, we need to start at the oldest so we reverse the list
+    // Tricks are ordered where index 0 is the newest trick. We need to start at the oldest, so we reverse the list
     for (trick in tricks.reversed()) {
         val suitLed = trick.cardOf(startPosition)!!.suit
         val winningCard = trick.cards()
@@ -134,35 +134,6 @@ fun winningPositionOfTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): 
     }
 
     return startPosition
-}
-
-/**
- * Get card value to compare which card is better - this has nothing to do with the
- * actual point values the players get.
- *
- * TODO: Uneufe/Obenabe
- */
-fun cardValue(card: Card, trump: Trump): Int = when {
-    trump.equalsSuit(card.suit) && card.rank == Rank.JACK -> 200 // Trump Buur
-    trump.equalsSuit(card.suit) && card.rank == Rank.NINE -> 150 // Trump Nell
-    trump.equalsSuit(card.suit) -> 100 + rankValue(card.rank, trump)
-    else -> rankValue(card.rank, trump)
-}
-
-/**
- * TODO: Uneufe/Obenabe
- */
-fun rankValue(rank: Rank, trump: Trump): Int = when (rank) {
-    Rank.SIX -> 1
-    Rank.SEVEN -> 2
-    Rank.EIGHT -> 3
-    Rank.NINE -> 4
-    Rank.TEN -> 5
-    Rank.JACK -> 6
-    Rank.QUEEN -> 7
-    Rank.KING -> 8
-    Rank.ACE -> 9
-    else -> 0
 }
 
 /**

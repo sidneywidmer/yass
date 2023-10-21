@@ -16,6 +16,12 @@ const Trump = ({trump}) => {
         case "CLUBS":
             emoji = "♣️"
             break
+        case "UNEUFE":
+            emoji = "⬆️️"
+            break
+        case "OBEABE":
+            emoji = "⬇️️"
+            break
         case "FREESTYLE":
             emoji = "🆓"
             break
