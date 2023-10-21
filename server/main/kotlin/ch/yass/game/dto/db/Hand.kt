@@ -2,7 +2,10 @@ package ch.yass.game.dto.db
 
 import ch.yass.core.helper.listFromDbJson
 import ch.yass.db.tables.records.HandRecord
-import ch.yass.game.dto.*
+import ch.yass.game.dto.Card
+import ch.yass.game.dto.Gschobe
+import ch.yass.game.dto.Position
+import ch.yass.game.dto.Trump
 import java.time.LocalDateTime
 import java.util.*
 
@@ -48,15 +51,4 @@ data class Hand(
         }
     }
 
-    /**
-     * Helper so we can easily compare trumps with suits. Obviously
-     * doesn't work for uneufe/obeabe.
-     */
-    fun trumpSuit(): Suit? {
-        if (this.trump == null) {
-            return null
-        }
-
-        return Suit.entries.firstOrNull { it.name == this.trump.name }
-    }
 }

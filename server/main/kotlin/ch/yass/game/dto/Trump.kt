@@ -19,4 +19,6 @@ enum class Trump {
     fun equalsSuit(suit: Suit): Boolean {
         return this.toString() == suit.toString()
     }
+
+    fun toSuit(): Suit? = Suit.entries.firstOrNull { it.toString() == this.toString() }
 }

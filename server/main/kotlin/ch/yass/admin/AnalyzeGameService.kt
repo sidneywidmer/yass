@@ -34,8 +34,11 @@ class AnalyzeGameService(private val gameService: GameService) {
         val tricksOfHand = tricksOfHand(state.tricks, hand) // newest trick is index 0
         val tricks = tricksOfHand.map { mapTrick(it, state, tricksOfHand, hand) }
 
+        val points = pointsByPosition(hand, tricksOfHand, state.seats)
+
         return AnalyzeHand(hand.trump, hand.gschobe, startingPlayer, players, tricks.reversed())
     }
+
 
     private fun mapTrick(trick: Trick, state: GameState, tricksOfHand: List<Trick>, hand: Hand): TrickWithCards {
         val tricksUptoGivenTrick = tricksOfHand.reversed().takeWhileInclusive { it.id != trick.id }.reversed()
