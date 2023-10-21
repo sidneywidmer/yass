@@ -2,20 +2,18 @@ package ch.yass
 
 import arrow.core.raise.recover
 import ch.yass.admin.dsl.game
-import ch.yass.core.error.InvalidState
-import ch.yass.core.error.PlayerIsLocked
 import ch.yass.game.GameService
 import ch.yass.game.api.ChooseTrumpRequest
-import ch.yass.game.api.PlayCardRequest
-import ch.yass.game.api.PlayedCard
-import ch.yass.game.api.SchiebeRequest
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Gschobe
 import ch.yass.game.dto.Position
-import ch.yass.game.dto.State
 import ch.yass.game.dto.Trump
-import ch.yass.game.engine.*
-import org.junit.jupiter.api.Assertions.*
+import ch.yass.game.engine.currentHand
+import ch.yass.game.engine.playerAtPosition
+import ch.yass.game.engine.tricksOfHand
+import ch.yass.game.engine.winningPositionOfCurrentTrick
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 import org.kodein.di.direct
 import org.kodein.di.instance

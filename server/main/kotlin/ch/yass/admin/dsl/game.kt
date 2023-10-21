@@ -6,11 +6,9 @@ import ch.yass.core.helper.toDbJson
 import ch.yass.db.tables.references.*
 import ch.yass.game.GameRepository
 import ch.yass.game.api.internal.GameState
-import ch.yass.game.dto.Gschobe
 import org.jooq.DSLContext
 import org.kodein.di.direct
 import org.kodein.di.instance
-import java.lang.Exception
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*

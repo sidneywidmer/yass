@@ -9,7 +9,6 @@ import ch.yass.core.error.GameWithCodeNotFound
 import ch.yass.core.helper.takeWhileInclusive
 import ch.yass.game.GameService
 import ch.yass.game.api.internal.GameState
-import ch.yass.game.dto.Position
 import ch.yass.game.dto.db.Hand
 import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Trick

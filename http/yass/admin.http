@@ -19,7 +19,7 @@ X-Session-Token: {{orySessionToken}}
 
 ###
 
-//  @name Generate State Game
+//  @name Analyze Game
 < {%
     request.variables.set("gameCode", "QWDXV")
 %}

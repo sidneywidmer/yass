@@ -1,10 +1,10 @@
 package ch.yass
 
 import arrow.core.raise.fold
-import ch.yass.core.error.PlayerDoesNotOwnCard
-import ch.yass.core.error.PlayerIsLocked
 import ch.yass.admin.dsl.game
 import ch.yass.core.error.GameNotFound
+import ch.yass.core.error.PlayerDoesNotOwnCard
+import ch.yass.core.error.PlayerIsLocked
 import ch.yass.game.GameService
 import ch.yass.game.api.PlayCardRequest
 import ch.yass.game.api.PlayedCard
@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.kodein.di.direct
 import org.kodein.di.instance
-import java.lang.Exception
 
 class WelcomeHandTest : BaseTest() {
     private val service: GameService = Yass.container.direct.instance()
