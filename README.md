@@ -21,9 +21,6 @@ won't start.
 ## Ideas / Todo's
 
 Ordered by priority:
-
-- [ ] Uneufe/Obeabe Trump
-- [ ] Points
-- [ ] Wiise
 - [ ] Introduce TypeScript and Zustand to FE
 - [ ] Build WS communication around centrifugal.dev
+- [ ] Wiise -> Last rule-wise feature missing but booring... Idea: Not done automatically, user has to specifically wiise some cards
