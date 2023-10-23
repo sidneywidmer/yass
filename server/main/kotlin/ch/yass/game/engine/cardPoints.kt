@@ -5,7 +5,6 @@ import ch.yass.game.dto.Rank
 import ch.yass.game.dto.Trump
 
 fun cardPoints(card: Card, trump: Trump): Int {
-    // TODO: last trick +5
     return when (trump) {
         Trump.DIAMONDS -> cardPointsSuitTrump(card, trump) * 2
         Trump.HEARTS -> cardPointsSuitTrump(card, trump) * 2
