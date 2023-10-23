@@ -1,3 +1,12 @@
+class Points {
+    constructor(north, east, south, west) {
+        this.NORTH = north;
+        this.EAST = east;
+        this.SOUTH = south;
+        this.WEST = west;
+    }
+}
+
 class Player {
     constructor(id, uuid, name, bot, createdAt, updatedAt) {
         this.id = id;
@@ -43,18 +52,20 @@ class Trick {
 }
 
 class Hand {
-    constructor(trump, gschobe, startingPlayer, players, tricks) {
+    constructor(trump, gschobe, startingPlayer, players, tricks, points) {
         this.trump = trump;
         this.gschobe = gschobe;
         this.startingPlayer = new Player(startingPlayer.id, startingPlayer.uuid, startingPlayer.name, startingPlayer.bot, startingPlayer.createdAt, startingPlayer.updatedAt);
         this.players = players.map((player) => new PlayerWithCards(player.uuid, player.name, player.cards, player.position));
         this.tricks = tricks.map((trick) => new Trick(trick.cards, trick.leadPlayer, trick.leadSuit, trick.winnerPlayer));
+        this.points = new Points(points.NORTH, points.EAST, points.SOUTH, points.WEST)
     }
 }
 
 class AnalyzeGame {
-    constructor(hands) {
-        this.hands = hands.map((hand) => new Hand(hand.trump, hand.gschobe, hand.startingPlayer, hand.players, hand.tricks));
+    constructor(hands, points) {
+        this.points = points
+        this.hands = hands.map((hand) => new Hand(hand.trump, hand.gschobe, hand.startingPlayer, hand.players, hand.tricks, hand.points));
     }
 }
 

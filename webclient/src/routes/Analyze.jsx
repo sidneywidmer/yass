@@ -19,15 +19,20 @@ const Analyze = (params) => {
     return (
         <div>
             <h1>Analyze Game {gameCode}</h1>
+            <h2>NS: {data.points.NORTH + data.points.SOUTH}, WE: {data.points.EAST + data.points.WEST}</h2>
             {data.hands.map((hand, index) => (
                 <Accordion key={index}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
                         <Typography sx={{width: '33%', flexShrink: 0}}>
                             Hand {index + 1}
                         </Typography>
-                        <Typography sx={{color: 'text.secondary'}}>
+                        <Typography sx={{width: '33%', color: 'text.secondary'}}>
                             Lead: {hand.startingPlayer.name},
                             Trump: <Trump trump={hand.trump}/>
+                        </Typography>
+                        <Typography sx={{color: 'text.secondary'}}>
+                            NS: {hand.points.NORTH + hand.points.SOUTH},
+                            WE: {hand.points.EAST + hand.points.WEST},
                         </Typography>
                         <Gschobe gschobe={hand.gschobe}/>
                     </AccordionSummary>

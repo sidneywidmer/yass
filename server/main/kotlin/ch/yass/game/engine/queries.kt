@@ -26,7 +26,7 @@ fun tricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> {
  */
 fun playerAtPosition(position: Position, seats: List<Seat>, players: List<Player>): Player? {
     return seats.firstOrNull { it.position == position }
-        .let { players.firstOrNull { seat -> seat.id == it?.playerId } }
+        .let { players.firstOrNull { player -> player.id == it?.playerId } }
 }
 
 /**
@@ -175,15 +175,10 @@ fun playableCards(hand: Hand, cards: List<Card>): List<Card> =
     }
 
 /**
- * Splits all tricks to a map with key POSITION and value a list of tricks that position won
+ * Splits all tricks to a map with key POSITION and value a list of tricks that position won. The given
+ * tricks are ordered descending where index 0 is the newest trick, so we reverse the list.
  */
-fun pointsByPosition(hand: Hand, tricks: List<Trick>, seats: List<Seat>): String {
-    // loop all tricks, find out the winning position of the trick,
-    // get card values by trump type (schwarz (clubs, spades) einfach, rot (heart, diamonds) doppelt)
-    // uneufe obeabe (8=8, ace/6 = 11
-    // Buur 20, Nell 9
-    // Ass (11), König (4), Ober (3), Unter (2), Banner (10)
-    // last trick +5
+fun pointsByPosition(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Points {
     val startPosition = seats.first { it.playerId == hand.startingPlayerId }.position
     val positionMap = Position.entries.associateWith { emptyList<Trick>() }
     val positionToTricksMap = tricks.reversed().fold(
@@ -194,13 +189,10 @@ fun pointsByPosition(hand: Hand, tricks: List<Trick>, seats: List<Seat>): String
         PositionToTrickAccumulator(accumulator.positions + (winner to wonTricks), winner)
     }
 
-    val pointsMap: Map<Position, Int> = positionToTricksMap.positions.mapValues { (_, tricks) ->
-        tricks.sumOf { foo(it) }
+    return positionToTricksMap.positions.mapValues { (_, tricksOfPosition) ->
+        tricksOfPosition.sumOf { trick ->
+            val lastTrickBonus = if (trick.id == tricks.first.id) 5 else 0  // first means last played in this context
+            trick.cards().sumOf { card -> cardPoints(card, hand.trump!!) } + lastTrickBonus
+        }
     }
-
-    return "foo"
-}
-
-fun foo(trick: Trick): Int {
-    return 5
 }
