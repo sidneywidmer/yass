@@ -24,8 +24,12 @@ class AnalyzeGameService(private val gameService: GameService) {
     fun analyze(code: String): AnalyzeGameStateResponse {
         val state = gameService.getStateByCode(code)
         val hands = state.hands.reversed().stream().map { mapHand(it, state) }.toList()
+        val totalPoints = hands.map { it.points }
+            .flatMap { it.entries }
+            .groupBy({ it.key }) { it.value }
+            .mapValues { it.value.sum() }
 
-        return AnalyzeGameStateResponse(hands);
+        return AnalyzeGameStateResponse(hands, totalPoints);
     }
 
     private fun mapHand(hand: Hand, state: GameState): ch.yass.admin.api.analzye.Hand {
@@ -33,18 +37,22 @@ class AnalyzeGameService(private val gameService: GameService) {
         val players = state.allPlayers.map { mapPlayer(it, hand, state) }.toList()
         val tricksOfHand = tricksOfHand(state.tricks, hand) // newest trick is index 0
         val tricks = tricksOfHand.map { mapTrick(it, state, tricksOfHand, hand) }
+        val points = pointsByPosition(hand, tricksOfHand, state.seats)
 
-        return AnalyzeHand(hand.trump, hand.gschobe, startingPlayer, players, tricks.reversed())
+        return AnalyzeHand(hand.trump, hand.gschobe, startingPlayer, players, tricks.reversed(), points)
     }
+
 
     private fun mapTrick(trick: Trick, state: GameState, tricksOfHand: List<Trick>, hand: Hand): TrickWithCards {
         val tricksUptoGivenTrick = tricksOfHand.reversed().takeWhileInclusive { it.id != trick.id }.reversed()
         val leadPosition = currentLeadPositionOfHand(hand, tricksUptoGivenTrick, state.seats, state.allPlayers)
         val leadPlayer = playerAtPosition(leadPosition, state.seats, state.allPlayers)!!
         val leadCard = trick.cardOf(leadPosition)
-        val winningPlayer = winningPositionOfCurrentTrick(hand, tricksUptoGivenTrick, state.seats)?.let {
-            playerAtPosition(it, state.seats, state.allPlayers)
-        }
+        val winningPlayer = playerAtPosition(
+            winningPositionOfCurrentTrick(hand, tricksUptoGivenTrick, state.seats),
+            state.seats,
+            state.allPlayers
+        )
         val cards = positionsOrderedWithStart(leadPosition).map {
             PlayedCardWithPlayer(
                 playerAtPosition(it, state.seats, state.allPlayers)!!,

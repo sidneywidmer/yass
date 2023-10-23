@@ -26,7 +26,7 @@ fun tricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> {
  */
 fun playerAtPosition(position: Position, seats: List<Seat>, players: List<Player>): Player? {
     return seats.firstOrNull { it.position == position }
-        .let { players.firstOrNull { seat -> seat.id == it?.playerId } }
+        .let { players.firstOrNull { player -> player.id == it?.playerId } }
 }
 
 /**
@@ -99,7 +99,7 @@ fun activePosition(
 }
 
 fun winningPositionOfCurrentTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position =
-    winningPositionOfTrick(hand, tricks, seats)
+    winningPositionOfTricks(hand, tricks, seats)
 
 fun winningPositionOfLastTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position? {
     if (tricks.count() < 2) {
@@ -107,34 +107,36 @@ fun winningPositionOfLastTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat
     }
 
     // Index 0 is the current trick, so we remove it to get data up to the last one
-    return winningPositionOfTrick(hand, tricks.drop(1), seats)
+    return winningPositionOfTricks(hand, tricks.drop(1), seats)
+}
+
+fun winningPositionOfTrick(trick: Trick, lead: Position, trump: Trump): Position {
+    val suitLed = trick.cardOf(lead)!!.suit
+    val winningCard = trick.cards()
+        .filter { it.suit == suitLed || it.suit == trump.toSuit() }
+        .maxBy { cardValue(it, trump) }
+
+    return when (winningCard) {
+        trick.north -> Position.NORTH
+        trick.east -> Position.EAST
+        trick.south -> Position.SOUTH
+        trick.west -> Position.WEST
+        else -> Position.NORTH
+    }
 }
 
 /**
  * To figure this out we need to recursively loop all played tricks in the given hand. Figures out
  * the winner of the last trick in the tricks list.
  */
-fun winningPositionOfTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position {
-    var startPosition = seats.first { it.playerId == hand.startingPlayerId }.position
+fun winningPositionOfTricks(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position {
+    val startPosition = seats.first { it.playerId == hand.startingPlayerId }.position
 
-    // Tricks are ordered where index 0 is the newest trick. We need to start at the oldest, so we reverse the list
-    for (trick in tricks.reversed()) {
-        val suitLed = trick.cardOf(startPosition)!!.suit
-        val winningCard = trick.cards()
-            .filter { it.suit == suitLed || it.suit == hand.trumpSuit() }
-            .maxBy { cardValue(it, hand.trump!!) }
-
-        startPosition = when (winningCard) {
-            trick.north -> Position.NORTH
-            trick.east -> Position.EAST
-            trick.south -> Position.SOUTH
-            trick.west -> Position.WEST
-            else -> Position.NORTH  // since trick.cards are just cards from these positions we don't care
-        }
+    return tricks.reversed().fold(startPosition) { lead, trick ->
+        winningPositionOfTrick(trick, lead, hand.trump!!)
     }
-
-    return startPosition
 }
+
 
 /**
  * See activePosition, this is just a helper to map a player to a position.
@@ -167,7 +169,30 @@ fun playableCards(hand: Hand, cards: List<Card>): List<Card> =
             Trump.DIAMONDS,
             Trump.HEARTS,
             Trump.SPADES
-        ) -> cards.filterNot { it.suit != hand.trumpSuit() && it.rank == Rank.JACK }
+        ) -> cards.filterNot { it.suit != hand.trump?.toSuit() && it.rank == Rank.JACK }
 
         else -> cards
     }
+
+/**
+ * Splits all tricks to a map with key POSITION and value a list of tricks that position won. The given
+ * tricks are ordered descending where index 0 is the newest trick, so we reverse the list.
+ */
+fun pointsByPosition(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Points {
+    val startPosition = seats.first { it.playerId == hand.startingPlayerId }.position
+    val positionMap = Position.entries.associateWith { emptyList<Trick>() }
+    val positionToTricksMap = tricks.reversed().fold(
+        PositionToTrickAccumulator(positionMap, startPosition)
+    ) { accumulator, trick ->
+        val winner = winningPositionOfTrick(trick, accumulator.lead, hand.trump!!)
+        val wonTricks = accumulator.positions[winner]!! + trick
+        PositionToTrickAccumulator(accumulator.positions + (winner to wonTricks), winner)
+    }
+
+    return positionToTricksMap.positions.mapValues { (_, tricksOfPosition) ->
+        tricksOfPosition.sumOf { trick ->
+            val lastTrickBonus = if (trick.id == tricks.first.id) 5 else 0  // first means last played in this context
+            trick.cards().sumOf { card -> cardPoints(card, hand.trump!!) } + lastTrickBonus
+        }
+    }
+}

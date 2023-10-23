@@ -35,5 +35,5 @@ const fetchData = async (url) => {
 
 export const fetchGame = async (gameCode) => {
     const result = await fetchData(`admin/analyze/game/${gameCode}`)
-    return new AnalyzeGame(result.hands)
+    return new AnalyzeGame(result.hands, result.points)
 };
