@@ -21,7 +21,7 @@ X-Session-Token: {{orySessionToken}}
 
 //  @name Analyze Game
 < {%
-    request.variables.set("gameCode", "QWDXV")
+    request.variables.set("gameCode", "LQRMX")
 %}
 GET /admin/analyze/game/{{gameCode}} HTTP/1.1
 Host: {{yassBaseUrl}}

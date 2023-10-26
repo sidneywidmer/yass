@@ -63,7 +63,8 @@ class Hand {
 }
 
 class AnalyzeGame {
-    constructor(hands, points) {
+    constructor(hands, points, gameUuid) {
+        this.gameUuid = gameUuid
         this.points = points
         this.hands = hands.map((hand) => new Hand(hand.trump, hand.gschobe, hand.startingPlayer, hand.players, hand.tricks, hand.points));
     }

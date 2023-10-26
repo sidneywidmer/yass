@@ -26,6 +26,10 @@ fun isTrumpSet(hand: Hand?): Boolean = !(hand?.trump != Trump.FREESTYLE && hand?
 
 fun isAlreadyGschobe(hand: Hand?): Boolean = hand?.gschobe != Gschobe.NOT_YET
 
+fun playerInGame(player: Player, seats: List<Seat>): Boolean {
+    return seats.any { it.playerId == player.id }
+}
+
 /**
  * Check if the current player was ever dealt and has not yet played the given card.
  */
