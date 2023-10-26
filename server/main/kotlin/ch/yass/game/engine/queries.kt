@@ -189,10 +189,14 @@ fun pointsByPosition(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Points
         PositionToTrickAccumulator(accumulator.positions + (winner to wonTricks), winner)
     }
 
-    return positionToTricksMap.positions.mapValues { (_, tricksOfPosition) ->
+    val positionsTotal = positionToTricksMap.positions.mapValues { (_, tricksOfPosition) ->
         tricksOfPosition.sumOf { trick ->
             val lastTrickBonus = if (trick.id == tricks.first.id) 5 else 0  // first means last played in this context
             trick.cards().sumOf { card -> cardPoints(card, hand.trump!!) } + lastTrickBonus
         }
     }
+
+    return multiplyByTrump(positionsTotal, hand.trump!!)
 }
+
+
