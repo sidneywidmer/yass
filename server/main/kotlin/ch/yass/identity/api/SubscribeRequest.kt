@@ -13,7 +13,7 @@ data class SubscribeRequest(
         validate(this) {
             validate(SubscribeRequest::channel)
                 .isNotNull()
-                .matches(Regex("(game:#[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})"))
+                .matches(Regex("(seat:#[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})"))
         }
     }
 }

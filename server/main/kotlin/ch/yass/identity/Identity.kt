@@ -11,6 +11,7 @@ object Identity {
     val module = DI.Module("Auth module") {
         bindSingleton { AuthController(instance()) }
         bindSingleton { AuthMiddleware(instance(), instance()) }
+        bindSingleton { ImpersonateMiddleware(instance()) }
         bindSingleton { createOryClient(instance()) }
     }
 

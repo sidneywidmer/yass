@@ -2,7 +2,8 @@ import axios from "axios";
 import {useLoading} from "../contexts/Loading.jsx";
 import {useError} from "../contexts/Error.jsx";
 import {useEffect, useState} from "react";
-import AnalyzeGame from './api/fetch-game/dto';
+import AnalyzeGame from "./api/analyze-game.js";
+import PlayGame from "./api/play-game.js";
 
 export const useFetchData = (fetchFunction, dependencies) => {
     const {startLoading, stopLoading} = useLoading()
@@ -33,7 +34,12 @@ const fetchData = async (url) => {
 
 };
 
-export const fetchGame = async (gameCode) => {
+export const fetchAnalyzeGame = async (gameCode) => {
     const result = await fetchData(`admin/analyze/game/${gameCode}`)
     return new AnalyzeGame(result.hands, result.points, result.gameUuid)
+};
+
+export const fetchPlayGame = async (gameCode) => {
+    const result = await fetchData(`admin/play/game/${gameCode}`)
+    return new PlayGame(result.gameUuid, result.seats)
 };

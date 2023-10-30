@@ -1,48 +1,36 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {useParams} from 'react-router-dom';
-import {fetchGame, useFetchData} from "../helpers/api.jsx";
-import {Centrifuge} from "centrifuge";
+import {fetchPlayGame, useFetchData} from "../helpers/api.jsx";
+import Seat from "../components/play/Seat.jsx";
+import {Grid} from "@mui/material";
+import Container from "@mui/material/Container";
 
 const Play = (params) => {
     let {gameCode} = useParams();
-    const data = useFetchData(() => fetchGame(gameCode), [gameCode]);
-
-    useEffect(() => {
-        if (!data || !data.gameUuid) {
-            return;
-        }
-
-        const centrifuge = new Centrifuge('ws://127.0.0.1:8000/connection/websocket');
-        centrifuge.connect();
-        centrifuge.on('connected', function (ctx) {
-            console.log('Connected to centrifuge', ctx)
-        });
-        centrifuge.on('disconnected', function (ctx) {
-            console.log('Disconnected from centrifuge', ctx)
-        });
-
-        // Code to run on the first render
-        const sub = centrifuge.newSubscription('game:#' + data.gameUuid);
-        sub.on('publication', function (ctx) {
-            console.log("New publication in game channel: ", ctx);
-        });
-        sub.on('subscribed', function (ctx) {
-            console.log("Now subscribed to game channel: ", ctx);
-        });
-        sub.on('error', function (ctx) {
-            console.log("Game channel error: ", ctx);
-        });
-        sub.subscribe();
-    }, [data]);
+    const data = useFetchData(() => fetchPlayGame(gameCode), [gameCode]);
 
     if (!data) {
         return null;
     }
 
     return (
-        <div>
-            hello
-        </div>
+        <Container maxWidth="70%" style={{padding: '30px'}}>
+            <Grid container>
+                <Grid item xs={4}/>
+                <Grid item xs={4} className="seat"> <Seat seat={data.seats["NORTH"]}/> </Grid>
+                <Grid item xs={4}/>
+
+
+                <Grid item xs={4} className="seat"><Seat seat={data.seats["WEST"]}/></Grid>
+                <Grid item xs={4}/>
+                <Grid item xs={4} className="seat"><Seat seat={data.seats["EAST"]}/></Grid>
+
+
+                <Grid item xs={4}/>
+                <Grid item xs={4} className="seat"><Seat seat={data.seats["SOUTH"]}/></Grid>
+                <Grid item xs={4}/>
+            </Grid>
+        </Container>
     );
 }
 

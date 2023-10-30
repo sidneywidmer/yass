@@ -1,7 +1,7 @@
 import React from 'react';
-import {Chip, Divider, Grid, Typography} from '@mui/material';
-import Card from "./Card.jsx";
+import {Grid, Typography} from '@mui/material';
 import Trump from "./Trump.jsx";
+import Card from "../common/Card.jsx";
 
 const Trick = ({trick}) => {
     return (

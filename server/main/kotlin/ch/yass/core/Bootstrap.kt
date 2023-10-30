@@ -7,6 +7,7 @@ import ch.yass.core.error.DomainException
 import ch.yass.core.error.domainExceptionHandler
 import ch.yass.core.error.globalExceptionHandler
 import ch.yass.identity.AuthMiddleware
+import ch.yass.identity.ImpersonateMiddleware
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.path
 import io.javalin.event.EventListener
@@ -34,6 +35,7 @@ class Bootstrap(private val config: ConfigSettings) {
             di.direct.instance<CORSMiddleware>(),
             di.direct.instance<MDCMiddleware>(),
             di.direct.instance<AuthMiddleware>(),
+            di.direct.instance<ImpersonateMiddleware>(),
         )
         registerMiddlewares(app, middlewares)
 

@@ -14,7 +14,7 @@ import LoadingProvider from "./contexts/Loading.jsx";
 
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-    <React.StrictMode>
+    <>
         <CssBaseline/>
         <ErrorProvider>
             <LoadingProvider>
@@ -22,6 +22,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                 <GlobalErrorHandling/>
             </LoadingProvider>
         </ErrorProvider>
-    </React.StrictMode>
+    </>
 );
 

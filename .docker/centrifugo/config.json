@@ -16,7 +16,7 @@
   ],
   "namespaces": [
     {
-      "name": "game",
+      "name": "seat",
       "presence": true,
       "proxy_subscribe": true
     }

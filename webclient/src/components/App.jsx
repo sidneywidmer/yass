@@ -11,11 +11,11 @@ const router = createBrowserRouter([
         element: <Root/>,
     },
     {
-        path: "/analyze/:gameCode",
+        path: "/admin/analyze/:gameCode",
         element: <Analyze/>,
     },
     {
-        path: "/play/:gameCode",
+        path: "/admin/play/:gameCode",
         element: <Play/>,
     }
 ]);
@@ -23,8 +23,6 @@ const router = createBrowserRouter([
 
 export default function App() {
     return (
-        <Container maxWidth="md">
-            <RouterProvider router={router}/>
-        </Container>
+        <RouterProvider router={router}/>
     );
 }

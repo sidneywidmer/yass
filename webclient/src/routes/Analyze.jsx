@@ -1,23 +1,24 @@
 import React from 'react';
 import {useParams} from 'react-router-dom';
-import {fetchGame, useFetchData} from "../helpers/api.jsx";
+import {fetchAnalyzeGame, useFetchData} from "../helpers/api.jsx";
 import {Accordion, AccordionDetails, AccordionSummary, Chip, Divider, Typography} from "@mui/material";
 import Player from "../components/analyze/Player.jsx";
 import Trick from "../components/analyze/Trick.jsx";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Trump from "../components/analyze/Trump.jsx";
 import Gschobe from "../components/analyze/Gschobe.jsx";
+import Container from "@mui/material/Container";
 
 const Analyze = (params) => {
     let {gameCode} = useParams();
-    const data = useFetchData(() => fetchGame(gameCode), [gameCode]);
+    const data = useFetchData(() => fetchAnalyzeGame(gameCode), [gameCode]);
 
     if (!data) {
         return null;
     }
 
     return (
-        <div>
+        <Container maxWidth="md">
             <h1>Analyze Game {gameCode}</h1>
             <h2>NS: {data.points.NORTH + data.points.SOUTH}, WE: {data.points.EAST + data.points.WEST}</h2>
             {data.hands.map((hand, index) => (
@@ -51,7 +52,7 @@ const Analyze = (params) => {
                     </AccordionDetails>
                 </Accordion>
             ))}
-        </div>
+        </Container>
     );
 }
 

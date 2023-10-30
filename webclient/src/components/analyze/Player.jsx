@@ -1,7 +1,7 @@
 import React from 'react';
 import {Grid, Typography} from '@mui/material';
 import Position from "./Position.jsx";
-import Card from "./Card.jsx";
+import Card from "../common/Card.jsx";
 
 const Player = ({player}) => {
     return (

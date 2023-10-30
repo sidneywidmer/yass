@@ -1,14 +1,12 @@
 package ch.yass.core.helper
 
-import ch.yass.core.error.DomainError
-import ch.yass.core.error.GameWithCodeNotFound
-import ch.yass.core.error.Unauthorized
-import ch.yass.core.error.ValiktorError
+import ch.yass.core.error.*
 import io.javalin.http.Context
 import org.valiktor.i18n.mapToMessage
 import java.util.*
 
 data class ErrorResponse(val message: String = "", val payload: Any? = null)
+data class CentrifugoErrorResponse(val code: Int, val message: String)
 data class Path(val path: String, val violations: List<Violation>)
 data class Violation(val code: String, val message: String = "")
 
@@ -23,7 +21,8 @@ fun successResponse(ctx: Context, data: Any): Context {
 fun errorResponse(ctx: Context, error: DomainError): Context {
     return when (error) {
         is ValiktorError -> ctx.status(422).json(groupValiktorViolations(error))
-        is Unauthorized -> ctx.status(401).json(ErrorResponse("ory authentication failed", error.exception.responseBody))
+        is Unauthorized -> ctx.status(401) .json(ErrorResponse("ory authentication failed", error.exception.responseBody))
+        is UnauthorizedSubscription -> ctx.status(200).json(object { val error = CentrifugoErrorResponse(403, "denied")})
         is GameWithCodeNotFound -> ctx.status(404).json(ErrorResponse("no game with code ${error.code} found"))
         else -> {
             logger().error("DomainError `${error.javaClass.name}` encountered: $error")

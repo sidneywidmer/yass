@@ -29,7 +29,7 @@ class AnalyzeGameService(private val gameService: GameService) {
             .groupBy({ it.key }) { it.value }
             .mapValues { it.value.sum() }
 
-        return AnalyzeGameStateResponse(hands, totalPoints, state.game.uuid);
+        return AnalyzeGameStateResponse(hands, totalPoints, state.game.uuid)
     }
 
     private fun mapHand(hand: Hand, state: GameState): ch.yass.admin.api.analzye.Hand {

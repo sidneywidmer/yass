@@ -29,8 +29,10 @@ class AuthMiddleware(
                 ctx.cookieMap()["ory_kratos_session"]
             )
             val player = playerService.fromSession(session)
+
             player
         }
+
 
         when (maybePlayer) {
             is Either.Left -> throw DomainException(maybePlayer.value)

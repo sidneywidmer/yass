@@ -30,6 +30,9 @@ fun playerInGame(player: Player, seats: List<Seat>): Boolean {
     return seats.any { it.playerId == player.id }
 }
 
+fun playerOwnsSeat(player: Player, seatUuid: String, seats: List<Seat>): Boolean =
+    seats.firstOrNull { it.playerId == player.id }?.uuid.toString() == seatUuid
+
 /**
  * Check if the current player was ever dealt and has not yet played the given card.
  */
