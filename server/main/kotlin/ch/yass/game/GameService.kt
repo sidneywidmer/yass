@@ -4,6 +4,9 @@ import arrow.core.raise.Raise
 import arrow.core.raise.ensure
 import ch.yass.core.error.*
 import ch.yass.core.helper.logger
+import ch.yass.core.pubsub.Channel
+import ch.yass.core.pubsub.Message
+import ch.yass.core.pubsub.publish
 import ch.yass.game.api.*
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.api.internal.NewHand
@@ -14,6 +17,10 @@ import ch.yass.game.dto.Trump
 import ch.yass.game.dto.db.Game
 import ch.yass.game.dto.db.Player
 import ch.yass.game.engine.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
+import okhttp3.internal.wait
 
 class GameService(private val repo: GameRepository) {
 
@@ -39,6 +46,7 @@ class GameService(private val repo: GameRepository) {
         val playedCard = Card.from(request.card)
         val nextState = nextState(state)
 
+        ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
         ensure(expectedState(listOf(State.PLAY_CARD, State.PLAY_CARD_BOT), nextState)) {
             InvalidState(nextState, state)
         }
@@ -55,6 +63,10 @@ class GameService(private val repo: GameRepository) {
         repo.playCard(playedCard, currentTrick, playerSeat)
         gameLoop(game)
 
+        state.seats.forEach {
+            publish(listOf(Message("hellooo")), Channel("seat", it.uuid))
+        }
+
         return repo.getState(game)
     }
 
@@ -66,6 +78,7 @@ class GameService(private val repo: GameRepository) {
         val nextState = nextState(state)
         val currentHand = currentHand(state.hands)!!
 
+        ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
         ensure(expectedState(listOf(State.TRUMP, State.TRUMP_BOT), nextState)) { InvalidState(nextState, state) }
         ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
         ensure(playableTrumps().contains(chosenTrump)) { TrumpInvalid(chosenTrump) }
@@ -86,6 +99,7 @@ class GameService(private val repo: GameRepository) {
         val gschobe = Gschobe.valueOf(request.gschobe)
         val currentHand = currentHand(state.hands)!!
 
+        ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
         ensure(expectedState(listOf(State.SCHIEBE, State.SCHIEBE_BOT), nextState)) { InvalidState(nextState, state) }
         ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
 

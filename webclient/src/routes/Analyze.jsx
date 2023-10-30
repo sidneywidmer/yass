@@ -1,6 +1,6 @@
 import React from 'react';
 import {useParams} from 'react-router-dom';
-import {fetchAnalyzeGame, useFetchData} from "../helpers/api.jsx";
+import {fetchAnalyzeGame, useApi} from "../helpers/api.jsx";
 import {Accordion, AccordionDetails, AccordionSummary, Chip, Divider, Typography} from "@mui/material";
 import Player from "../components/analyze/Player.jsx";
 import Trick from "../components/analyze/Trick.jsx";
@@ -11,7 +11,7 @@ import Container from "@mui/material/Container";
 
 const Analyze = (params) => {
     let {gameCode} = useParams();
-    const data = useFetchData(() => fetchAnalyzeGame(gameCode), [gameCode]);
+    const data = useApi(() => fetchAnalyzeGame(gameCode), [gameCode]);
 
     if (!data) {
         return null;

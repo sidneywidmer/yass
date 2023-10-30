@@ -1,11 +1,9 @@
 package ch.yass.identity.api
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import org.valiktor.functions.isNotNull
 import org.valiktor.functions.matches
 import org.valiktor.validate
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 data class SubscribeRequest(
     val channel: String,
 ) {

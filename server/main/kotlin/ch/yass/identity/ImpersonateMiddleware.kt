@@ -12,6 +12,7 @@ import ch.yass.identity.api.ImpersonateRequest
 import ch.yass.identity.helper.isAdmin
 import ch.yass.identity.helper.player
 import io.javalin.http.Context
+import io.javalin.http.HandlerType
 
 /**
  * If we find a request with a body that contains the json field data.impersonate and the current
@@ -21,6 +22,11 @@ class ImpersonateMiddleware(
     private val playerService: PlayerService
 ) : Middleware {
     override fun before(ctx: Context) {
+        // See AuthMiddleware
+        if (ctx.method() == HandlerType.OPTIONS) {
+            return
+        }
+
         val player = player(ctx)
         if (!isAdmin(player)) {
             return

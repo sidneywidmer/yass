@@ -1,5 +1,6 @@
 package ch.yass.core
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.util.StdDateFormat
@@ -22,7 +23,6 @@ object Core {
         bindSingleton { createDSLContext(instance()) }
         bindSingleton { Bootstrap(instance()) }
         bindSingleton { MDCMiddleware() }
-        bindSingleton { CORSMiddleware() }
         bindSingleton { LoggerFactory.getLogger("Yass") }
         bindSingleton { createJsonMapper() }
     }
@@ -31,6 +31,7 @@ object Core {
         val mapper = jacksonObjectMapper().apply {
             registerModule(JavaTimeModule())
             disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             dateFormat = StdDateFormat().withColonInTimeZone(true)
         }
 

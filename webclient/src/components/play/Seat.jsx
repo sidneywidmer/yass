@@ -1,9 +1,27 @@
 import React, {useEffect} from 'react';
 import {Centrifuge} from "centrifuge";
 import Card from "../common/Card.jsx";
-import {Box} from "@mui/material";
+import {playCard, useApi} from "../../helpers/api.jsx";
 
-const Seat = ({seat}) => {
+const Seat = ({seat, gameUuid}) => {
+    const clickCardHandler = (card) => {
+        const data = {
+            "game": gameUuid,
+            "card": card,
+            "data": {"impersonate": seat.player.uuid}
+        }
+        // const foo = useApi(() => playCard(data), []); --> possible with zustand?
+        playCard(data)
+            .then(responseData => {
+                // Handle the response data here
+                console.log('Response Data:', responseData);
+            })
+            .catch(error => {
+                // Handle errors here
+                console.error('Error:', error);
+            });
+    }
+
     useEffect(() => {
         const data = {"data": {"impersonate": seat.player.uuid}}
         const centrifuge = new Centrifuge('ws://127.0.0.1:8000/connection/websocket', data);
@@ -37,7 +55,7 @@ const Seat = ({seat}) => {
             Seat: {seat.uuid} <br/>
             Position: {seat.position} <br/>
             {seat.cards.map((trickCard, trickCardIndex) => (
-                <Card key={trickCardIndex} card={trickCard}/>
+                <Card key={trickCardIndex} card={trickCard} clickHandler={clickCardHandler}/>
             ))}
         </>
     );

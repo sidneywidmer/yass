@@ -3,12 +3,11 @@ package ch.yass.game
 import arrow.core.raise.either
 import ch.yass.core.contract.Controller
 import ch.yass.core.helper.errorResponse
-import ch.yass.core.helper.logger
 import ch.yass.core.helper.successResponse
 import ch.yass.core.helper.validate
 import ch.yass.game.api.*
 import ch.yass.identity.helper.player
-import io.javalin.apibuilder.ApiBuilder.get
+import io.javalin.apibuilder.ApiBuilder.post
 import io.javalin.apibuilder.EndpointGroup
 import io.javalin.http.Context
 
@@ -16,11 +15,11 @@ class GameController(private val service: GameService) : Controller {
     override val path = "/game"
 
     override val endpoints = EndpointGroup {
-        get("/create", ::create)
-        get("/join", ::join)
-        get("/play", ::play)
-        get("/trump", ::trump)
-        get("/schiebe", ::schiebe)
+        post("/create", ::create)
+        post("/join", ::join)
+        post("/play", ::play)
+        post("/trump", ::trump)
+        post("/schiebe", ::schiebe)
     }
 
     // Save new Game to DB
@@ -32,8 +31,6 @@ class GameController(private val service: GameService) : Controller {
         val request = validate<JoinGameRequest>(ctx.body())
         val player = player(ctx)
         val gameState = service.join(request, player)
-
-        logger().info("Player ${player.uuid} joined Game ${gameState.game.uuid}")
 
         GameStateResponse.from(gameState, player)
     }.fold(

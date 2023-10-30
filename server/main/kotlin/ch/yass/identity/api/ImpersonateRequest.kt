@@ -1,12 +1,9 @@
 package ch.yass.identity.api
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import org.valiktor.functions.isNotNull
 import org.valiktor.functions.matches
 import org.valiktor.validate
-import java.util.UUID
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 data class ImpersonateData(val impersonate: String) {
     init {
         validate(this) {
@@ -17,5 +14,4 @@ data class ImpersonateData(val impersonate: String) {
     }
 }
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 data class ImpersonateRequest(val data: ImpersonateData)

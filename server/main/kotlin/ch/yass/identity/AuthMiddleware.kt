@@ -10,6 +10,7 @@ import ch.yass.core.error.DomainException
 import ch.yass.core.error.Unauthorized
 import ch.yass.game.PlayerService
 import io.javalin.http.Context
+import io.javalin.http.HandlerType.OPTIONS
 import sh.ory.ApiException
 import sh.ory.model.Session
 
@@ -22,6 +23,13 @@ class AuthMiddleware(
     private val playerService: PlayerService
 ) : Middleware {
     override fun before(ctx: Context) {
+        // Options request won't match any endpoints since they're all GET/POST/e.t.c and because of this
+        // we don't need any authentication. This middleware should be replaced with the javalin 6
+        // before/afterMatched https://github.com/javalin/javalin/pull/1984 handlers
+        if (ctx.method() == OPTIONS) {
+            return
+        }
+
         val maybePlayer = either {
             val session = getSession(
                 oryClient,

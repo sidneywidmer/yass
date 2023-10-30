@@ -1,6 +1,7 @@
 package ch.yass.core.helper
 
 import ch.yass.Yass
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.typesafe.config.Config
 import org.kodein.di.direct
 import org.kodein.di.instance
@@ -15,4 +16,8 @@ fun logger(): Logger {
 
 fun config(): Config {
     return Yass.container.direct.instance()
+}
+
+fun jackson(): ObjectMapper {
+    return Yass.container.direct.instance<ObjectMapper>()
 }

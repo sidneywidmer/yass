@@ -2,7 +2,9 @@ import React from "react"
 import {Tooltip} from "@mui/material";
 
 
-const Card = ({card, player, isWinner}) => {
+const Card = ({card, player, isWinner, clickHandler}) => {
+    clickHandler = clickHandler || ((card) => {
+    });
     if (!card) {
         return <span className="card-container">--</span>
     }
@@ -82,7 +84,7 @@ const Card = ({card, player, isWinner}) => {
     }
 
     if (!player) {
-        return <span className="card-container">{suitEmoji}{rankEmoji}</span>
+        return <span className="card-container" onClick={() => clickHandler(card)}>{suitEmoji}{rankEmoji}</span>
     }
 
     return (
