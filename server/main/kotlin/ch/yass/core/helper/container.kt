@@ -1,6 +1,7 @@
 package ch.yass.core.helper
 
 import ch.yass.Yass
+import ch.yass.core.CentrifugoClient
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.typesafe.config.Config
 import org.kodein.di.direct
@@ -20,4 +21,8 @@ fun config(): Config {
 
 fun jackson(): ObjectMapper {
     return Yass.container.direct.instance<ObjectMapper>()
+}
+
+fun centrifugo(): CentrifugoClient {
+    return Yass.container.direct.instance<CentrifugoClient>()
 }
