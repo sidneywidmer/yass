@@ -6,7 +6,10 @@ import ch.yass.game.dto.Points
 import ch.yass.game.dto.Position
 
 
-sealed interface Action
+sealed interface Action {
+    val type: String
+        get() = this.javaClass.simpleName
+}
 
 data class CardPlayed(val card: Card, val position: Position) : Action
 data class UpdatePlayedCards(val cards: List<Card>) : Action

@@ -49,7 +49,7 @@ export const fetchAnalyzeGame = async (gameCode) => {
 
 export const fetchPlayGame = async (gameCode) => {
     const result = await getData(`admin/play/game/${gameCode}`)
-    return new PlayGame(result.gameUuid, result.seats)
+    return new PlayGame(result.gameUuid, result.seats, result.cardsPlayed)
 };
 
 export const playCard = async (data) => {

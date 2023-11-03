@@ -1,12 +1,9 @@
 package ch.yass.core.pubsub
 
 import ch.yass.core.helper.centrifugo
-import ch.yass.core.helper.config
 import ch.yass.core.helper.jackson
-import ch.yass.core.helper.logger
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator
-import com.github.kittinunf.fuel.httpPost
 import java.util.*
 
 data class Channel(
@@ -24,17 +21,10 @@ data class PublishRequest(
 )
 
 fun publish(actions: List<Action>, channel: Channel) {
-    val ptv = BasicPolymorphicTypeValidator.builder()
-        .allowIfSubType("ch.yass.core.pubsub")
-        .build()
-
-    val mapper = jackson().copy().activateDefaultTypingAsProperty(
-        ptv,
-        ObjectMapper.DefaultTyping.NON_FINAL,
-        "type"
-    )
-
+    val body = jackson().writeValueAsString(actions)
     val response = centrifugo().server.post("/api/publish")
-        .body(mapper.writeValueAsString(PublishRequest(channel.toString(), actions)))
+        .body(body)
         .responseString()
+
+    // TODO: Check response, maybe throw or log? How can we recover
 }
