@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {Centrifuge} from "centrifuge";
 import Card from "../common/Card.jsx";
-import {playCard, useApi} from "../../helpers/api.jsx";
+import {playCard} from "../../helpers/api.jsx";
 
 const Seat = ({seat, gameUuid}) => {
     const clickCardHandler = (card) => {
@@ -55,7 +55,8 @@ const Seat = ({seat, gameUuid}) => {
             Seat: {seat.uuid} <br/>
             Position: {seat.position} <br/>
             {seat.cards.map((trickCard, trickCardIndex) => (
-                <Card key={trickCardIndex} card={trickCard} clickHandler={clickCardHandler}/>
+                <Card key={trickCardIndex} styles={trickCard.locked ? ["clickable", "locked"] : ["clickable"]}
+                      card={trickCard} clickHandler={clickCardHandler}/>
             ))}
         </>
     );

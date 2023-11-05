@@ -17,6 +17,7 @@ fun cardValue(card: Card, trump: Trump): Int = when (trump) {
 fun cardValueSuitTrump(card: Card, trump: Trump): Int = when {
     trump.equalsSuit(card.suit) && card.rank == Rank.JACK -> 200 // Trump Buur
     trump.equalsSuit(card.suit) && card.rank == Rank.NINE -> 150 // Trump Nell
+    trump.equalsSuit(card.suit) -> 100 + rankValueAscending(card.rank)
     else -> rankValueAscending(card.rank)
 }
 

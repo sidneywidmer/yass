@@ -74,7 +74,6 @@ fun isGameFinished(hands: List<Hand>, tricks: List<Trick>): Boolean {
     return hands.count() == 5 && tricksOfHand.size == 9 && lastTrick.cards().count() == 4
 }
 
-
 fun cardIsPlayable(card: Card, player: Player, state: GameState): Boolean {
     val trick = currentTrick(state.tricks)!!
     val hand = currentHand(state.hands)!!

@@ -21,7 +21,7 @@ data class PublishRequest(
 )
 
 fun publish(actions: List<Action>, channel: Channel) {
-    val body = jackson().writeValueAsString(actions)
+    val body = jackson().writeValueAsString(PublishRequest(channel.toString(), actions))
     val response = centrifugo().server.post("/api/publish")
         .body(body)
         .responseString()

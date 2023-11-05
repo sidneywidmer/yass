@@ -1,11 +1,9 @@
-package ch.yass.admin.api.play
+package ch.yass.game.dto
 
-import ch.yass.game.dto.CardInHand
-import ch.yass.game.dto.Position
 import ch.yass.game.dto.db.Player
 import java.util.*
 
-data class PlayGameSeat(
+data class SeatState(
     val uuid: UUID,
     val cards: List<CardInHand>,
     val position: Position,

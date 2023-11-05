@@ -1,16 +1,15 @@
 package ch.yass.game.engine
 
 import ch.yass.game.dto.Card
-import ch.yass.game.dto.Points
 import ch.yass.game.dto.Rank
 import ch.yass.game.dto.Trump
 
-fun multiplyByTrump(points: Points, trump: Trump): Points {
+fun multiplyByTrump(points: Int, trump: Trump): Int {
     return when (trump) {
-        Trump.OBEABE -> points.mapValues { it.value * 3 }
-        Trump.UNEUFE -> points.mapValues { it.value * 3 }
-        Trump.DIAMONDS -> points.mapValues { it.value * 2 }
-        Trump.HEARTS -> points.mapValues { it.value * 2 }
+        Trump.OBEABE -> points * 3
+        Trump.UNEUFE -> points * 3
+        Trump.DIAMONDS -> points * 2
+        Trump.HEARTS -> points * 2
         Trump.CLUBS -> points
         Trump.SPADES -> points
         else -> points

@@ -52,7 +52,6 @@ class GameService(private val repo: GameRepository) {
         }
         ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
         ensure(playerOwnsCard(player, playedCard, state)) { PlayerDoesNotOwnCard(player, playedCard, state) }
-        ensure(isTrumpSet(currentHand(state.hands)!!)) { TrumpNotChosen(state) }
         ensure(cardIsPlayable(playedCard, player, state)) { CardNotPlayable(playedCard, player, state) }
 
         val currentTrick = currentTrick(state.tricks)!!

@@ -30,9 +30,8 @@ class GameController(private val service: GameService) : Controller {
     private fun join(ctx: Context) = either {
         val request = validate<JoinGameRequest>(ctx.body())
         val player = player(ctx)
-        val gameState = service.join(request, player)
-
-        GameStateResponse.from(gameState, player)
+        service.join(request, player)
+        SuccessfulActionResponse()
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }
@@ -42,8 +41,8 @@ class GameController(private val service: GameService) : Controller {
         val request = validate<PlayCardRequest>(ctx.body())
         val player = player(ctx)
 
-        val gameState = service.play(request, player)
-        GameStateResponse.from(gameState, player)
+        service.play(request, player)
+        SuccessfulActionResponse()
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }
@@ -53,8 +52,8 @@ class GameController(private val service: GameService) : Controller {
         val request = validate<ChooseTrumpRequest>(ctx.body())
         val player = player(ctx)
 
-        val gameState = service.trump(request, player)
-        GameStateResponse.from(gameState, player)
+        service.trump(request, player)
+        SuccessfulActionResponse()
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }
@@ -64,8 +63,8 @@ class GameController(private val service: GameService) : Controller {
         val request = validate<SchiebeRequest>(ctx.body())
         val player = player(ctx)
 
-        val gameState = service.schiebe(request, player)
-        GameStateResponse.from(gameState, player)
+        service.schiebe(request, player)
+        SuccessfulActionResponse()
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }

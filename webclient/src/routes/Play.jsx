@@ -2,8 +2,9 @@ import React from 'react';
 import {useParams} from 'react-router-dom';
 import {fetchPlayGame, useApi} from "../helpers/api.jsx";
 import Seat from "../components/play/Seat.jsx";
-import {Grid} from "@mui/material";
+import {Grid, Tooltip} from "@mui/material";
 import Container from "@mui/material/Container";
+import Card from "../components/common/Card.jsx";
 
 const Play = (params) => {
     let {gameCode} = useParams();
@@ -22,7 +23,13 @@ const Play = (params) => {
 
 
                 <Grid item xs={4} className="seat"><Seat seat={data.seats["WEST"]} gameUuid={data.gameUuid}/></Grid>
-                <Grid item xs={4}/>
+                <Grid item xs={4}>
+                    {data.cardsPlayed.map((card, index) => (
+                        <Tooltip title={card.position} key={index}>
+                            <Card card={card}/>
+                        </Tooltip>
+                    ))}
+                </Grid>
                 <Grid item xs={4} className="seat"><Seat seat={data.seats["EAST"]} gameUuid={data.gameUuid}/></Grid>
 
 

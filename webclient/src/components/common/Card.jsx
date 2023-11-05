@@ -1,99 +1,53 @@
-import React from "react"
+import React, {forwardRef} from 'react';
 import {Tooltip} from "@mui/material";
 
 
-const Card = ({card, player, isWinner, clickHandler}) => {
-    clickHandler = clickHandler || ((card) => {
+const Card = forwardRef((props, ref) => {
+    const {card, styles, clickHandler, ...other} = props;
+
+    const handler = clickHandler || (() => {
     });
+
     if (!card) {
-        return <span className="card-container">--</span>
+        return <span ref={ref} className="card-container">--</span>
     }
 
-    const {suit, rank} = card
-    let suitEmoji = ""
-    let rankEmoji = ""
+    const baseClass = 'card-container';
+    const cardClasses = styles ? [baseClass, ...styles].join(' ') : baseClass;
 
-    switch (suit) {
-        case "SPADES":
-            suitEmoji = "♠️"
-            break
-        case "HEARTS":
-            suitEmoji = "❤️"
-            break
-        case "DIAMONDS":
-            suitEmoji = "♦️"
-            break
-        case "CLUBS":
-            suitEmoji = "♣️"
-            break
-        case "WELCOME":
-            suitEmoji = "W"
-            break
-        default:
-            suitEmoji = suit
-    }
+    const cardEmojis = {
+        suit: {
+            SPADES: "♠️",
+            HEARTS: "❤️",
+            DIAMONDS: "♦️",
+            CLUBS: "♣️",
+            WELCOME: "W",
+        },
+        rank: {
+            ONE: "1",
+            TWO: "2",
+            THREE: "3",
+            FOUR: "4",
+            FIVE: "5",
+            SIX: "6",
+            SEVEN: "7",
+            EIGHT: "8",
+            NINE: "9",
+            TEN: "10",
+            JACK: "J",
+            QUEEN: "Q",
+            KING: "K",
+            ACE: "A",
+            HELLO: "H",
+        },
+    };
 
-    switch (rank) {
-        case "ONE":
-            rankEmoji = "1"
-            break
-        case "TWO":
-            rankEmoji = "2"
-            break
-        case "THREE":
-            rankEmoji = "3"
-            break
-        case "FOUR":
-            rankEmoji = "4"
-            break
-        case "FIVE":
-            rankEmoji = "5"
-            break
-        case "SIX":
-            rankEmoji = "6"
-            break
-        case "SEVEN":
-            rankEmoji = "7"
-            break
-        case "EIGHT":
-            rankEmoji = "8"
-            break
-        case "NINE":
-            rankEmoji = "9"
-            break
-        case "TEN":
-            rankEmoji = "10"
-            break
-        case "JACK":
-            rankEmoji = "J"
-            break
-        case "QUEEN":
-            rankEmoji = "Q"
-            break
-        case "KING":
-            rankEmoji = "K"
-            break
-        case "ACE":
-            rankEmoji = "A"
-            break
-        case "HELLO":
-            rankEmoji = "H"
-            break
-        default:
-            rankEmoji = rank
-    }
+    const {suit, rank} = card;
+    const suitEmoji = cardEmojis.suit[suit] || suit;
+    const rankEmoji = cardEmojis.rank[rank] || rank;
 
-    if (!player) {
-        return <span className="card-container" onClick={() => clickHandler(card)}>{suitEmoji}{rankEmoji}</span>
-    }
-
-    return (
-        <Tooltip title={player.name} placement="top">
-            <span className="card-container" style={isWinner ? {"backgroundColor": "#fff4bd"} : {}}>
-                {suitEmoji}{rankEmoji}
-            </span>
-        </Tooltip>
-    )
-}
+    return <span {...other} ref={ref} className={cardClasses}
+                 onClick={() => handler(card)}>{suitEmoji}{rankEmoji}</span>
+})
 
 export default Card
