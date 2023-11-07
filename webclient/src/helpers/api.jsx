@@ -55,3 +55,11 @@ export const fetchPlayGame = async (gameCode) => {
 export const playCard = async (data) => {
     return await postData(`game/play`, data)
 };
+
+export const chooseTrump = async (data) => {
+    return await postData(`game/trump`, data)
+};
+
+export const schiebe = async (data) => {
+    return await postData(`game/schiebe`, data)
+};

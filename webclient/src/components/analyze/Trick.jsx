@@ -1,6 +1,6 @@
 import React from 'react';
 import {Grid, Tooltip, Typography} from '@mui/material';
-import Trump from "./Trump.jsx";
+import Trump from "../common/Trump.jsx";
 import Card from "../common/Card.jsx";
 
 const Trick = ({trick}) => {

@@ -5,7 +5,7 @@ import {Accordion, AccordionDetails, AccordionSummary, Chip, Divider, Typography
 import Player from "../components/analyze/Player.jsx";
 import Trick from "../components/analyze/Trick.jsx";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Trump from "../components/analyze/Trump.jsx";
+import Trump from "../components/common/Trump.jsx";
 import Gschobe from "../components/analyze/Gschobe.jsx";
 import Container from "@mui/material/Container";
 

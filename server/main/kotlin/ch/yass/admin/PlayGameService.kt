@@ -1,6 +1,7 @@
 package ch.yass.admin
 
 import arrow.core.raise.Raise
+import arrow.core.raise.recover
 import ch.yass.admin.api.PlayGameResponse
 import ch.yass.game.dto.SeatState
 import ch.yass.core.error.GameWithCodeNotFound
@@ -19,17 +20,13 @@ class PlayGameService(private val gameService: GameService) {
         val playedCards = currentTrick(state.tricks)!!.cardsByPosition()
 
         return PlayGameResponse(state.game.uuid, seats, playedCards)
-
     }
 
     private fun mapSeat(seat: Seat, state: GameState): SeatState {
         val player = playerAtPosition(seat.position, state.seats, state.allPlayers)!!
         val hand = currentHand(state.hands)!!
         val cards = hand.cardsOf(seat.position).map {
-            hier gehts weiter -> check if correct state, basically all the same as in gameService.play -> how to optimize?
-            val notLocked = cardIsPlayable(it, player, state)
-                    && playerOwnsCard(player, it, state)
-                    && playerHasActivePosition(player, state)
+            val notLocked = recover({ cardIsPlayable(it, player, state) }, { false })
             CardInHand(it.suit, it.rank, it.skin, !notLocked)
         }
 
