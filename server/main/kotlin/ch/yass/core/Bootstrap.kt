@@ -7,6 +7,7 @@ import ch.yass.core.error.DomainException
 import ch.yass.core.error.domainExceptionHandler
 import ch.yass.core.error.globalExceptionHandler
 import ch.yass.identity.AuthMiddleware
+import ch.yass.identity.ImpersonateMiddleware
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.path
 import io.javalin.event.EventListener
@@ -26,14 +27,20 @@ class Bootstrap(private val config: ConfigSettings) {
         val app = Javalin.create { javalinConfig ->
             javalinConfig.showJavalinBanner = false
             javalinConfig.jsonMapper(JavalinJackson(di.direct.instance()))
+            javalinConfig.plugins.enableCors { cors ->
+                cors.add {
+                    it.allowHost("http://127.0.0.1:5173")
+                    it.allowCredentials = true
+                }
+            }
         }
 
         // Register all middlewares here. We're doing this manually to ensure
         // the correct order (opposed to just also use di.allInstances()).
         val middlewares: List<Middleware> = listOf(
-            di.direct.instance<CORSMiddleware>(),
             di.direct.instance<MDCMiddleware>(),
             di.direct.instance<AuthMiddleware>(),
+            di.direct.instance<ImpersonateMiddleware>(),
         )
         registerMiddlewares(app, middlewares)
 

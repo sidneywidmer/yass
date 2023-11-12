@@ -8,6 +8,7 @@ import ch.yass.game.dto.db.Player
 import org.valiktor.ConstraintViolation
 import sh.ory.ApiException
 import sh.ory.model.Identity
+import java.util.UUID
 
 sealed interface DomainError
 
@@ -21,13 +22,18 @@ data class ValiktorError(val violations: Set<ConstraintViolation>) : ValidationE
 
 // Auth related Errors
 sealed interface AuthError : DomainError
-data class Unauthorized(val exception: ApiException): AuthError
+data class Unauthorized(val exception: ApiException) : AuthError
 data class OryIdentityWithoutName(val identity: Identity) : AuthError
+data class UnauthorizedSubscription(val error: DomainError) : AuthError
+data class CanNotImpersonate(val player: Player, val impersonateUuid: UUID) : AuthError
 
 // Game or Game-State related Errors
 sealed interface GameError : DomainError
 data object GameAlreadyFull : GameError
 data class GameNotFound(val uuid: String) : GameError
+data class SeatNotFound(val uuid: String) : GameError
+data class PlayerNotInGame(val player: Player, val state: GameState) : GameError
+data class PlayerDoesNotOwnSeat(val player: Player, val seatUuid: String, val state: GameState) : GameError
 data class PlayerIsLocked(val player: Player, val state: GameState) : GameError
 data class PlayerDoesNotOwnCard(val player: Player, val card: Card, val state: GameState) : GameError
 data class CardNotPlayable(val card: Card, val player: Player, val state: GameState) : GameError

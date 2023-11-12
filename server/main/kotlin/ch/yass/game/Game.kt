@@ -9,6 +9,6 @@ object Game {
         bindSingleton { GameController(instance()) }
         bindSingleton { PlayerService(instance()) }
         bindSingleton { GameRepository(instance()) }
-        bindSingleton { GameService(instance()) }
+        bindSingleton { GameService(instance(), instance()) }
     }
 }

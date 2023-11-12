@@ -1,5 +1,13 @@
 package ch.yass.game.engine
 
+import arrow.core.raise.Raise
+import arrow.core.raise.ensure
+import ch.yass.core.error.GameError
+import ch.yass.core.error.InvalidState
+import ch.yass.core.error.PlayerIsLocked
+import ch.yass.core.error.PlayerNotInGame
+import ch.yass.core.error.PlayerDoesNotOwnCard
+import ch.yass.core.error.CardNotPlayable
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Card
 import ch.yass.game.dto.Gschobe
@@ -25,6 +33,13 @@ fun unplayedCardsOfPlayer(player: Player, hands: List<Hand>, seats: List<Seat>, 
 fun isTrumpSet(hand: Hand?): Boolean = !(hand?.trump != Trump.FREESTYLE && hand?.trump == null)
 
 fun isAlreadyGschobe(hand: Hand?): Boolean = hand?.gschobe != Gschobe.NOT_YET
+
+fun playerInGame(player: Player, seats: List<Seat>): Boolean {
+    return seats.any { it.playerId == player.id }
+}
+
+fun playerOwnsSeat(player: Player, seatUuid: String, seats: List<Seat>): Boolean =
+    seats.firstOrNull { it.playerId == player.id }?.uuid.toString() == seatUuid
 
 /**
  * Check if the current player was ever dealt and has not yet played the given card.
@@ -67,8 +82,22 @@ fun isGameFinished(hands: List<Hand>, tricks: List<Trick>): Boolean {
     return hands.count() == 5 && tricksOfHand.size == 9 && lastTrick.cards().count() == 4
 }
 
-
+context(Raise<GameError>)
 fun cardIsPlayable(card: Card, player: Player, state: GameState): Boolean {
+    val nextState = nextState(state)
+
+    ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
+    ensure(expectedState(listOf(State.PLAY_CARD, State.PLAY_CARD_BOT), nextState)) {
+        InvalidState(nextState, state)
+    }
+    ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
+    ensure(playerOwnsCard(player, card, state)) { PlayerDoesNotOwnCard(player, card, state) }
+    ensure(cardFollowsLead(card, player, state)) { CardNotPlayable(card, player, state) }
+
+    return true
+}
+
+fun cardFollowsLead(card: Card, player: Player, state: GameState): Boolean {
     val trick = currentTrick(state.tricks)!!
     val hand = currentHand(state.hands)!!
     val tricks = tricksOfHand(state.tricks, hand)

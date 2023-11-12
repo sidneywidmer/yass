@@ -3,7 +3,9 @@ package ch.yass.game.dto.db
 import ch.yass.core.helper.fromDbJson
 import ch.yass.db.tables.records.TrickRecord
 import ch.yass.game.dto.Card
+import ch.yass.game.dto.CardOnTable
 import ch.yass.game.dto.Position
+import org.postgresql.core.Tuple
 import java.time.LocalDateTime
 import java.util.*
 
@@ -45,5 +47,11 @@ data class Trick(
 
     fun cards(): List<Card> {
         return listOfNotNull(this.north, this.east, this.south, this.west)
+    }
+
+    fun cardsByPosition(): List<CardOnTable> {
+        return Position.entries
+            .mapNotNull { cardOf(it)?.let { card -> Pair(card, it) } }
+            .map { p -> CardOnTable(p.first.suit, p.first.rank, p.first.skin, p.second) }
     }
 }

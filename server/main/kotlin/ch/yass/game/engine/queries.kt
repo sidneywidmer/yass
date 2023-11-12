@@ -21,6 +21,10 @@ fun tricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> {
     return tricks.filter { it.handId == hand.id }
 }
 
+fun completeTricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> {
+    return tricks.filter { it.handId == hand.id && it.cards().count() == 4 }
+}
+
 /**
  * Get the player sitting at the given position.
  */
@@ -189,14 +193,13 @@ fun pointsByPosition(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Points
         PositionToTrickAccumulator(accumulator.positions + (winner to wonTricks), winner)
     }
 
-    val positionsTotal = positionToTricksMap.positions.mapValues { (_, tricksOfPosition) ->
+    return positionToTricksMap.positions.mapValues { (_, tricksOfPosition) ->
         tricksOfPosition.sumOf { trick ->
-            val lastTrickBonus = if (trick.id == tricks.first.id) 5 else 0  // first means last played in this context
-            trick.cards().sumOf { card -> cardPoints(card, hand.trump!!) } + lastTrickBonus
+            // First means last played in this context, you get the bonus if the hand is complete
+            val lastTrickBonus = if (trick.id == tricks.first().id && tricks.count() == 9) 5 else 0
+            trick.cards().sumOf { card -> multiplyByTrump(cardPoints(card, hand.trump!!), hand.trump) } + lastTrickBonus
         }
     }
-
-    return multiplyByTrump(positionsTotal, hand.trump!!)
 }
 
 

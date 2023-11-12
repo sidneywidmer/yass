@@ -4,6 +4,7 @@ import arrow.core.raise.Raise
 import ch.yass.core.error.GameAlreadyFull
 import ch.yass.core.error.GameNotFound
 import ch.yass.core.error.GameWithCodeNotFound
+import ch.yass.core.error.SeatNotFound
 import ch.yass.core.helper.toDbJson
 import ch.yass.db.tables.references.*
 import ch.yass.game.api.internal.GameState
@@ -64,6 +65,17 @@ class GameRepository(private val db: DSLContext) {
             .fetchOneInto(Game::class.java)
 
         return game ?: raise(GameNotFound(uuid))
+    }
+
+    context(Raise<SeatNotFound>)
+    fun getBySeatUUID(uuid: String): Game {
+        val game = db.select()
+            .from(SEAT)
+            .join(GAME).on(SEAT.GAME_ID.eq(GAME.ID))
+            .where(SEAT.UUID.eq(uuid))
+            .fetchOneInto(Game::class.java)
+
+        return game ?: raise(SeatNotFound(uuid))
     }
 
     fun chooseTrump(trump: Trump, hand: Hand): Hand =
@@ -177,5 +189,6 @@ class GameRepository(private val db: DSLContext) {
             .returningResult(SEAT)
             .fetchOneInto(Seat::class.java)!!
     }
+
 
 }

@@ -56,6 +56,19 @@ services:
         source: ./.docker/kratos/email-password
         target: /etc/config/kratos
 
+  centrifugo:
+    container_name: centrifugo
+    image: centrifugo/centrifugo:v5
+    volumes:
+      - ./.docker/centrifugo/config.json:/centrifugo/config.json
+    command: centrifugo -c config.json
+    ports:
+      - 8000:8000
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+
   mailslurper:
     image: oryd/mailslurper:latest-smtps
     ports:

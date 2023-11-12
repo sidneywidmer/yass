@@ -18,10 +18,8 @@ import org.valiktor.ConstraintViolationException
  */
 context(Raise<ValidationError>)
 inline fun <reified T> validate(json: String): T {
-    val mapper = Yass.container.direct.instance<ObjectMapper>()
-
     return try {
-        mapper.readValue(json, T::class.java)
+        jackson().readValue(json, T::class.java)
     } catch (exception: ValueInstantiationException) {
         when (exception.cause) {
             is ConstraintViolationException -> raise(ValiktorError((exception.cause as ConstraintViolationException).constraintViolations))

@@ -3,6 +3,7 @@ import Container from '@mui/material/Container';
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import Root from "../routes/Root.jsx";
 import Analyze from "../routes/Analyze.jsx";
+import Play from "../routes/Play.jsx";
 
 const router = createBrowserRouter([
     {
@@ -10,16 +11,18 @@ const router = createBrowserRouter([
         element: <Root/>,
     },
     {
-        path: "/analyze/:gameCode",
+        path: "/admin/analyze/:gameCode",
         element: <Analyze/>,
     },
+    {
+        path: "/admin/play/:gameCode",
+        element: <Play/>,
+    }
 ]);
 
 
 export default function App() {
     return (
-        <Container maxWidth="md">
-            <RouterProvider router={router}/>
-        </Container>
+        <RouterProvider router={router}/>
     );
 }

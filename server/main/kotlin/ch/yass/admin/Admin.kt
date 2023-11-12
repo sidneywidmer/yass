@@ -6,7 +6,8 @@ import org.kodein.di.instance
 
 object Admin {
     val module = DI.Module("Admin module") {
-        bindSingleton { AdminController(instance(), instance()) }
+        bindSingleton { AdminController(instance(), instance(), instance()) }
         bindSingleton { AnalyzeGameService(instance()) }
+        bindSingleton { PlayGameService(instance()) }
     }
 }

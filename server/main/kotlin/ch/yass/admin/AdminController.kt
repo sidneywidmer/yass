@@ -3,6 +3,7 @@ package ch.yass.admin
 import arrow.core.raise.either
 import arrow.core.raise.recover
 import ch.yass.admin.api.GenerateHandResponse
+import ch.yass.admin.api.PlayGameResponse
 import ch.yass.admin.dsl.game
 import ch.yass.core.contract.Controller
 import ch.yass.core.helper.errorResponse
@@ -21,7 +22,11 @@ import io.javalin.apibuilder.EndpointGroup
 import io.javalin.http.Context
 
 
-class AdminController(private val analyzeGameService: AnalyzeGameService, private val gameService: GameService) :
+class AdminController(
+    private val playGameService: PlayGameService,
+    private val analyzeGameService: AnalyzeGameService,
+    private val gameService: GameService
+) :
     Controller {
     override val path = "/admin"
 
@@ -30,10 +35,22 @@ class AdminController(private val analyzeGameService: AnalyzeGameService, privat
         get("/generate/bot/game", ::generateBotGame)
         get("/generate/state/game", ::generateGame)
         get("/analyze/game/{code}", ::analyzeGame)
+        get("/play/game/{code}", ::playGame)
     }
 
     private fun analyzeGame(ctx: Context) = either {
         analyzeGameService.analyze(ctx.pathParam("code"))
+    }.fold(
+        { errorResponse(ctx, it) },
+        { successResponse(ctx, it) }
+    )
+
+    /**
+     * Allows an admin to play a 4 player game from one browser window.
+     */
+    private fun playGame(ctx: Context) = either {
+        playGameService.play(ctx.pathParam("code"))
+
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }
@@ -56,19 +73,7 @@ class AdminController(private val analyzeGameService: AnalyzeGameService, privat
                     south(cards = "welcome")
                     west(cards = "welcome")
                     tricks {
-                        trick(north = "WH", east = "WH", south = "WH", west = "WH")
-                    }
-                }
-                hand {
-                    trump(Trump.CLUBS)
-                    gschobe(Gschobe.NO)
-                    north(cards = "C9,D7,D10,DQ,H6,HQ,HK,S9,SJ", start = true)
-                    east(cards = "C7,CJ,DA,H7,H10,HA,S8,SQ,SK")
-                    south(cards = "C8,C10,CQ,CA,D9,H8,H9,S7,SA")
-                    west(cards = "C6,CK,D6,D8,DJ,DK,HJ,S6,S10")
-                    tricks {
-                        trick("C9", "C7", "C8", "C6")
-                        trick("D7", "DA", "D9", null)
+                        trick(null, null, null, null)
                     }
                 }
             }

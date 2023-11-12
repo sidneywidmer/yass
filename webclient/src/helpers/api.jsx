@@ -2,9 +2,10 @@ import axios from "axios";
 import {useLoading} from "../contexts/Loading.jsx";
 import {useError} from "../contexts/Error.jsx";
 import {useEffect, useState} from "react";
-import AnalyzeGame from './api/fetch-game/dto';
+import AnalyzeGame from "./api/analyze-game.js";
+import PlayGame from "./api/play-game.js";
 
-export const useFetchData = (fetchFunction, dependencies) => {
+export const useApi = (fetchFunction, dependencies) => {
     const {startLoading, stopLoading} = useLoading()
     const {handleError} = useError()
     const [fetchedData, setFetchedData] = useState(null)
@@ -27,13 +28,38 @@ export const useFetchData = (fetchFunction, dependencies) => {
     return fetchedData
 };
 
-const fetchData = async (url) => {
+const getData = async (url) => {
     const response = await axios.get(`http://127.0.0.1:8080/${url}`, {withCredentials: true})
     return response.data
-
 };
 
-export const fetchGame = async (gameCode) => {
-    const result = await fetchData(`admin/analyze/game/${gameCode}`)
-    return new AnalyzeGame(result.hands, result.points)
+const postData = async (url, data) => {
+    const response = await axios.post(`http://127.0.0.1:8080/${url}`, data, {
+        withCredentials: true,
+        headers: {'Content-Type': 'application/json'}
+    });
+
+    return response.data;
+};
+
+export const fetchAnalyzeGame = async (gameCode) => {
+    const result = await getData(`admin/analyze/game/${gameCode}`)
+    return new AnalyzeGame(result.hands, result.points, result.gameUuid)
+};
+
+export const fetchPlayGame = async (gameCode) => {
+    const result = await getData(`admin/play/game/${gameCode}`)
+    return new PlayGame(result.gameUuid, result.seats, result.cardsPlayed)
+};
+
+export const playCard = async (data) => {
+    return await postData(`game/play`, data)
+};
+
+export const chooseTrump = async (data) => {
+    return await postData(`game/trump`, data)
+};
+
+export const schiebe = async (data) => {
+    return await postData(`game/schiebe`, data)
 };

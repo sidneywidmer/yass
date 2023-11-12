@@ -4,6 +4,8 @@ import arrow.core.raise.Raise
 import arrow.core.raise.ensure
 import ch.yass.core.error.*
 import ch.yass.core.helper.logger
+import ch.yass.core.pubsub.Channel
+import ch.yass.core.pubsub.PubSub
 import ch.yass.game.api.*
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.api.internal.NewHand
@@ -14,8 +16,9 @@ import ch.yass.game.dto.Trump
 import ch.yass.game.dto.db.Game
 import ch.yass.game.dto.db.Player
 import ch.yass.game.engine.*
+import ch.yass.game.pubsub.cardPlayedActions
 
-class GameService(private val repo: GameRepository) {
+class GameService(private val repo: GameRepository, private val pubSub: PubSub) {
 
     context(Raise<GameWithCodeNotFound>, Raise<GameAlreadyFull>)
     fun join(request: JoinGameRequest, player: Player): GameState {
@@ -37,25 +40,22 @@ class GameService(private val repo: GameRepository) {
         val game = repo.getByUUID(request.game)
         val state = repo.getState(game)
         val playedCard = Card.from(request.card)
-        val nextState = nextState(state)
 
-        ensure(expectedState(listOf(State.PLAY_CARD, State.PLAY_CARD_BOT), nextState)) {
-            InvalidState(nextState, state)
-        }
-        ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
-        ensure(playerOwnsCard(player, playedCard, state)) { PlayerDoesNotOwnCard(player, playedCard, state) }
-        ensure(isTrumpSet(currentHand(state.hands)!!)) { TrumpNotChosen(state) }
-        ensure(cardIsPlayable(playedCard, player, state)) { CardNotPlayable(playedCard, player, state) }
+
+        cardIsPlayable(playedCard, player, state)
 
         val currentTrick = currentTrick(state.tricks)!!
         val playerSeat = playerSeat(player, state.seats)
 
-        logger().info("Player ${player.uuid} (bot:${player.bot}) played $playedCard")
-
         repo.playCard(playedCard, currentTrick, playerSeat)
         gameLoop(game)
 
-        return repo.getState(game)
+        val updatedState = repo.getState(game)
+        state.seats.forEach {
+            pubSub.publish(cardPlayedActions(state, playedCard, playerSeat, it), Channel("seat", it.uuid))
+        }
+
+        return updatedState
     }
 
     context(Raise<GameError>)
@@ -66,6 +66,7 @@ class GameService(private val repo: GameRepository) {
         val nextState = nextState(state)
         val currentHand = currentHand(state.hands)!!
 
+        ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
         ensure(expectedState(listOf(State.TRUMP, State.TRUMP_BOT), nextState)) { InvalidState(nextState, state) }
         ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
         ensure(playableTrumps().contains(chosenTrump)) { TrumpInvalid(chosenTrump) }
@@ -86,6 +87,7 @@ class GameService(private val repo: GameRepository) {
         val gschobe = Gschobe.valueOf(request.gschobe)
         val currentHand = currentHand(state.hands)!!
 
+        ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
         ensure(expectedState(listOf(State.SCHIEBE, State.SCHIEBE_BOT), nextState)) { InvalidState(nextState, state) }
         ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
 

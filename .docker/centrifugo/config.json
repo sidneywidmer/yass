@@ -1,0 +1,24 @@
+{
+  "token_hmac_secret_key": "my_secret",
+  "api_key": "my_api_key",
+  "admin_password": "password",
+  "admin_secret": "secret",
+  "admin": true,
+  "allowed_origins": [
+    "http://127.0.0.1:5173"
+  ],
+  "proxy_connect_endpoint": "http://host.docker.internal:8080/auth/connect",
+  "proxy_subscribe_endpoint": "http://host.docker.internal:8080/auth/subscribe",
+  "proxy_subscribe_timeout": "5s",
+  "proxy_connect_timeout": "5s",
+  "proxy_http_headers": [
+    "Cookie"
+  ],
+  "namespaces": [
+    {
+      "name": "seat",
+      "presence": true,
+      "proxy_subscribe": true
+    }
+  ]
+}

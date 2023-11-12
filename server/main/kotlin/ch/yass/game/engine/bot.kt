@@ -10,7 +10,7 @@ import kotlin.random.Random
 fun chooseCardForBot(botPlayer: Player, state: GameState): Card {
     val cards = unplayedCardsOfPlayer(botPlayer, state.hands, state.seats, state.tricks)
 
-    return cards.shuffled().first { cardIsPlayable(it, botPlayer, state) }
+    return cards.shuffled().first { cardFollowsLead(it, botPlayer, state) }
 }
 
 fun chooseTrumpForBot(botPlayer: Player, state: GameState): Trump = playableTrumps().shuffled().first()

@@ -1,7 +1,7 @@
 import React from 'react';
-import {Chip, Divider, Grid, Typography} from '@mui/material';
-import Card from "./Card.jsx";
-import Trump from "./Trump.jsx";
+import {Grid, Tooltip, Typography} from '@mui/material';
+import Trump from "../common/Trump.jsx";
+import Card from "../common/Card.jsx";
 
 const Trick = ({trick}) => {
     return (
@@ -14,8 +14,10 @@ const Trick = ({trick}) => {
                 </Grid>
                 <Grid item xs={10}>
                     {trick.cards.map((trickCard, trickCardIndex) => (
-                        <Card key={trickCardIndex} card={trickCard.card} player={trickCard.player}
-                              isWinner={trick.winnerPlayer.id === trickCard.player.id}/>
+                        <Tooltip title={trickCard.player.name} placement="top">
+                            <Card key={trickCardIndex} card={trickCard.card}
+                                  styles={trick.winnerPlayer.id === trickCard.player.id ? ['winner'] : []}/>
+                        </Tooltip>
                     ))}
                 </Grid>
             </Grid>

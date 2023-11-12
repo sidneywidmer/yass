@@ -1,0 +1,14 @@
+//  @name Play Card
+POST /game/play HTTP/1.1
+Host: {{yassBaseUrl}}
+X-Session-Token: {{orySessionToken}}
+Content-Type: application/json
+
+{
+  "game": "ebc46e65-1f25-4cad-b53d-bca88de72d7d",
+  "card": {
+    "suit": "SPADES",
+    "rank": "NINE",
+    "skin": "french"
+  }
+}
