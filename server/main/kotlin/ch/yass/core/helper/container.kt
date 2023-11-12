@@ -22,7 +22,3 @@ fun config(): Config {
 fun jackson(): ObjectMapper {
     return Yass.container.direct.instance<ObjectMapper>()
 }
-
-fun centrifugo(): CentrifugoClient {
-    return Yass.container.direct.instance<CentrifugoClient>()
-}

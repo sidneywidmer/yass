@@ -5,7 +5,7 @@ import arrow.core.raise.ensure
 import ch.yass.core.error.*
 import ch.yass.core.helper.logger
 import ch.yass.core.pubsub.Channel
-import ch.yass.core.pubsub.publish
+import ch.yass.core.pubsub.PubSub
 import ch.yass.game.api.*
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.api.internal.NewHand
@@ -18,7 +18,7 @@ import ch.yass.game.dto.db.Player
 import ch.yass.game.engine.*
 import ch.yass.game.pubsub.cardPlayedActions
 
-class GameService(private val repo: GameRepository) {
+class GameService(private val repo: GameRepository, private val pubSub: PubSub) {
 
     context(Raise<GameWithCodeNotFound>, Raise<GameAlreadyFull>)
     fun join(request: JoinGameRequest, player: Player): GameState {
@@ -50,11 +50,12 @@ class GameService(private val repo: GameRepository) {
         repo.playCard(playedCard, currentTrick, playerSeat)
         gameLoop(game)
 
+        val updatedState = repo.getState(game)
         state.seats.forEach {
-            publish(cardPlayedActions(state, playedCard, it), Channel("seat", it.uuid))
+            pubSub.publish(cardPlayedActions(state, playedCard, playerSeat, it), Channel("seat", it.uuid))
         }
 
-        return repo.getState(game)
+        return updatedState
     }
 
     context(Raise<GameError>)

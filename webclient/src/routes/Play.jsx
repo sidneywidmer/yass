@@ -14,7 +14,6 @@ const Play = (params) => {
 
     useEffect(() => {
         if (data) {
-            hier gehts weiter -> wieso ist cards played immer empty?
             setCardsPlayed(data.cardsPlayed);
         }
     }, [data])

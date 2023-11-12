@@ -2,6 +2,7 @@ package ch.yass.core
 
 import ch.yass.core.helper.config
 import ch.yass.core.helper.logger
+import ch.yass.core.pubsub.PubSub
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -29,6 +30,7 @@ object Core {
         bindSingleton { LoggerFactory.getLogger("Yass") }
         bindSingleton { createJsonMapper() }
         bindSingleton { createCentrifugoClient() }
+        bindSingleton { PubSub(instance(), instance()) }
     }
 
     private fun createCentrifugoClient(): CentrifugoClient {
