@@ -1,6 +1,7 @@
 package ch.yass.core.pubsub
 
 import ch.yass.core.CentrifugoClient
+import ch.yass.core.helper.config
 import com.fasterxml.jackson.databind.ObjectMapper
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
@@ -15,7 +16,7 @@ class PubSub(private val jackson: ObjectMapper, private val centrifugo: Centrifu
         val body = jackson.writeValueAsString(PublishRequest(channel.toString(), actions))
 
         val request = Request.Builder()
-            .url("/api/publish")
+            .url(config().getString("centrifugo.basePath") + "/api/publish")
             .post(body.toRequestBody("application/json".toMediaType()))
             .build()
 

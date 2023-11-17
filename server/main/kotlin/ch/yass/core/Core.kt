@@ -18,8 +18,9 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import org.slf4j.LoggerFactory
 import org.zalando.logbook.Logbook
-import org.zalando.logbook.core.DefaultHttpLogWriter
-import org.zalando.logbook.core.DefaultSink
+import org.zalando.logbook.core.*
+import org.zalando.logbook.core.HeaderFilters.replaceCookies
+import org.zalando.logbook.core.HeaderFilters.replaceHeaders
 import org.zalando.logbook.json.JsonHttpLogFormatter
 import org.zalando.logbook.okhttp.LogbookInterceptor
 import java.sql.DriverManager
@@ -42,6 +43,8 @@ object Core {
         val sink = DefaultSink(JsonHttpLogFormatter(), DefaultHttpLogWriter())
 
         return Logbook.builder()
+            .headerFilter(replaceCookies("ory_kratos_session"::equals, "logbook-replaced"))
+            .headerFilter(replaceHeaders("x-api-key"::equals, "logbook-replaced"))
             .sink(sink)
             .build()
     }
@@ -49,19 +52,11 @@ object Core {
     private fun createCentrifugoClient(logbook: Logbook): CentrifugoClient {
         val client = OkHttpClient.Builder()
             .addInterceptor { chain ->
-                val original = chain.request();
-
-                // Set base URL
-                val requestWithBaseUrl = original.newBuilder()
-                    .url(original.url.newBuilder().addPathSegments(config().getString("centrifugo.basePath")).build())
-                    .build();
-
-                // Add X-API-Key header
-                val requestWithApiKey = requestWithBaseUrl.newBuilder()
+                val requestWithApiKey = chain.request().newBuilder()
                     .header("X-API-Key", config().getString("centrifugo.apiKey"))
-                    .build();
+                    .build()
 
-                chain.proceed(requestWithApiKey);
+                chain.proceed(requestWithApiKey)
             }
             .addNetworkInterceptor(LogbookInterceptor(logbook))
             .build()
