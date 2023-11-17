@@ -47,7 +47,11 @@ class Trick {
         this.cards = cards.map((trickCard) => new TrickCard(trickCard.player, trickCard.card));
         this.leadPlayer = new Player(leadPlayer.id, leadPlayer.uuid, leadPlayer.name, leadPlayer.bot, leadPlayer.createdAt, leadPlayer.updatedAt);
         this.leadSuit = leadSuit;
-        this.winnerPlayer = new Player(winnerPlayer.id, winnerPlayer.uuid, winnerPlayer.name, winnerPlayer.bot, winnerPlayer.createdAt, winnerPlayer.updatedAt);
+        if (winnerPlayer === null) {
+            this.winnerPlayer = null;
+        } else {
+            this.winnerPlayer = new Player(winnerPlayer.id, winnerPlayer.uuid, winnerPlayer.name, winnerPlayer.bot, winnerPlayer.createdAt, winnerPlayer.updatedAt);
+        }
     }
 }
 

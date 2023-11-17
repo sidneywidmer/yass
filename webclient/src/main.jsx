@@ -8,20 +8,14 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import {CssBaseline} from "@mui/material";
 import App from "./components/App.jsx";
-import GlobalErrorHandling from "./components/GlobalErrorHandling.jsx";
-import ErrorProvider from "./contexts/Error.jsx";
-import LoadingProvider from "./contexts/Loading.jsx";
+import GlobalMessageHandling from "./components/GlobalMessageHandling.jsx";
 
 
 ReactDOM.createRoot(document.getElementById("root")).render(
     <>
         <CssBaseline/>
-        <ErrorProvider>
-            <LoadingProvider>
-                <App/>
-                <GlobalErrorHandling/>
-            </LoadingProvider>
-        </ErrorProvider>
+        <App/>
+        <GlobalMessageHandling/>
     </>
 );
 

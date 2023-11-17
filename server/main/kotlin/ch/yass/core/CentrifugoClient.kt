@@ -1,5 +1,5 @@
 package ch.yass.core
 
-import com.github.kittinunf.fuel.core.FuelManager
+import okhttp3.OkHttpClient
 
-data class CentrifugoClient(val server: FuelManager)
+data class CentrifugoClient(val server: OkHttpClient)

@@ -60,9 +60,9 @@ class AdminController(
         val state = game {
             players {
                 north(name = "ueli", bot = false)
-                east(name = "doris", bot = false)
-                south(name = "christoph", bot = false)
-                west(name = "daniela", bot = false)
+                east(name = "doris", bot = true)
+                south(name = "christoph", bot = true)
+                west(name = "daniela", bot = true)
             }
             hands {
                 hand {

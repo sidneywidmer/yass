@@ -14,6 +14,9 @@ fun currentTrick(tricks: List<Trick>): Trick? = tricks.firstOrNull()
 
 fun currentHand(hands: List<Hand>): Hand? = hands.firstOrNull()
 
+fun completedHands(hands: List<Hand>, tricks: List<Trick>): List<Hand> =
+    hands.filter { tricksOfHand(tricks, it).size == 9 }
+
 fun playerSeat(player: Player, seats: List<Seat>): Seat =
     seats.first { it.playerId == player.id }
 
@@ -90,8 +93,9 @@ fun activePosition(
     val currentLead = currentLeadPositionOfHand(hand, tricksOfHand, seats, players)
     val positions = positionsOrderedWithStart(currentLead)
 
-    // This is the first trick of the hand and the lead player has gschobe, it's their partners turn
-    if (trick.cards().isEmpty() && tricksOfHand.count() == 1 && hand.gschobe == Gschobe.YES) {
+    // This is the first trick of the hand and the lead player has gschobe, it's their partners turn to choose
+    // a trump. As soon as the trump is chosen it's the "normal" players turn again.
+    if (trick.cards().isEmpty() && tricksOfHand.count() == 1 && hand.gschobe == Gschobe.YES && !isTrumpSet(hand)) {
         return positions[2]
     }
 
@@ -102,8 +106,14 @@ fun activePosition(
     return nextHandStartingPosition(hands, players, seats)
 }
 
-fun winningPositionOfCurrentTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position =
-    winningPositionOfTricks(hand, tricks, seats)
+fun winningPositionOfCurrentTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position? {
+    if (tricks.first().cards().size < 4) {
+        return null
+    }
+
+    return winningPositionOfTricks(hand, tricks, seats)
+}
+
 
 fun winningPositionOfLastTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position? {
     if (tricks.count() < 2) {
@@ -111,7 +121,15 @@ fun winningPositionOfLastTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat
     }
 
     // Index 0 is the current trick, so we remove it to get data up to the last one
-    return winningPositionOfTricks(hand, tricks.drop(1), seats)
+    val tricksWithoutNewest = tricks.drop(1)
+
+    // It's possible that this function is called on an incomplete trick, e.g. for analyzing data. Because
+    // of this we return early since winningPositionOfTricks only works with a complete trick.
+    if (tricksWithoutNewest.first().cards().size < 4) {
+        return null
+    }
+
+    return winningPositionOfTricks(hand, tricksWithoutNewest, seats)
 }
 
 fun winningPositionOfTrick(trick: Trick, lead: Position, trump: Trump): Position {
@@ -177,6 +195,21 @@ fun playableCards(hand: Hand, cards: List<Card>): List<Card> =
 
         else -> cards
     }
+
+fun pointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>, seats: List<Seat>): Points {
+    val initial = mapOf(
+        Position.NORTH to 0,
+        Position.EAST to 0,
+        Position.SOUTH to 0,
+        Position.WEST to 0,
+    )
+
+    return hands.fold(initial) { accumulator, hand ->
+        val tricksOfHand = completeTricksOfHand(tricks, hand)
+        val pointsNew = pointsByPosition(hand, tricksOfHand, seats)
+        accumulator.mapValues { (position, points) -> points + pointsNew[position]!! }
+    }
+}
 
 /**
  * Splits all tricks to a map with key POSITION and value a list of tricks that position won. The given

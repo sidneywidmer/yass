@@ -14,9 +14,9 @@ const Trick = ({trick}) => {
                 </Grid>
                 <Grid item xs={10}>
                     {trick.cards.map((trickCard, trickCardIndex) => (
-                        <Tooltip title={trickCard.player.name} placement="top">
-                            <Card key={trickCardIndex} card={trickCard.card}
-                                  styles={trick.winnerPlayer.id === trickCard.player.id ? ['winner'] : []}/>
+                        <Tooltip key={trickCardIndex} title={trickCard.player.name} placement="top">
+                            <Card card={trickCard.card}
+                                  styles={trick.winnerPlayer?.id === trickCard.player.id ? ['winner'] : []}/>
                         </Tooltip>
                     ))}
                 </Grid>

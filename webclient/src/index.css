@@ -22,12 +22,17 @@
     background: #e5e5e5;
 }
 
+.already-played {
+    opacity: 0.3;
+}
+
 .clickable {
     cursor: pointer;
 }
 
 .seat {
+    border-radius: 12px;
     height: 300px;
     background: #c8d6e5;
-    padding: 10px;
+    padding: 30px;
 }

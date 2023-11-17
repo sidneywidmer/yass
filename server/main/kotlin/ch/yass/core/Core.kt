@@ -1,7 +1,6 @@
 package ch.yass.core
 
 import ch.yass.core.helper.config
-import ch.yass.core.helper.logger
 import ch.yass.core.pubsub.PubSub
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -9,8 +8,8 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.util.StdDateFormat
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.github.kittinunf.fuel.core.FuelManager
 import com.typesafe.config.ConfigFactory
+import okhttp3.OkHttpClient
 import org.jooq.DSLContext
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
@@ -18,6 +17,11 @@ import org.kodein.di.DI
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 import org.slf4j.LoggerFactory
+import org.zalando.logbook.Logbook
+import org.zalando.logbook.core.DefaultHttpLogWriter
+import org.zalando.logbook.core.DefaultSink
+import org.zalando.logbook.json.JsonHttpLogFormatter
+import org.zalando.logbook.okhttp.LogbookInterceptor
 import java.sql.DriverManager
 import com.typesafe.config.Config as ConfigSettings
 
@@ -29,16 +33,40 @@ object Core {
         bindSingleton { MDCMiddleware() }
         bindSingleton { LoggerFactory.getLogger("Yass") }
         bindSingleton { createJsonMapper() }
-        bindSingleton { createCentrifugoClient() }
+        bindSingleton { createLogbook() }
+        bindSingleton { createCentrifugoClient(instance()) }
         bindSingleton { PubSub(instance(), instance()) }
     }
 
-    private fun createCentrifugoClient(): CentrifugoClient {
-        val manager = FuelManager().apply {
-            baseHeaders = mapOf("X-API-Key" to config().getString("centrifugo.apiKey"))
-            basePath = config().getString("centrifugo.basePath")
-        }
-        return CentrifugoClient(manager)
+    private fun createLogbook(): Logbook {
+        val sink = DefaultSink(JsonHttpLogFormatter(), DefaultHttpLogWriter())
+
+        return Logbook.builder()
+            .sink(sink)
+            .build()
+    }
+
+    private fun createCentrifugoClient(logbook: Logbook): CentrifugoClient {
+        val client = OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                val original = chain.request();
+
+                // Set base URL
+                val requestWithBaseUrl = original.newBuilder()
+                    .url(original.url.newBuilder().addPathSegments(config().getString("centrifugo.basePath")).build())
+                    .build();
+
+                // Add X-API-Key header
+                val requestWithApiKey = requestWithBaseUrl.newBuilder()
+                    .header("X-API-Key", config().getString("centrifugo.apiKey"))
+                    .build();
+
+                chain.proceed(requestWithApiKey);
+            }
+            .addNetworkInterceptor(LogbookInterceptor(logbook))
+            .build()
+
+        return CentrifugoClient(client)
     }
 
     private fun createJsonMapper(): ObjectMapper {

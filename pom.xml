@@ -84,7 +84,21 @@
             <artifactId>fuel</artifactId>
             <version>2.3.1</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.zalando</groupId>
+            <artifactId>logbook-core</artifactId>
+            <version>3.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.zalando</groupId>
+            <artifactId>logbook-json</artifactId>
+            <version>3.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.zalando</groupId>
+            <artifactId>logbook-okhttp</artifactId>
+            <version>3.6.0</version>
+        </dependency>
 
         <!-- Database -->
         <dependency>

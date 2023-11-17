@@ -1,28 +1,50 @@
 import axios from "axios";
-import {useLoading} from "../contexts/Loading.jsx";
-import {useError} from "../contexts/Error.jsx";
 import {useEffect, useState} from "react";
 import AnalyzeGame from "./api/analyze-game.js";
 import PlayGame from "./api/play-game.js";
+import useGameStore from "../store/global.jsx";
+
+const handleError = (error) => {
+    if (error.response) {
+        const status = error.response.status;
+        switch (status) {
+            case 401:
+                useGameStore.getState().addMessage({severity: 'error', message: 'Unauthorized: Please log in'});
+                break;
+            case 500:
+                const errorMessage = error.response.data.payload.domainError || 'Internal Server Error';
+                useGameStore.getState().addMessage({severity: 'error', message: errorMessage});
+                break;
+            default:
+                useGameStore.getState().addMessage({
+                    severity: 'error',
+                    message: `Unhandled Response Status: ${status}`
+                });
+        }
+    } else if (error.request) {
+        useGameStore.getState().addMessage({severity: 'error', message: 'No Response Received'});
+    } else {
+        useGameStore.getState().addMessage({severity: 'error', message: `Request Setup Error: ${error.message}`});
+    }
+}
+
+export const api = (fetchFunction) => {
+    return fetchFunction()
+        .then((data) => {
+            return data
+        })
+        .catch((error) => handleError(error));
+};
 
 export const useApi = (fetchFunction, dependencies) => {
-    const {startLoading, stopLoading} = useLoading()
-    const {handleError} = useError()
     const [fetchedData, setFetchedData] = useState(null)
 
     useEffect(() => {
-        startLoading()
-
         fetchFunction()
             .then((data) => {
                 setFetchedData(data)
             })
-            .catch((error) => {
-                handleError(error)
-            })
-            .finally(() => {
-                stopLoading()
-            });
+            .catch((error) => handleError(error));
     }, [...dependencies])
 
     return fetchedData
