@@ -84,13 +84,6 @@ fun isGameFinished(hands: List<Hand>, tricks: List<Trick>): Boolean {
 
 context(Raise<GameError>)
 fun cardIsPlayable(card: Card, player: Player, state: GameState): Boolean {
-    val nextState = nextState(state)
-
-    ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
-    ensure(expectedState(listOf(State.PLAY_CARD, State.PLAY_CARD_BOT), nextState)) {
-        InvalidState(nextState, state)
-    }
-    ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
     ensure(playerOwnsCard(player, card, state)) { PlayerDoesNotOwnCard(player, card, state) }
     ensure(cardFollowsLead(card, player, state)) { CardNotPlayable(card, player, state) }
 

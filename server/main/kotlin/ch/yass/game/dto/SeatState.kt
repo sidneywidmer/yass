@@ -7,5 +7,9 @@ data class SeatState(
     val uuid: UUID,
     val cards: List<CardInHand>,
     val position: Position,
-    val player: Player
+    val player: Player,
+    val points: Points,
+    val state: State,
+    val activePosition: Position,
+    val trump: Trump?,
 )

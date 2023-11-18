@@ -1,24 +1,26 @@
-import React, {useCallback, useEffect, useRef} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Centrifuge} from "centrifuge";
 import Card from "../common/Card.jsx";
-import {chooseTrump, playCard, schiebe} from "../../helpers/api.jsx";
+import {api, chooseTrump, playCard, schiebe} from "../../helpers/api.jsx";
 import Trump from "../common/Trump.jsx";
+import useGameStore from "../../store/global.jsx";
 
 const Seat = ({seat, gameUuid, cardsPlayed, setCardsPlayed}) => {
-    const centrifugeRef = useRef(null);
+    const [isConnected, setIsConnected] = useState(false);
+    const [actions, setActions] = useState([]);
+    const [cardsInHand, setCardsInHand] = useState(seat.cards);
+    const [points, setPoints] = useState(seat.points);
+    const [state, setState] = useState(seat.state);
+    const [activePosition, setActivePosition] = useState(seat.activePosition);
+    const [trump, setTrump] = useState(seat.trump);
+
     const onCardClick = (card) => {
         const data = {
             "game": gameUuid,
             "card": card,
             "data": {"impersonate": seat.player.uuid}
         }
-        playCard(data)
-            .then(responseData => {
-                console.log('Response Data:', responseData);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+        api(() => playCard(data));
     }
 
     const onTrumpClick = (trump) => {
@@ -27,13 +29,7 @@ const Seat = ({seat, gameUuid, cardsPlayed, setCardsPlayed}) => {
             "trump": trump,
             "data": {"impersonate": seat.player.uuid}
         }
-        chooseTrump(data)
-            .then(responseData => {
-                console.log('Response Data:', responseData);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+        api(() => chooseTrump(data));
     }
 
     const onSchiebeClick = (gschobe) => {
@@ -42,13 +38,7 @@ const Seat = ({seat, gameUuid, cardsPlayed, setCardsPlayed}) => {
             "gschobe": gschobe,
             "data": {"impersonate": seat.player.uuid}
         }
-        schiebe(data)
-            .then(responseData => {
-                console.log('Response Data:', responseData);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+        api(() => schiebe(data));
     }
 
     const trumps = [
@@ -61,94 +51,162 @@ const Seat = ({seat, gameUuid, cardsPlayed, setCardsPlayed}) => {
         "FREESTYLE"
     ];
 
-    const channelCardPlayed = useCallback((action) => {
-        const newCard = {
-            ...action.card,
-            "position": action.position
+    const cardPlayed = (action) => {
+        // All positions get this event but only NORTH has access to this state otherwise
+        // each played card would be displayed 4 times
+        if (setCardsPlayed !== undefined) {
+            setCardsPlayed([...cardsPlayed, action.card]);
         }
-        if (!cardsPlayed.some(card => card.suit === newCard.suit && card.rank === newCard.rank)) {
-            setCardsPlayed([...cardsPlayed, newCard]);
-        }
-    }, [cardsPlayed, setCardsPlayed]);
+    };
 
+    const updateHand = (action) => {
+        setCardsInHand(action.cards);
+    };
+
+    const updateState = (action) => {
+        setState(action.state);
+    };
+
+    const updateActive = (action) => {
+        setActivePosition(action.position);
+    };
+
+    const updatePoints = (action) => {
+        setPoints(action.points);
+        if (setCardsPlayed !== undefined) {
+            useGameStore.getState().addMessage({severity: "info", message: "Points updated!"});
+        }
+    };
+
+    const updatePlayedCards = (action) => {
+        if (setCardsPlayed !== undefined) {
+            setCardsPlayed(action.cards);
+        }
+    };
+
+    const updateTrump = (action) => {
+        setTrump(action.trump);
+    };
+
+    const message = (action) => {
+        if (setCardsPlayed !== undefined) {
+            useGameStore.getState().addMessage({severity: "info", message: action.message});
+        }
+    };
 
     useEffect(() => {
         const data = {data: {impersonate: seat.player.uuid}};
 
         const centrifuge = new Centrifuge('ws://127.0.0.1:8000/connection/websocket', data);
         centrifuge.connect();
+
         centrifuge.on('connected', function (ctx) {
-            console.log('Connected to centrifuge', ctx);
+            console.log("connected ", ctx);
+            setIsConnected(true);
         });
         centrifuge.on('disconnected', function (ctx) {
-            console.log('Disconnected from centrifuge', ctx);
+            setIsConnected(false);
         });
 
+
         const sub = centrifuge.newSubscription('seat:#' + seat.uuid, data);
+        sub.on('subscribed', function (ctx) {
+            console.log('subscribed ', ctx);
+        });
         sub.subscribe();
 
-        // Save the centrifuge instance to the ref
-        centrifugeRef.current = centrifuge;
 
-        // Cleanup function to disconnect when the component unmounts
+        sub.on('publication', function (ctx) {
+            setActions(previous => [ctx, ...previous]);
+
+        });
+
         return () => {
-            if (centrifugeRef.current) {
-                centrifugeRef.current.disconnect();
-            }
+            centrifuge.disconnect();
+            sub.unsubscribe();
         };
-    }, [seat.player.uuid]);
+    }, [seat.uuid]);
 
     useEffect(() => {
-        if (centrifugeRef.current) {
-            const sub = centrifugeRef.current.getSubscription('seat:#' + seat.uuid);
+        let timeoutId;
+
+        const debouncedEffect = () => {
+            if (actions.length === 0) {
+                return;
+            }
 
             const actionMap = {
-                CardPlayed: channelCardPlayed,
+                CardPlayed: cardPlayed,
+                UpdateHand: updateHand,
+                UpdatePoints: updatePoints,
+                UpdateState: updateState,
+                UpdateActive: updateActive,
+                UpdatePlayedCards: updatePlayedCards,
+                UpdateTrump: updateTrump,
+                Message: message,
             };
 
-            sub.on('publication', function (ctx) {
-                console.log("New publication in game channel: ", ctx);
-                ctx.data.forEach((action) => {
-                    const executeFunction = actionMap[action.type];
-                    if (executeFunction) {
-                        executeFunction(action);
+            actions.shift().data.forEach((action) => {
+                const executeFunction = actionMap[action.type];
+                if (executeFunction) {
+                    if (setCardsPlayed !== undefined) {
+                        console.log(seat.uuid, action.type)
                     }
-                });
+                    executeFunction(action);
+                }
             });
+        };
 
-            sub.on('subscribed', function (ctx) {
-                console.log("Now subscribed to game channel: ", ctx);
-            });
+        // Set up the debounced effect
+        timeoutId = setTimeout(debouncedEffect, 100); // Adjust the delay as needed (e.g., 500ms)
 
-            sub.on('unsubscribed', function (ctx) {
-                console.log("Now unsubscribed to game channel: ", ctx);
-            });
+        // Cleanup: Clear the timeout when the component unmounts or when the dependency changes
+        return () => {
+            clearTimeout(timeoutId);
+        };
+    }, [actions]);
 
-            sub.on('error', function (ctx) {
-                console.log("Game channel error: ", ctx);
-            });
 
+    const getCardStyles = (cardInHand, activePosition, seat, state) => {
+        const baseStyles = ["clickable"];
+
+        if (cardInHand.state === "UNPLAYABLE" || activePosition !== seat.position || state !== "PLAY_CARD") {
+            baseStyles.push("locked");
         }
-    }, [centrifugeRef, seat.uuid, cardsPlayed]);
+
+        if (cardInHand.state === "ALREADY_PLAYED") {
+            baseStyles.push("already-played");
+        }
+
+        return baseStyles;
+    };
 
     return (
-        <>
-            Position: {seat.position} <br/>
-            {seat.cards.map((trickCard, trickCardIndex) => (
-                <Card key={trickCardIndex} styles={trickCard.locked ? ["clickable", "locked"] : ["clickable"]}
-                      card={trickCard} clickHandler={onCardClick}/>
+        <div>
+            Points: {points[seat.position]}, <Trump trump={trump}/><br/>
+            Active: {activePosition}, State: {state}<br/>
+            {cardsInHand.map((cardInHand, cardInHandIndex) => (
+                <Card key={cardInHandIndex}
+                      styles={getCardStyles(cardInHand, activePosition, seat, state)}
+                      card={cardInHand}
+                      clickHandler={onCardClick}/>
             ))}
             <br/><br/>
-            <span className={"card-container clickable"} onClick={() => onSchiebeClick("YES")}>Y</span>
-            <span className={"card-container clickable"} onClick={() => onSchiebeClick("NO")}>N</span>
+            <span
+                className={`card-container clickable ${activePosition === seat.position && state === "SCHIEBE" ? "" : "locked"}`}
+                onClick={() => onSchiebeClick("YES")}>Y</span>
+            <span
+                className={`card-container clickable ${activePosition === seat.position && state === "SCHIEBE" ? "" : "locked"}`}
+                onClick={() => onSchiebeClick("NO")}>N</span>
             <br/>
             {trumps.map((trump, index) => (
-                <div key={index} className={"card-container clickable"} onClick={() => onTrumpClick(trump)}>
+                <div key={index}
+                     className={`card-container clickable ${activePosition === seat.position && state === "TRUMP" ? "" : "locked"}`}
+                     onClick={() => onTrumpClick(trump)}>
                     <Trump trump={trump}/>
                 </div>
             ))}
-
-        </>
+        </div>
     );
 }
 
