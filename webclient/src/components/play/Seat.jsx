@@ -128,42 +128,30 @@ const Seat = ({seat, gameUuid, cardsPlayed, setCardsPlayed}) => {
     }, [seat.uuid]);
 
     useEffect(() => {
-        let timeoutId;
+        if (actions.length === 0) {
+            return;
+        }
 
-        const debouncedEffect = () => {
-            if (actions.length === 0) {
-                return;
-            }
+        const actionMap = {
+            CardPlayed: cardPlayed,
+            UpdateHand: updateHand,
+            UpdatePoints: updatePoints,
+            UpdateState: updateState,
+            UpdateActive: updateActive,
+            UpdatePlayedCards: updatePlayedCards,
+            UpdateTrump: updateTrump,
+            Message: message,
+        };
 
-            const actionMap = {
-                CardPlayed: cardPlayed,
-                UpdateHand: updateHand,
-                UpdatePoints: updatePoints,
-                UpdateState: updateState,
-                UpdateActive: updateActive,
-                UpdatePlayedCards: updatePlayedCards,
-                UpdateTrump: updateTrump,
-                Message: message,
-            };
-
-            actions.shift().data.forEach((action) => {
-                const executeFunction = actionMap[action.type];
-                if (executeFunction) {
-                    if (setCardsPlayed !== undefined) {
-                        console.log(seat.uuid, action.type)
-                    }
-                    executeFunction(action);
+        actions.shift().data.forEach((action) => {
+            const executeFunction = actionMap[action.type];
+            if (executeFunction) {
+                if (setCardsPlayed !== undefined) {
+                    console.log(seat.uuid, action.type)
                 }
-            });
-        };
-
-        // Set up the debounced effect
-        timeoutId = setTimeout(debouncedEffect, 100); // Adjust the delay as needed (e.g., 500ms)
-
-        // Cleanup: Clear the timeout when the component unmounts or when the dependency changes
-        return () => {
-            clearTimeout(timeoutId);
-        };
+                executeFunction(action);
+            }
+        });
     }, [actions]);
 
 

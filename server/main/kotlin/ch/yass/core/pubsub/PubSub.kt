@@ -20,7 +20,8 @@ class PubSub(private val jackson: ObjectMapper, private val centrifugo: Centrifu
             .post(body.toRequestBody("application/json".toMediaType()))
             .build()
 
-        centrifugo.server.newCall(request).execute()
+        val response = centrifugo.server.newCall(request).execute()
+        response.body?.close()
     }
 }
 

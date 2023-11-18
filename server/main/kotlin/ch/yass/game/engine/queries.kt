@@ -1,7 +1,10 @@
 package ch.yass.game.engine
 
 import arrow.core.raise.Raise
+import arrow.core.raise.fold
 import ch.yass.core.error.GameAlreadyFull
+import ch.yass.core.error.GameError
+import ch.yass.core.error.PlayerDoesNotOwnCard
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Hand
@@ -34,6 +37,19 @@ fun completeTricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> {
 fun playerAtPosition(position: Position, seats: List<Seat>, players: List<Player>): Player? {
     return seats.firstOrNull { it.position == position }
         .let { players.firstOrNull { player -> player.id == it?.playerId } }
+}
+
+fun cardsInHand(hand: Hand, player: Player, state: GameState): List<CardInHand> {
+    val seat = playerSeat(player, state.seats)
+
+    return hand.cardsOf(seat.position).map {
+        val cardState = fold(
+            { cardIsPlayable(it, player, state) },
+            { error: GameError -> if (error is PlayerDoesNotOwnCard) CardInHandState.ALREADY_PLAYED else CardInHandState.UNPLAYABLE },
+            { CardInHandState.PLAYABLE }
+        )
+        CardInHand(it.suit, it.rank, it.skin, cardState)
+    }
 }
 
 /**
