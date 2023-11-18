@@ -12,6 +12,7 @@ import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.path
 import io.javalin.event.EventListener
 import io.javalin.json.JavalinJackson
+import org.eclipse.jetty.server.Server
 import org.flywaydb.core.Flyway
 import org.kodein.di.DI
 import org.kodein.di.allInstances

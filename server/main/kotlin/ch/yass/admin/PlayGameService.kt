@@ -29,15 +29,7 @@ class PlayGameService(private val gameService: GameService) {
         val player = playerAtPosition(seat.position, state.seats, state.allPlayers)!!
         val hand = currentHand(state.hands)!!
         val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks, state.seats)
-        val cards = hand.cardsOf(seat.position).map {
-            val cardState = fold(
-                { cardIsPlayable(it, player, state) },
-                { error: GameError -> if (error is PlayerDoesNotOwnCard) ALREADY_PLAYED else UNPLAYABLE },
-                { PLAYABLE }
-            )
-            CardInHand(it.suit, it.rank, it.skin, cardState)
-        }
-
+        val cards = cardsInHand(hand, player, state)
         val nextState = nextState(state)
         val active = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
 

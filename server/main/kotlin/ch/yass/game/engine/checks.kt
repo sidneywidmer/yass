@@ -105,6 +105,7 @@ fun cardFollowsLead(card: Card, player: Player, state: GameState): Boolean {
         isLastCard(cards) -> true
         isFollowingLead(lead, card) -> true
         couldNotFollowLead(hand, cards, lead) -> true
+        card.suit == hand.trump?.toSuit() -> true
         else -> false
     }
 }

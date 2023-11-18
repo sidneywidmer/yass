@@ -137,7 +137,7 @@ class GameService(private val repo: GameRepository, private val pubSub: PubSub) 
             State.PLAY_CARD -> {}
             State.TRUMP -> {}
             State.SCHIEBE -> {}
-            State.PLAY_CARD_BOT -> GlobalScope.launch { delay(1500).also { playAsBot(updatedState) } }
+            State.PLAY_CARD_BOT -> GlobalScope.launch { delay(500).also { playAsBot(updatedState) } }
             State.TRUMP_BOT -> trumpAsBot(updatedState)
             State.SCHIEBE_BOT -> schiebeAsBot(updatedState)
             State.NEW_TRICK -> GlobalScope.launch {
