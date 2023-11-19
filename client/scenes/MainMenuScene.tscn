@@ -1,0 +1,76 @@
+[gd_scene load_steps=6 format=3 uid="uid://dv2y18ye8j7o0"]
+
+[ext_resource type="Script" path="res://scenes/MainMenuScene.gd" id="1_1foie"]
+[ext_resource type="PackedScene" uid="uid://g4qhvbvdm62w" path="res://scenes/GameSettingsScene.tscn" id="3_dgs4d"]
+[ext_resource type="PackedScene" uid="uid://bkk87o2ooo6at" path="res://ui/overlays/FadeOverlay.tscn" id="3_kf1us"]
+[ext_resource type="PackedScene" uid="uid://b4blrdjthcxnn" path="res://ui/components/GameLogo.tscn" id="4_fnufg"]
+[ext_resource type="PackedScene" uid="uid://ckgd5pscbwsqc" path="res://scenes/LoginScene.tscn" id="4_g8s7u"]
+
+[node name="MainMenuScene" type="Node2D"]
+script = ExtResource("1_1foie")
+settings_scene = ExtResource("3_dgs4d")
+login_scene = ExtResource("4_g8s7u")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="CenterContainer" type="CenterContainer" parent="UI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/CenterContainer"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="GameLogo" parent="UI/CenterContainer/VBoxContainer" instance=ExtResource("4_fnufg")]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_bottom = 40
+
+[node name="PlayerName" type="Label" parent="UI/CenterContainer/VBoxContainer/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Welcome: ASADF"
+horizontal_alignment = 1
+
+[node name="MarginContainer2" type="MarginContainer" parent="UI/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_bottom = 40
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/CenterContainer/VBoxContainer/MarginContainer2"]
+layout_mode = 2
+
+[node name="GameCode" type="LineEdit" parent="UI/CenterContainer/VBoxContainer/MarginContainer2/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Code (ZLDKN)"
+
+[node name="JoinGameButton" type="Button" parent="UI/CenterContainer/VBoxContainer/MarginContainer2/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "beitreten"
+
+[node name="SettingsButton" type="Button" parent="UI/CenterContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "settings"
+
+[node name="LogoutButton" type="Button" parent="UI/CenterContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "logout"
+
+[node name="ExitButton" type="Button" parent="UI/CenterContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "leave_game"
+
+[node name="FadeOverlay" parent="UI" instance=ExtResource("3_kf1us")]
+unique_name_in_owner = true
+visible = false
