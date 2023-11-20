@@ -80,6 +80,6 @@ text = "Login"
 unique_name_in_owner = true
 visible = false
 
-[node name="OryClient" type="Node" parent="UI"]
+[node name="OryClient" type="Node" parent="."]
 unique_name_in_owner = true
 script = ExtResource("5_bvreu")

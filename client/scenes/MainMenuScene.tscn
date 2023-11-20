@@ -1,6 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://dv2y18ye8j7o0"]
+[gd_scene load_steps=7 format=3 uid="uid://dv2y18ye8j7o0"]
 
 [ext_resource type="Script" path="res://scenes/MainMenuScene.gd" id="1_1foie"]
+[ext_resource type="Script" path="res://api/ApiClient.gd" id="1_uxwkb"]
 [ext_resource type="PackedScene" uid="uid://g4qhvbvdm62w" path="res://scenes/GameSettingsScene.tscn" id="3_dgs4d"]
 [ext_resource type="PackedScene" uid="uid://bkk87o2ooo6at" path="res://ui/overlays/FadeOverlay.tscn" id="3_kf1us"]
 [ext_resource type="PackedScene" uid="uid://b4blrdjthcxnn" path="res://ui/components/GameLogo.tscn" id="4_fnufg"]
@@ -42,16 +43,26 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_constants/margin_bottom = 40
 
-[node name="HBoxContainer" type="HBoxContainer" parent="UI/CenterContainer/VBoxContainer/MarginContainer2"]
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/CenterContainer/VBoxContainer/MarginContainer2"]
 layout_mode = 2
 
-[node name="GameCode" type="LineEdit" parent="UI/CenterContainer/VBoxContainer/MarginContainer2/HBoxContainer"]
+[node name="ErrorLabel" type="Label" parent="UI/CenterContainer/VBoxContainer/MarginContainer2/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.921569, 0.301961, 0.294118, 1)
+text = "Error: Txt"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/CenterContainer/VBoxContainer/MarginContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="GameCode" type="LineEdit" parent="UI/CenterContainer/VBoxContainer/MarginContainer2/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Code (ZLDKN)"
 
-[node name="JoinGameButton" type="Button" parent="UI/CenterContainer/VBoxContainer/MarginContainer2/HBoxContainer"]
+[node name="JoinGameButton" type="Button" parent="UI/CenterContainer/VBoxContainer/MarginContainer2/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "beitreten"
@@ -74,3 +85,7 @@ text = "leave_game"
 [node name="FadeOverlay" parent="UI" instance=ExtResource("3_kf1us")]
 unique_name_in_owner = true
 visible = false
+
+[node name="ApiClient" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("1_uxwkb")

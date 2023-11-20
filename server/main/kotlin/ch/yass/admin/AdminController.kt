@@ -59,7 +59,6 @@ class AdminController(
     private fun generateGame(ctx: Context) {
         val state = game {
             players {
-                north(name = "ueli", bot = false)
                 east(name = "doris", bot = true)
                 south(name = "christoph", bot = true)
                 west(name = "daniela", bot = true)

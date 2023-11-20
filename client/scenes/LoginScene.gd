@@ -16,7 +16,6 @@ func _ready() -> void:
 	overlay.visible = true
 	ory.login_flow(_on_auth_flow_success, _on_auth_flow_failed)
 	
-	# DEV ONLY
 	email.text = Player._email
 	
 	login_button.pressed.connect(_on_login_button_pressed)

@@ -9,7 +9,9 @@ extends Node2D
 @onready var join_button := %JoinGameButton
 @onready var exit_button := %ExitButton
 @onready var player_name := %PlayerName
+@onready var error := %ErrorLabel
 @onready var code := %GameCode
+@onready var api := %ApiClient
 
 var next_scene = null
 var new_game = true
@@ -27,7 +29,11 @@ func _ready() -> void:
 	overlay.on_complete_fade_out.connect(_on_fade_overlay_on_complete_fade_out)
 
 func _on_join_button_pressed() -> void:
-	print(code.text)
+	api.join(
+		code.text,
+		_on_join_success,
+		_on_join_failed
+	)
 
 func _on_settings_button_pressed() -> void:
 	new_game = false
@@ -41,6 +47,16 @@ func _on_logout_button_pressed() -> void:
 
 func _on_exit_button_pressed() -> void:
 	get_tree().quit()
-
+	
+func _on_join_success(data) -> void:
+	print(data)
+	
+func _on_join_failed(response_code, result, data) -> void:
+	error.visible = true
+	if response_code == 404:
+		error.text = "No game with code {code} found".format({"code": code.text})
+	else:
+		error.text = "Could not join game, maybe it's already full? :("
+	
 func _on_fade_overlay_on_complete_fade_out() -> void:
 	get_tree().change_scene_to_packed(next_scene)
