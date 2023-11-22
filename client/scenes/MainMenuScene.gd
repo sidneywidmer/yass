@@ -1,8 +1,5 @@
 extends Node2D
 
-@export var settings_scene:PackedScene
-@export var login_scene:PackedScene
-
 @onready var overlay := %FadeOverlay
 @onready var settings_button := %SettingsButton
 @onready var logout_button := %LogoutButton
@@ -18,7 +15,6 @@ var new_game = true
 
 func _ready() -> void:
 	overlay.visible = true
-	settings_button.disabled = settings_scene == null
 	
 	player_name.text = "Willkommen, {name} ({mail})".format({"name": Player._playername, "mail": Player._email})
 	
@@ -37,19 +33,22 @@ func _on_join_button_pressed() -> void:
 
 func _on_settings_button_pressed() -> void:
 	new_game = false
-	next_scene = settings_scene
+	next_scene = "res://scenes/GameSettingsScene.tscn"
 	overlay.fade_out()
 	
 func _on_logout_button_pressed() -> void:
 	Player.logout()
-	next_scene = login_scene
+	next_scene = "res://scenes/LoginScene.tscn"
 	overlay.fade_out()
 
 func _on_exit_button_pressed() -> void:
 	get_tree().quit()
 	
 func _on_join_success(data) -> void:
-	print(data)
+	Player.game_init_data = data
+	next_scene = "res://scenes/GameScene.tscn"
+
+	overlay.fade_out()
 	
 func _on_join_failed(response_code, result, data) -> void:
 	error.visible = true
@@ -59,4 +58,4 @@ func _on_join_failed(response_code, result, data) -> void:
 		error.text = "Could not join game, maybe it's already full? :("
 	
 func _on_fade_overlay_on_complete_fade_out() -> void:
-	get_tree().change_scene_to_packed(next_scene)
+	get_tree().change_scene_to_file(next_scene)

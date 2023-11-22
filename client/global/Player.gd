@@ -7,6 +7,10 @@ var _ory_session = null
 var _email = null
 var _playername = null
 
+var game_init_data = null
+var game_scene = null
+var position = null
+
 var config:ConfigFile
 
 func _ready():
