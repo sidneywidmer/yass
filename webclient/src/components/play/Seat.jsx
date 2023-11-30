@@ -78,9 +78,9 @@ const Seat = ({seat, gameUuid, cardsPlayed, setCardsPlayed}) => {
         }
     };
 
-    const updatePlayedCards = (action) => {
+    const clearPlayedCards = (action) => {
         if (setCardsPlayed !== undefined) {
-            setCardsPlayed(action.cards);
+            setCardsPlayed([]);
         }
     };
 
@@ -138,7 +138,7 @@ const Seat = ({seat, gameUuid, cardsPlayed, setCardsPlayed}) => {
             UpdatePoints: updatePoints,
             UpdateState: updateState,
             UpdateActive: updateActive,
-            UpdatePlayedCards: updatePlayedCards,
+            ClearPlayedCards: clearPlayedCards,
             UpdateTrump: updateTrump,
             Message: message,
         };

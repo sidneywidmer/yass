@@ -1,53 +1,52 @@
+class_name Players
 extends Node
 
-const Card = preload('res://scenes/Card.tscn')
+const Card = preload("res://scenes/Card.tscn")
 
-enum Players {NORTH, EAST, SOUTH, WEST}
+enum PositionsEnum {NORTH, EAST, SOUTH, WEST}
 
 @onready var hand := %Hand
 @onready var north := %North
 @onready var east := %East
 @onready var west := %West
 @onready var config = {
-	Players.NORTH: {
-		'node': north, 
-		'offset': Vector2(0, 80), 
-		'rotate': 0, 
-		'off_table': Vector2(0, 100)
+	PositionsEnum.NORTH: {
+		"node": north, 
+		"offset": Vector2(0, 80), 
+		"rotate": 0, 
+		"off_table": Vector2(0, 100)
 	},
-	Players.EAST: {
-		'node': east, 
-		'offset': Vector2(-80, 0), 
-		'rotate': 15, 
-		'off_table': Vector2(-100, 0)
+	PositionsEnum.EAST: {
+		"node": east, 
+		"offset": Vector2(-80, 0), 
+		"rotate": 15, 
+		"off_table": Vector2(-100, 0)
 	},
-	Players.SOUTH: {
-		'node': hand, 
-		'offset': Vector2(0, 80), 
-		'rotate': -15, 
-		'off_table': Vector2(0, -100)
+	PositionsEnum.SOUTH: {
+		"node": hand, 
+		"offset": Vector2(0, -80), 
+		"rotate": -15, 
+		"off_table": Vector2(0, -100)
 	},
-	Players.WEST: {
-		'node': west, 
-		'offset': Vector2(80, 0), 
-		'rotate': -15, 
-		'off_table': Vector2(100, 0)
+	PositionsEnum.WEST: {
+		"node": west, 
+		"offset": Vector2(80, 0), 
+		"rotate": -15, 
+		"off_table": Vector2(100, 0)
 	},
 }
 
 var game_scene = null
 var rng = RandomNumberGenerator.new()
 
-func relative_position(position):
-	""" 
-	Calculate the position of given absolute position relative to ourselves. Eg if we 
-	are NORTH, our relative position is SOUTH. A card from our partner (absolute SOUTH)
-	will relative to us be NORTH.
-	
-	@param position: NORTH/EAST/WEST/SOUTH
-	"""
-	var south_offset = Players.SOUTH - Player.position
-	var new = Players[position] + south_offset
+""" 
+Calculate the position of given absolute position relative to ourselves. Eg if we 
+are NORTH, our relative position is SOUTH. A card from our partner (absolute SOUTH)
+will relative to us be NORTH.
+"""
+func relative_position(position: String):
+	var south_offset = PositionsEnum.SOUTH - Player.position
+	var new = PositionsEnum[position] + south_offset
 	
 	if new > 3:
 		return new % 4
@@ -65,25 +64,25 @@ func play(absolute_position, suit, rank, skin):
 	card_instance.suit = suit
 	card_instance.rank = rank
 	card_instance.skin = skin
-	card_instance.rotation_degrees = cnfg['rotate']
+	card_instance.rotation_degrees = cnfg["rotate"]
 	
-	cnfg['node'].add_child(card_instance)
+	cnfg["node"].add_child(card_instance)
 	
 	card_instance.z_index = 9
 	card_instance.tween(
-		'rotation_degrees', 
-		rng.randf_range(-10.0, 10.0) + cnfg['rotate']
+		"rotation_degrees", 
+		rng.randf_range(-10.0, 10.0) + cnfg["rotate"]
 	)
 	
-	var extra = {'offset': cnfg['offset'] * -1, 'node': cnfg['node']}
+	var extra = {"offset": cnfg["offset"] * -1, "node": cnfg["node"]}
 	card_instance.tween(
-		'global_position', 
-		 game_scene._table.global_position-cnfg['offset'],
+		"global_position", 
+		 game_scene._table.global_position-cnfg["offset"],
 		_play_out_complete.bind(extra).bind(card_instance)
 	)
 
 func _play_out_complete(card_instance, extra: Dictionary = {}):
 	card_instance.z_index = 0
-	extra['node'].remove_child(card_instance)
+	extra["node"].remove_child(card_instance)
 	game_scene._table.add_child(card_instance)
-	card_instance.position = extra['offset']
+	card_instance.position = extra["offset"]

@@ -12,7 +12,8 @@
   "proxy_subscribe_timeout": "5s",
   "proxy_connect_timeout": "5s",
   "proxy_http_headers": [
-    "Cookie"
+    "Cookie",
+    "X-Session-Token"
   ],
   "namespaces": [
     {

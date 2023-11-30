@@ -9,15 +9,14 @@ signal clean_complete(card_instance, extra)
 @onready var image := %Image
 @onready var transitions := %Transitions
 
-enum{HAND, PEAK, DRAG, TABLE}
+enum {HAND, PEAK, DRAG, TABLE}
 
-var suit = ''
-var rank = ''
-var skin = ''
-var state = ''
+var suit = ""
+var rank = ""
+var skin = ""
+var state = ""
 
 var state_position = HAND
-var locked = true
 var _tmp_root_position = null
 var _tmp_root_rotation = null
 
@@ -26,10 +25,10 @@ func _ready():
 	image.texture = load(asset)
 
 func tween(type, to, on_complete = null, duration = 0.18):
-	var tween = transitions.create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
-	tween.tween_property(self, type, to, duration)
+	var tween_node = transitions.create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	tween_node.tween_property(self, type, to, duration)
 	if on_complete:
-		tween.connect("finished", on_complete)
+		tween_node.connect("finished", on_complete)
 
 func _on_draggable_entered():
 	if state_position != HAND:
@@ -42,11 +41,11 @@ func _on_draggable_entered():
 	self.z_index = 9
 	
 	var offset = 50
-	if locked:
+	if state == "UNPLAYABLE" or _hand.game_scene.active_position != Player.position:
 		offset = 20
 
 	self.tween(
-		'position', 
+		"position", 
 		Vector2(self.get_position().x, self.get_position().y-offset)
 	)
 
@@ -57,15 +56,15 @@ func _on_draggable_exited():
 	self.rotation = _tmp_root_rotation
 	self.z_index = 0
 	self.tween(
-		'position', 
+		"position", 
 		_tmp_root_position,
 		_peak_in_complete
 	)
 	
 func _on_draggable_pressed():
-	if locked:
+	if state == "UNPLAYABLE" or state_position == TABLE or _hand.game_scene.active_position != Player.position:
 		return
-		
+	
 	_hand.play(self)
 	
 func _peak_in_complete():

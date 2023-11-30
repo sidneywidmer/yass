@@ -4,6 +4,7 @@ import ch.yass.core.pubsub.Action
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Card
 import ch.yass.game.dto.CardOnTable
+import ch.yass.game.dto.Position
 import ch.yass.game.dto.Trump
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
@@ -11,17 +12,22 @@ import ch.yass.game.engine.*
 fun newHandActions(state: GameState, seat: Seat): List<Action> {
     val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks, state.seats)
     val hand = currentHand(state.hands)!!
+    val lastHand = lastHand(state.hands)!!
     val player = playerAtPosition(seat.position, state.seats, state.allPlayers)!!
     val cards = cardsInHand(hand, player, state)
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
+
+    // If no winner found it's probably the welcome hand, and we just move the cords to SOUTH as default
+    val winningPos =
+        winningPositionOfLastTrick(lastHand, tricksOfHand(state.tricks, lastHand), state.seats) ?: Position.SOUTH
 
     return listOf(
         UpdateState(nextState),
         UpdateActive(activePosition),
         UpdateHand(cards),
         UpdatePoints(points),
-        UpdatePlayedCards(emptyList()),
+        ClearPlayedCards(winningPos),
     )
 }
 
@@ -38,7 +44,7 @@ fun newTrickActions(state: GameState, seat: Seat): List<Action> {
         UpdateState(nextState),
         UpdateActive(activePosition),
         UpdateHand(cards),
-        UpdatePlayedCards(emptyList()),
+        ClearPlayedCards(winningPos!!),
         Message("Winning Position of last trick $winningPos"),
     )
 }

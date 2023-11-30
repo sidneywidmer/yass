@@ -21,8 +21,11 @@ boot_splash/size/window_width_override=1920
 
 [autoload]
 
-UserSettings="*res://settings/UserSettings.gd"
 Player="*res://global/Player.gd"
+SceneSwitcher="*res://ui/overlays/SceneSwitcher.tscn"
+UserSettings="*res://settings/UserSettings.gd"
+OryClient="*res://api/OryClient.gd"
+ApiClient="*res://api/ApiClient.gd"
 
 [display]
 

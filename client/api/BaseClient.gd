@@ -11,8 +11,12 @@ func _init(_base_url: String = "", _timeout: int = 10, _use_ory_session: bool = 
 	timeout = _timeout
 	use_ory_session = _use_ory_session
 
-func _http_get(endpoint: String, on_success: Callable, on_error: Callable) -> void:
+func _http_get(endpoint: String, on_success: Callable, on_error: Callable, extra_headers: Array) -> void:
 	var headers = ["Accept: application/json"]
+	
+	if extra_headers.size() > 0:
+		headers.append_array(extra_headers)
+	
 	if use_ory_session:
 		headers.append("X-Session-Token: {token}".format({"token": Player._ory_session}))
 	
@@ -56,6 +60,7 @@ func _on_request_completed(result: int, response_code: int, _headers: PackedStri
 	if response_code == 200 and result == 0:
 		on_success.call(parsed)
 	else:
+		print(on_error)
 		on_error.call(response_code, result, parsed)
 		
 func _dict_to_query_string(data: Dictionary) -> String:

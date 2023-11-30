@@ -1,9 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://ckgd5pscbwsqc"]
+[gd_scene load_steps=4 format=3 uid="uid://ckgd5pscbwsqc"]
 
 [ext_resource type="Script" path="res://scenes/LoginScene.gd" id="1_0srs0"]
 [ext_resource type="PackedScene" uid="uid://b4blrdjthcxnn" path="res://ui/components/GameLogo.tscn" id="1_47hgp"]
-[ext_resource type="PackedScene" uid="uid://bkk87o2ooo6at" path="res://ui/overlays/FadeOverlay.tscn" id="4_2vtti"]
-[ext_resource type="Script" path="res://api/OryClient.gd" id="5_bvreu"]
+[ext_resource type="PackedScene" uid="uid://8213lw6ps1sr" path="res://ui/overlays/LoadingOverlay.tscn" id="3_fwqty"]
 
 [node name="LoginScene" type="Node2D"]
 script = ExtResource("1_0srs0")
@@ -73,13 +72,7 @@ theme_override_constants/margin_top = 40
 [node name="LoginButton" type="Button" parent="UI/MarginContainer/VBoxContainer/MarginContainerBtn"]
 unique_name_in_owner = true
 layout_mode = 2
-disabled = true
 text = "Login"
 
-[node name="FadeOverlay" parent="UI" instance=ExtResource("4_2vtti")]
+[node name="LoadingOverlay" parent="UI" instance=ExtResource("3_fwqty")]
 unique_name_in_owner = true
-visible = false
-
-[node name="OryClient" type="Node" parent="."]
-unique_name_in_owner = true
-script = ExtResource("5_bvreu")
