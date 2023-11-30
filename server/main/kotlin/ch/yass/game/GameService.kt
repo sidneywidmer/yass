@@ -118,7 +118,7 @@ class GameService(private val repo: GameRepository, private val pubSub: PubSub) 
      * - NEW_TRICK -> Call gameLoop again, the next state could e.g. be PLAY_CARD_BOT
      * - NEW_HAND -> Call gameLoop again, the next state again could be a BOT action
      *
-     * The delays make a better UX, so e.g a trick is not removed instantly by UpdatePlayedCards Action. The
+     * The delays make a better UX, so e.g a trick is not removed instantly by ClearPlayedCards action. The
      * other option would be to delay these actions client side, but I opted for this solution to keep the
      * client and server state as in-sync as possible.
      */

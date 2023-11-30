@@ -4,7 +4,7 @@ import ch.yass.core.pubsub.Action
 import ch.yass.game.dto.*
 
 data class CardPlayed(val card: CardOnTable) : Action
-data class UpdatePlayedCards(val cards: List<CardOnTable>) : Action
+data class ClearPlayedCards(val position: Position) : Action
 data class UpdateState(val state: State) : Action
 data class UpdateActive(val position: Position) : Action
 data class UpdateHand(val cards: List<CardInHand>) : Action

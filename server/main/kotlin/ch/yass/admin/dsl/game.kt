@@ -61,8 +61,10 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
     }
 
     state.hands.map { h ->
-        val startPosition = h.positions().first { it.start }
-        val startPlayer = state.players.first { it.position == startPosition.position }
+        // Either take a flagged start player, otherwise just take anyone
+        val startPosition = h.positions().firstOrNull { it.start }
+        val startPlayer = state.players.firstOrNull { it.position == startPosition?.position } ?: state.players.first()
+
         val hand = db.newRecord(HAND).apply {
             uuid = UUID.randomUUID().toString()
             createdAt = LocalDateTime.now(ZoneOffset.UTC)

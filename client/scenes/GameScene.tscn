@@ -1,0 +1,127 @@
+[gd_scene load_steps=6 format=3 uid="uid://dyyfwek4s8bwa"]
+
+[ext_resource type="Script" path="res://scenes/GameScene.gd" id="1_ylqbl"]
+[ext_resource type="Script" path="res://scenes/Players.gd" id="2_com8u"]
+[ext_resource type="Script" path="res://scenes/Table.gd" id="2_m42t1"]
+[ext_resource type="PackedScene" uid="uid://hqs3fcpq486x" path="res://ui/overlays/ChooseTrump.tscn" id="2_uupfa"]
+[ext_resource type="Script" path="res://scenes/Hand.gd" id="4_0j5un"]
+
+[node name="GameScene" type="Node2D"]
+script = ExtResource("1_ylqbl")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Info" type="Control" parent="CanvasLayer"]
+custom_minimum_size = Vector2(480, 150)
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_bottom = 100.0
+grow_horizontal = 2
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/Info"]
+custom_minimum_size = Vector2(480, 150)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0.721569, 0.580392, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="CanvasLayer/Info"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/Info/CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 110
+
+[node name="PointsNS" type="Label" parent="CanvasLayer/Info/CenterContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.909804, 0.921569, 0.94902, 1)
+theme_override_font_sizes/font_size = 25
+text = "NS"
+
+[node name="Trump" type="Label" parent="CanvasLayer/Info/CenterContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 35
+text = "💙"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PointsWE" type="Label" parent="CanvasLayer/Info/CenterContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.909804, 0.921569, 0.94902, 1)
+theme_override_font_sizes/font_size = 25
+text = "WE"
+
+[node name="ChooseTrump" parent="CanvasLayer" instance=ExtResource("2_uupfa")]
+unique_name_in_owner = true
+visible = false
+
+[node name="Players" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_com8u")
+
+[node name="Table" type="Control" parent="Players"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_m42t1")
+
+[node name="Hand" type="Control" parent="Players"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("4_0j5un")
+
+[node name="MarginContainer" type="MarginContainer" parent="Players"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+grow_horizontal = 2
+theme_override_constants/margin_top = 150
+
+[node name="North" type="Control" parent="Players/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="East" type="Control" parent="Players"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="West" type="Control" parent="Players"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+grow_vertical = 2

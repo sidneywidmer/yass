@@ -17,6 +17,8 @@ fun currentTrick(tricks: List<Trick>): Trick? = tricks.firstOrNull()
 
 fun currentHand(hands: List<Hand>): Hand? = hands.firstOrNull()
 
+fun lastHand(hands: List<Hand>): Hand? = hands.getOrNull(1)
+
 fun completedHands(hands: List<Hand>, tricks: List<Trick>): List<Hand> =
     hands.filter { tricksOfHand(tricks, it).size == 9 }
 
