@@ -22,11 +22,9 @@ func _ready():
 	
 	load_values()
 	
-	if _ory_session == "":
-		get_tree().change_scene_to_file("res://scenes/LoginScene.tscn")
-	
 func socket_connect():
-	print("Connecting to websockets")
+	if _socket_connected:
+		return
 	_socket.set_handshake_headers(["X-Session-Token: {session}".format({"session": _ory_session})])
 	_socket.connect_to_url("ws://127.0.0.1:8000/connection/websocket")
 	_socket_poll = true

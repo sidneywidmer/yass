@@ -1,7 +1,6 @@
 package ch.yass.game
 
 import arrow.core.raise.either
-import ch.yass.admin.api.PlayGameResponse
 import ch.yass.core.contract.Controller
 import ch.yass.core.helper.errorResponse
 import ch.yass.core.helper.successResponse

@@ -5,6 +5,7 @@ func _init():
 
 func whoami(on_success: Callable, on_error: Callable) -> void:
 	var headers = ["Authorization: Bearer {session}".format({"session": Player._ory_session})]
+	print("Session: " + Player._ory_session)
 	_http_get(
 		"/sessions/whoami",
 		on_success,

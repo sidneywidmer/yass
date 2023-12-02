@@ -49,10 +49,12 @@ func play(card_instance: Card):
 		_on_play_failed
 	)
 		
-func update(cards):	
-	# If we don"t have any cards we can"t update anything which means
-	# it"s a new hand and we draw
-	if self.get_children().size() == 0:
+func update(cards: Array, new_cards: bool):	
+	# If we get new_cards, remove all the cards we currently hold and 
+	# replace them with the new set - otherwise just update the hand.
+	if new_cards == true:
+		self.get_children().map(func(card): card.queue_free())
+		
 		return await draw(cards)
 		
 	for card in cards:

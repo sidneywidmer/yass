@@ -1,0 +1,16 @@
+key,de,en
+login.lbl.email,E-Mail,E-Mail
+login.lbl.password,Passwort,Password
+login.btn.login,Einloggen,Login
+login.error.login_failed,Zugangsdaten ungültig,Invalid credentials
+loading.lbl,Laden...,Loading...
+login.error.server_connection,"Fehler: Der Server konnte nicht erreicht werden. Response-Code {response_code}, Client-Code {client_code}","Error: Could not reach server. Response-Code {response_code}, Client-Code {client_code}"
+main.lbl.welcome,"Willkommen, {name} ({mail})","Welcome, {name} ({mail})"
+main.lbl.settings,Einstellungen,Settings
+main.lbl.logout,Abmelden,Logout
+main.lbl.leave_game,Verlassen,Quit
+main.btn.join,beitreten,join
+main.placeholder.code,Code (ZLDKN),Code (ZLDKN)
+main.error.game_404,Kein Spiel mit Code {code} gefunden.,No game with code {code} found.
+main.error.join,Der Code ist entweder ungültig oder das Spiel ist schon voll.,The code is either invalid or the game is already full.
+trump.lbl.choose,Trump wählen,Choose trump

@@ -46,7 +46,7 @@ grow_vertical = 2
 [node name="ColorRect" type="ColorRect" parent="Overlay"]
 custom_minimum_size = Vector2(400, 300)
 layout_mode = 2
-color = Color(0, 0.807843, 0.788235, 1)
+color = Color(0, 0.721569, 0.580392, 1)
 
 [node name="MarginContainer" type="MarginContainer" parent="Overlay/ColorRect"]
 layout_mode = 1
@@ -70,8 +70,9 @@ theme_override_constants/margin_bottom = 10
 [node name="Label" type="Label" parent="Overlay/ColorRect/MarginContainer/VBoxContainer/MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.909804, 0.921569, 0.94902, 1)
 theme_override_font_sizes/font_size = 25
-text = "Choose Trump"
+text = "trump.lbl.choose"
 horizontal_alignment = 1
 
 [node name="GridContainer" type="GridContainer" parent="Overlay/ColorRect/MarginContainer/VBoxContainer"]

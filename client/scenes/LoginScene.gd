@@ -31,9 +31,9 @@ func _on_whoami_success(_data):
 	Player.socket_connect()
 	SceneSwitcher.switch("res://scenes/MainMenuScene.tscn")
 	
-func _on_whoami_failed(_response_code: int, result: int, _parsed):
+func _on_whoami_failed(response_code: int, result: int, _parsed):
 	if result != 0:
-		loading.set_text("Could not reach server, try again later :( Code: {code}".format({"code": result}))
+		loading.set_text(tr("login.error.server_connection").format({"response_code": response_code, "client_code": result}))
 	else:
 		OryClient.login_flow(_on_auth_flow_success, _on_auth_flow_failed)
 
@@ -44,7 +44,7 @@ func _on_auth_flow_success(data):
 	
 func _on_auth_flow_failed(response_code: int, result: int, _parsed):
 	error.visible = true
-	error.text = "Error: Could not reach server to login, code: {c}, result: {r}".format({"c": response_code, "r": result})
+	error.text = tr("login.error.server_connection").format({"response_code": response_code, "client_code": result})
 
 func _on_login_success(data):
 	Player.set_player(
@@ -53,9 +53,9 @@ func _on_login_success(data):
 		data["session"]["identity"]["traits"]["name"]
 	)
 	Player.socket_connect()
-	
 	error.visible = false
+	SceneSwitcher.switch("res://scenes/MainMenuScene.tscn")
 	
 func _on_login_failed(_response_code: int, _result: int, _parsed):
 	error.visible = true
-	error.text = "E-Mail/Passwort falsch"
+	error.text = tr("login.error.login_failed")

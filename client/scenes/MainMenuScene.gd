@@ -11,7 +11,7 @@ extends Node2D
 var new_game = true
 
 func _ready() -> void:
-	player_name.text = "Willkommen, {name} ({mail})".format({"name": Player._playername, "mail": Player._email})
+	player_name.text = tr("main.lbl.welcome").format({"name": Player._playername, "mail": Player._email})
 	
 	settings_button.pressed.connect(_on_settings_button_pressed)
 	logout_button.pressed.connect(_on_logout_button_pressed)
@@ -43,6 +43,6 @@ func _on_join_success(data) -> void:
 func _on_join_failed(response_code, _result, _data) -> void:
 	error.visible = true
 	if response_code == 404:
-		error.text = "No game with code {code} found".format({"code": code.text})
+		error.text = tr("main.error.game_404").format({"code": code.text})
 	else:
-		error.text = "Could not join game, maybe it's already full? :("
+		error.text = tr("main.error.join")

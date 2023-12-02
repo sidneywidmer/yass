@@ -22,8 +22,8 @@ boot_splash/size/window_width_override=1920
 [autoload]
 
 Player="*res://global/Player.gd"
-SceneSwitcher="*res://ui/overlays/SceneSwitcher.tscn"
 UserSettings="*res://settings/UserSettings.gd"
+SceneSwitcher="*res://ui/overlays/SceneSwitcher.tscn"
 OryClient="*res://api/OryClient.gd"
 ApiClient="*res://api/ApiClient.gd"
 
@@ -31,9 +31,10 @@ ApiClient="*res://api/ApiClient.gd"
 
 window/size/viewport_width=480
 window/size/viewport_height=854
-window/size/initial_position_type=0
+window/size/initial_position_type=2
 window/stretch/aspect="ignore"
 window/handheld/orientation=1
+window/size/initial_screen.windows=2
 
 [gui]
 
@@ -96,7 +97,9 @@ pause={
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://i18n/translation.de.translation", "res://i18n/translation.en.translation")
+locale/translations=PackedStringArray("res://i18n/translations.de.translation", "res://i18n/translations.en.translation")
+locale/translations_pot_files=PackedStringArray("res://scenes/Card.gd", "res://scenes/Card.tscn", "res://scenes/GameScene.gd", "res://scenes/GameScene.tscn", "res://scenes/GameSettingsScene.gd", "res://scenes/GameSettingsScene.tscn", "res://scenes/Hand.gd", "res://scenes/LoginScene.gd", "res://scenes/LoginScene.tscn", "res://scenes/MainMenuScene.gd", "res://scenes/MainMenuScene.tscn", "res://scenes/Players.gd", "res://scenes/Table.gd")
+locale/fallback="de"
 
 [rendering]
 

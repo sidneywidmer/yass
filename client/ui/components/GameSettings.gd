@@ -1,4 +1,4 @@
-extends VBoxContainer
+extends CenterContainer
 
 @onready var master_volume_toggle := %MasterEnabledToggle
 @onready var master_volume_slider := %MasterVolumeSlider

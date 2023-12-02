@@ -25,7 +25,7 @@ fun newHandActions(state: GameState, seat: Seat): List<Action> {
     return listOf(
         UpdateState(nextState),
         UpdateActive(activePosition),
-        UpdateHand(cards),
+        UpdateHand(cards, true),
         UpdatePoints(points),
         ClearPlayedCards(winningPos),
     )
@@ -43,9 +43,8 @@ fun newTrickActions(state: GameState, seat: Seat): List<Action> {
     return listOf(
         UpdateState(nextState),
         UpdateActive(activePosition),
-        UpdateHand(cards),
-        ClearPlayedCards(winningPos!!),
-        Message("Winning Position of last trick $winningPos"),
+        UpdateHand(cards, false),
+        ClearPlayedCards(winningPos!!)
     )
 }
 
@@ -60,7 +59,7 @@ fun cardPlayedActions(state: GameState, card: Card, playedBy: Seat, seat: Seat):
         UpdateState(nextState),
         UpdateActive(activePosition),
         CardPlayed(CardOnTable(card.suit, card.rank, card.skin, playedBy.position)),
-        UpdateHand(cards),
+        UpdateHand(cards, false),
     )
 }
 
@@ -81,7 +80,6 @@ fun schiebeActions(state: GameState, seat: Seat): List<Action> {
 
     return listOf(
         UpdateActive(activePosition),
-        UpdateState(nextState),
-        Message("Gschobe!")
+        UpdateState(nextState)
     )
 }

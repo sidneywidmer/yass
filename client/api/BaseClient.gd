@@ -60,7 +60,6 @@ func _on_request_completed(result: int, response_code: int, _headers: PackedStri
 	if response_code == 200 and result == 0:
 		on_success.call(parsed)
 	else:
-		print(on_error)
 		on_error.call(response_code, result, parsed)
 		
 func _dict_to_query_string(data: Dictionary) -> String:

@@ -43,7 +43,7 @@ theme_override_constants/separation = 0
 
 [node name="Label" type="Label" parent="UI/MarginContainer/VBoxContainer/VBoxEMail"]
 layout_mode = 2
-text = "E-Mail"
+text = "login.lbl.email"
 
 [node name="EMail" type="LineEdit" parent="UI/MarginContainer/VBoxContainer/VBoxEMail"]
 unique_name_in_owner = true
@@ -56,8 +56,7 @@ theme_override_constants/separation = 0
 
 [node name="Label" type="Label" parent="UI/MarginContainer/VBoxContainer/VBoxPW"]
 layout_mode = 2
-text = "Password
-"
+text = "login.lbl.password"
 
 [node name="Password" type="LineEdit" parent="UI/MarginContainer/VBoxContainer/VBoxPW"]
 unique_name_in_owner = true
@@ -72,7 +71,8 @@ theme_override_constants/margin_top = 40
 [node name="LoginButton" type="Button" parent="UI/MarginContainer/VBoxContainer/MarginContainerBtn"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Login"
+text = "login.btn.login"
 
 [node name="LoadingOverlay" parent="UI" instance=ExtResource("3_fwqty")]
 unique_name_in_owner = true
+visible = false

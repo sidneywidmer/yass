@@ -84,7 +84,7 @@ func _on_clear_cards(data):
 	_table.clean(winner)
 	
 func _on_update_hand(data):
-	_hand.update(data["cards"])
+	_hand.update(data["cards"], data["newCards"])
 	
 func _on_update_state(data):
 	state = data["state"]

@@ -137,18 +137,18 @@ class GameService(private val repo: GameRepository, private val pubSub: PubSub) 
             State.PLAY_CARD -> {}
             State.TRUMP -> {}
             State.SCHIEBE -> {}
-            State.PLAY_CARD_BOT -> GlobalScope.launch { delay(500).also { playAsBot(updatedState) } }
+            State.PLAY_CARD_BOT -> GlobalScope.launch { delay(200).also { playAsBot(updatedState) } }
             State.TRUMP_BOT -> trumpAsBot(updatedState)
             State.SCHIEBE_BOT -> schiebeAsBot(updatedState)
             State.NEW_TRICK -> GlobalScope.launch {
-                delay(2500)
+                delay(1000)
                 repo.createTrick(currentHand)
                 publishForSeats(updatedState.seats) { seat -> newTrickActions(repo.getState(game), seat) }
                 gameLoop(game)
             }
 
             State.NEW_HAND -> GlobalScope.launch {
-                delay(2500)
+                delay(1000)
                 val startingPlayer = nextHandStartingPlayer(
                     updatedState.hands,
                     updatedState.allPlayers,

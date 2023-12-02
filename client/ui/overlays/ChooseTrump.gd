@@ -4,7 +4,7 @@ extends Control
 @onready var background = %Background
 @onready var schiebe_container = %SchiebeContainer
 
-var game_scene: PackedScene
+var game_scene: Node2D
 
 func slide_in(allow_schiebe: bool):
 	var temp_position = overlay.position.y
@@ -31,8 +31,9 @@ func _on_trump_pressed(trump: String):
 	# Player chose an actual trump but state is still schiebe, so we do that first and 
 	# then choose the trump.
 	if game_scene.state == "SCHIEBE":
-		ApiClient.schiebe(Player.game_init_data["gameUuid"], "NO", _on_schiebe_extra_success.bind(trump), _on_schiebe_failed)
-#		
+		return ApiClient.schiebe(Player.game_init_data["gameUuid"], "NO", _on_schiebe_extra_success.bind(trump), _on_schiebe_failed)
+
+	ApiClient.trump(Player.game_init_data["gameUuid"], trump, _on_trump_success, _on_trump_failed)
 
 func _on_slide_out_complete():
 	var bg_tween = create_tween().set_trans(Tween.TRANS_CUBIC)
