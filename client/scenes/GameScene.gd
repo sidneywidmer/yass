@@ -35,7 +35,7 @@ func _ready():
 	_hand.game_scene = self
 	_players.game_scene = self
 	_table.game_scene = self
-	_choose_trump_gui.game_scene = self
+#	_choose_trump_gui.content.game_scene = self
 	
 	Player.game_scene = self
 	Player.position = Players.PositionsEnum[Player.game_init_data["seat"]["position"]]
@@ -66,6 +66,7 @@ func _on_message(actions):
 			print("Unknown action: " + action["type"])
 
 func _on_card_played(data):
+	_choose_trump_gui.slide_in()
 	var card = data["card"]
 	
 	# Don"t play card since the client already did that for us
@@ -89,7 +90,8 @@ func _on_update_hand(data):
 func _on_update_state(data):
 	state = data["state"]
 	if (state == "TRUMP" or state == "SCHIEBE") and active_position == Player.position:
-		_choose_trump_gui.slide_in(state == "SCHIEBE")
+#		state == "SCHIEBE"
+		_choose_trump_gui.slide_in()
 		
 func _on_update_active_position(data):
 	active_position = Players.PositionsEnum[data["position"]]

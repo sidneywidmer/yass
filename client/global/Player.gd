@@ -50,7 +50,7 @@ func set_player(ory_session: String, email: String, playername: String):
 	_set_value("ory_session", ory_session)
 	_set_value("email", email)
 	_set_value("playername", playername)
-	
+
 	load_values()
 
 func _set_value(key, value):

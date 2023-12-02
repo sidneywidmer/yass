@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://dyyfwek4s8bwa"]
+[gd_scene load_steps=7 format=3 uid="uid://dyyfwek4s8bwa"]
 
 [ext_resource type="Script" path="res://scenes/GameScene.gd" id="1_ylqbl"]
 [ext_resource type="Script" path="res://scenes/Players.gd" id="2_com8u"]
 [ext_resource type="Script" path="res://scenes/Table.gd" id="2_m42t1"]
-[ext_resource type="PackedScene" uid="uid://hqs3fcpq486x" path="res://ui/overlays/ChooseTrump.tscn" id="2_uupfa"]
+[ext_resource type="PackedScene" uid="uid://hqs3fcpq486x" path="res://ui/overlays/SlideInOverlay.tscn" id="2_uupfa"]
+[ext_resource type="PackedScene" uid="uid://7dt2wyfkohxi" path="res://ui/components/ChooseTrump.tscn" id="3_v6iul"]
 [ext_resource type="Script" path="res://scenes/Hand.gd" id="4_0j5un"]
 
 [node name="GameScene" type="Node2D"]
@@ -67,6 +68,7 @@ text = "WE"
 [node name="ChooseTrump" parent="CanvasLayer" instance=ExtResource("2_uupfa")]
 unique_name_in_owner = true
 visible = false
+content_scene = ExtResource("3_v6iul")
 
 [node name="Players" type="Node" parent="."]
 unique_name_in_owner = true
