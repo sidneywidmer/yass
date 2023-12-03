@@ -63,6 +63,11 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "main.btn.join"
 
+[node name="CustomGameButton" type="Button" parent="UI/CenterContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "main.lbl.custom_game"
+
 [node name="SettingsButton" type="Button" parent="UI/CenterContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2

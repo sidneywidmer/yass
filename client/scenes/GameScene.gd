@@ -88,6 +88,7 @@ func _on_update_hand(data):
 	
 func _on_update_state(data):
 	state = data["state"]
+	print(state)
 	if (state == "TRUMP" or state == "SCHIEBE") and active_position == Player.position:
 		_choose_trump_gui.slide_in({"state": state})
 		

@@ -2,6 +2,7 @@ package ch.yass.game
 
 import arrow.core.raise.Raise
 import arrow.core.raise.ensure
+import ch.yass.admin.dsl.interpretCards
 import ch.yass.core.error.*
 import ch.yass.core.pubsub.Action
 import ch.yass.core.pubsub.Channel
@@ -9,18 +10,59 @@ import ch.yass.core.pubsub.PubSub
 import ch.yass.game.api.*
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.api.internal.NewHand
-import ch.yass.game.dto.Card
-import ch.yass.game.dto.Gschobe
-import ch.yass.game.dto.State
-import ch.yass.game.dto.Trump
+import ch.yass.game.api.internal.NewPlayer
+import ch.yass.game.api.internal.NewSeat
+import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Game
 import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
 import ch.yass.game.pubsub.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.*
 
-class GameService(private val repo: GameRepository, private val pubSub: PubSub) {
+class GameService(
+    private val repo: GameRepository,
+    private val pubSub: PubSub,
+    private val playerService: PlayerService
+) {
+
+    /**
+     * Validate settings, create a new game in the db, create players for all bots and seat them
+     * as configured in the settings. Then seat the player at a free position, deal everyone
+     * some cards and start a fresh trick.
+     */
+    context(Raise<GameAlreadyFull>)
+    fun create(request: CreateCustomGameRequest, player: Player): String {
+        val settings = GameSettings.from(request)
+
+        // TODO: Check settings (max 3 bots, wcvalue in sensible range)
+
+        val game = repo.createGame(settings)
+        val botNames = arrayOf(
+            "Rolf", "Heidi", "Urs", "Elsbeth", "Matthias", "François", "Chantal", "Pierre", "Brigitte", "Michel",
+            "Giuseppe", "Maria", "Marco", "Lucia", "Roberto", "Gian", "Anna", "Silvan", "Petra", "Lukas"
+        )
+
+        settings.botPositions().map { position ->
+            val botPlayer = playerService.create(NewPlayer(UUID.randomUUID(), botNames.random(), true))
+            repo.takeASeat(game, botPlayer, position)
+        }
+        repo.takeASeat(game, player)
+
+        // TODO: This will need some refactoring: The welcome hand should be related to what cards the player
+        //       unlocked so we can't deal the full hand yet if we don't know all the players. This should
+        //       be done when the player joins at the table.
+        // Creating player always starts game
+        val cards = Position.entries.associateWith { interpretCards("welcome") }
+        val hand = repo.createHand(NewHand(game, player, cards, Trump.FREESTYLE, Gschobe.NO))
+        repo.createTrick(hand)
+
+        return game.code
+    }
 
     context(Raise<GameWithCodeNotFound>, Raise<GameAlreadyFull>)
     fun join(request: JoinGameRequest, player: Player): GameState {

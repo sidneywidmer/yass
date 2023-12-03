@@ -5,4 +5,5 @@ import java.util.UUID
 data class NewPlayer(
     val uuid: UUID,
     val name: String,
+    val bot: Boolean = false,
 )

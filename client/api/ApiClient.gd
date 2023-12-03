@@ -42,3 +42,11 @@ func trump(game: String, trump: String, on_success: Callable, on_error: Callable
 		on_success,
 		on_error
 	)
+	
+func create_custom_game(params: Dictionary, on_success: Callable, on_error: Callable):
+	_http_post(
+		"/game/create",
+		params,
+		on_success,
+		on_error
+	)

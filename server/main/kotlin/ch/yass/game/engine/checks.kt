@@ -30,7 +30,7 @@ fun unplayedCardsOfPlayer(player: Player, hands: List<Hand>, seats: List<Seat>, 
     return allCards.minus(playedCards.toSet())
 }
 
-fun isTrumpSet(hand: Hand?): Boolean = !(hand?.trump != Trump.FREESTYLE && hand?.trump == null)
+fun isTrumpSet(hand: Hand?): Boolean = hand?.trump != null
 
 fun isAlreadyGschobe(hand: Hand?): Boolean = hand?.gschobe != Gschobe.NOT_YET
 
