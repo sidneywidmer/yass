@@ -177,7 +177,24 @@ custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 
+[node name="TextureButton" type="TextureButton" parent="SchiebeContainer/CenterContainer/Schiebe"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_default_cursor_shape = 2
+
 [node name="Schiebe" type="Sprite2D" parent="SchiebeContainer/CenterContainer/Schiebe"]
 position = Vector2(19, 22)
 scale = Vector2(0.35, 0.35)
 texture = ExtResource("7_anyy6")
+
+[connection signal="pressed" from="GridContainer/CLUBS/TextureButton" to="." method="_on_trump_pressed" binds= ["CLUBS"]]
+[connection signal="pressed" from="GridContainer/Spades/TextureButton" to="." method="_on_trump_pressed" binds= ["SPADES"]]
+[connection signal="pressed" from="GridContainer/Hearts/TextureButton" to="." method="_on_trump_pressed" binds= ["HEARTS"]]
+[connection signal="pressed" from="GridContainer/Diamonds/TextureButton" to="." method="_on_trump_pressed" binds= ["DIAMONDS"]]
+[connection signal="pressed" from="GridContainer/Uneufe/TextureButton" to="." method="_on_trump_pressed" binds= ["UNEUFE"]]
+[connection signal="pressed" from="GridContainer/Obeabe/TextureButton" to="." method="_on_trump_pressed" binds= ["OBEABE"]]
+[connection signal="pressed" from="SchiebeContainer/CenterContainer/Schiebe/TextureButton" to="." method="_on_trump_pressed" binds= ["SCHIEBE"]]

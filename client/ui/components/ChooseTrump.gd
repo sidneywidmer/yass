@@ -6,8 +6,12 @@ extends VBoxContainer
 var game_scene: Node2D
 var parent_overlay: Control
 
-func allow_schiebe(allow: bool):
-	schiebe_container.visible = allow
+func add_additional_params(params: Dictionary):
+	game_scene = params["game_scene"]
+	parent_overlay = params["parent_overlay"]
+
+func before_slide_in(params: Dictionary):
+	schiebe_container.visible = params["state"] == "SCHIEBE"
 
 func _on_trump_pressed(trump: String):
 	parent_overlay.slide_out()
@@ -37,3 +41,7 @@ func _on_trump_success(_data):
 func _on_trump_failed(_response_code: int, _result: int, _parsed):
 	# TODO: Just show rejoin or how do we handle this?
 	pass
+
+
+func _on_texture_button_pressed(extra_arg_0):
+	pass # Replace with function body.
