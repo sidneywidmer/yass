@@ -10,10 +10,7 @@ import ch.yass.db.tables.references.*
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.api.internal.NewHand
 import ch.yass.game.api.internal.NewSeat
-import ch.yass.game.dto.Card
-import ch.yass.game.dto.Gschobe
-import ch.yass.game.dto.Position
-import ch.yass.game.dto.Trump
+import ch.yass.game.dto.*
 import ch.yass.game.dto.db.*
 import ch.yass.game.dto.db.Game
 import ch.yass.game.engine.randomFreePosition
@@ -25,14 +22,27 @@ import java.util.*
 
 class GameRepository(private val db: DSLContext) {
 
+    fun createGame(settings: GameSettings): Game {
+        return db.insertInto(GAME, GAME.UUID, GAME.CODE, GAME.CREATED_AT, GAME.UPDATED_AT, GAME.SETTINGS)
+            .values(
+                UUID.randomUUID().toString(),
+                (1..5).map { ('A'..'Z').random() }.joinToString(""),
+                LocalDateTime.now(ZoneOffset.UTC),
+                LocalDateTime.now(ZoneOffset.UTC),
+                toDbJson(settings)
+            )
+            .returningResult(GAME)
+            .fetchOne(mapping(Game::fromRecord))!!
+    }
+
     context(Raise<GameAlreadyFull>)
-    fun takeASeat(game: Game, player: Player): Seat {
+    fun takeASeat(game: Game, player: Player, position: Position? = null): Seat {
         val seats = getSeats(game)
         val maybeAlreadySeated = seats.firstOrNull { it.playerId == player.id }
         return maybeAlreadySeated?.let { rejoinSeat(it) }
             ?: run {
-                val position = randomFreePosition(seats)
-                createSeat(NewSeat(game, player, position))
+                val p = position ?: randomFreePosition(seats)
+                createSeat(NewSeat(game, player, p))
             }
     }
 
@@ -134,8 +144,8 @@ class GameRepository(private val db: DSLContext) {
                 LocalDateTime.now(ZoneOffset.UTC),
                 hand.game.id,
                 hand.startingPlayer.id,
-                null,
-                Gschobe.NOT_YET.name,
+                hand.trump?.name,
+                hand.gschobe?.name ?: Gschobe.NOT_YET.name,
                 toDbJson(hand.positions[Position.NORTH]),
                 toDbJson(hand.positions[Position.EAST]),
                 toDbJson(hand.positions[Position.SOUTH]),
@@ -143,6 +153,21 @@ class GameRepository(private val db: DSLContext) {
             )
             .returningResult(HAND)
             .fetchOne(mapping(Hand::fromRecord))!!
+
+    fun createSeat(seat: NewSeat): Seat {
+        return db
+            .insertInto(SEAT, SEAT.UUID, SEAT.PLAYER_ID, SEAT.GAME_ID, SEAT.POSITION, SEAT.CREATED_AT, SEAT.UPDATED_AT)
+            .values(
+                UUID.randomUUID().toString(),
+                seat.player.id,
+                seat.game.id,
+                seat.position.toString(),
+                LocalDateTime.now(ZoneOffset.UTC),
+                LocalDateTime.now(ZoneOffset.UTC)
+            )
+            .returningResult(SEAT)
+            .fetchOneInto(Seat::class.java)!!
+    }
 
     private fun getPlayers(seats: List<Seat>): List<Player> =
         db.selectFrom(PLAYER)
@@ -166,21 +191,6 @@ class GameRepository(private val db: DSLContext) {
             .orderBy(HAND.CREATED_AT.desc())
             .fetch(Hand::fromRecord)
 
-    private fun createSeat(seat: NewSeat): Seat {
-        return db
-            .insertInto(SEAT, SEAT.UUID, SEAT.PLAYER_ID, SEAT.GAME_ID, SEAT.POSITION, SEAT.CREATED_AT, SEAT.UPDATED_AT)
-            .values(
-                UUID.randomUUID().toString(),
-                seat.player.id,
-                seat.game.id,
-                seat.position.toString(),
-                LocalDateTime.now(ZoneOffset.UTC),
-                LocalDateTime.now(ZoneOffset.UTC)
-            )
-            .returningResult(SEAT)
-            .fetchOneInto(Seat::class.java)!!
-    }
-
     private fun rejoinSeat(seat: Seat): Seat {
         return db.update(SEAT)
             .set(SEAT.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
@@ -189,6 +199,5 @@ class GameRepository(private val db: DSLContext) {
             .returningResult(SEAT)
             .fetchOneInto(Seat::class.java)!!
     }
-
 
 }

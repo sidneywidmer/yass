@@ -26,10 +26,16 @@ class GameController(private val service: GameService) : Controller {
         post("/schiebe", ::schiebe)
     }
 
-    // Save new Game to DB
-    // Set current player as starting player
-    // Create first welcome hand
-    private fun create(ctx: Context): Nothing = TODO()
+    private fun create(ctx: Context) = either {
+        val request = validate<CreateCustomGameRequest>(ctx.body())
+        val player = player(ctx)
+        val code = service.create(request, player)
+
+        CreateCustomGameResponse(code)
+    }.fold(
+        { errorResponse(ctx, it) },
+        { successResponse(ctx, it) }
+    )
 
     private fun join(ctx: Context) = either {
         val request = validate<JoinGameRequest>(ctx.body())

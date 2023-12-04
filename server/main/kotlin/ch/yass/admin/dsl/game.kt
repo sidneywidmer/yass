@@ -6,6 +6,8 @@ import ch.yass.core.helper.toDbJson
 import ch.yass.db.tables.references.*
 import ch.yass.game.GameRepository
 import ch.yass.game.api.internal.GameState
+import ch.yass.game.dto.GameSettings
+import ch.yass.game.dto.WinningConditionType
 import org.jooq.DSLContext
 import org.kodein.di.direct
 import org.kodein.di.instance
@@ -32,6 +34,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
         createdAt = LocalDateTime.now(ZoneOffset.UTC)
         updatedAt = LocalDateTime.now(ZoneOffset.UTC)
         code = (1..5).map { ('A'..'Z').random() }.joinToString("")
+        settings = toDbJson(GameSettings(false, false, false, false, WinningConditionType.HANDS, 10))
         store()
     }
     val game = recover({ repo.getByUUID(gameRecord.uuid!!) }, { throw Exception("invalid uuid") })

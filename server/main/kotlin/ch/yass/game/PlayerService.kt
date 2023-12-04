@@ -47,7 +47,7 @@ class PlayerService(private val db: DSLContext) {
             .values(
                 player.uuid.toString(),
                 player.name,
-                false,
+                player.bot,
                 LocalDateTime.now(ZoneOffset.UTC),
                 LocalDateTime.now(ZoneOffset.UTC),
             )

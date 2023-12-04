@@ -1,14 +1,13 @@
 extends Node2D
 
 @onready var settings_button := %SettingsButton
+@onready var custom_game_button := %CustomGameButton
 @onready var logout_button := %LogoutButton
 @onready var join_button := %JoinGameButton
 @onready var exit_button := %ExitButton
 @onready var player_name := %PlayerName
 @onready var error := %ErrorLabel
 @onready var code := %GameCode
-
-var new_game = true
 
 func _ready() -> void:
 	player_name.text = tr("main.lbl.welcome").format({"name": Player._playername, "mail": Player._email})
@@ -17,6 +16,7 @@ func _ready() -> void:
 	logout_button.pressed.connect(_on_logout_button_pressed)
 	exit_button.pressed.connect(_on_exit_button_pressed)
 	join_button.pressed.connect(_on_join_button_pressed)
+	custom_game_button.pressed.connect(_on_custom_game_button_pressed)
 
 func _on_join_button_pressed() -> void:
 	ApiClient.join(
@@ -26,7 +26,6 @@ func _on_join_button_pressed() -> void:
 	)
 
 func _on_settings_button_pressed() -> void:
-	new_game = false
 	SceneSwitcher.switch("res://scenes/GameSettingsScene.tscn")
 	
 func _on_logout_button_pressed() -> void:
@@ -35,6 +34,9 @@ func _on_logout_button_pressed() -> void:
 
 func _on_exit_button_pressed() -> void:
 	get_tree().quit()
+	
+func _on_custom_game_button_pressed() -> void:
+	SceneSwitcher.switch("res://scenes/CustomGameScene.tscn")
 	
 func _on_join_success(data) -> void:
 	Player.game_init_data = data
