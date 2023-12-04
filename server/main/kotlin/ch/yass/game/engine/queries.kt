@@ -19,8 +19,11 @@ fun currentHand(hands: List<Hand>): Hand? = hands.firstOrNull()
 
 fun lastHand(hands: List<Hand>): Hand? = hands.getOrNull(1)
 
+/**
+ * Hands that have 9 tricks with 4 cards each. Welcome hand is NOT counted since it only has 1 card and 1 trick.
+ */
 fun completedHands(hands: List<Hand>, tricks: List<Trick>): List<Hand> =
-    hands.filter { tricksOfHand(tricks, it).size == 9 }
+    hands.filter { hand -> tricksOfHand(tricks, hand).filter { trick -> trick.cards().size == 4 }.size == 9 }
 
 fun playerSeat(player: Player, seats: List<Seat>): Seat =
     seats.first { it.playerId == player.id }
@@ -70,7 +73,7 @@ fun nextState(state: GameState): State {
 
     return when {
         trick == null -> State.NEW_TRICK
-        isGameFinished(state.hands, state.tricks) -> State.FINISHED
+        isGameFinished(state) -> State.FINISHED
 
         // Special case for "welcome" trick, only one card is played per player
         isWelcomeHandFinished(trick, state.hands) -> State.NEW_HAND

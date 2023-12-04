@@ -1,0 +1,3 @@
+ALTER TABLE game
+    ADD COLUMN settings JSON NOT NULL DEFAULT '{}'::JSON;
+

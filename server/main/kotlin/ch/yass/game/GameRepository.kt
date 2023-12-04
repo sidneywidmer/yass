@@ -23,16 +23,16 @@ import java.util.*
 class GameRepository(private val db: DSLContext) {
 
     fun createGame(settings: GameSettings): Game {
-        // TODO: Handle settings -> to json
-        return db.insertInto(GAME, GAME.UUID, GAME.CODE, GAME.CREATED_AT, GAME.UPDATED_AT)
+        return db.insertInto(GAME, GAME.UUID, GAME.CODE, GAME.CREATED_AT, GAME.UPDATED_AT, GAME.SETTINGS)
             .values(
                 UUID.randomUUID().toString(),
                 (1..5).map { ('A'..'Z').random() }.joinToString(""),
                 LocalDateTime.now(ZoneOffset.UTC),
                 LocalDateTime.now(ZoneOffset.UTC),
+                toDbJson(settings)
             )
             .returningResult(GAME)
-            .fetchOneInto(Game::class.java)!!
+            .fetchOne(mapping(Game::fromRecord))!!
     }
 
     context(Raise<GameAlreadyFull>)

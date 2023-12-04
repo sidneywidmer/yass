@@ -11,7 +11,6 @@ import ch.yass.game.api.*
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.api.internal.NewHand
 import ch.yass.game.api.internal.NewPlayer
-import ch.yass.game.api.internal.NewSeat
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Game
 import ch.yass.game.dto.db.Player
@@ -35,11 +34,16 @@ class GameService(
      * as configured in the settings. Then seat the player at a free position, deal everyone
      * some cards and start a fresh trick.
      */
-    context(Raise<GameAlreadyFull>)
+    context(Raise<GameError>)
     fun create(request: CreateCustomGameRequest, player: Player): String {
         val settings = GameSettings.from(request)
 
-        // TODO: Check settings (max 3 bots, wcvalue in sensible range)
+        val validWcValue = when (settings.winningConditionType) {
+            WinningConditionType.HANDS -> settings.winningConditionValue in 1..99
+            WinningConditionType.POINTS -> settings.winningConditionValue in 100..9000
+        }
+        ensure(settings.botPositions().size < 4) { GameSettingsMaxBots(settings) }
+        ensure(validWcValue) { GameSettingsInvalidValue(settings) }
 
         val game = repo.createGame(settings)
         val botNames = arrayOf(
