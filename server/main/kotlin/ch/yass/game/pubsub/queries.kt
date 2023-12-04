@@ -6,6 +6,7 @@ import ch.yass.game.dto.Card
 import ch.yass.game.dto.CardOnTable
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.Trump
+import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
 
@@ -75,6 +76,16 @@ fun trumpChosenActions(state: GameState, trump: Trump, seat: Seat): List<Action>
 }
 
 fun schiebeActions(state: GameState, seat: Seat): List<Action> {
+    val nextState = nextState(state)
+    val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
+
+    return listOf(
+        UpdateActive(activePosition),
+        UpdateState(nextState)
+    )
+}
+
+fun playerJoinedActions(state: GameState, newPlayer: Player, seat: Seat): List<Action> {
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
 
