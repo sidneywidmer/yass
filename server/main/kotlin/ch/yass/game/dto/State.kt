@@ -1,6 +1,7 @@
 package ch.yass.game.dto
 
 enum class State {
+    WAITING_FOR_PLAYERS,
     PLAY_CARD,
     PLAY_CARD_BOT,
     SCHIEBE,

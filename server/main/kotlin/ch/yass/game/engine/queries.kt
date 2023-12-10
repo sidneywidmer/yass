@@ -72,6 +72,7 @@ fun nextState(state: GameState): State {
     val tricks = hand?.let { tricksOfHand(state.tricks, it) } ?: emptyList()
 
     return when {
+        state.allPlayers.size < 4 -> State.WAITING_FOR_PLAYERS
         trick == null -> State.NEW_TRICK
         isGameFinished(state) -> State.FINISHED
 

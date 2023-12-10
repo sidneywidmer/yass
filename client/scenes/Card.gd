@@ -30,6 +30,12 @@ func tween(type, to, on_complete = null, duration = 0.18):
 	if on_complete:
 		tween_node.connect("finished", on_complete)
 
+func _is_playable():
+	return state == "PLAYABLE" \
+				and state_position != TABLE \
+				and _hand.game_scene.active_position == Player.position \
+				and _hand.game_scene.state == "PLAY_CARD"
+	
 func _on_draggable_entered():
 	if state_position != HAND:
 		return
@@ -41,7 +47,7 @@ func _on_draggable_entered():
 	self.z_index = 9
 	
 	var offset = 50
-	if state == "UNPLAYABLE" or _hand.game_scene.active_position != Player.position:
+	if !_is_playable():
 		offset = 20
 
 	self.tween(
@@ -62,7 +68,7 @@ func _on_draggable_exited():
 	)
 	
 func _on_draggable_pressed():
-	if state == "UNPLAYABLE" or state_position == TABLE or _hand.game_scene.active_position != Player.position:
+	if !_is_playable():
 		return
 	
 	_hand.play(self)

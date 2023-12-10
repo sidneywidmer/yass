@@ -68,11 +68,16 @@ class GameService(
         return game.code
     }
 
-    context(Raise<GameWithCodeNotFound>, Raise<GameAlreadyFull>)
+    context(Raise<GameError>, Raise<DbError>)
     fun join(request: JoinGameRequest, player: Player): GameState {
         val game = repo.getByCode(request.code)
 
         repo.takeASeat(game, player)
+
+        val state = repo.getState(game)
+        publishForSeats(state.seats) { seat -> playerJoinedActions(state, player, seat) }
+
+        gameLoop(game)
 
         return repo.getState(game)
     }
@@ -176,6 +181,7 @@ class GameService(
         val nextStateLoop = nextState(updatedState)
 
         when (nextStateLoop) {
+            State.WAITING_FOR_PLAYERS -> {}
             State.FINISHED -> {
                 publishForSeats(updatedState.seats) { listOf(Message("Game finished!")) }
             }

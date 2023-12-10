@@ -39,7 +39,6 @@ func _on_create_success(data):
 	)
 	
 func _on_join_success(data) -> void:
-	print(data)
 	Player.game_init_data = data
 	SceneSwitcher.switch("res://scenes/GameScene.tscn")
 	
@@ -47,4 +46,4 @@ func _on_join_failed(response_code, _result, _data) -> void:
 	pass
 	
 func _on_create_failed(_response_code: int, _result: int, _parsed):
-	print(_response_code, _result, _parsed)
+	pass

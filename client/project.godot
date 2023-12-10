@@ -104,4 +104,5 @@ locale/fallback="de"
 [rendering]
 
 renderer/rendering_method="mobile"
+textures/vram_compression/import_etc2_astc=true
 environment/defaults/default_clear_color=Color(0.909804, 0.921569, 0.94902, 1)
