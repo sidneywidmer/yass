@@ -40,11 +40,11 @@ nb-configuration.xml
 .env
 
 # Godot
-client/.godot/
-client/.import/
-client/export.cfg
-client/export_presets.cfg
+godotclient/.godot/
+godotclient/.import/
+godotclient/export.cfg
+godotclient/export_presets.cfg
 client/*.translation
-client/.mono/
-client/data_*/
-client/mono_crash.*.json
+godotclient/.mono/
+godotclient/data_*/
+godotclient/mono_crash.*.json
