@@ -45,7 +45,7 @@ class GameController(private val service: GameService) : Controller {
         val seat = mapSeat(playerSeat(player, state.seats), state)
         val playedCards = currentTrick(state.tricks)!!.cardsByPosition()
 
-        JoinGameResponse(state.game.uuid, seat, playedCards)
+        JoinGameResponse(state.game.uuid, state.game.code, seat, playedCards)
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }

@@ -39,18 +39,21 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/Info/CenterContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Info/CenterContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/Info/CenterContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 110
 
-[node name="PointsNS" type="Label" parent="CanvasLayer/Info/CenterContainer/HBoxContainer"]
+[node name="PointsNS" type="Label" parent="CanvasLayer/Info/CenterContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.909804, 0.921569, 0.94902, 1)
 theme_override_font_sizes/font_size = 25
 text = "NS"
 
-[node name="Trump" type="Label" parent="CanvasLayer/Info/CenterContainer/HBoxContainer"]
+[node name="Trump" type="Label" parent="CanvasLayer/Info/CenterContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 35
@@ -58,12 +61,20 @@ text = "💙"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PointsWE" type="Label" parent="CanvasLayer/Info/CenterContainer/HBoxContainer"]
+[node name="PointsWE" type="Label" parent="CanvasLayer/Info/CenterContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.909804, 0.921569, 0.94902, 1)
 theme_override_font_sizes/font_size = 25
 text = "WE"
+
+[node name="StatusLabel" type="Label" parent="CanvasLayer/Info/CenterContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.909804, 0.921569, 0.94902, 1)
+theme_override_font_sizes/font_size = 20
+text = "status label"
+horizontal_alignment = 1
 
 [node name="ChooseTrump" parent="CanvasLayer" instance=ExtResource("2_uupfa")]
 unique_name_in_owner = true
@@ -73,6 +84,20 @@ content_scene = ExtResource("3_v6iul")
 [node name="Players" type="Node" parent="."]
 unique_name_in_owner = true
 script = ExtResource("2_com8u")
+
+[node name="Debug" type="Label" parent="Players"]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 80
+text = "FOOBAR"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
 
 [node name="Table" type="Control" parent="Players"]
 unique_name_in_owner = true

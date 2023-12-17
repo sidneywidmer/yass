@@ -12,8 +12,7 @@
             <root level="INFO">
                 <appender-ref ref="Console"/>
             </root>
-
-
+<!--            <logger name="org.zalando.logbook" level="TRACE"/>-->
         </then>
         <else>
             <root level="INFO">

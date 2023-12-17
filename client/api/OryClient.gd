@@ -1,7 +1,7 @@
 extends BaseClient
 
 func _init():
-	super._init("http://127.0.0.1:4433", 3, false)
+	super._init("http://127.0.0.1:4433", 30, false)
 
 func whoami(on_success: Callable, on_error: Callable) -> void:
 	var headers = ["Authorization: Bearer {session}".format({"session": Player._ory_session})]

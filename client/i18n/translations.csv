@@ -27,3 +27,5 @@ custom_game.lbl.winning_condition.points,Anzahl Punkte,Total Points
 custom_game.placeholder.winning_condition.value,2500,2500
 custom_game.btn.create,Spiel erstellen,Create game
 custom_game.btn.back,Zurück,Back
+game.lbl.waiting_for_player,Warte auf Spieler,Waiting for players
+game.lbl.waiting_for_trump,{player} wählt Trump,{player} chooses trump

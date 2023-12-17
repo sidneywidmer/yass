@@ -9,7 +9,6 @@ extends Control
 @onready var winning_condition_type := %WinningCondition
 @onready var winning_condition_value := %WinningConditionValue
 
-# Called when the node enters the scene tree for the first time.
 func _ready():
 	back_button.pressed.connect(_on_back_button_pressed)
 	create_button.pressed.connect(_on_create_button_pressed)
@@ -31,7 +30,6 @@ func _on_create_button_pressed():
 	ApiClient.create_custom_game(payload, _on_create_success, _on_create_failed)
 	
 func _on_create_success(data):
-	print(data["code"])
 	ApiClient.join(
 		data["code"],
 		_on_join_success,
@@ -42,8 +40,8 @@ func _on_join_success(data) -> void:
 	Player.game_init_data = data
 	SceneSwitcher.switch("res://scenes/GameScene.tscn")
 	
-func _on_join_failed(response_code, _result, _data) -> void:
-	pass
+func _on_join_failed(_response_code, _result, _data) -> void:
+	print("join failed")
 	
 func _on_create_failed(_response_code: int, _result: int, _parsed):
-	pass
+	print("create failed")

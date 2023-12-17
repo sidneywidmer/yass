@@ -7,6 +7,8 @@ extends Node2D
 @onready var _points_we_label = %PointsWE
 @onready var _trump_label = %Trump
 @onready var _choose_trump_gui = %ChooseTrump
+@onready var _status_label = %StatusLabel
+@onready var _debug_label = %Debug
 
 var active_position: Players.PositionsEnum
 var state: String
@@ -40,6 +42,8 @@ func _ready():
 	Player.game_scene = self
 	Player.position = Players.PositionsEnum[Player.game_init_data["seat"]["position"]]
 	
+	_debug_label.text = Player.game_init_data["code"]
+	
 	_on_update_active_position({"position": Player.game_init_data["seat"]["activePosition"]})
 	_on_update_state(Player.game_init_data["seat"])
 	_on_update_trump(Player.game_init_data["seat"])
@@ -57,6 +61,14 @@ func _ready():
 		
 	_hand.draw(Player.game_init_data["seat"]["cards"])
 	Player.socket_seat_subscribe(Player.game_init_data["seat"]["uuid"], _on_message)
+
+func _show_status(text: String):
+	_status_label.show()
+	_status_label.text = text
+	
+func _hide_status():
+	_status_label.hide()
+	_status_label.text = ""
 
 func _on_message(actions):
 	for action in actions:
@@ -88,7 +100,14 @@ func _on_update_hand(data):
 	
 func _on_update_state(data):
 	state = data["state"]
-	print(state)
+	_hide_status()
+	
+	if state == "WAITING_FOR_PLAYERS":
+		_show_status(tr("game.lbl.waiting_for_player"))
+		
+	if (state == "TRUMP" or state == "SCHIEBE") and active_position != Player.position:
+		_show_status(tr("game.lbl.waiting_for_trump").format({"player": active_position}))
+		
 	if (state == "TRUMP" or state == "SCHIEBE") and active_position == Player.position:
 		_choose_trump_gui.slide_in({"state": state})
 		

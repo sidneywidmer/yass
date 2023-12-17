@@ -68,7 +68,7 @@ func _on_play_success(_data):
 func _on_play_failed(_response_code: int, _result: int, _parsed):
 	# TODO: Revert card instance back to hand somehow?
 	# Or just show an error overlay to "rejoin"?
-	pass
+	print("play failed")
 	
 func _play_out_complete(card_instance):
 	card_instance.z_index = 0

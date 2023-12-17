@@ -1,7 +1,7 @@
 extends BaseClient
 
 func _init():
-	super._init("http://127.0.0.1:8080", 3, true)
+	super._init("http://127.0.0.1:8080", 30, true)
 
 func whoami(on_success: Callable, on_error: Callable) -> void:
 	_http_get(

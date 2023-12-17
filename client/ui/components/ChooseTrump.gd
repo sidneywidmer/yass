@@ -33,15 +33,11 @@ func _on_schiebe_success(_data):
 	
 func _on_schiebe_failed(_response_code: int, _result: int, _parsed):
 	# TODO: Just show rejoin or how do we handle this?
-	pass
+	print("schiebe failed")
 	
 func _on_trump_success(_data):
 	pass
 	
 func _on_trump_failed(_response_code: int, _result: int, _parsed):
 	# TODO: Just show rejoin or how do we handle this?
-	pass
-
-
-func _on_texture_button_pressed(extra_arg_0):
-	pass # Replace with function body.
+	print("trump failed")

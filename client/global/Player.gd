@@ -28,6 +28,10 @@ func socket_connect():
 	_socket.set_handshake_headers(["X-Session-Token: {session}".format({"session": _ory_session})])
 	_socket.connect_to_url("ws://127.0.0.1:8000/connection/websocket")
 	_socket_poll = true
+	set_process(true)
+	
+func socket_disconnect():
+	_socket.close()
 
 func socket_seat_subscribe(uuid: String, on_message: Callable):
 	var channel = "seat:#{uuid}".format({"uuid": uuid})
@@ -39,6 +43,7 @@ func _socket_subscribe(channel: String, on_message: Callable):
 	
 func logout():
 	_set_value("ory_session", "")
+	socket_disconnect()
 	load_values()
 
 func load_values():
@@ -79,7 +84,7 @@ func _process(_delta):
 			if packet == "{}":
 				_socket.send_text("{}")
 				continue
-				
+
 			var parsed = JSON.parse_string(packet)
 			if parsed.has("push"):
 				_socket_channels[parsed["push"]["channel"]].call(parsed["push"]["pub"]["data"])
@@ -91,5 +96,4 @@ func _process(_delta):
 		_socket_connected = false
 		var code = _socket.get_close_code()
 		var reason = _socket.get_close_reason()
-		print("WebSocket closed with code: %d, reason %s. Clean: %s" % [code, reason, code != -1])
 		set_process(false)
