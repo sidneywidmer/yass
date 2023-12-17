@@ -11,24 +11,28 @@ enum PositionsEnum {NORTH, EAST, SOUTH, WEST}
 @onready var west := %West
 @onready var config = {
 	PositionsEnum.NORTH: {
+		"label": tr("game.lbl.north"),
 		"node": north, 
 		"offset": Vector2(0, 80), 
 		"rotate": 0, 
 		"off_table": Vector2(0, 100)
 	},
 	PositionsEnum.EAST: {
+		"label": tr("game.lbl.easth"),
 		"node": east, 
 		"offset": Vector2(-80, 0), 
 		"rotate": 15, 
 		"off_table": Vector2(-100, 0)
 	},
 	PositionsEnum.SOUTH: {
+		"label": tr("game.lbl.south"),
 		"node": hand, 
 		"offset": Vector2(0, -80), 
 		"rotate": -15, 
 		"off_table": Vector2(0, -100)
 	},
 	PositionsEnum.WEST: {
+		"label": tr("game.lbl.west"),
 		"node": west, 
 		"offset": Vector2(80, 0), 
 		"rotate": -15, 

@@ -28,4 +28,8 @@ custom_game.placeholder.winning_condition.value,2500,2500
 custom_game.btn.create,Spiel erstellen,Create game
 custom_game.btn.back,Zurück,Back
 game.lbl.waiting_for_player,Warte auf Spieler,Waiting for players
-game.lbl.waiting_for_trump,{player} wählt Trump,{player} chooses trump
+game.lbl.waiting_for_trump,{player} wählt Trumpf,{player} chooses trump
+game.lbl.north,Norden,North
+game.lbl.east,Osten,East
+game.lbl.south,Süden,South
+game.lbl.west,Westen,West
