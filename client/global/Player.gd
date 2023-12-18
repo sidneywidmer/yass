@@ -22,6 +22,11 @@ func _ready():
 	
 	load_values()
 	
+func _notification(what):
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		socket_disconnect()
+		get_tree().quit() # default behavior
+	
 func socket_connect():
 	if _socket_connected:
 		return
@@ -79,7 +84,7 @@ func _process(_delta):
 			
 		while _socket.get_available_packet_count():
 			var packet = _socket.get_packet().get_string_from_utf8()
-			
+			print(packet)
 			# Answer the centrifugo ping/pong call
 			if packet == "{}":
 				_socket.send_text("{}")
@@ -87,7 +92,7 @@ func _process(_delta):
 
 			var parsed = JSON.parse_string(packet)
 			if parsed.has("push"):
-				_socket_channels[parsed["push"]["channel"]].call(parsed["push"]["pub"]["data"])
+				_socket_channels[parsed["push"]["channel"]].call(parsed["push"])
 				
 	elif state == WebSocketPeer.STATE_CLOSING:
 		pass

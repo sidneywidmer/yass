@@ -7,6 +7,8 @@ import ch.yass.core.helper.successResponse
 import ch.yass.core.helper.validate
 import ch.yass.game.api.*
 import ch.yass.game.api.internal.GameState
+import ch.yass.game.dto.PlayerAtTable
+import ch.yass.game.dto.Position
 import ch.yass.game.dto.SeatState
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
@@ -44,8 +46,11 @@ class GameController(private val service: GameService) : Controller {
 
         val seat = mapSeat(playerSeat(player, state.seats), state)
         val playedCards = currentTrick(state.tricks)!!.cardsByPosition()
+        val otherPlayers = Position.entries
+            .map { pos -> Pair(pos, playerAtPosition(pos, state.seats, state.allPlayers)) }
+            .mapNotNull { pair -> pair.second?.let { PlayerAtTable(it.uuid, it.name, it.bot, pair.first) } }
 
-        JoinGameResponse(state.game.uuid, state.game.code, seat, playedCards)
+        JoinGameResponse(state.game.uuid, state.game.code, seat, playedCards, otherPlayers)
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }

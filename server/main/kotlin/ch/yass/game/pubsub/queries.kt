@@ -2,10 +2,7 @@ package ch.yass.game.pubsub
 
 import ch.yass.core.pubsub.Action
 import ch.yass.game.api.internal.GameState
-import ch.yass.game.dto.Card
-import ch.yass.game.dto.CardOnTable
-import ch.yass.game.dto.Position
-import ch.yass.game.dto.Trump
+import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
@@ -19,7 +16,7 @@ fun newHandActions(state: GameState, seat: Seat): List<Action> {
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
 
-    // If no winner found it's probably the welcome hand, and we just move the cords to SOUTH as default
+    // If no winner found it's probably the welcome hand, and we just move the cards to SOUTH as default
     val winningPos =
         winningPositionOfLastTrick(lastHand, tricksOfHand(state.tricks, lastHand), state.seats) ?: Position.SOUTH
 
@@ -85,11 +82,12 @@ fun schiebeActions(state: GameState, seat: Seat): List<Action> {
     )
 }
 
-fun playerJoinedActions(state: GameState, newPlayer: Player, seat: Seat): List<Action> {
+fun playerJoinedActions(state: GameState, newPlayer: Player, joinedAtSeat: Seat, seat: Seat): List<Action> {
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
 
     return listOf(
+        PlayerJoined(PlayerAtTable(newPlayer.uuid, newPlayer.name, newPlayer.bot, joinedAtSeat.position)),
         UpdateActive(activePosition),
         UpdateState(nextState)
     )

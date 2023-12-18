@@ -71,11 +71,10 @@ class GameService(
     context(Raise<GameError>, Raise<DbError>)
     fun join(request: JoinGameRequest, player: Player): GameState {
         val game = repo.getByCode(request.code)
-
-        repo.takeASeat(game, player)
-
+        val joinedAtSeat = repo.takeASeat(game, player)
         val state = repo.getState(game)
-        publishForSeats(state.seats) { seat -> playerJoinedActions(state, player, seat) }
+
+        publishForSeats(state.seats) { seat -> playerJoinedActions(state, player, joinedAtSeat, seat) }
 
         gameLoop(game)
 

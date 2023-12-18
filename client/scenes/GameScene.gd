@@ -9,6 +9,7 @@ extends Node2D
 @onready var _choose_trump_gui = %ChooseTrump
 @onready var _status_label = %StatusLabel
 
+var position_icon_tweens: Array
 var active_position: Players.PositionsEnum
 var state: String
 var trump: String
@@ -21,6 +22,7 @@ var socket_actions: Dictionary = {
 	"UpdateActive": _on_update_active_position,
 	"UpdateTrump": _on_update_trump,
 	"UpdatePoints": _on_update_points,
+	"PlayerJoined": _on_player_joined,
 }
 var trumps: Dictionary = {
 	"SPADES": "♠️",
@@ -45,6 +47,7 @@ func _ready():
 	_on_update_state(Player.game_init_data["seat"])
 	_on_update_trump(Player.game_init_data["seat"])
 	_on_update_points(Player.game_init_data["seat"])
+	Player.game_init_data["otherPlayers"].map(func(player): _on_player_joined({"player": player}))
 	
 	# If we got some players already in the game at login we"ll 
 	# show them here including any cards they might"ve played
@@ -67,12 +70,21 @@ func _hide_status():
 	_status_label.hide()
 	_status_label.text = ""
 
-func _on_message(actions):
-	for action in actions:
-		if socket_actions.has(action["type"]):
-			socket_actions[action["type"]].call(action)
-		else:
-			print("Unknown action: " + action["type"])
+func _on_message(data):
+	if data.has("pub"):
+		var actions = data["pub"]["data"]
+		for action in actions:
+			if socket_actions.has(action["type"]):
+				socket_actions[action["type"]].call(action)
+			else:
+				print("Unknown action: " + action["type"])
+				
+	if data.has("leave"):
+		print("leave")
+		print(data["leave"]["info"])
+		print(Player.game_init_data["otherPlayers"])
+		
+	print(data)
 
 func _on_card_played(data):
 	var card = data["card"]
@@ -108,9 +120,25 @@ func _on_update_state(data):
 		
 	if (state == "TRUMP" or state == "SCHIEBE") and active_position == Player.position:
 		_choose_trump_gui.slide_in({"state": state})
-		
+
+# Update the active_position and handle the position icon animations
 func _on_update_active_position(data):
 	active_position = Players.PositionsEnum[data["position"]]
+	
+	# Stop any already running tweens and empty buffer
+	position_icon_tweens.map(func(tween): tween.kill())
+	position_icon_tweens = []
+	
+	# Get correct icon node
+	var player_position = _players.relative_position(data["position"])
+	var icon_node = _players.config[player_position]["icon"]
+	
+	# Animate icon "pulse" and add tween to bufffer so we can later kill it again
+	var tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	tween.tween_property(icon_node, "scale", Vector2(1.1, 1.1), 0.4)
+	tween.tween_property(icon_node, "scale", Vector2(0.9, 0.9), 0.4)
+	tween.set_loops()
+	position_icon_tweens.push_back(tween)
 	
 func _on_update_trump(data):
 	if data["trump"] == null:
@@ -124,19 +152,20 @@ func _on_update_points(data):
 	_points_ns_label.text = str(points["NORTH"] + points["SOUTH"])
 	_points_we_label.text = str(points["WEST"] + points["EAST"])
 	
-func player_joined(_player_name, absolute_position):
-	var player_position = _players.relative_position(absolute_position)
+func _on_player_joined(data):
+	var player_position = _players.relative_position(data["player"]["position"])
 	var config = _players.config[player_position]
-	var label = config["node"].get_node("name")
+	var icon_node = config["icon"]
 	
-	label.text = name
-	var from = label.position
-	var to = label.position + (config["offset"]/2)
+	var asset = str("res://assets/positions/", data["player"]["position"],  "-online.svg")
+	icon_node.texture = load(asset)
+	icon_node.show()
+	
+	var to = icon_node.position + (config["offset"]/1.5)
+	if player_position == Players.PositionsEnum.SOUTH:
+		# South needs the icon a little more towards the center because of the cards that are alos there
+		to = icon_node.position + (config["offset"]*2.5)
 
-	var tween = Tween.new()
-	add_child(tween)
-	tween.interpolate_property(
-		label, "position", 
-		from, to, 0.1,
-		Tween.TRANS_QUAD, Tween.EASE_OUT)
-	tween.start()
+	var tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	tween.tween_property(icon_node, "position", to, 0.4)
+	
