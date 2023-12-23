@@ -71,20 +71,13 @@ func _hide_status():
 	_status_label.text = ""
 
 func _on_message(data):
-	if data.has("pub"):
-		var actions = data["pub"]["data"]
-		for action in actions:
-			if socket_actions.has(action["type"]):
-				socket_actions[action["type"]].call(action)
-			else:
-				print("Unknown action: " + action["type"])
-				
-	if data.has("leave"):
-		print("leave")
-		print(data["leave"]["info"])
-		print(Player.game_init_data["otherPlayers"])
-		
-	print(data)
+	var actions = data["pub"]["data"]
+	for action in actions:
+		if socket_actions.has(action["type"]):
+			socket_actions[action["type"]].call(action)
+		else:
+			print("Unknown action: " + action["type"])
+			
 
 func _on_card_played(data):
 	var card = data["card"]
@@ -163,7 +156,7 @@ func _on_player_joined(data):
 	
 	var to = icon_node.position + (config["offset"]/1.5)
 	if player_position == Players.PositionsEnum.SOUTH:
-		# South needs the icon a little more towards the center because of the cards that are alos there
+		# South needs the icon a little more towards the center because of the cards that are also there
 		to = icon_node.position + (config["offset"]*2.5)
 
 	var tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)

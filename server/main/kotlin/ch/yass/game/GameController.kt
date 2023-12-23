@@ -1,7 +1,9 @@
 package ch.yass.game
 
 import arrow.core.raise.either
+import arrow.core.raise.ensure
 import ch.yass.core.contract.Controller
+import ch.yass.core.error.PlayerDoesNotOwnSeat
 import ch.yass.core.helper.errorResponse
 import ch.yass.core.helper.successResponse
 import ch.yass.core.helper.validate
@@ -16,8 +18,10 @@ import ch.yass.identity.helper.player
 import io.javalin.apibuilder.ApiBuilder.post
 import io.javalin.apibuilder.EndpointGroup
 import io.javalin.http.Context
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
-class GameController(private val service: GameService) : Controller {
+class GameController(private val service: GameService, private val repo: GameRepository) : Controller {
     override val path = "/game"
 
     override val endpoints = EndpointGroup {
@@ -26,7 +30,22 @@ class GameController(private val service: GameService) : Controller {
         post("/play", ::play)
         post("/trump", ::trump)
         post("/schiebe", ::schiebe)
+        post("/ping", ::ping)
     }
+
+    private fun ping(ctx: Context) = either {
+        val request = validate<PingSeatRequest>(ctx.body())
+        val player = player(ctx)
+        val state = repo.getState(repo.getBySeatUUID(request.seat))
+
+        ensure(playerOwnsSeat(player, request.seat, state.seats)) { PlayerDoesNotOwnSeat(player, request.seat, state) }
+        repo.pingSeat(request.seat, LocalDateTime.now(ZoneOffset.UTC))
+
+        SuccessfulActionResponse()
+    }.fold(
+        { errorResponse(ctx, it) },
+        { successResponse(ctx, it) }
+    )
 
     private fun create(ctx: Context) = either {
         val request = validate<CreateCustomGameRequest>(ctx.body())

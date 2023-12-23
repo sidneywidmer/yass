@@ -23,13 +23,14 @@ import java.util.*
 class GameRepository(private val db: DSLContext) {
 
     fun createGame(settings: GameSettings): Game {
-        return db.insertInto(GAME, GAME.UUID, GAME.CODE, GAME.CREATED_AT, GAME.UPDATED_AT, GAME.SETTINGS)
+        return db.insertInto(GAME, GAME.UUID, GAME.CODE, GAME.CREATED_AT, GAME.UPDATED_AT, GAME.SETTINGS, GAME.STATUS)
             .values(
                 UUID.randomUUID().toString(),
-                (1..5).map { ('A'..'Z').random() }.joinToString(""),
+                (1..5).map { ('A'..'Z').random() }.joinToString(""), // TODO: Handle collisions
                 LocalDateTime.now(ZoneOffset.UTC),
                 LocalDateTime.now(ZoneOffset.UTC),
-                toDbJson(settings)
+                toDbJson(settings),
+                GameStatus.RUNNING.name
             )
             .returningResult(GAME)
             .fetchOne(mapping(Game::fromRecord))!!
@@ -154,7 +155,15 @@ class GameRepository(private val db: DSLContext) {
             .returningResult(HAND)
             .fetchOne(mapping(Hand::fromRecord))!!
 
-    fun createSeat(seat: NewSeat): Seat {
+    fun pingSeat(seatUuid: String, ping: LocalDateTime): Seat {
+        return db.update(SEAT)
+            .set(SEAT.PLAYER_PING, ping)
+            .where(SEAT.UUID.eq(seatUuid))
+            .returningResult(SEAT)
+            .fetchOneInto(Seat::class.java)!!
+    }
+
+    private fun createSeat(seat: NewSeat): Seat {
         return db
             .insertInto(SEAT, SEAT.UUID, SEAT.PLAYER_ID, SEAT.GAME_ID, SEAT.POSITION, SEAT.CREATED_AT, SEAT.UPDATED_AT)
             .values(

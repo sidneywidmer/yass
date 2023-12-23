@@ -17,6 +17,7 @@ data class Seat(
     val gameId: Int,
     val position: Position,
     val rejoinedAt: LocalDateTime?,
+    val playerPing: LocalDateTime,
 ) {
     /**
      * Helper to map this seats position to the correct db

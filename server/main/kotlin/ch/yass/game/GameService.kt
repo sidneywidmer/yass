@@ -159,6 +159,11 @@ class GameService(
         return repo.getState(game)
     }
 
+    fun ping(player: Player) {
+        repo
+
+    }
+
     /**
      * Controlling our game state. There are some special cases where the game engine is responsible
      * for the next action and not the user:
@@ -260,5 +265,6 @@ class GameService(
 
     private fun publishForSeats(seats: List<Seat>, action: (Seat) -> List<Action>) =
         seats.forEach { pubSub.publish(action.invoke(it), Channel("seat", it.uuid)) }
+
 
 }

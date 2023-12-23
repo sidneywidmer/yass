@@ -18,11 +18,7 @@
   ],
   "namespaces": [
     {
-      hier gehts weiter -> wieso erhalte ich den leave event nicht in Godot. Wir erhalten nur user uuid, wissen wir welches icon rot setzten?
       "name": "seat",
-      "presence": true,
-      "join_leave": true,
-      "force_push_join_leave": true,
       "proxy_subscribe": true
     }
   ]

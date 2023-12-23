@@ -10,6 +10,13 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.typesafe.config.ConfigFactory
 import okhttp3.OkHttpClient
+import org.jobrunr.configuration.JobRunr
+import org.jobrunr.configuration.JobRunrConfiguration
+import org.jobrunr.scheduling.JobScheduler
+import org.jobrunr.server.BackgroundJobServerConfiguration
+import org.jobrunr.storage.InMemoryStorageProvider
+import org.jobrunr.storage.StorageProviderUtils.DatabaseOptions
+import org.jobrunr.storage.sql.common.DefaultSqlStorageProvider
 import org.jooq.DSLContext
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
@@ -26,6 +33,7 @@ import org.zalando.logbook.okhttp.LogbookInterceptor
 import java.sql.DriverManager
 import com.typesafe.config.Config as ConfigSettings
 
+
 object Core {
     val module = DI.Module("Core module") {
         bindSingleton { ConfigFactory.load() }
@@ -37,6 +45,18 @@ object Core {
         bindSingleton { createLogbook() }
         bindSingleton { createCentrifugoClient(instance()) }
         bindSingleton { PubSub(instance(), instance()) }
+        bindSingleton { createJobRunr() }
+    }
+
+    private fun createJobRunr(): JobScheduler {
+        val config = BackgroundJobServerConfiguration.usingStandardBackgroundJobServerConfiguration()
+            .andPollIntervalInSeconds(10)
+
+        return JobRunr.configure()
+            .useStorageProvider(InMemoryStorageProvider())
+            .useBackgroundJobServer(config, true)
+            .initialize()
+            .jobScheduler
     }
 
     private fun createLogbook(): Logbook {
@@ -76,8 +96,8 @@ object Core {
     }
 
     private fun createDSLContext(config: ConfigSettings): DSLContext {
-        System.setProperty("org.jooq.no-tips", "true");
-        System.setProperty("org.jooq.no-logo", "true");
+        System.setProperty("org.jooq.no-tips", "true")
+        System.setProperty("org.jooq.no-logo", "true")
 
         val conn = DriverManager.getConnection(
             config.getString("db.url"),

@@ -19,6 +19,14 @@ func play(game: String, suit: String, rank: String, skin: String, on_success: Ca
 		on_error
 	)
 	
+func ping(seat: String, on_success: Callable, on_error: Callable) -> void:
+	_http_post(
+		"/game/ping",
+		{"seat": seat},
+		on_success,
+		on_error
+	)
+	
 func join(code: String, on_success: Callable, on_error: Callable) -> void:
 	_http_post(
 		"/game/join",
