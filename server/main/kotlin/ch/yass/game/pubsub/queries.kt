@@ -61,7 +61,7 @@ fun cardPlayedActions(state: GameState, card: Card, playedBy: Seat, seat: Seat):
     )
 }
 
-fun trumpChosenActions(state: GameState, trump: Trump, seat: Seat): List<Action> {
+fun trumpChosenActions(state: GameState, trump: Trump): List<Action> {
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
 
@@ -72,7 +72,7 @@ fun trumpChosenActions(state: GameState, trump: Trump, seat: Seat): List<Action>
     )
 }
 
-fun schiebeActions(state: GameState, seat: Seat): List<Action> {
+fun schiebeActions(state: GameState): List<Action> {
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
 
@@ -82,13 +82,35 @@ fun schiebeActions(state: GameState, seat: Seat): List<Action> {
     )
 }
 
-fun playerJoinedActions(state: GameState, newPlayer: Player, joinedAtSeat: Seat, seat: Seat): List<Action> {
+fun playerJoinedActions(state: GameState, newPlayer: Player, joinedAtSeat: Seat): List<Action> {
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
 
     return listOf(
-        PlayerJoined(PlayerAtTable(newPlayer.uuid, newPlayer.name, newPlayer.bot, joinedAtSeat.position)),
+        PlayerJoined(
+            PlayerAtTable(
+                newPlayer.uuid,
+                newPlayer.name,
+                newPlayer.bot,
+                joinedAtSeat.position,
+                joinedAtSeat.status
+            )
+        ),
         UpdateActive(activePosition),
         UpdateState(nextState)
+    )
+}
+
+fun playerDisconnectedActions(state: GameState, dcSeat: Seat, dcPlayer: Player): List<Action> {
+    return listOf(
+        PlayerDisconnected(
+            PlayerAtTable(
+                dcPlayer.uuid,
+                dcPlayer.name,
+                dcPlayer.bot,
+                dcSeat.position,
+                dcSeat.status
+            )
+        )
     )
 }

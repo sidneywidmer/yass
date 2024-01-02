@@ -11,6 +11,6 @@ object Game {
         bindSingleton { PlayerService(instance()) }
         bindSingleton { GameRepository(instance()) }
         bindSingleton { GameService(instance(), instance(), instance()) }
-        bindEagerSingleton { JobsService(instance()) }
+        bindEagerSingleton { JobsService(instance(), instance(), instance()) }
     }
 }

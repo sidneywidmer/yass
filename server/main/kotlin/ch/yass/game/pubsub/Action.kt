@@ -13,5 +13,6 @@ data class UpdateHand(val cards: List<CardInHand>, val newCards: Boolean) : Acti
 data class UpdatePoints(val points: Points) : Action
 data class UpdateTrump(val trump: Trump) : Action
 data class PlayerJoined(val player: PlayerAtTable) : Action
+data class PlayerDisconnected(val player: PlayerAtTable) : Action
 data class Message(val message: String) : Action
 

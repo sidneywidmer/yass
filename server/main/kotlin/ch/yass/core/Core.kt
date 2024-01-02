@@ -1,5 +1,6 @@
 package ch.yass.core
 
+import ch.yass.Yass
 import ch.yass.core.helper.config
 import ch.yass.core.pubsub.PubSub
 import com.fasterxml.jackson.databind.DeserializationFeature
@@ -14,15 +15,16 @@ import org.jobrunr.configuration.JobRunr
 import org.jobrunr.configuration.JobRunrConfiguration
 import org.jobrunr.scheduling.JobScheduler
 import org.jobrunr.server.BackgroundJobServerConfiguration
+import org.jobrunr.server.JobActivator
 import org.jobrunr.storage.InMemoryStorageProvider
 import org.jobrunr.storage.StorageProviderUtils.DatabaseOptions
 import org.jobrunr.storage.sql.common.DefaultSqlStorageProvider
 import org.jooq.DSLContext
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
-import org.kodein.di.DI
-import org.kodein.di.bindSingleton
-import org.kodein.di.instance
+import org.kodein.di.*
+import org.kodein.type.erased
+import org.kodein.type.typeToken
 import org.slf4j.LoggerFactory
 import org.zalando.logbook.Logbook
 import org.zalando.logbook.core.*
@@ -52,8 +54,16 @@ object Core {
         val config = BackgroundJobServerConfiguration.usingStandardBackgroundJobServerConfiguration()
             .andPollIntervalInSeconds(10)
 
+        // JobRunr needs to be able to resolve dependencies from our kodein container
+        val jobActivator: JobActivator = object : JobActivator {
+            override fun <T : Any> activateJob(jobClass: Class<T>): T {
+                return Yass.container.direct.Instance(erased(jobClass))
+            }
+        }
+
         return JobRunr.configure()
             .useStorageProvider(InMemoryStorageProvider())
+            .useJobActivator(jobActivator)
             .useBackgroundJobServer(config, true)
             .initialize()
             .jobScheduler

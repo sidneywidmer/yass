@@ -23,6 +23,7 @@ var socket_actions: Dictionary = {
 	"UpdateTrump": _on_update_trump,
 	"UpdatePoints": _on_update_points,
 	"PlayerJoined": _on_player_joined,
+	"PlayerDisconnected": _on_player_disconnected,
 }
 var trumps: Dictionary = {
 	"SPADES": "♠️",
@@ -144,14 +145,19 @@ func _on_update_points(data):
 	points = data["points"]
 	_points_ns_label.text = str(points["NORTH"] + points["SOUTH"])
 	_points_we_label.text = str(points["WEST"] + points["EAST"])
-	
+
 func _on_player_joined(data):
 	var player_position = _players.relative_position(data["player"]["position"])
 	var config = _players.config[player_position]
 	var icon_node = config["icon"]
 	
-	var asset = str("res://assets/positions/", data["player"]["position"],  "-online.svg")
-	icon_node.texture = load(asset)
+	icon_node.texture = load(_get_position_icon_name(data["player"]))
+	
+	# Early return if node already visible. This means the player connect/disconnected and we 
+	# we don't need to animate it in the viewport, this ist just at the beginning
+	if icon_node.visible == true:
+		return
+	
 	icon_node.show()
 	
 	var to = icon_node.position + (config["offset"]/1.5)
@@ -162,3 +168,17 @@ func _on_player_joined(data):
 	var tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 	tween.tween_property(icon_node, "position", to, 0.4)
 	
+func _get_position_icon_name(data):
+	var position = data["position"].to_lower()
+	var status = "connected" # this default also applies for status BOT, they're always online
+	if data["status"] == "DISCONNECTED":
+		status = "disconnected"
+	return str("res://assets/positions/", position, "-", status, ".svg")
+	
+func _on_player_disconnected(data):
+	var player_position = _players.relative_position(data["player"]["position"])
+	var config = _players.config[player_position]
+	var icon_node = config["icon"]
+#
+	var asset = str("res://assets/positions/", data["player"]["position"],  "-disconnected.svg")
+	icon_node.texture = load(asset)

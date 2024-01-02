@@ -74,7 +74,8 @@ class GameService(
         val joinedAtSeat = repo.takeASeat(game, player)
         val state = repo.getState(game)
 
-        publishForSeats(state.seats) { seat -> playerJoinedActions(state, player, joinedAtSeat, seat) }
+        val actions = playerJoinedActions(state, player, joinedAtSeat)
+        publishForSeats(state.seats) { actions }
 
         gameLoop(game)
 
@@ -131,7 +132,8 @@ class GameService(
 
         repo.chooseTrump(chosenTrump, currentHand)
 
-        publishForSeats(state.seats) { seat -> trumpChosenActions(repo.getState(game), chosenTrump, seat) }
+        val actions = trumpChosenActions(repo.getState(game), chosenTrump)
+        publishForSeats(state.seats) { actions }
 
         gameLoop(game)
 
@@ -152,23 +154,46 @@ class GameService(
 
         repo.schiebe(gschobe, currentHand)
 
-        publishForSeats(state.seats) { seat -> schiebeActions(repo.getState(game), seat) }
+        val actions = schiebeActions(repo.getState(game))
+        publishForSeats(state.seats) { actions }
 
         gameLoop(game)
 
         return repo.getState(game)
     }
 
-    fun ping(player: Player) {
-        repo
+    context(Raise<SeatNotFound>)
+    fun disconnectSeat(seatUUID: UUID) {
+        val game = repo.getBySeatUUID(seatUUID.toString())
+        val state = repo.getState(game)
 
+        val dcSeat = state.seats.first { it.uuid == seatUUID }
+        val dcPlayer = playerAtPosition(dcSeat.position, state.seats, state.allPlayers)!!
+        val actions = playerDisconnectedActions(state, dcSeat, dcPlayer)
+
+        repo.updateSeatStatus(dcSeat, SeatStatus.DISCONNECTED)
+        publishForSeats(state.seats) { actions }
     }
+
+    context(Raise<SeatNotFound>)
+    fun connectSeat(seat: Seat) {
+        val game = repo.getBySeatUUID(seat.uuid.toString())
+        val state = repo.getState(game)
+        val player = playerAtPosition(seat.position, state.seats, state.allPlayers)!!
+        val actions = playerJoinedActions(state, player, seat)
+
+        repo.updateSeatStatus(seat, SeatStatus.CONNECTED)
+        publishForSeats(state.seats) { actions }
+    }
+
+    private fun publishForSeats(seats: List<Seat>, action: (Seat) -> List<Action>) =
+        seats.forEach { pubSub.publish(action.invoke(it), Channel("seat", it.uuid)) }
 
     /**
      * Controlling our game state. There are some special cases where the game engine is responsible
      * for the next action and not the user:
      *
-     * - PLAY_CARD_BOT -> Wait for 1.5s then play the card async
+     * - PLAY_CARD_BOT -> Wait, then play the card async
      * - NEW_TRICK -> Wait 1s before creating the new trick async
      * - NEW_TRICK -> Call gameLoop again, the next state could e.g. be PLAY_CARD_BOT
      * - NEW_HAND -> Call gameLoop again, the next state again could be a BOT action
@@ -199,7 +224,8 @@ class GameService(
             State.NEW_TRICK -> GlobalScope.launch {
                 delay(1000)
                 repo.createTrick(currentHand)
-                publishForSeats(updatedState.seats) { seat -> newTrickActions(repo.getState(game), seat) }
+                val state = repo.getState(game)
+                publishForSeats(updatedState.seats) { seat -> newTrickActions(state, seat) }
                 gameLoop(game)
             }
 
@@ -212,7 +238,8 @@ class GameService(
                 )
                 val newHand = repo.createHand(NewHand(game, startingPlayer, randomHand()))
                 repo.createTrick(newHand)
-                publishForSeats(updatedState.seats) { seat -> newHandActions(repo.getState(game), seat) }
+                val state = repo.getState(game)
+                publishForSeats(updatedState.seats) { seat -> newHandActions(state, seat) }
                 gameLoop(game)
             }
         }
@@ -262,9 +289,4 @@ class GameService(
 
         return schiebe(request, botPlayer)
     }
-
-    private fun publishForSeats(seats: List<Seat>, action: (Seat) -> List<Action>) =
-        seats.forEach { pubSub.publish(action.invoke(it), Channel("seat", it.uuid)) }
-
-
 }

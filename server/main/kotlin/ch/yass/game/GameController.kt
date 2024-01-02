@@ -6,12 +6,14 @@ import ch.yass.core.contract.Controller
 import ch.yass.core.error.PlayerDoesNotOwnSeat
 import ch.yass.core.helper.errorResponse
 import ch.yass.core.helper.successResponse
+import ch.yass.core.helper.toUUID
 import ch.yass.core.helper.validate
 import ch.yass.game.api.*
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.PlayerAtTable
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.SeatState
+import ch.yass.game.dto.SeatStatus
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
 import ch.yass.identity.helper.player
@@ -37,9 +39,15 @@ class GameController(private val service: GameService, private val repo: GameRep
         val request = validate<PingSeatRequest>(ctx.body())
         val player = player(ctx)
         val state = repo.getState(repo.getBySeatUUID(request.seat))
+        val seat = state.seats.first { it.uuid == request.seat.toUUID() }
 
         ensure(playerOwnsSeat(player, request.seat, state.seats)) { PlayerDoesNotOwnSeat(player, request.seat, state) }
-        repo.pingSeat(request.seat, LocalDateTime.now(ZoneOffset.UTC))
+
+        if (seat.status == SeatStatus.DISCONNECTED) {
+            service.connectSeat(seat)
+        }
+
+        repo.pingSeat(seat, LocalDateTime.now(ZoneOffset.UTC))
 
         SuccessfulActionResponse()
     }.fold(
@@ -66,8 +74,22 @@ class GameController(private val service: GameService, private val repo: GameRep
         val seat = mapSeat(playerSeat(player, state.seats), state)
         val playedCards = currentTrick(state.tricks)!!.cardsByPosition()
         val otherPlayers = Position.entries
-            .map { pos -> Pair(pos, playerAtPosition(pos, state.seats, state.allPlayers)) }
-            .mapNotNull { pair -> pair.second?.let { PlayerAtTable(it.uuid, it.name, it.bot, pair.first) } }
+            .map { pos ->
+                val player = playerAtPosition(pos, state.seats, state.allPlayers)
+                val seat = player?.let { playerSeat(player, state.seats) }
+                Pair(seat, player)
+            }
+            .mapNotNull { pair ->
+                pair.second?.let {
+                    PlayerAtTable(
+                        it.uuid,
+                        it.name,
+                        it.bot,
+                        pair.first!!.position,
+                        pair.first!!.status
+                    )
+                }
+            }
 
         JoinGameResponse(state.game.uuid, state.game.code, seat, playedCards, otherPlayers)
     }.fold(
