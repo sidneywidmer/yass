@@ -20,7 +20,9 @@ data class Seat(
     var playerId: Int? = null,
     var gameId: Int? = null,
     var position: String? = null,
-    var rejoinedAt: LocalDateTime? = null
+    var rejoinedAt: LocalDateTime? = null,
+    var playerPing: LocalDateTime? = null,
+    var status: String? = null
 ): Serializable {
 
 
@@ -80,6 +82,18 @@ data class Seat(
         }
         else if (this.rejoinedAt != o.rejoinedAt)
             return false
+        if (this.playerPing === null) {
+            if (o.playerPing !== null)
+                return false
+        }
+        else if (this.playerPing != o.playerPing)
+            return false
+        if (this.status === null) {
+            if (o.status !== null)
+                return false
+        }
+        else if (this.status != o.status)
+            return false
         return true
     }
 
@@ -94,6 +108,8 @@ data class Seat(
         result = prime * result + (if (this.gameId === null) 0 else this.gameId.hashCode())
         result = prime * result + (if (this.position === null) 0 else this.position.hashCode())
         result = prime * result + (if (this.rejoinedAt === null) 0 else this.rejoinedAt.hashCode())
+        result = prime * result + (if (this.playerPing === null) 0 else this.playerPing.hashCode())
+        result = prime * result + (if (this.status === null) 0 else this.status.hashCode())
         return result
     }
 
@@ -108,6 +124,8 @@ data class Seat(
         sb.append(", ").append(gameId)
         sb.append(", ").append(position)
         sb.append(", ").append(rejoinedAt)
+        sb.append(", ").append(playerPing)
+        sb.append(", ").append(status)
 
         sb.append(")")
         return sb.toString()

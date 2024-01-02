@@ -23,13 +23,14 @@ import java.util.*
 class GameRepository(private val db: DSLContext) {
 
     fun createGame(settings: GameSettings): Game {
-        return db.insertInto(GAME, GAME.UUID, GAME.CODE, GAME.CREATED_AT, GAME.UPDATED_AT, GAME.SETTINGS)
+        return db.insertInto(GAME, GAME.UUID, GAME.CODE, GAME.CREATED_AT, GAME.UPDATED_AT, GAME.SETTINGS, GAME.STATUS)
             .values(
                 UUID.randomUUID().toString(),
-                (1..5).map { ('A'..'Z').random() }.joinToString(""),
+                (1..5).map { ('A'..'Z').random() }.joinToString(""), // TODO: Handle collisions
                 LocalDateTime.now(ZoneOffset.UTC),
                 LocalDateTime.now(ZoneOffset.UTC),
-                toDbJson(settings)
+                toDbJson(settings),
+                GameStatus.RUNNING.name
             )
             .returningResult(GAME)
             .fetchOne(mapping(Game::fromRecord))!!
@@ -96,6 +97,14 @@ class GameRepository(private val db: DSLContext) {
             .returningResult(HAND)
             .fetchOneInto(Hand::class.java)!!
 
+    fun updateSeatStatus(seat: Seat, status: SeatStatus): Seat =
+        db.update(SEAT)
+            .set(SEAT.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
+            .set(SEAT.STATUS, status.name)
+            .where(SEAT.ID.eq(seat.id))
+            .returningResult(SEAT)
+            .fetchOneInto(Seat::class.java)!!
+
     fun schiebe(gschobe: Gschobe, hand: Hand): Hand =
         db.update(HAND)
             .set(HAND.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
@@ -154,14 +163,34 @@ class GameRepository(private val db: DSLContext) {
             .returningResult(HAND)
             .fetchOne(mapping(Hand::fromRecord))!!
 
-    fun createSeat(seat: NewSeat): Seat {
+    fun pingSeat(seat: Seat, ping: LocalDateTime): Seat {
+        return db.update(SEAT)
+            .set(SEAT.PLAYER_PING, ping)
+            .where(SEAT.ID.eq(seat.id))
+            .returningResult(SEAT)
+            .fetchOneInto(Seat::class.java)!!
+    }
+
+    private fun createSeat(seat: NewSeat): Seat {
         return db
-            .insertInto(SEAT, SEAT.UUID, SEAT.PLAYER_ID, SEAT.GAME_ID, SEAT.POSITION, SEAT.CREATED_AT, SEAT.UPDATED_AT)
+            .insertInto(
+                SEAT,
+                SEAT.UUID,
+                SEAT.PLAYER_ID,
+                SEAT.GAME_ID,
+                SEAT.POSITION,
+                SEAT.PLAYER_PING,
+                SEAT.STATUS,
+                SEAT.CREATED_AT,
+                SEAT.UPDATED_AT
+            )
             .values(
                 UUID.randomUUID().toString(),
                 seat.player.id,
                 seat.game.id,
                 seat.position.toString(),
+                LocalDateTime.now(ZoneOffset.UTC), // Everyone gets one free ping, just to avoid false positive PlayerDisconnected events
+                if (seat.player.bot) SeatStatus.BOT.name else SeatStatus.CONNECTED.name,
                 LocalDateTime.now(ZoneOffset.UTC),
                 LocalDateTime.now(ZoneOffset.UTC)
             )
@@ -192,9 +221,18 @@ class GameRepository(private val db: DSLContext) {
             .fetch(Hand::fromRecord)
 
     private fun rejoinSeat(seat: Seat): Seat {
+        // In case the game was set to STALE in the meantime...
+        db.update(GAME)
+            .set(GAME.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
+            .set(GAME.STATUS, GameStatus.RUNNING.name)
+            .where(GAME.ID.eq(seat.gameId))
+            .execute()
+
         return db.update(SEAT)
             .set(SEAT.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
             .set(SEAT.REJOINED_AT, LocalDateTime.now(ZoneOffset.UTC))
+            .set(SEAT.PLAYER_PING, LocalDateTime.now(ZoneOffset.UTC)) // Avoids race condition with playerPing job
+            .set(SEAT.STATUS, SeatStatus.CONNECTED.name)
             .where(SEAT.ID.eq(seat.id))
             .returningResult(SEAT)
             .fetchOneInto(Seat::class.java)!!

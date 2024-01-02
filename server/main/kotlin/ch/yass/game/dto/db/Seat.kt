@@ -3,6 +3,7 @@ package ch.yass.game.dto.db
 import ch.yass.db.tables.records.TrickRecord
 import ch.yass.db.tables.references.TRICK
 import ch.yass.game.dto.Position
+import ch.yass.game.dto.SeatStatus
 import org.jooq.JSON
 import org.jooq.TableField
 import java.time.LocalDateTime
@@ -16,7 +17,9 @@ data class Seat(
     val playerId: Int,
     val gameId: Int,
     val position: Position,
+    val status: SeatStatus,
     val rejoinedAt: LocalDateTime?,
+    val playerPing: LocalDateTime,
 ) {
     /**
      * Helper to map this seats position to the correct db

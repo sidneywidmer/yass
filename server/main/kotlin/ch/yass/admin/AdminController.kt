@@ -3,7 +3,6 @@ package ch.yass.admin
 import arrow.core.raise.either
 import arrow.core.raise.recover
 import ch.yass.admin.api.GenerateHandResponse
-import ch.yass.admin.api.PlayGameResponse
 import ch.yass.admin.dsl.game
 import ch.yass.core.contract.Controller
 import ch.yass.core.helper.errorResponse

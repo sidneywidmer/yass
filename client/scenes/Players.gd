@@ -9,9 +9,15 @@ enum PositionsEnum {NORTH, EAST, SOUTH, WEST}
 @onready var north := %North
 @onready var east := %East
 @onready var west := %West
+@onready var north_icon := %NorthIcon
+@onready var east_icon := %EastIcon
+@onready var south_icon := %SouthIcon
+@onready var west_icon := %WestIcon
+
 @onready var config = {
 	PositionsEnum.NORTH: {
 		"label": tr("game.lbl.north"),
+		"icon": north_icon,
 		"node": north, 
 		"offset": Vector2(0, 80), 
 		"rotate": 0, 
@@ -19,6 +25,7 @@ enum PositionsEnum {NORTH, EAST, SOUTH, WEST}
 	},
 	PositionsEnum.EAST: {
 		"label": tr("game.lbl.easth"),
+		"icon": east_icon,
 		"node": east, 
 		"offset": Vector2(-80, 0), 
 		"rotate": 15, 
@@ -26,6 +33,7 @@ enum PositionsEnum {NORTH, EAST, SOUTH, WEST}
 	},
 	PositionsEnum.SOUTH: {
 		"label": tr("game.lbl.south"),
+		"icon": south_icon,
 		"node": hand, 
 		"offset": Vector2(0, -80), 
 		"rotate": -15, 
@@ -33,6 +41,7 @@ enum PositionsEnum {NORTH, EAST, SOUTH, WEST}
 	},
 	PositionsEnum.WEST: {
 		"label": tr("game.lbl.west"),
+		"icon": west_icon,
 		"node": west, 
 		"offset": Vector2(80, 0), 
 		"rotate": -15, 

@@ -53,14 +53,18 @@ func update(cards: Array, new_cards: bool):
 	# If we get new_cards, remove all the cards we currently hold and 
 	# replace them with the new set - otherwise just update the hand.
 	if new_cards == true:
-		self.get_children().map(func(card): card.queue_free())
+		self.get_cards().map(func(card): card.queue_free())
 		
 		return await draw(cards)
 		
 	for card in cards:
-		for card_instance in self.get_children():
+		for card_instance in self.get_cards():
 			if card["suit"] == card_instance.suit and card["rank"] == card_instance.rank:
 				card_instance.state = card["state"]
+
+func get_cards():
+	# We don't want the Sprite2D children, they're only for the position icon
+	return self.get_children().filter(func(child): return !child.is_class("Sprite2D"))
 
 func _on_play_success(_data):
 	pass
@@ -82,7 +86,7 @@ func rearange_hand():
 	var vertical_shrink = 0.0005 
 	var card_rotation = 1.2
 	
-	var cards = self.get_children()
+	var cards = self.get_cards()
 	if len(cards) == 0:
 		return
 	

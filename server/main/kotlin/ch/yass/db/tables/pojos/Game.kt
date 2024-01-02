@@ -20,7 +20,8 @@ data class Game(
     var createdAt: LocalDateTime? = null,
     var updatedAt: LocalDateTime? = null,
     var code: String? = null,
-    var settings: JSON? = null
+    var settings: JSON? = null,
+    var status: String? = null
 ): Serializable {
 
 
@@ -68,6 +69,12 @@ data class Game(
         }
         else if (this.settings != o.settings)
             return false
+        if (this.status === null) {
+            if (o.status !== null)
+                return false
+        }
+        else if (this.status != o.status)
+            return false
         return true
     }
 
@@ -80,6 +87,7 @@ data class Game(
         result = prime * result + (if (this.updatedAt === null) 0 else this.updatedAt.hashCode())
         result = prime * result + (if (this.code === null) 0 else this.code.hashCode())
         result = prime * result + (if (this.settings === null) 0 else this.settings.hashCode())
+        result = prime * result + (if (this.status === null) 0 else this.status.hashCode())
         return result
     }
 
@@ -92,6 +100,7 @@ data class Game(
         sb.append(", ").append(updatedAt)
         sb.append(", ").append(code)
         sb.append(", ").append(settings)
+        sb.append(", ").append(status)
 
         sb.append(")")
         return sb.toString()

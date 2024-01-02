@@ -15,10 +15,14 @@ var _socket = WebSocketPeer.new()
 var _socket_poll: bool = false
 var _socket_connected: bool = false
 var _socket_channels: Dictionary = {}
+var _ping_timer = Timer.new()
 
 func _ready():
 	config = ConfigFile.new()
 	config.load(SETTINGS_FILE)
+	
+	_ping_timer.wait_time = 5.0
+	get_tree().get_root().add_child.call_deferred(_ping_timer)
 	
 	load_values()
 	
@@ -32,10 +36,24 @@ func socket_connect():
 	
 func socket_disconnect():
 	_socket.close()
+	_ping_timer.stop()
 
 func socket_seat_subscribe(uuid: String, on_message: Callable):
 	var channel = "seat:#{uuid}".format({"uuid": uuid})
 	_socket_subscribe(channel, on_message)
+	
+	# Start our player heartbeat/ping
+	_ping_timer.start()
+	_ping_timer.timeout.connect(_on_ping_timeout)
+	
+func _on_ping_timeout():
+	ApiClient.ping(Player.game_init_data["seat"]["uuid"], _on_ping_success, _on_ping_timeout)
+	
+func _on_ping_success(_data):
+	pass
+	
+func _on_schiebe_failed(_response_code: int, _result: int, _parsed):
+	print("Ping failed")
 	
 func _socket_subscribe(channel: String, on_message: Callable):
 	_socket.send_text(JSON.stringify({"subscribe":{"channel": channel},"id":2}))
@@ -87,7 +105,7 @@ func _process(_delta):
 
 			var parsed = JSON.parse_string(packet)
 			if parsed.has("push"):
-				_socket_channels[parsed["push"]["channel"]].call(parsed["push"]["pub"]["data"])
+				_socket_channels[parsed["push"]["channel"]].call(parsed["push"])
 				
 	elif state == WebSocketPeer.STATE_CLOSING:
 		pass

@@ -19,7 +19,6 @@
   "namespaces": [
     {
       "name": "seat",
-      "presence": true,
       "proxy_subscribe": true
     }
   ]

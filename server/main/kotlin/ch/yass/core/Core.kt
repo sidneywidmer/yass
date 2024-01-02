@@ -1,5 +1,6 @@
 package ch.yass.core
 
+import ch.yass.Yass
 import ch.yass.core.helper.config
 import ch.yass.core.pubsub.PubSub
 import com.fasterxml.jackson.databind.DeserializationFeature
@@ -10,12 +11,20 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.typesafe.config.ConfigFactory
 import okhttp3.OkHttpClient
+import org.jobrunr.configuration.JobRunr
+import org.jobrunr.configuration.JobRunrConfiguration
+import org.jobrunr.scheduling.JobScheduler
+import org.jobrunr.server.BackgroundJobServerConfiguration
+import org.jobrunr.server.JobActivator
+import org.jobrunr.storage.InMemoryStorageProvider
+import org.jobrunr.storage.StorageProviderUtils.DatabaseOptions
+import org.jobrunr.storage.sql.common.DefaultSqlStorageProvider
 import org.jooq.DSLContext
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
-import org.kodein.di.DI
-import org.kodein.di.bindSingleton
-import org.kodein.di.instance
+import org.kodein.di.*
+import org.kodein.type.erased
+import org.kodein.type.typeToken
 import org.slf4j.LoggerFactory
 import org.zalando.logbook.Logbook
 import org.zalando.logbook.core.*
@@ -25,6 +34,7 @@ import org.zalando.logbook.json.JsonHttpLogFormatter
 import org.zalando.logbook.okhttp.LogbookInterceptor
 import java.sql.DriverManager
 import com.typesafe.config.Config as ConfigSettings
+
 
 object Core {
     val module = DI.Module("Core module") {
@@ -37,6 +47,26 @@ object Core {
         bindSingleton { createLogbook() }
         bindSingleton { createCentrifugoClient(instance()) }
         bindSingleton { PubSub(instance(), instance()) }
+        bindSingleton { createJobRunr() }
+    }
+
+    private fun createJobRunr(): JobScheduler {
+        val config = BackgroundJobServerConfiguration.usingStandardBackgroundJobServerConfiguration()
+            .andPollIntervalInSeconds(10)
+
+        // JobRunr needs to be able to resolve dependencies from our kodein container
+        val jobActivator: JobActivator = object : JobActivator {
+            override fun <T : Any> activateJob(jobClass: Class<T>): T {
+                return Yass.container.direct.Instance(erased(jobClass))
+            }
+        }
+
+        return JobRunr.configure()
+            .useStorageProvider(InMemoryStorageProvider())
+            .useJobActivator(jobActivator)
+            .useBackgroundJobServer(config, true)
+            .initialize()
+            .jobScheduler
     }
 
     private fun createLogbook(): Logbook {
@@ -76,8 +106,8 @@ object Core {
     }
 
     private fun createDSLContext(config: ConfigSettings): DSLContext {
-        System.setProperty("org.jooq.no-tips", "true");
-        System.setProperty("org.jooq.no-logo", "true");
+        System.setProperty("org.jooq.no-tips", "true")
+        System.setProperty("org.jooq.no-logo", "true")
 
         val conn = DriverManager.getConnection(
             config.getString("db.url"),
