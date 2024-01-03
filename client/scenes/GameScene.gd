@@ -9,6 +9,7 @@ extends Node2D
 @onready var _choose_trump_gui = %ChooseTrump
 @onready var _game_finished_gui = %GameFinished
 @onready var _status_label = %StatusLabel
+@onready var _confetti = %Confetti
 
 var position_icon_tweens: Array
 var active_position: Players.PositionsEnum
@@ -192,4 +193,5 @@ func _on_player_disconnected(data):
 	icon_node.texture = load(asset)
 	
 func _on_game_finished(data):
+	_confetti.start()
 	_game_finished_gui.slide_in(data)
