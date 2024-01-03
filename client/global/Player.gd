@@ -32,10 +32,13 @@ func socket_connect():
 	_socket.set_handshake_headers(["X-Session-Token: {session}".format({"session": _ory_session})])
 	_socket.connect_to_url("ws://127.0.0.1:8000/connection/websocket")
 	_socket_poll = true
-	set_process(true)
 	
 func socket_disconnect():
 	_socket.close()
+	
+func socket_seat_unsubscribe(uuid: String):
+	var channel = "seat:#{uuid}".format({"uuid": uuid})
+	_socket.send_text(JSON.stringify({"unsubscribe":{"channel": channel},"id":2}))
 	_ping_timer.stop()
 
 func socket_seat_subscribe(uuid: String, on_message: Callable):
@@ -112,6 +115,6 @@ func _process(_delta):
 		
 	elif state == WebSocketPeer.STATE_CLOSED:
 		_socket_connected = false
+		_socket_poll = false
 		var code = _socket.get_close_code()
 		var reason = _socket.get_close_reason()
-		set_process(false)

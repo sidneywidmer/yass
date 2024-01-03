@@ -171,6 +171,14 @@ class GameRepository(private val db: DSLContext) {
             .fetchOneInto(Seat::class.java)!!
     }
 
+    fun finishGame(game: Game): Game {
+        return db.update(GAME)
+            .set(GAME.STATUS, GameStatus.FINISHED.name)
+            .where(GAME.ID.eq(game.id))
+            .returningResult(GAME)
+            .fetchOneInto(Game::class.java)!!
+    }
+
     private fun createSeat(seat: NewSeat): Seat {
         return db
             .insertInto(
@@ -237,5 +245,6 @@ class GameRepository(private val db: DSLContext) {
             .returningResult(SEAT)
             .fetchOneInto(Seat::class.java)!!
     }
+
 
 }

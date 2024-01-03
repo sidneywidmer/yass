@@ -24,7 +24,7 @@ enum PositionsEnum {NORTH, EAST, SOUTH, WEST}
 		"off_table": Vector2(0, 100)
 	},
 	PositionsEnum.EAST: {
-		"label": tr("game.lbl.easth"),
+		"label": tr("game.lbl.east"),
 		"icon": east_icon,
 		"node": east, 
 		"offset": Vector2(-80, 0), 

@@ -3,7 +3,6 @@ package ch.yass.game.pubsub
 import ch.yass.core.pubsub.Action
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Player
-import ch.yass.game.dto.db.Seat
 
 data class CardPlayed(val card: CardOnTable) : Action
 data class ClearPlayedCards(val position: Position) : Action
@@ -14,5 +13,10 @@ data class UpdatePoints(val points: Points) : Action
 data class UpdateTrump(val trump: Trump) : Action
 data class PlayerJoined(val player: PlayerAtTable) : Action
 data class PlayerDisconnected(val player: PlayerAtTable) : Action
-data class Message(val message: String) : Action
+data class GameFinished(
+    val winners: List<Player>,
+    val losers: List<Player>,
+    val winnerPoints: Int,
+    val loserPoints: Int
+) : Action
 

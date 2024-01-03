@@ -4,20 +4,18 @@ extends Control
 @onready var background = %Background
 @onready var container = %Container
 
-@export var content_scene: PackedScene
-
 var content = null
 var original_position = null
 
-# Ensure content has an add_additional_params and a before_slide_in function
-# so we can pass data through. I bet there's a better way to do this 
-# with either inerhitance or signals...
 func _ready():
-	content = content_scene.instantiate()
-	container.add_child(content)
-	self.visible = true # Not 100% sure why this is needed but without it the size of the node is wrong
 	original_position = overlay.global_position.y
-	self.visible = false
+	
+	# Content needs a script with two functions:
+	# - add_additional_params
+	# - before_slide_in
+	# With these we can react to those two events, i bet there's a better 
+	# way with signals but for now this works :)
+	content = container.get_child(0)
 	
 func pass_additional_params(params: Dictionary):
 	params["parent_overlay"] = self

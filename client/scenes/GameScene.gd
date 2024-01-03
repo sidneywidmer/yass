@@ -7,7 +7,9 @@ extends Node2D
 @onready var _points_we_label = %PointsWE
 @onready var _trump_label = %Trump
 @onready var _choose_trump_gui = %ChooseTrump
+@onready var _game_finished_gui = %GameFinished
 @onready var _status_label = %StatusLabel
+@onready var _confetti = %Confetti
 
 var position_icon_tweens: Array
 var active_position: Players.PositionsEnum
@@ -24,6 +26,7 @@ var socket_actions: Dictionary = {
 	"UpdatePoints": _on_update_points,
 	"PlayerJoined": _on_player_joined,
 	"PlayerDisconnected": _on_player_disconnected,
+	"GameFinished": _on_game_finished,
 }
 var trumps: Dictionary = {
 	"SPADES": "♠️",
@@ -34,6 +37,12 @@ var trumps: Dictionary = {
 	"OBEABE": "⬇️️",
 	"FREESTYLE": "🆓",
 }
+
+func _input(event):
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_Q:
+			Player.socket_seat_unsubscribe(Player.game_init_data["seat"]["uuid"])
+			SceneSwitcher.switch("res://scenes/MainMenuScene.tscn")
 
 func _ready():
 	_hand.game_scene = self
@@ -182,3 +191,7 @@ func _on_player_disconnected(data):
 #
 	var asset = str("res://assets/positions/", data["player"]["position"],  "-disconnected.svg")
 	icon_node.texture = load(asset)
+	
+func _on_game_finished(data):
+	_confetti.start()
+	_game_finished_gui.slide_in(data)
