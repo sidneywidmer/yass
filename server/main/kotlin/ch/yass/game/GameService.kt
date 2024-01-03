@@ -46,13 +46,16 @@ class GameService(
         ensure(validWcValue) { GameSettingsInvalidValue(settings) }
 
         val game = repo.createGame(settings)
-        val botNames = arrayOf(
+        val botNames = arrayListOf(
             "Rolf", "Heidi", "Urs", "Elsbeth", "Matthias", "François", "Chantal", "Pierre", "Brigitte", "Michel",
             "Giuseppe", "Maria", "Marco", "Lucia", "Roberto", "Gian", "Anna", "Silvan", "Petra", "Lukas"
         )
 
+        // TODO: This will need som refactoring: We should not create a new player for every bot but instead
+        //       move some of this logic to the seat and all bots can have the same names...
         settings.botPositions().map { position ->
-            val botPlayer = playerService.create(NewPlayer(UUID.randomUUID(), botNames.random(), true))
+            val botName = botNames.removeAt((0 until botNames.size).random()) // Avoids duplicate names
+            val botPlayer = playerService.create(NewPlayer(UUID.randomUUID(), botName, true))
             repo.takeASeat(game, botPlayer, position)
         }
         repo.takeASeat(game, player)
@@ -212,7 +215,10 @@ class GameService(
         when (nextStateLoop) {
             State.WAITING_FOR_PLAYERS -> {}
             State.FINISHED -> {
-                publishForSeats(updatedState.seats) { listOf(Message("Game finished!")) }
+                repo.finishGame(game)
+                val state = repo.getState(game)
+                val actions = gameFinishedActions(state)
+                publishForSeats(updatedState.seats) { actions }
             }
 
             State.PLAY_CARD -> {}

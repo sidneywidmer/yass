@@ -33,3 +33,6 @@ game.lbl.north,Norden,North
 game.lbl.east,Osten,East
 game.lbl.south,Süden,South
 game.lbl.west,Westen,West
+game.finished.lbl.title,Spielende,We have a winner
+game.finished.lbl.text,Gewonnen haben {winner1} + {winner2} mit {winner_points} Punkten gegen {loser1} + {loser2} mit {loser_points} Punkten!,The winners are {winner1} + {winner2} with {winner_points} points versus {loser1} + {loser2} with {loser_points} points!
+game.finished.btn.back,Zurück zum Hauptmenü,Back to Mainmenu
