@@ -39,7 +39,7 @@ func _http_post_form(endpoint: String, body: Dictionary, on_success: Callable, o
 	request.request(base_url + endpoint, headers, HTTPClient.METHOD_POST, bodyEncoded)
 	
 func _http_post(endpoint: String, body: Dictionary, on_success: Callable, on_error: Callable) -> void:
-	var headers = ["Accept: application/json"]
+	var headers = ["Accept: application/json", "Content-Type: application/json"]
 	if use_ory_session:
 		headers.append("X-Session-Token: {token}".format({"token": Player._ory_session}))
 	

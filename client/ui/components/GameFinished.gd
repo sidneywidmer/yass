@@ -2,7 +2,7 @@ extends VBoxContainer
 
 @onready var _winners_text = %WinnersText
 
-func add_additional_params(params: Dictionary):
+func add_additional_params(_params: Dictionary):
 	pass
 
 func before_slide_in(params: Dictionary):

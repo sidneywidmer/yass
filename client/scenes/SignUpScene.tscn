@@ -1,0 +1,102 @@
+[gd_scene load_steps=3 format=3 uid="uid://ba0sek1ih2044"]
+
+[ext_resource type="Script" path="res://scenes/SignUpScene.gd" id="1_1uiq5"]
+[ext_resource type="PackedScene" uid="uid://8213lw6ps1sr" path="res://ui/overlays/LoadingOverlay.tscn" id="1_7nplf"]
+
+[node name="SignUpScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_1uiq5")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="MarginContainer" type="MarginContainer" parent="UI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_top = 50
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "signup.lbl.signup"
+
+[node name="ErrorLabel" type="Label" parent="UI/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.921569, 0.301961, 0.294118, 1)
+text = "Error: Txt asdf asdlökfj aösdlkfj aösldkjf aösldkfj aölsdkfj aölskdfj öalksdjf asdöfl kjasdf "
+autowrap_mode = 2
+
+[node name="VBoxName" type="VBoxContainer" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Label" type="Label" parent="UI/MarginContainer/VBoxContainer/VBoxName"]
+layout_mode = 2
+text = "signup.lbl.name"
+
+[node name="Name" type="LineEdit" parent="UI/MarginContainer/VBoxContainer/VBoxName"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxEMail" type="VBoxContainer" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Label" type="Label" parent="UI/MarginContainer/VBoxContainer/VBoxEMail"]
+layout_mode = 2
+text = "signup.lbl.email"
+
+[node name="EMail" type="LineEdit" parent="UI/MarginContainer/VBoxContainer/VBoxEMail"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxPW" type="VBoxContainer" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Label" type="Label" parent="UI/MarginContainer/VBoxContainer/VBoxPW"]
+layout_mode = 2
+text = "signup.lbl.password"
+
+[node name="Password" type="LineEdit" parent="UI/MarginContainer/VBoxContainer/VBoxPW"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+secret = true
+
+[node name="MarginContainerBtn" type="MarginContainer" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_top = 40
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer/VBoxContainer/MarginContainerBtn"]
+layout_mode = 2
+
+[node name="SignUpButton" type="Button" parent="UI/MarginContainer/VBoxContainer/MarginContainerBtn/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "signup.btn.signup"
+
+[node name="BackButton" type="Button" parent="UI/MarginContainer/VBoxContainer/MarginContainerBtn/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "signup.btn.back"
+
+[node name="LoadingOverlay" parent="UI" instance=ExtResource("1_7nplf")]
+unique_name_in_owner = true
+visible = false

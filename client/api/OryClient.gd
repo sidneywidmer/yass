@@ -21,6 +21,27 @@ func login_flow(on_success: Callable, on_error: Callable) -> void:
 		[]
 	)
 	
+func signup_flow(on_success: Callable, on_error: Callable) -> void:
+	_http_get(
+		"/self-service/registration/api",
+		on_success,
+		on_error,
+		[]
+	)
+	
+func signup(username: String, email: String, password: String, flow: String, on_success: Callable, on_error: Callable) -> void:
+	_http_post(
+		"/self-service/registration?flow={flow}".format({"flow": flow}),
+		{
+			"traits.email": email,
+			"traits.name": username,
+			"password": password,
+			"method": "password"
+		},
+		on_success,
+		on_error
+	)
+	
 func login(flow: String, identifier: String, password: String, on_success: Callable, on_error: Callable) -> void:
 	var fields = {"method": "password", "password": password, "identifier": identifier}
 	
