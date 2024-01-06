@@ -4,17 +4,22 @@ extends Node2D
 @onready var email := %EMail
 @onready var password := %Password
 @onready var login_button := %LoginButton
+@onready var signup_button := %SignUpButton
 @onready var error := %ErrorLabel
 
 var auth_flow = null
 
 func _ready() -> void:
-	loading.visible = true
-	
-	OryClient.whoami(_on_whoami_success, _on_whoami_failed)
+	if OS.is_debug_build() and Player.profile == "":
+		SceneSwitcher.switch("res://scenes/ChooseProfileScene.tscn")
+		
+	if Player.profile != "":
+		loading.visible = true
+		OryClient.whoami(_on_whoami_success, _on_whoami_failed)
 	
 	email.text = Player._email
 	login_button.pressed.connect(_on_login_button_pressed)
+	signup_button.pressed.connect(_on_signup_button_pressed)
 	email.grab_focus()
 
 func _on_login_button_pressed() -> void:
@@ -25,6 +30,9 @@ func _on_login_button_pressed() -> void:
 		_on_login_success,
 		_on_login_failed
 	)
+	
+func _on_signup_button_pressed() -> void:
+	SceneSwitcher.switch("res://scenes/SignUpScene.tscn")
 	
 func _on_whoami_success(_data):
 	loading.fade_out()

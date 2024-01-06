@@ -1,12 +1,12 @@
 extends Node
 
 const SECTION = "auth"
-const SETTINGS_FILE = "user://settings.cfg"
 
 var game_init_data: Dictionary
 var game_scene: Node2D
 var position: Players.PositionsEnum
 var config: ConfigFile
+var profile: String
 
 var _ory_session: String
 var _email: String
@@ -18,14 +18,25 @@ var _socket_channels: Dictionary = {}
 var _ping_timer = Timer.new()
 
 func _ready():
+	# If it's a debug build we first need to select a profile since godot 
+	# can not yet detect the different debug windows. So for us to "login"
+	# as different users in debug we chosse the profile in ChooseProfileScene
+	if !OS.is_debug_build():
+		profile = "default"
+		boot()
+	
+func boot():
 	config = ConfigFile.new()
-	config.load(SETTINGS_FILE)
+	config.load(_get_settings_file())
 	
 	_ping_timer.wait_time = 5.0
 	get_tree().get_root().add_child.call_deferred(_ping_timer)
 	
 	load_values()
-	
+
+func _get_settings_file():
+	return "user://settings-{profile}.cfg".format({"profile": profile})
+
 func socket_connect():
 	if _socket_connected:
 		return
@@ -81,7 +92,7 @@ func set_player(ory_session: String, email: String, playername: String):
 
 func _set_value(key, value):
 	config.set_value(SECTION, key, value)
-	config.save(SETTINGS_FILE)
+	config.save(_get_settings_file())
 	
 func _get_value(key):
 	return config.get_value(SECTION, key, "")
@@ -116,5 +127,3 @@ func _process(_delta):
 	elif state == WebSocketPeer.STATE_CLOSED:
 		_socket_connected = false
 		_socket_poll = false
-		var code = _socket.get_close_code()
-		var reason = _socket.get_close_reason()

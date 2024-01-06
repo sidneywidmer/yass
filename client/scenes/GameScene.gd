@@ -178,18 +178,18 @@ func _on_player_joined(data):
 	tween.tween_property(icon_node, "position", to, 0.4)
 	
 func _get_position_icon_name(data):
-	var position = data["position"].to_lower()
+	var positionLower = data["position"].to_lower()
 	var status = "connected" # this default also applies for status BOT, they're always online
 	if data["status"] == "DISCONNECTED":
 		status = "disconnected"
-	return str("res://assets/positions/", position, "-", status, ".svg")
+	return str("res://assets/positions/", positionLower, "-", status, ".svg")
 	
 func _on_player_disconnected(data):
 	var player_position = _players.relative_position(data["player"]["position"])
 	var config = _players.config[player_position]
 	var icon_node = config["icon"]
 #
-	var asset = str("res://assets/positions/", data["player"]["position"],  "-disconnected.svg")
+	var asset = str("res://assets/positions/", data["player"]["position"].to_lower(),  "-disconnected.svg")
 	icon_node.texture = load(asset)
 	
 func _on_game_finished(data):
