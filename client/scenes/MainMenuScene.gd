@@ -30,7 +30,7 @@ func _on_settings_button_pressed() -> void:
 	
 func _on_logout_button_pressed() -> void:
 	Player.logout()
-	SceneSwitcher.switch("res://scenes/LoginScene.tscn")
+	SceneSwitcher.switch("res://scenes/auth/LoginScene.tscn")
 
 func _on_exit_button_pressed() -> void:
 	get_tree().quit()
@@ -40,7 +40,7 @@ func _on_custom_game_button_pressed() -> void:
 	
 func _on_join_success(data) -> void:
 	Player.game_init_data = data
-	SceneSwitcher.switch("res://scenes/GameScene.tscn")
+	SceneSwitcher.switch("res://scenes/game/GameScene.tscn")
 	
 func _on_join_failed(response_code, _result, _data) -> void:
 	error.visible = true

@@ -26,8 +26,8 @@
         <!-- Framework -->
         <dependency>
             <groupId>io.javalin</groupId>
-            <artifactId>javalin-bundle</artifactId>
-            <version>5.6.0</version>
+            <artifactId>javalin</artifactId>
+            <version>6.0.0-beta.4</version>
         </dependency>
         <dependency>
             <groupId>org.kodein.di</groupId>

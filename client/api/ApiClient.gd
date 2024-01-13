@@ -58,3 +58,12 @@ func create_custom_game(params: Dictionary, on_success: Callable, on_error: Call
 		on_success,
 		on_error
 	)
+	
+func anon_sign_up(username: String, token: String, on_success: Callable, on_error: Callable):
+	_http_post(
+		"/auth/anon/signup",
+		{"username": username, "token": token},
+		on_success,
+		on_error
+	)
+	

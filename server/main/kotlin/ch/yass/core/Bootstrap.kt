@@ -10,9 +10,8 @@ import ch.yass.identity.AuthMiddleware
 import ch.yass.identity.ImpersonateMiddleware
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.path
-import io.javalin.event.EventListener
+import io.javalin.config.EventConfig
 import io.javalin.json.JavalinJackson
-import org.eclipse.jetty.server.Server
 import org.flywaydb.core.Flyway
 import org.kodein.di.DI
 import org.kodein.di.allInstances
@@ -28,8 +27,13 @@ class Bootstrap(private val config: ConfigSettings) {
         val app = Javalin.create { javalinConfig ->
             javalinConfig.showJavalinBanner = false
             javalinConfig.jsonMapper(JavalinJackson(di.direct.instance()))
-            javalinConfig.plugins.enableCors { cors ->
-                cors.add {
+            javalinConfig.useVirtualThreads = true
+            javalinConfig.router.apiBuilder {
+                val controllers: List<Controller> by di.allInstances()
+                controllers.forEach { path(it.path, it.endpoints) }
+            }
+            javalinConfig.bundledPlugins.enableCors { cors ->
+                cors.addRule {
                     it.allowHost("http://127.0.0.1:5173")
                     it.allowCredentials = true
                 }
@@ -44,9 +48,6 @@ class Bootstrap(private val config: ConfigSettings) {
             di.direct.instance<ImpersonateMiddleware>(),
         )
         registerMiddlewares(app, middlewares)
-
-        val controllers: List<Controller> by di.allInstances()
-        registerRoutes(app, controllers)
 
         registerEvents(app)
 
@@ -73,7 +74,7 @@ class Bootstrap(private val config: ConfigSettings) {
     }
 
     private fun registerEvents(app: Javalin) {
-        app.events { event: EventListener ->
+        app.events { event: EventConfig ->
             event.serverStopping {
                 // Ensure all logback appenders get flushed
                 val loggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
@@ -82,18 +83,12 @@ class Bootstrap(private val config: ConfigSettings) {
         }
     }
 
-    private fun registerRoutes(app: Javalin, controllers: List<Controller>) {
-        app.routes {
-            controllers.forEach { path(it.path, it.endpoints) }
-        }
-    }
-
     private fun registerMiddlewares(app: Javalin, middlewares: List<Middleware>) {
-        app.before { ctx ->
+        app.beforeMatched { ctx ->
             middlewares.forEach { it.before(ctx) }
         }
 
-        app.after { ctx ->
+        app.afterMatched { ctx ->
             middlewares.forEach { it.after(ctx) }
         }
     }

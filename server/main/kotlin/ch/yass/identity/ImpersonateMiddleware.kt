@@ -12,7 +12,6 @@ import ch.yass.identity.api.ImpersonateRequest
 import ch.yass.identity.helper.isAdmin
 import ch.yass.identity.helper.player
 import io.javalin.http.Context
-import io.javalin.http.HandlerType
 
 /**
  * If we find a request with a body that contains the json field data.impersonate and the current
@@ -22,8 +21,8 @@ class ImpersonateMiddleware(
     private val playerService: PlayerService
 ) : Middleware {
     override fun before(ctx: Context) {
-        // See AuthMiddleware
-        if (ctx.method() == HandlerType.OPTIONS) {
+        // Not relevant for PUBLIC endpoints, we wouldn't want to impersonate anyone there...
+        if (ctx.routeRoles().contains(EndpointRole.PUBLIC)) {
             return
         }
 
@@ -35,7 +34,7 @@ class ImpersonateMiddleware(
         either {
             val request = validate<ImpersonateRequest>(ctx.body())
             val uuid = request.data.impersonate.toUUID()
-            playerService.get(uuid) ?: raise(CanNotImpersonate(player, uuid))
+            playerService.getByOryUuid(uuid) ?: raise(CanNotImpersonate(player, uuid))
         }.onRight {
             logger().info("Player ${player.uuid} impersonating ${it.uuid} for request ${ctx.path()}")
             ctx.attribute(CtxAttributes.PLAYER.name, it)

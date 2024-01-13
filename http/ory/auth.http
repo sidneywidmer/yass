@@ -16,7 +16,7 @@ Accept: application/json
 Content-Type: application/x-www-form-urlencoded
 
 method = password &
-password = ds%2CvUvwL40jwaX%29Q &
+password = FooBar318318 &
 identifier = hello%40sidney.dev
 
 > {%
