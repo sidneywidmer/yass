@@ -43,7 +43,7 @@ autowrap_mode = 2
 
 [node name="InfoLabel" type="Label" parent="UI/MarginContainer/VBoxContainer"]
 layout_mode = 2
-text = "Anonyme Accounts können jederzeit mit einem richtigen Account verknüpft werden. Die Daten sind jedoch nur temporär und können verloren gehen."
+text = "anon.lbl.info"
 autowrap_mode = 2
 
 [node name="VBoxName" type="VBoxContainer" parent="UI/MarginContainer/VBoxContainer"]

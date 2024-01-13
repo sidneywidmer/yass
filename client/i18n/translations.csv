@@ -2,6 +2,7 @@ key,de,en
 login.lbl.email,E-Mail,E-Mail
 login.lbl.password,Passwort,Password
 login.btn.signup,Registrieren,Signup
+login.btn.anon,Ohne Login spielen,Play without account
 login.btn.login,Einloggen,Login
 login.error.login_failed,Zugangsdaten ungültig,Invalid credentials
 loading.lbl,Laden...,Loading...
@@ -45,3 +46,8 @@ signup.btn.back,Zurück zum Login,Back to login
 signup.btn.signup,Registrieren,Signtup
 signup.error.signup_failed,"Ungültige Daten: Stelle sicher, dass das Passwort mindestens 8 Zeichen hat und genügend sicher ist",Invalid data: ensure that the password has at least 8 characters and is secure enought
 signup.error.server_connection,"Fehler: Der Server konnte nicht erreicht werden. Response-Code {response_code}, Client-Code {client_code}","Error: Could not reach server. Response-Code {response_code}, Client-Code {client_code}"
+anon.lbl.anon,Ohne Login spielen,Play without account
+anon.lbl.name,Benutzername,Username
+anon.btn.back,Zurück zum Login,Back to login
+anon.btn.signup,Weiter,Continue
+anon.lbl.info,Anonyme Accounts können jederzeit mit einem richtigen Account verknüpft werden. ,Anonymous accounts can't later be connected with a real user account if desired.

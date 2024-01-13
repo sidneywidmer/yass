@@ -31,7 +31,6 @@ func _on_signup_button_pressed() -> void:
 	)
 	
 func _on_signup_flow_success(data):
-	print(data)
 	signup_flow = data["id"]
 	error.visible = false
 	
