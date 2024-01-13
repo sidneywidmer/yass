@@ -1,7 +1,7 @@
 extends BaseClient
 
 func _init():
-	super._init("http://127.0.0.1:8080", 30, true)
+	super._init("http://127.0.0.1:8080", 30, true, true)
 
 func whoami(on_success: Callable, on_error: Callable) -> void:
 	_http_get(
@@ -59,10 +59,10 @@ func create_custom_game(params: Dictionary, on_success: Callable, on_error: Call
 		on_error
 	)
 	
-func anon_sign_up(username: String, token: String, on_success: Callable, on_error: Callable):
+func anon_sign_up(token: String, name: String, on_success: Callable, on_error: Callable):
 	_http_post(
 		"/auth/anon/signup",
-		{"username": username, "token": token},
+		{"name": name, "anonToken": token},
 		on_success,
 		on_error
 	)

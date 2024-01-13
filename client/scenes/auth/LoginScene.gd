@@ -16,7 +16,10 @@ func _ready() -> void:
 		
 	if Player.profile != "":
 		loading.visible = true
-		OryClient.whoami(_on_whoami_success, _on_whoami_failed)
+		if Player.is_anon():
+			ApiClient.whoami(_on_whoami_success, _on_whoami_failed)
+		else: 
+			OryClient.whoami(_on_whoami_success, _on_whoami_failed)
 	
 	email.text = Player._email
 	login_button.pressed.connect(_on_login_button_pressed)

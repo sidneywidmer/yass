@@ -37,6 +37,12 @@ class PlayerService(private val db: DSLContext) {
         return player
     }
 
+    fun getByAnonToken(token: String): Player? {
+        return db.selectFrom(PLAYER)
+            .where(PLAYER.ANON_TOKEN.eq(token))
+            .fetchOneInto(Player::class.java)
+    }
+
     fun getByOryUuid(oryUuid: UUID): Player? {
         return db.selectFrom(PLAYER)
             .where(PLAYER.ORY_UUID.eq(oryUuid.toString()))

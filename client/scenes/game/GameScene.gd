@@ -39,7 +39,7 @@ var trumps: Dictionary = {
 }
 
 func _input(event):
-	if event is InputEventKey and event.pressed:
+	if event is InputEventKey and event.pressed and OS.is_debug_build():
 		if event.keycode == KEY_Q:
 			Player.socket_seat_unsubscribe(Player.game_init_data["seat"]["uuid"])
 			SceneSwitcher.switch("res://scenes/MainMenuScene.tscn")

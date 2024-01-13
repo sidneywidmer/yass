@@ -14,7 +14,8 @@
   "proxy_connect_timeout": "5s",
   "proxy_http_headers": [
     "Cookie",
-    "X-Session-Token"
+    "X-Session-Token",
+    "X-Anon-Token"
   ],
   "namespaces": [
     {

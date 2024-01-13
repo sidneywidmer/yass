@@ -16,6 +16,7 @@ import ch.yass.game.api.internal.NewAnonPlayer
 import ch.yass.game.engine.playerInGame
 import ch.yass.game.engine.playerOwnsSeat
 import ch.yass.identity.api.AnonSignupRequest
+import ch.yass.identity.api.AnonSignupResponse
 import ch.yass.identity.api.SubscribeRequest
 import ch.yass.identity.api.WhoAmIResponse
 import ch.yass.identity.helper.player
@@ -36,13 +37,10 @@ class AuthController(private val gameRepo: GameRepository, private val playerSer
 
     private fun anonSignup(ctx: Context) {
         either {
-            // Save anon_token and name here
-            // Middlware: if X-Session-Anon-Token is set -> query it to also allow login
-            // Godot save anon token
             val request = validate<AnonSignupRequest>(ctx.body())
             playerService.create(NewAnonPlayer(request.name, request.anonToken))
-            HIER GEHTS WEITER
-            AnonSignupResponse()
+
+            AnonSignupResponse(request.name)
         }.fold(
             { errorResponse(ctx, it) },
             { successResponse(ctx, it) }

@@ -10,7 +10,11 @@ extends Node2D
 @onready var code := %GameCode
 
 func _ready() -> void:
-	player_name.text = tr("main.lbl.welcome").format({"name": Player._playername, "mail": Player._email})
+	if Player.is_anon():
+		player_name.text = tr("main.lbl.welcome").format({"name": Player._playername, "mail": "Anonymous"})
+		logout_button.disabled = true
+	else:
+		player_name.text = tr("main.lbl.welcome").format({"name": Player._playername, "mail": Player._email})
 	
 	settings_button.pressed.connect(_on_settings_button_pressed)
 	logout_button.pressed.connect(_on_logout_button_pressed)

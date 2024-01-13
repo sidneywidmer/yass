@@ -5,11 +5,13 @@ class_name BaseClient
 var base_url : String = ""
 var timeout: int = 10
 var use_ory_session: bool = false
+var use_anon_token: bool = false
 
-func _init(_base_url: String = "", _timeout: int = 10, _use_ory_session: bool = false):
+func _init(_base_url: String = "", _timeout: int = 10, _use_ory_session: bool = false, _use_anon_token: bool = false):
 	base_url = _base_url
 	timeout = _timeout
 	use_ory_session = _use_ory_session
+	use_anon_token = _use_anon_token
 
 func _http_get(endpoint: String, on_success: Callable, on_error: Callable, extra_headers: Array) -> void:
 	var headers = ["Accept: application/json"]
@@ -19,6 +21,9 @@ func _http_get(endpoint: String, on_success: Callable, on_error: Callable, extra
 	
 	if use_ory_session:
 		headers.append("X-Session-Token: {token}".format({"token": Player._ory_session}))
+		
+	if use_anon_token:
+		headers.append("X-Anon-Token: {token}".format({"token": Player._anon_token}))
 	
 	var request = HTTPRequest.new()
 	add_child(request)
@@ -40,8 +45,12 @@ func _http_post_form(endpoint: String, body: Dictionary, on_success: Callable, o
 	
 func _http_post(endpoint: String, body: Dictionary, on_success: Callable, on_error: Callable) -> void:
 	var headers = ["Accept: application/json", "Content-Type: application/json"]
+	
 	if use_ory_session:
 		headers.append("X-Session-Token: {token}".format({"token": Player._ory_session}))
+		
+	if use_anon_token:
+		headers.append("X-Anon-Token: {token}".format({"token": Player._anon_token}))
 	
 	var request = HTTPRequest.new()
 	var bodyEncoded = JSON.stringify(body)

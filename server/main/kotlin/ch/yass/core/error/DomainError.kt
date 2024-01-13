@@ -27,6 +27,7 @@ data class Unauthorized(val exception: ApiException) : AuthError
 data class OryIdentityWithoutName(val identity: Identity) : AuthError
 data class UnauthorizedSubscription(val error: DomainError) : AuthError
 data class InvalidAnonSignup(val foo: String) : AuthError
+data class InvalidAnonToken(val token: String) : AuthError
 data class CanNotImpersonate(val player: Player, val impersonateUuid: UUID) : AuthError
 
 // Game or Game-State related Errors
