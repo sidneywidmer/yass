@@ -26,6 +26,9 @@ fun errorResponse(ctx: Context, error: DomainError): Context {
         is Unauthorized -> ctx.status(401)
             .json(ErrorResponse("ory authentication failed", error.exception.responseBody))
 
+        is InvalidAnonToken -> ctx.status(401)
+            .json(ErrorResponse("anon authentication failed"))
+
         is UnauthorizedSubscription -> ctx.status(200).json(object {
             val error = CentrifugoErrorResponse(403, "denied")
         })

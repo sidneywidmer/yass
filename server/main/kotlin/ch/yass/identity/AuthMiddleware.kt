@@ -53,6 +53,6 @@ class AuthMiddleware(
     context(Raise<Unauthorized>)
     private fun getSession(session: String?, cookie: String?): Session =
         catch({
-            oryClient.frontend.toSession(session, cookie?.let { "ory_kratos_session=$cookie" })
+            oryClient.frontend.toSession(session, cookie?.let { "ory_kratos_session=$cookie" }, null)
         }) { e: ApiException -> raise(Unauthorized(e)) }
 }

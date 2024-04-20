@@ -17,7 +17,7 @@ func _ready() -> void:
 	if Player.profile != "":
 		loading.visible = true
 		if Player.is_anon():
-			ApiClient.whoami(_on_whoami_success, _on_whoami_failed)
+			ApiClient.whoami(_on_whoami_success, _on_anon_whoami_failed)
 		else: 
 			OryClient.whoami(_on_whoami_success, _on_whoami_failed)
 	
@@ -52,11 +52,19 @@ func _on_whoami_failed(response_code: int, result: int, _parsed):
 		loading.set_text(tr("login.error.server_connection").format({"response_code": response_code, "client_code": result}))
 	else:
 		OryClient.login_flow(_on_auth_flow_success, _on_auth_flow_failed)
+		
+func _on_anon_whoami_failed(response_code: int, result: int, parsed):
+	if result != 0:
+		loading.set_text(tr("login.error.server_connection").format({"response_code": response_code, "client_code": result}))
+	else:
+		# This should never happen - but we give the user the partial anon token so if he contacts us we try to identify his profile
+		error.visible = true
+		error.text = tr("login.error.anon_token_invalid").format({"partial_token": Player._anon_token.left(25)})
+		_on_whoami_failed(response_code, result, parsed) # Redirect to normal failed login to get an ory login flow
 
 func _on_auth_flow_success(data):
 	loading.visible = false
 	auth_flow = data["id"]
-	error.visible = false
 	
 func _on_auth_flow_failed(response_code: int, result: int, _parsed):
 	error.visible = true

@@ -26,8 +26,8 @@ class PlayerService(private val db: DSLContext) {
      */
     context(Raise<StringNoValidUUID>, Raise<OryIdentityWithoutName>)
     fun fromSession(session: Session): Player {
-        val oryUuid = session.identity.id.toUUID()
-        val name = getNameFromIdentity(session.identity)
+        val oryUuid = session.identity!!.id.toUUID()
+        val name = getNameFromIdentity(session.identity!!)
         var player = getOrCreateByOry(oryUuid, NewOryPlayer(oryUuid, name))
 
         if (player.name != name) {

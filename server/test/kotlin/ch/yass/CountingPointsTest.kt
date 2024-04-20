@@ -38,7 +38,7 @@ class CountingPointsTest : BaseTest() {
     @Test
     fun testTrump() {
         val state = getStateSpades()
-        val hand = state.hands.first
+        val hand = state.hands.first()
 
         val points = pointsByPosition(hand, tricksOfHand(state.tricks, hand), state.seats)
         assertEquals(50, points[Position.NORTH])

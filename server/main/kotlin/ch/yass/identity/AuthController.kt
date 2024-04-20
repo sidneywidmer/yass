@@ -3,7 +3,6 @@ package ch.yass.identity
 import arrow.core.raise.either
 import arrow.core.raise.ensure
 import ch.yass.core.contract.Controller
-import ch.yass.core.error.InvalidAnonSignup
 import ch.yass.core.error.PlayerDoesNotOwnSeat
 import ch.yass.core.error.PlayerNotInGame
 import ch.yass.core.error.UnauthorizedSubscription
