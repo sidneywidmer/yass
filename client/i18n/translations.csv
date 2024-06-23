@@ -9,6 +9,7 @@ login.error.login_failed,Zugangsdaten ungültig,Invalid credentials
 loading.lbl,Laden...,Loading...
 login.error.server_connection,"Fehler: Der Server konnte nicht erreicht werden. Response-Code {response_code}, Client-Code {client_code}","Error: Could not reach server. Response-Code {response_code}, Client-Code {client_code}"
 main.lbl.welcome,"Willkommen, {name} ({mail})","Welcome, {name} ({mail})"
+main.lbl.signup,Registrieren,Signup
 main.lbl.settings,Einstellungen,Settings
 main.lbl.logout,Abmelden,Logout
 main.lbl.leave_game,Verlassen,Quit
@@ -43,6 +44,7 @@ signup.lbl.signup,Registrieren,Signup
 signup.lbl.name,Benutzername,Username
 signup.lbl.email,E-Mail,E-Mail
 signup.lbl.password,Passwort,Password
+signup.btn.back_anon,Zurück zum Hauptmenü,Back to Mainmenu
 signup.btn.back,Zurück zum Login,Back to login
 signup.btn.signup,Registrieren,Signtup
 signup.error.signup_failed,"Ungültige Daten: Stelle sicher, dass das Passwort mindestens 8 Zeichen hat und genügend sicher ist",Invalid data: ensure that the password has at least 8 characters and is secure enought

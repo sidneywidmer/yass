@@ -45,15 +45,18 @@ func _on_anon_button_pressed() -> void:
 func _on_whoami_success(_data):
 	loading.fade_out()
 	Player.socket_connect()
+	Player.set_authenitcated(true)
 	SceneSwitcher.switch("res://scenes/MainMenuScene.tscn")
 	
 func _on_whoami_failed(response_code: int, result: int, _parsed):
+	Player.set_authenitcated(false)
 	if result != 0:
 		loading.set_text(tr("login.error.server_connection").format({"response_code": response_code, "client_code": result}))
 	else:
 		OryClient.login_flow(_on_auth_flow_success, _on_auth_flow_failed)
 		
 func _on_anon_whoami_failed(response_code: int, result: int, parsed):
+	Player.set_authenitcated(false)
 	if result != 0:
 		loading.set_text(tr("login.error.server_connection").format({"response_code": response_code, "client_code": result}))
 	else:

@@ -1,7 +1,7 @@
 extends BaseClient
 
 func _init():
-	super._init("http://127.0.0.1:8080", 30, true, true)
+	super._init("http://172.25.57.42:8080", 5, true, true)
 
 func whoami(on_success: Callable, on_error: Callable) -> void:
 	_http_get(
@@ -63,6 +63,14 @@ func anon_sign_up(token: String, name: String, on_success: Callable, on_error: C
 	_http_post(
 		"/auth/anon/signup",
 		{"name": name, "anonToken": token},
+		on_success,
+		on_error
+	)
+	
+func anon_link_account(ory_session: String, on_success: Callable, on_error: Callable):
+	_http_post(
+		"/auth/anon/link",
+		{"orySession": ory_session},
 		on_success,
 		on_error
 	)

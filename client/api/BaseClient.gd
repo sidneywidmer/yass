@@ -19,10 +19,9 @@ func _http_get(endpoint: String, on_success: Callable, on_error: Callable, extra
 	if extra_headers.size() > 0:
 		headers.append_array(extra_headers)
 	
-	if use_ory_session:
-		headers.append("X-Session-Token: {token}".format({"token": Player._ory_session}))
-		
-	if use_anon_token:
+	if use_ory_session && !Player.is_anon():
+		headers.append("X-Session-Token: {token}".format({"token": Player._ory_session}))	
+	elif use_anon_token && Player.is_anon():
 		headers.append("X-Anon-Token: {token}".format({"token": Player._anon_token}))
 	
 	var request = HTTPRequest.new()
@@ -46,10 +45,9 @@ func _http_post_form(endpoint: String, body: Dictionary, on_success: Callable, o
 func _http_post(endpoint: String, body: Dictionary, on_success: Callable, on_error: Callable) -> void:
 	var headers = ["Accept: application/json", "Content-Type: application/json"]
 	
-	if use_ory_session:
+	if use_ory_session && !Player.is_anon():
 		headers.append("X-Session-Token: {token}".format({"token": Player._ory_session}))
-		
-	if use_anon_token:
+	elif use_anon_token && Player.is_anon():
 		headers.append("X-Anon-Token: {token}".format({"token": Player._anon_token}))
 	
 	var request = HTTPRequest.new()

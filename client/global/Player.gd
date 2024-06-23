@@ -10,6 +10,7 @@ var profile: String
 
 var _ory_session: String = ""
 var _anon_token: String = ""
+var _authenticated: bool = false
 var _email: String
 var _playername: String
 var _socket = WebSocketPeer.new()
@@ -36,7 +37,11 @@ func boot():
 	load_values()
 	
 func is_anon():
+	# Just means the user has an anon token but it could be invalid if there errors on the backend
 	return _anon_token != ""
+	
+func is_authenticated():
+	return _authenticated
 
 func _get_settings_file():
 	return "user://settings-{profile}.cfg".format({"profile": profile})
@@ -93,6 +98,9 @@ func load_values():
 func set_anon_token(token: String):
 	_anon_token = token
 	_set_value("anon_token", token)
+	
+func set_authenitcated(authenticated: bool):
+	_authenticated = authenticated
 	
 func set_player(ory_session: String, email: String, playername: String):
 	_set_value("ory_session", ory_session)

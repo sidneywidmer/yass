@@ -92,6 +92,11 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "signup.btn.signup"
 
+[node name="BackButtonAnon" type="Button" parent="UI/MarginContainer/VBoxContainer/MarginContainerBtn/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "signup.btn.back_anon"
+
 [node name="BackButton" type="Button" parent="UI/MarginContainer/VBoxContainer/MarginContainerBtn/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
