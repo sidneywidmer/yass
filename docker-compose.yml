@@ -60,6 +60,8 @@ services:
         target: /etc/config/kratos
 
   centrifugo:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     container_name: centrifugo
     image: centrifugo/centrifugo:v5.2
     volumes:

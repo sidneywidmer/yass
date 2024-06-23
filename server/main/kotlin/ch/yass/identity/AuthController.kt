@@ -1,30 +1,35 @@
 package ch.yass.identity
 
+import arrow.core.raise.Raise
 import arrow.core.raise.either
 import arrow.core.raise.ensure
+import arrow.core.raise.ensureNotNull
 import ch.yass.core.contract.Controller
-import ch.yass.core.error.PlayerDoesNotOwnSeat
-import ch.yass.core.error.PlayerNotInGame
-import ch.yass.core.error.UnauthorizedSubscription
+import ch.yass.core.error.*
 import ch.yass.core.helper.errorResponse
 import ch.yass.core.helper.successResponse
+import ch.yass.core.helper.toUUID
 import ch.yass.core.helper.validate
 import ch.yass.game.GameRepository
 import ch.yass.game.PlayerService
 import ch.yass.game.api.internal.NewAnonPlayer
+import ch.yass.game.dto.db.Player
 import ch.yass.game.engine.playerInGame
 import ch.yass.game.engine.playerOwnsSeat
-import ch.yass.identity.api.AnonSignupRequest
-import ch.yass.identity.api.AnonSignupResponse
-import ch.yass.identity.api.SubscribeRequest
-import ch.yass.identity.api.WhoAmIResponse
+import ch.yass.identity.api.*
 import ch.yass.identity.helper.player
 import io.javalin.apibuilder.ApiBuilder.get
 import io.javalin.apibuilder.ApiBuilder.post
 import io.javalin.apibuilder.EndpointGroup
 import io.javalin.http.Context
+import sh.ory.ApiException
+import sh.ory.model.Session
 
-class AuthController(private val gameRepo: GameRepository, private val playerService: PlayerService) : Controller {
+class AuthController(
+    private val gameRepo: GameRepository,
+    private val playerService: PlayerService,
+    private val oryClient: OryClient
+) : Controller {
     override val path = "/auth"
 
     override val endpoints = EndpointGroup {
@@ -32,6 +37,30 @@ class AuthController(private val gameRepo: GameRepository, private val playerSer
         post("/connect", ::connect)
         post("/subscribe", ::subscribe)
         post("/anon/signup", ::anonSignup, EndpointRole.PUBLIC)
+        post("/anon/link", ::anonLink)
+    }
+
+    /**
+     * Anonymous users don't have an ory_uuid in the DB but an anon_token. When an anon user links his
+     * profile with an ory account, we can delete the anon_token and set the ory_uuid.
+     */
+    private fun anonLink(ctx: Context) {
+        either {
+            val request = validate<AnonLinkRequest>(ctx.body())
+            val player = player(ctx)
+
+            ensureNotNull(player.anonToken) { CanNotLinkAnonAccount(player, request.orySession) }
+
+            val orySession = getSession(player, request.orySession)
+            playerService.linkAnonAccount(player, orySession.identity!!.id.toUUID(), request.orySession)
+
+            object {
+                val success = true
+            }
+        }.fold(
+            { errorResponse(ctx, it) },
+            { successResponse(ctx, it) }
+        )
     }
 
     private fun anonSignup(ctx: Context) {
@@ -87,5 +116,10 @@ class AuthController(private val gameRepo: GameRepository, private val playerSer
         )
     }
 
+    context(Raise<CanNotLinkAnonAccount>)
+    private fun getSession(player: Player, orySession: String): Session =
+        arrow.core.raise.catch({
+            oryClient.frontend.toSession(orySession, null, null)
+        }) { _: ApiException -> raise(CanNotLinkAnonAccount(player, orySession)) }
 
 }

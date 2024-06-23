@@ -16,6 +16,7 @@ import ch.yass.game.dto.Trump
 import ch.yass.game.engine.cardToNotation
 import ch.yass.game.engine.playerAtPosition
 import ch.yass.game.engine.randomHand
+import ch.yass.identity.EndpointRole
 import io.javalin.apibuilder.ApiBuilder.get
 import io.javalin.apibuilder.EndpointGroup
 import io.javalin.http.Context
@@ -30,11 +31,18 @@ class AdminController(
     override val path = "/admin"
 
     override val endpoints = EndpointGroup {
+        get("/ping", ::ping, EndpointRole.PUBLIC)
         get("/generate/hand", ::generateHand)
         get("/generate/bot/game", ::generateBotGame)
         get("/generate/state/game", ::generateGame)
         get("/analyze/game/{code}", ::analyzeGame)
         get("/play/game/{code}", ::playGame)
+    }
+
+    private fun ping(ctx: Context) {
+        successResponse(ctx, object {
+            val pong = true
+        })
     }
 
     private fun analyzeGame(ctx: Context) = either {

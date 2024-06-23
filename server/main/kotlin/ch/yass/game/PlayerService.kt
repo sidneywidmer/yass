@@ -1,6 +1,8 @@
 package ch.yass.game
 
 import arrow.core.raise.Raise
+import arrow.core.raise.ensure
+import ch.yass.core.error.CanNotLinkAnonAccount
 import ch.yass.core.error.OryIdentityWithoutName
 import ch.yass.core.error.StringNoValidUUID
 import ch.yass.core.helper.toUUID
@@ -77,6 +79,21 @@ class PlayerService(private val db: DSLContext) {
             bot = false,
             anonToken = player.anonToken
         )
+    }
+
+    context(Raise<CanNotLinkAnonAccount>)
+    fun linkAnonAccount(player: Player, oryUuid: UUID, orySession: String): Player {
+        // Just make sure no funky stuff is going on and we don't have an existing player with this ory uuid already set
+        val existingOryUuids = db.fetchCount(PLAYER, PLAYER.ORY_UUID.eq(oryUuid.toString()))
+        ensure(existingOryUuids == 0) { CanNotLinkAnonAccount(player, orySession) }
+
+        return db.update(PLAYER)
+            .setNull(PLAYER.ANON_TOKEN)
+            .set(PLAYER.ORY_UUID, oryUuid.toString())
+            .set(PLAYER.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
+            .where(PLAYER.UUID.eq(player.uuid.toString()))
+            .returningResult(PLAYER)
+            .fetchOneInto(Player::class.java)!!
     }
 
     private fun createInternal(uuid: UUID, oryUuid: UUID?, name: String, bot: Boolean, anonToken: String?): Player {
