@@ -35,18 +35,18 @@ func join(code: String, on_success: Callable, on_error: Callable) -> void:
 		on_error
 	)
 	
-func schiebe(game: String, schiebe: String, on_success: Callable, on_error: Callable):
+func schiebe(game: String, schiebe_value: String, on_success: Callable, on_error: Callable):
 	_http_post(
 		"/game/schiebe",
-		{"game": game, "gschobe": schiebe},
+		{"game": game, "gschobe": schiebe_value},
 		on_success,
 		on_error
 	)
 	
-func trump(game: String, trump: String, on_success: Callable, on_error: Callable):
+func trump(game: String, trump_value: String, on_success: Callable, on_error: Callable):
 	_http_post(
 		"/game/trump",
-		{"game": game, "trump": trump},
+		{"game": game, "trump": trump_value},
 		on_success,
 		on_error
 	)
@@ -59,10 +59,10 @@ func create_custom_game(params: Dictionary, on_success: Callable, on_error: Call
 		on_error
 	)
 	
-func anon_sign_up(token: String, name: String, on_success: Callable, on_error: Callable):
+func anon_sign_up(token: String, name_value: String, on_success: Callable, on_error: Callable):
 	_http_post(
 		"/auth/anon/signup",
-		{"name": name, "anonToken": token},
+		{"name": name_value, "anonToken": token},
 		on_success,
 		on_error
 	)
