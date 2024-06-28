@@ -7,14 +7,12 @@ script = ExtResource("1_w2ang")
 
 [node name="Title" type="Label" parent="."]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.909804, 0.921569, 0.94902, 1)
-theme_override_font_sizes/font_size = 25
 text = "game.finished.lbl.title"
 
 [node name="WinnersText" type="Label" parent="."]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.909804, 0.921569, 0.94902, 1)
 text = "game.finished.lbl.text"
 autowrap_mode = 3
 
