@@ -8,7 +8,9 @@ var position: Players.PositionsEnum
 var config: ConfigFile
 var profile: String
 
-var _ory_session: String
+var _ory_session: String = ""
+var _anon_token: String = ""
+var _authenticated: bool = false
 var _email: String
 var _playername: String
 var _socket = WebSocketPeer.new()
@@ -33,6 +35,13 @@ func boot():
 	get_tree().get_root().add_child.call_deferred(_ping_timer)
 	
 	load_values()
+	
+func is_anon():
+	# Just means the user has an anon token but it could be invalid if there errors on the backend
+	return _anon_token != ""
+	
+func is_authenticated():
+	return _authenticated
 
 func _get_settings_file():
 	return "user://settings-{profile}.cfg".format({"profile": profile})
@@ -40,7 +49,12 @@ func _get_settings_file():
 func socket_connect():
 	if _socket_connected:
 		return
-	_socket.set_handshake_headers(["X-Session-Token: {session}".format({"session": _ory_session})])
+		
+	if Player.is_anon():
+		_socket.set_handshake_headers(["X-Anon-Token: {token}".format({"token": _anon_token})])
+	else:
+		_socket.set_handshake_headers(["X-Session-Token: {session}".format({"session": _ory_session})])
+		
 	_socket.connect_to_url("ws://127.0.0.1:8000/connection/websocket")
 	_socket_poll = true
 	
@@ -66,9 +80,6 @@ func _on_ping_timeout():
 func _on_ping_success(_data):
 	pass
 	
-func _on_schiebe_failed(_response_code: int, _result: int, _parsed):
-	print("Ping failed")
-	
 func _socket_subscribe(channel: String, on_message: Callable):
 	_socket.send_text(JSON.stringify({"subscribe":{"channel": channel},"id":2}))
 	_socket_channels[channel] = on_message
@@ -80,8 +91,16 @@ func logout():
 
 func load_values():
 	_ory_session = _get_value("ory_session")
+	_anon_token = _get_value("anon_token")
 	_email = _get_value("email")
 	_playername = _get_value("playername")
+	
+func set_anon_token(token: String):
+	_anon_token = token
+	_set_value("anon_token", token)
+	
+func set_authenitcated(authenticated: bool):
+	_authenticated = authenticated
 	
 func set_player(ory_session: String, email: String, playername: String):
 	_set_value("ory_session", ory_session)

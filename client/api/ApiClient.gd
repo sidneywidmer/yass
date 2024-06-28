@@ -1,7 +1,7 @@
 extends BaseClient
 
 func _init():
-	super._init("http://127.0.0.1:8080", 30, true)
+	super._init("http://172.25.57.42:8080", 5, true, true)
 
 func whoami(on_success: Callable, on_error: Callable) -> void:
 	_http_get(
@@ -35,18 +35,18 @@ func join(code: String, on_success: Callable, on_error: Callable) -> void:
 		on_error
 	)
 	
-func schiebe(game: String, schiebe: String, on_success: Callable, on_error: Callable):
+func schiebe(game: String, schiebe_value: String, on_success: Callable, on_error: Callable):
 	_http_post(
 		"/game/schiebe",
-		{"game": game, "gschobe": schiebe},
+		{"game": game, "gschobe": schiebe_value},
 		on_success,
 		on_error
 	)
 	
-func trump(game: String, trump: String, on_success: Callable, on_error: Callable):
+func trump(game: String, trump_value: String, on_success: Callable, on_error: Callable):
 	_http_post(
 		"/game/trump",
-		{"game": game, "trump": trump},
+		{"game": game, "trump": trump_value},
 		on_success,
 		on_error
 	)
@@ -58,3 +58,20 @@ func create_custom_game(params: Dictionary, on_success: Callable, on_error: Call
 		on_success,
 		on_error
 	)
+	
+func anon_sign_up(token: String, name_value: String, on_success: Callable, on_error: Callable):
+	_http_post(
+		"/auth/anon/signup",
+		{"name": name_value, "anonToken": token},
+		on_success,
+		on_error
+	)
+	
+func anon_link_account(ory_session: String, on_success: Callable, on_error: Callable):
+	_http_post(
+		"/auth/anon/link",
+		{"orySession": ory_session},
+		on_success,
+		on_error
+	)
+	

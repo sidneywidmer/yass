@@ -17,7 +17,7 @@ import org.jooq.Identity
 import org.jooq.Name
 import org.jooq.Record
 import org.jooq.Records
-import org.jooq.Row6
+import org.jooq.Row8
 import org.jooq.Schema
 import org.jooq.SelectField
 import org.jooq.Table
@@ -93,6 +93,16 @@ open class Player(
      */
     val BOT: TableField<PlayerRecord, Boolean?> = createField(DSL.name("bot"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field("false", SQLDataType.BOOLEAN)), this, "")
 
+    /**
+     * The column <code>public.player.ory_uuid</code>.
+     */
+    val ORY_UUID: TableField<PlayerRecord, String?> = createField(DSL.name("ory_uuid"), SQLDataType.VARCHAR(37), this, "")
+
+    /**
+     * The column <code>public.player.anon_token</code>.
+     */
+    val ANON_TOKEN: TableField<PlayerRecord, String?> = createField(DSL.name("anon_token"), SQLDataType.VARCHAR(255), this, "")
+
     private constructor(alias: Name, aliased: Table<PlayerRecord>?): this(alias, null, null, aliased, null)
     private constructor(alias: Name, aliased: Table<PlayerRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, aliased, parameters)
 
@@ -135,18 +145,18 @@ open class Player(
     override fun rename(name: Table<*>): Player = Player(name.getQualifiedName(), null)
 
     // -------------------------------------------------------------------------
-    // Row6 type methods
+    // Row8 type methods
     // -------------------------------------------------------------------------
-    override fun fieldsRow(): Row6<Int?, String?, LocalDateTime?, LocalDateTime?, String?, Boolean?> = super.fieldsRow() as Row6<Int?, String?, LocalDateTime?, LocalDateTime?, String?, Boolean?>
+    override fun fieldsRow(): Row8<Int?, String?, LocalDateTime?, LocalDateTime?, String?, Boolean?, String?, String?> = super.fieldsRow() as Row8<Int?, String?, LocalDateTime?, LocalDateTime?, String?, Boolean?, String?, String?>
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    fun <U> mapping(from: (Int?, String?, LocalDateTime?, LocalDateTime?, String?, Boolean?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
+    fun <U> mapping(from: (Int?, String?, LocalDateTime?, LocalDateTime?, String?, Boolean?, String?, String?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    fun <U> mapping(toType: Class<U>, from: (Int?, String?, LocalDateTime?, LocalDateTime?, String?, Boolean?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
+    fun <U> mapping(toType: Class<U>, from: (Int?, String?, LocalDateTime?, LocalDateTime?, String?, Boolean?, String?, String?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
 }

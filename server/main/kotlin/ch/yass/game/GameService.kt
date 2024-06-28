@@ -9,8 +9,9 @@ import ch.yass.core.pubsub.Channel
 import ch.yass.core.pubsub.PubSub
 import ch.yass.game.api.*
 import ch.yass.game.api.internal.GameState
+import ch.yass.game.api.internal.NewBotPlayer
 import ch.yass.game.api.internal.NewHand
-import ch.yass.game.api.internal.NewPlayer
+import ch.yass.game.api.internal.NewOryPlayer
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Game
 import ch.yass.game.dto.db.Player
@@ -55,7 +56,7 @@ class GameService(
         //       move some of this logic to the seat and all bots can have the same names...
         settings.botPositions().map { position ->
             val botName = botNames.removeAt((0 until botNames.size).random()) // Avoids duplicate names
-            val botPlayer = playerService.create(NewPlayer(UUID.randomUUID(), botName, true))
+            val botPlayer = playerService.create(NewBotPlayer(botName))
             repo.takeASeat(game, botPlayer, position)
         }
         repo.takeASeat(game, player)
@@ -172,7 +173,7 @@ class GameService(
 
         val dcSeat = state.seats.first { it.uuid == seatUUID }
         val dcPlayer = playerAtPosition(dcSeat.position, state.seats, state.allPlayers)!!
-        val actions = playerDisconnectedActions(state, dcSeat, dcPlayer)
+        val actions = playerDisconnectedActions(dcSeat, dcPlayer)
 
         repo.updateSeatStatus(dcSeat, SeatStatus.DISCONNECTED)
         publishForSeats(state.seats) { actions }

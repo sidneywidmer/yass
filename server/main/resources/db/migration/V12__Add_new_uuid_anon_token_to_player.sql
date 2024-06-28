@@ -1,0 +1,4 @@
+ALTER TABLE player
+    ADD COLUMN ory_uuid VARCHAR(37) NULL,
+    ADD COLUMN anon_token VARCHAR(255) NULL;
+

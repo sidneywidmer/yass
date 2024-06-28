@@ -19,10 +19,20 @@ fun successResponse(ctx: Context, data: Any): Context {
 }
 
 fun errorResponse(ctx: Context, error: DomainError): Context {
+    logger().debug("{} encountered: {}", error.javaClass.name, error)
+
     return when (error) {
         is ValiktorError -> ctx.status(422).json(groupValiktorViolations(error))
-        is Unauthorized -> ctx.status(401) .json(ErrorResponse("ory authentication failed", error.exception.responseBody))
-        is UnauthorizedSubscription -> ctx.status(200).json(object { val error = CentrifugoErrorResponse(403, "denied")})
+        is Unauthorized -> ctx.status(401)
+            .json(ErrorResponse("ory authentication failed", error.exception.responseBody))
+
+        is InvalidAnonToken -> ctx.status(401)
+            .json(ErrorResponse("anon authentication failed"))
+
+        is UnauthorizedSubscription -> ctx.status(200).json(object {
+            val error = CentrifugoErrorResponse(403, "denied")
+        })
+
         is GameWithCodeNotFound -> ctx.status(404).json(ErrorResponse("no game with code ${error.code} found"))
         else -> {
             logger().error("DomainError `${error.javaClass.name}` encountered: $error")

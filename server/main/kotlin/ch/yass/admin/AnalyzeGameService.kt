@@ -42,7 +42,6 @@ class AnalyzeGameService(private val gameService: GameService) {
         return AnalyzeHand(hand.trump, hand.gschobe, startingPlayer, players, tricks.reversed(), points)
     }
 
-
     private fun mapTrick(trick: Trick, state: GameState, tricksOfHand: List<Trick>, hand: Hand): TrickWithCards {
         val tricksUptoGivenTrick = tricksOfHand.reversed().takeWhileInclusive { it.id != trick.id }.reversed()
         val leadPosition = currentLeadPositionOfHand(hand, tricksUptoGivenTrick, state.seats, state.allPlayers)

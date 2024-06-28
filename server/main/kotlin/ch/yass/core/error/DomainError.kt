@@ -26,7 +26,9 @@ sealed interface AuthError : DomainError
 data class Unauthorized(val exception: ApiException) : AuthError
 data class OryIdentityWithoutName(val identity: Identity) : AuthError
 data class UnauthorizedSubscription(val error: DomainError) : AuthError
+data class InvalidAnonToken(val token: String) : AuthError
 data class CanNotImpersonate(val player: Player, val impersonateUuid: UUID) : AuthError
+data class CanNotLinkAnonAccount(val player: Player, val orySession: String) : AuthError
 
 // Game or Game-State related Errors
 sealed interface GameError : DomainError

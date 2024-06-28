@@ -127,7 +127,7 @@ fun playerJoinedActions(state: GameState, newPlayer: Player, joinedAtSeat: Seat)
     )
 }
 
-fun playerDisconnectedActions(state: GameState, dcSeat: Seat, dcPlayer: Player): List<Action> {
+fun playerDisconnectedActions(dcSeat: Seat, dcPlayer: Player): List<Action> {
     return listOf(
         PlayerDisconnected(
             PlayerAtTable(

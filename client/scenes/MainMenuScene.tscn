@@ -73,6 +73,11 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "main.lbl.settings"
 
+[node name="SignUpButton" type="Button" parent="UI/CenterContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "main.lbl.signup"
+
 [node name="LogoutButton" type="Button" parent="UI/CenterContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2

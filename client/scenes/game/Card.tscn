@@ -1,0 +1,29 @@
+[gd_scene load_steps=2 format=3 uid="uid://px2ebmrmoj1n"]
+
+[ext_resource type="Script" path="res://scenes/game/Card.gd" id="1_kclla"]
+
+[node name="Card" type="Node2D"]
+script = ExtResource("1_kclla")
+
+[node name="Container" type="Node2D" parent="."]
+
+[node name="Front" type="Node2D" parent="Container"]
+
+[node name="Image" type="Sprite2D" parent="Container/Front"]
+unique_name_in_owner = true
+position = Vector2(0.850399, -0.891621)
+scale = Vector2(0.548511, 0.548511)
+
+[node name="Draggable" type="TextureButton" parent="Container"]
+offset_left = -64.0
+offset_top = -122.0
+offset_right = 66.0
+offset_bottom = 121.0
+mouse_default_cursor_shape = 2
+
+[node name="Transitions" type="Node" parent="."]
+unique_name_in_owner = true
+
+[connection signal="mouse_entered" from="Container/Draggable" to="." method="_on_draggable_entered"]
+[connection signal="mouse_exited" from="Container/Draggable" to="." method="_on_draggable_exited"]
+[connection signal="pressed" from="Container/Draggable" to="." method="_on_draggable_pressed"]

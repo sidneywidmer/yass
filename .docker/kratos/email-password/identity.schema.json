@@ -29,7 +29,8 @@
         "name": {
           "type": "string",
           "title": "Player name",
-          "minLength": 3
+          "minLength": 3,
+          "maxLength": 15
         }
       },
       "required": [

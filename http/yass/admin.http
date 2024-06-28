@@ -1,3 +1,7 @@
+//  @name Ping
+GET /admin/ping HTTP/1.1
+Host: {{yassBaseUrl}}
+
 //  @name Generate Hand
 GET /admin/generate/hand HTTP/1.1
 Host: {{yassBaseUrl}}

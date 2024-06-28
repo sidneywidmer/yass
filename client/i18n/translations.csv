@@ -2,11 +2,14 @@ key,de,en
 login.lbl.email,E-Mail,E-Mail
 login.lbl.password,Passwort,Password
 login.btn.signup,Registrieren,Signup
+login.btn.anon,Ohne Login spielen,Play without account
 login.btn.login,Einloggen,Login
+login.error.anon_token_invalid,"Es scheint, als hättest du noch ein Anonymes Profil aber dieses ist plötzlich ungültig. Melde dich doch bitte mit dem Code ""{partial_token}"" beim Support.",It looks like you have an Anonymous profile but it is invalid. Please contact support with the code {partial_token}.
 login.error.login_failed,Zugangsdaten ungültig,Invalid credentials
 loading.lbl,Laden...,Loading...
 login.error.server_connection,"Fehler: Der Server konnte nicht erreicht werden. Response-Code {response_code}, Client-Code {client_code}","Error: Could not reach server. Response-Code {response_code}, Client-Code {client_code}"
 main.lbl.welcome,"Willkommen, {name} ({mail})","Welcome, {name} ({mail})"
+main.lbl.signup,Registrieren,Signup
 main.lbl.settings,Einstellungen,Settings
 main.lbl.logout,Abmelden,Logout
 main.lbl.leave_game,Verlassen,Quit
@@ -41,7 +44,13 @@ signup.lbl.signup,Registrieren,Signup
 signup.lbl.name,Benutzername,Username
 signup.lbl.email,E-Mail,E-Mail
 signup.lbl.password,Passwort,Password
+signup.btn.back_anon,Zurück zum Hauptmenü,Back to Mainmenu
 signup.btn.back,Zurück zum Login,Back to login
 signup.btn.signup,Registrieren,Signtup
 signup.error.signup_failed,"Ungültige Daten: Stelle sicher, dass das Passwort mindestens 8 Zeichen hat und genügend sicher ist",Invalid data: ensure that the password has at least 8 characters and is secure enought
 signup.error.server_connection,"Fehler: Der Server konnte nicht erreicht werden. Response-Code {response_code}, Client-Code {client_code}","Error: Could not reach server. Response-Code {response_code}, Client-Code {client_code}"
+anon.lbl.anon,Ohne Login spielen,Play without account
+anon.lbl.name,Benutzername,Username
+anon.btn.back,Zurück zum Login,Back to login
+anon.btn.signup,Weiter,Continue
+anon.lbl.info,Anonyme Accounts können jederzeit mit einem richtigen Account verknüpft werden. ,Anonymous accounts can't later be connected with a real user account if desired.

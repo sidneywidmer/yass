@@ -1,0 +1,92 @@
+[gd_scene load_steps=4 format=3 uid="uid://ckgd5pscbwsqc"]
+
+[ext_resource type="Script" path="res://scenes/auth/LoginScene.gd" id="1_hcral"]
+[ext_resource type="PackedScene" uid="uid://b4blrdjthcxnn" path="res://ui/components/GameLogo.tscn" id="2_kd830"]
+[ext_resource type="PackedScene" uid="uid://8213lw6ps1sr" path="res://ui/overlays/LoadingOverlay.tscn" id="3_tqaxc"]
+
+[node name="LoginScene" type="Node2D"]
+script = ExtResource("1_hcral")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="MarginContainer" type="MarginContainer" parent="UI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_top = 50
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 10
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_bottom = 40
+
+[node name="GameLogo" parent="UI/MarginContainer/VBoxContainer/MarginContainer" instance=ExtResource("2_kd830")]
+layout_mode = 2
+
+[node name="ErrorLabel" type="Label" parent="UI/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.921569, 0.301961, 0.294118, 1)
+text = "Error: Txt"
+autowrap_mode = 2
+
+[node name="VBoxEMail" type="VBoxContainer" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Label" type="Label" parent="UI/MarginContainer/VBoxContainer/VBoxEMail"]
+layout_mode = 2
+text = "login.lbl.email"
+
+[node name="EMail" type="LineEdit" parent="UI/MarginContainer/VBoxContainer/VBoxEMail"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxPW" type="VBoxContainer" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Label" type="Label" parent="UI/MarginContainer/VBoxContainer/VBoxPW"]
+layout_mode = 2
+text = "login.lbl.password"
+
+[node name="Password" type="LineEdit" parent="UI/MarginContainer/VBoxContainer/VBoxPW"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+secret = true
+
+[node name="MarginContainerBtn" type="MarginContainer" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_top = 40
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer/VBoxContainer/MarginContainerBtn"]
+layout_mode = 2
+
+[node name="LoginButton" type="Button" parent="UI/MarginContainer/VBoxContainer/MarginContainerBtn/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "login.btn.login"
+
+[node name="SignUpButton" type="Button" parent="UI/MarginContainer/VBoxContainer/MarginContainerBtn/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "login.btn.signup"
+
+[node name="AnonButton" type="Button" parent="UI/MarginContainer/VBoxContainer/MarginContainerBtn/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "login.btn.anon"
+
+[node name="LoadingOverlay" parent="UI" instance=ExtResource("3_tqaxc")]
+unique_name_in_owner = true
+visible = false
