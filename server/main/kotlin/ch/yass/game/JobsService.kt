@@ -35,7 +35,7 @@ class JobsService(scheduler: JobScheduler, private val db: DSLContext, private v
     }
 
     fun playerPing() {
-        logger().info("Job [Player Ping]: Start checking player pings")
+        logger().debug("Job [Player Ping]: Start checking player pings")
 
         val sevenSecondsAgo = LocalDateTime.now(ZoneOffset.UTC).minusSeconds(7)  // Player ping is every 5
 
@@ -57,11 +57,11 @@ class JobsService(scheduler: JobScheduler, private val db: DSLContext, private v
             )
         }
 
-        logger().info("Job [Player Ping]: Done! Dispatched PlayerDisconnected events to ${dcRecords.size} seats.")
+        logger().debug("Job [Player Ping]: Done! Dispatched PlayerDisconnected events to ${dcRecords.size} seats.")
     }
 
     fun gameStatus() {
-        logger().info("Job [Game Status]: Start updating game status")
+        logger().debug("Job [Game Status]: Start updating game status")
 
         val fiveMinutesAgo = LocalDateTime.now(ZoneOffset.UTC).minusMinutes(5)
         val update: Int = db
@@ -77,6 +77,6 @@ class JobsService(scheduler: JobScheduler, private val db: DSLContext, private v
             .and(GAME.STATUS.eq(GameStatus.RUNNING.name))
             .execute()
 
-        logger().info("Job [Game Status]: Done! Set game status STALE for $update game entries.")
+        logger().debug("Job [Game Status]: Done! Set game status STALE for $update game entries.")
     }
 }

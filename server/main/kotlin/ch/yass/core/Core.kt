@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.util.StdDateFormat
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.typesafe.config.ConfigFactory
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import okhttp3.OkHttpClient
 import org.jobrunr.configuration.JobRunr
 import org.jobrunr.configuration.JobRunrConfiguration
@@ -109,11 +111,14 @@ object Core {
         System.setProperty("org.jooq.no-tips", "true")
         System.setProperty("org.jooq.no-logo", "true")
 
-        val conn = DriverManager.getConnection(
-            config.getString("db.url"),
-            config.getString("db.username"),
-            config.getString("db.password"),
-        )
+        val hikariConfig = HikariConfig().apply {
+            jdbcUrl = config.getString("db.url")
+            username = config.getString("db.username")
+            password = config.getString("db.password")
+            maximumPoolSize = 10 // Adjust the pool size according to your needs
+        }
+
+        val conn = HikariDataSource(hikariConfig)
 
         return DSL.using(conn, SQLDialect.POSTGRES)
     }

@@ -57,7 +57,7 @@ class Bootstrap(private val config: ConfigSettings) {
         app.exception(DomainException::class.java) { exception, ctx -> domainExceptionHandler(ctx, exception) }
         app.exception(Exception::class.java) { exception, ctx -> globalExceptionHandler(exception, ctx) }
 
-        app.start("127.0.0.1", config.getInt("server.port"))
+        app.start("0.0.0.0", config.getInt("server.port"))
     }
 
     private fun setupFlyway() {
