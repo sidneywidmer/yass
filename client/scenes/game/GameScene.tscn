@@ -89,15 +89,15 @@ layout_mode = 2
 unique_name_in_owner = true
 visible = false
 
-[node name="Confetti" type="Node2D" parent="CanvasLayer/GameFinished"]
-unique_name_in_owner = true
-script = ExtResource("5_chx7o")
-
 [node name="Container" parent="CanvasLayer/GameFinished/Overlay" index="1"]
 custom_minimum_size = Vector2(300, 0)
 
 [node name="GameFinished" parent="CanvasLayer/GameFinished/Overlay/Container" index="0" instance=ExtResource("4_1borg")]
 layout_mode = 2
+
+[node name="Confetti" type="Node2D" parent="CanvasLayer/GameFinished"]
+unique_name_in_owner = true
+script = ExtResource("5_chx7o")
 
 [node name="Players" type="Node" parent="."]
 unique_name_in_owner = true
