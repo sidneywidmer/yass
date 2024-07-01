@@ -2,12 +2,18 @@ package ch.yass.game.engine
 
 import arrow.core.raise.Raise
 import arrow.core.raise.ensure
+import ch.yass.core.error.CardNotPlayable
 import ch.yass.core.error.GameError
 import ch.yass.core.error.PlayerDoesNotOwnCard
-import ch.yass.core.error.CardNotPlayable
 import ch.yass.game.api.internal.GameState
-import ch.yass.game.dto.*
-import ch.yass.game.dto.db.*
+import ch.yass.game.dto.Card
+import ch.yass.game.dto.Gschobe
+import ch.yass.game.dto.State
+import ch.yass.game.dto.WinningConditionType
+import ch.yass.game.dto.db.Hand
+import ch.yass.game.dto.db.Player
+import ch.yass.game.dto.db.Seat
+import ch.yass.game.dto.db.Trick
 
 /**
  * Take all cards the given player was dealt in the current hand and subtract all the
@@ -25,6 +31,11 @@ fun unplayedCardsOfPlayer(player: Player, hands: List<Hand>, seats: List<Seat>, 
 }
 
 fun isTrumpSet(hand: Hand?): Boolean = hand?.trump != null
+
+fun isAlreadyGewiesen(hand: Hand?, tricks: List<Trick>): Boolean {
+    // if it's the first trick in the hand, the player gas not yet gewiesen and they have a valid weis
+    return true
+}
 
 fun isAlreadyGschobe(hand: Hand?): Boolean = hand?.gschobe != Gschobe.NOT_YET
 

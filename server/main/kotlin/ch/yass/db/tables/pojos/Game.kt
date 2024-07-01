@@ -28,49 +28,49 @@ data class Game(
     override fun equals(other: Any?): Boolean {
         if (this === other)
             return true
-        if (other === null)
+        if (other == null)
             return false
         if (this::class != other::class)
             return false
         val o: Game = other as Game
-        if (this.id === null) {
-            if (o.id !== null)
+        if (this.id == null) {
+            if (o.id != null)
                 return false
         }
         else if (this.id != o.id)
             return false
-        if (this.uuid === null) {
-            if (o.uuid !== null)
+        if (this.uuid == null) {
+            if (o.uuid != null)
                 return false
         }
         else if (this.uuid != o.uuid)
             return false
-        if (this.createdAt === null) {
-            if (o.createdAt !== null)
+        if (this.createdAt == null) {
+            if (o.createdAt != null)
                 return false
         }
         else if (this.createdAt != o.createdAt)
             return false
-        if (this.updatedAt === null) {
-            if (o.updatedAt !== null)
+        if (this.updatedAt == null) {
+            if (o.updatedAt != null)
                 return false
         }
         else if (this.updatedAt != o.updatedAt)
             return false
-        if (this.code === null) {
-            if (o.code !== null)
+        if (this.code == null) {
+            if (o.code != null)
                 return false
         }
         else if (this.code != o.code)
             return false
-        if (this.settings === null) {
-            if (o.settings !== null)
+        if (this.settings == null) {
+            if (o.settings != null)
                 return false
         }
         else if (this.settings != o.settings)
             return false
-        if (this.status === null) {
-            if (o.status !== null)
+        if (this.status == null) {
+            if (o.status != null)
                 return false
         }
         else if (this.status != o.status)
@@ -81,13 +81,13 @@ data class Game(
     override fun hashCode(): Int {
         val prime = 31
         var result = 1
-        result = prime * result + (if (this.id === null) 0 else this.id.hashCode())
-        result = prime * result + (if (this.uuid === null) 0 else this.uuid.hashCode())
-        result = prime * result + (if (this.createdAt === null) 0 else this.createdAt.hashCode())
-        result = prime * result + (if (this.updatedAt === null) 0 else this.updatedAt.hashCode())
-        result = prime * result + (if (this.code === null) 0 else this.code.hashCode())
-        result = prime * result + (if (this.settings === null) 0 else this.settings.hashCode())
-        result = prime * result + (if (this.status === null) 0 else this.status.hashCode())
+        result = prime * result + (if (this.id == null) 0 else this.id.hashCode())
+        result = prime * result + (if (this.uuid == null) 0 else this.uuid.hashCode())
+        result = prime * result + (if (this.createdAt == null) 0 else this.createdAt.hashCode())
+        result = prime * result + (if (this.updatedAt == null) 0 else this.updatedAt.hashCode())
+        result = prime * result + (if (this.code == null) 0 else this.code.hashCode())
+        result = prime * result + (if (this.settings == null) 0 else this.settings.hashCode())
+        result = prime * result + (if (this.status == null) 0 else this.status.hashCode())
         return result
     }
 

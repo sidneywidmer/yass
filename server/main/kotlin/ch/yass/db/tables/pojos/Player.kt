@@ -27,55 +27,55 @@ data class Player(
     override fun equals(other: Any?): Boolean {
         if (this === other)
             return true
-        if (other === null)
+        if (other == null)
             return false
         if (this::class != other::class)
             return false
         val o: Player = other as Player
-        if (this.id === null) {
-            if (o.id !== null)
+        if (this.id == null) {
+            if (o.id != null)
                 return false
         }
         else if (this.id != o.id)
             return false
-        if (this.uuid === null) {
-            if (o.uuid !== null)
+        if (this.uuid == null) {
+            if (o.uuid != null)
                 return false
         }
         else if (this.uuid != o.uuid)
             return false
-        if (this.createdAt === null) {
-            if (o.createdAt !== null)
+        if (this.createdAt == null) {
+            if (o.createdAt != null)
                 return false
         }
         else if (this.createdAt != o.createdAt)
             return false
-        if (this.updatedAt === null) {
-            if (o.updatedAt !== null)
+        if (this.updatedAt == null) {
+            if (o.updatedAt != null)
                 return false
         }
         else if (this.updatedAt != o.updatedAt)
             return false
-        if (this.name === null) {
-            if (o.name !== null)
+        if (this.name == null) {
+            if (o.name != null)
                 return false
         }
         else if (this.name != o.name)
             return false
-        if (this.bot === null) {
-            if (o.bot !== null)
+        if (this.bot == null) {
+            if (o.bot != null)
                 return false
         }
         else if (this.bot != o.bot)
             return false
-        if (this.oryUuid === null) {
-            if (o.oryUuid !== null)
+        if (this.oryUuid == null) {
+            if (o.oryUuid != null)
                 return false
         }
         else if (this.oryUuid != o.oryUuid)
             return false
-        if (this.anonToken === null) {
-            if (o.anonToken !== null)
+        if (this.anonToken == null) {
+            if (o.anonToken != null)
                 return false
         }
         else if (this.anonToken != o.anonToken)
@@ -86,14 +86,14 @@ data class Player(
     override fun hashCode(): Int {
         val prime = 31
         var result = 1
-        result = prime * result + (if (this.id === null) 0 else this.id.hashCode())
-        result = prime * result + (if (this.uuid === null) 0 else this.uuid.hashCode())
-        result = prime * result + (if (this.createdAt === null) 0 else this.createdAt.hashCode())
-        result = prime * result + (if (this.updatedAt === null) 0 else this.updatedAt.hashCode())
-        result = prime * result + (if (this.name === null) 0 else this.name.hashCode())
-        result = prime * result + (if (this.bot === null) 0 else this.bot.hashCode())
-        result = prime * result + (if (this.oryUuid === null) 0 else this.oryUuid.hashCode())
-        result = prime * result + (if (this.anonToken === null) 0 else this.anonToken.hashCode())
+        result = prime * result + (if (this.id == null) 0 else this.id.hashCode())
+        result = prime * result + (if (this.uuid == null) 0 else this.uuid.hashCode())
+        result = prime * result + (if (this.createdAt == null) 0 else this.createdAt.hashCode())
+        result = prime * result + (if (this.updatedAt == null) 0 else this.updatedAt.hashCode())
+        result = prime * result + (if (this.name == null) 0 else this.name.hashCode())
+        result = prime * result + (if (this.bot == null) 0 else this.bot.hashCode())
+        result = prime * result + (if (this.oryUuid == null) 0 else this.oryUuid.hashCode())
+        result = prime * result + (if (this.anonToken == null) 0 else this.anonToken.hashCode())
         return result
     }
 

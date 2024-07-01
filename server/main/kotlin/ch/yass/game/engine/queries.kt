@@ -37,7 +37,7 @@ fun completeTricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> {
 }
 
 /**
- * Get the player sitting at the given position.
+ * Can return null because maybe the game is not full yet.
  */
 fun playerAtPosition(position: Position, seats: List<Seat>, players: List<Player>): Player? {
     return seats.firstOrNull { it.position == position }
@@ -83,6 +83,7 @@ fun nextState(state: GameState): State {
         isTrickFinished(trick) -> State.NEW_TRICK
         !isAlreadyGschobe(hand) -> if (player.bot) State.SCHIEBE_BOT else State.SCHIEBE
         !isTrumpSet(hand) -> if (player.bot) State.TRUMP_BOT else State.TRUMP
+        !isAlreadyGewiesen(hand, tricks) -> State.WEISEN
         else -> if (player.bot) State.PLAY_CARD_BOT else State.PLAY_CARD
     }
 }
@@ -255,6 +256,14 @@ fun pointsByPosition(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Points
             trick.cards().sumOf { card -> multiplyByTrump(cardPoints(card, hand.trump!!), hand.trump) } + lastTrickBonus
         }
     }
+}
+
+fun possibleWeise(cards: List<Card>, trump: Trump): List<Weis> {
+    // Sequence 1-9 max
+    // 4 of the same -> four nell four buur for extra points
+    // queen/king of trump
+
+    return emptyList()
 }
 
 

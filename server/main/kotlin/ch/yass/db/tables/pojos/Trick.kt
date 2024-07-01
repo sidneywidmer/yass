@@ -30,61 +30,61 @@ data class Trick(
     override fun equals(other: Any?): Boolean {
         if (this === other)
             return true
-        if (other === null)
+        if (other == null)
             return false
         if (this::class != other::class)
             return false
         val o: Trick = other as Trick
-        if (this.id === null) {
-            if (o.id !== null)
+        if (this.id == null) {
+            if (o.id != null)
                 return false
         }
         else if (this.id != o.id)
             return false
-        if (this.uuid === null) {
-            if (o.uuid !== null)
+        if (this.uuid == null) {
+            if (o.uuid != null)
                 return false
         }
         else if (this.uuid != o.uuid)
             return false
-        if (this.createdAt === null) {
-            if (o.createdAt !== null)
+        if (this.createdAt == null) {
+            if (o.createdAt != null)
                 return false
         }
         else if (this.createdAt != o.createdAt)
             return false
-        if (this.updatedAt === null) {
-            if (o.updatedAt !== null)
+        if (this.updatedAt == null) {
+            if (o.updatedAt != null)
                 return false
         }
         else if (this.updatedAt != o.updatedAt)
             return false
-        if (this.handId === null) {
-            if (o.handId !== null)
+        if (this.handId == null) {
+            if (o.handId != null)
                 return false
         }
         else if (this.handId != o.handId)
             return false
-        if (this.north === null) {
-            if (o.north !== null)
+        if (this.north == null) {
+            if (o.north != null)
                 return false
         }
         else if (this.north != o.north)
             return false
-        if (this.east === null) {
-            if (o.east !== null)
+        if (this.east == null) {
+            if (o.east != null)
                 return false
         }
         else if (this.east != o.east)
             return false
-        if (this.south === null) {
-            if (o.south !== null)
+        if (this.south == null) {
+            if (o.south != null)
                 return false
         }
         else if (this.south != o.south)
             return false
-        if (this.west === null) {
-            if (o.west !== null)
+        if (this.west == null) {
+            if (o.west != null)
                 return false
         }
         else if (this.west != o.west)
@@ -95,15 +95,15 @@ data class Trick(
     override fun hashCode(): Int {
         val prime = 31
         var result = 1
-        result = prime * result + (if (this.id === null) 0 else this.id.hashCode())
-        result = prime * result + (if (this.uuid === null) 0 else this.uuid.hashCode())
-        result = prime * result + (if (this.createdAt === null) 0 else this.createdAt.hashCode())
-        result = prime * result + (if (this.updatedAt === null) 0 else this.updatedAt.hashCode())
-        result = prime * result + (if (this.handId === null) 0 else this.handId.hashCode())
-        result = prime * result + (if (this.north === null) 0 else this.north.hashCode())
-        result = prime * result + (if (this.east === null) 0 else this.east.hashCode())
-        result = prime * result + (if (this.south === null) 0 else this.south.hashCode())
-        result = prime * result + (if (this.west === null) 0 else this.west.hashCode())
+        result = prime * result + (if (this.id == null) 0 else this.id.hashCode())
+        result = prime * result + (if (this.uuid == null) 0 else this.uuid.hashCode())
+        result = prime * result + (if (this.createdAt == null) 0 else this.createdAt.hashCode())
+        result = prime * result + (if (this.updatedAt == null) 0 else this.updatedAt.hashCode())
+        result = prime * result + (if (this.handId == null) 0 else this.handId.hashCode())
+        result = prime * result + (if (this.north == null) 0 else this.north.hashCode())
+        result = prime * result + (if (this.east == null) 0 else this.east.hashCode())
+        result = prime * result + (if (this.south == null) 0 else this.south.hashCode())
+        result = prime * result + (if (this.west == null) 0 else this.west.hashCode())
         return result
     }
 

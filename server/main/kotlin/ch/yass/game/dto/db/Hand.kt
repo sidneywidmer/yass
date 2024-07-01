@@ -2,10 +2,7 @@ package ch.yass.game.dto.db
 
 import ch.yass.core.helper.listFromDbJson
 import ch.yass.db.tables.records.HandRecord
-import ch.yass.game.dto.Card
-import ch.yass.game.dto.Gschobe
-import ch.yass.game.dto.Position
-import ch.yass.game.dto.Trump
+import ch.yass.game.dto.*
 import java.time.LocalDateTime
 import java.util.*
 
@@ -22,6 +19,10 @@ data class Hand(
     val east: List<Card>,
     val south: List<Card>,
     val west: List<Card>,
+    val northWeise: List<Weis>,
+    val eastWeise: List<Weis>,
+    val southWeise: List<Weis>,
+    val westWeise: List<Weis>,
 ) {
     companion object {
         fun fromRecord(hand: HandRecord): Hand {
@@ -37,7 +38,11 @@ data class Hand(
                 listFromDbJson<Card>(hand.north),
                 listFromDbJson<Card>(hand.east),
                 listFromDbJson<Card>(hand.south),
-                listFromDbJson<Card>(hand.west)
+                listFromDbJson<Card>(hand.west),
+                listFromDbJson<Weis>(hand.northWeise),
+                listFromDbJson<Weis>(hand.eastWeise),
+                listFromDbJson<Weis>(hand.southWeise),
+                listFromDbJson<Weis>(hand.westWeise)
             )
         }
     }
@@ -48,6 +53,15 @@ data class Hand(
             Position.EAST -> this.east
             Position.SOUTH -> this.south
             Position.WEST -> this.west
+        }
+    }
+
+    fun weiseOf(position: Position): List<Weis> {
+        return when (position) {
+            Position.NORTH -> this.northWeise
+            Position.EAST -> this.eastWeise
+            Position.SOUTH -> this.southWeise
+            Position.WEST -> this.westWeise
         }
     }
 

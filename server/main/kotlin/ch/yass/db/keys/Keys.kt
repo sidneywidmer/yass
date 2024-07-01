@@ -4,61 +4,15 @@
 package ch.yass.db.keys
 
 
-import ch.yass.db.tables.ContinuityContainers
-import ch.yass.db.tables.CourierMessageDispatches
-import ch.yass.db.tables.CourierMessages
-import ch.yass.db.tables.FlywaySchemaHistory
 import ch.yass.db.tables.Game
 import ch.yass.db.tables.Hand
-import ch.yass.db.tables.Identities
-import ch.yass.db.tables.IdentityCredentialIdentifiers
-import ch.yass.db.tables.IdentityCredentialTypes
-import ch.yass.db.tables.IdentityCredentials
-import ch.yass.db.tables.IdentityRecoveryAddresses
-import ch.yass.db.tables.IdentityRecoveryCodes
-import ch.yass.db.tables.IdentityRecoveryTokens
-import ch.yass.db.tables.IdentityVerifiableAddresses
-import ch.yass.db.tables.IdentityVerificationCodes
-import ch.yass.db.tables.IdentityVerificationTokens
-import ch.yass.db.tables.Networks
 import ch.yass.db.tables.Player
 import ch.yass.db.tables.Seat
-import ch.yass.db.tables.SelfserviceErrors
-import ch.yass.db.tables.SelfserviceLoginFlows
-import ch.yass.db.tables.SelfserviceRecoveryFlows
-import ch.yass.db.tables.SelfserviceRegistrationFlows
-import ch.yass.db.tables.SelfserviceSettingsFlows
-import ch.yass.db.tables.SelfserviceVerificationFlows
-import ch.yass.db.tables.SessionDevices
-import ch.yass.db.tables.Sessions
 import ch.yass.db.tables.Trick
-import ch.yass.db.tables.records.ContinuityContainersRecord
-import ch.yass.db.tables.records.CourierMessageDispatchesRecord
-import ch.yass.db.tables.records.CourierMessagesRecord
-import ch.yass.db.tables.records.FlywaySchemaHistoryRecord
 import ch.yass.db.tables.records.GameRecord
 import ch.yass.db.tables.records.HandRecord
-import ch.yass.db.tables.records.IdentitiesRecord
-import ch.yass.db.tables.records.IdentityCredentialIdentifiersRecord
-import ch.yass.db.tables.records.IdentityCredentialTypesRecord
-import ch.yass.db.tables.records.IdentityCredentialsRecord
-import ch.yass.db.tables.records.IdentityRecoveryAddressesRecord
-import ch.yass.db.tables.records.IdentityRecoveryCodesRecord
-import ch.yass.db.tables.records.IdentityRecoveryTokensRecord
-import ch.yass.db.tables.records.IdentityVerifiableAddressesRecord
-import ch.yass.db.tables.records.IdentityVerificationCodesRecord
-import ch.yass.db.tables.records.IdentityVerificationTokensRecord
-import ch.yass.db.tables.records.NetworksRecord
 import ch.yass.db.tables.records.PlayerRecord
 import ch.yass.db.tables.records.SeatRecord
-import ch.yass.db.tables.records.SelfserviceErrorsRecord
-import ch.yass.db.tables.records.SelfserviceLoginFlowsRecord
-import ch.yass.db.tables.records.SelfserviceRecoveryFlowsRecord
-import ch.yass.db.tables.records.SelfserviceRegistrationFlowsRecord
-import ch.yass.db.tables.records.SelfserviceSettingsFlowsRecord
-import ch.yass.db.tables.records.SelfserviceVerificationFlowsRecord
-import ch.yass.db.tables.records.SessionDevicesRecord
-import ch.yass.db.tables.records.SessionsRecord
 import ch.yass.db.tables.records.TrickRecord
 
 import org.jooq.ForeignKey
@@ -72,84 +26,18 @@ import org.jooq.impl.Internal
 // UNIQUE and PRIMARY KEY definitions
 // -------------------------------------------------------------------------
 
-val CONTINUITY_CONTAINERS_PKEY: UniqueKey<ContinuityContainersRecord> = Internal.createUniqueKey(ContinuityContainers.CONTINUITY_CONTAINERS, DSL.name("continuity_containers_pkey"), arrayOf(ContinuityContainers.CONTINUITY_CONTAINERS.ID), true)
-val COURIER_MESSAGE_DISPATCHES_PKEY: UniqueKey<CourierMessageDispatchesRecord> = Internal.createUniqueKey(CourierMessageDispatches.COURIER_MESSAGE_DISPATCHES, DSL.name("courier_message_dispatches_pkey"), arrayOf(CourierMessageDispatches.COURIER_MESSAGE_DISPATCHES.ID), true)
-val COURIER_MESSAGES_PKEY: UniqueKey<CourierMessagesRecord> = Internal.createUniqueKey(CourierMessages.COURIER_MESSAGES, DSL.name("courier_messages_pkey"), arrayOf(CourierMessages.COURIER_MESSAGES.ID), true)
-val FLYWAY_SCHEMA_HISTORY_PK: UniqueKey<FlywaySchemaHistoryRecord> = Internal.createUniqueKey(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, DSL.name("flyway_schema_history_pk"), arrayOf(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.INSTALLED_RANK), true)
 val GAME_PKEY: UniqueKey<GameRecord> = Internal.createUniqueKey(Game.GAME, DSL.name("game_pkey"), arrayOf(Game.GAME.ID), true)
 val HAND_PKEY: UniqueKey<HandRecord> = Internal.createUniqueKey(Hand.HAND, DSL.name("hand_pkey"), arrayOf(Hand.HAND.ID), true)
-val IDENTITIES_PKEY: UniqueKey<IdentitiesRecord> = Internal.createUniqueKey(Identities.IDENTITIES, DSL.name("identities_pkey"), arrayOf(Identities.IDENTITIES.ID), true)
-val IDENTITY_CREDENTIAL_IDENTIFIERS_PKEY: UniqueKey<IdentityCredentialIdentifiersRecord> = Internal.createUniqueKey(IdentityCredentialIdentifiers.IDENTITY_CREDENTIAL_IDENTIFIERS, DSL.name("identity_credential_identifiers_pkey"), arrayOf(IdentityCredentialIdentifiers.IDENTITY_CREDENTIAL_IDENTIFIERS.ID), true)
-val IDENTITY_CREDENTIAL_TYPES_PKEY: UniqueKey<IdentityCredentialTypesRecord> = Internal.createUniqueKey(IdentityCredentialTypes.IDENTITY_CREDENTIAL_TYPES, DSL.name("identity_credential_types_pkey"), arrayOf(IdentityCredentialTypes.IDENTITY_CREDENTIAL_TYPES.ID), true)
-val IDENTITY_CREDENTIALS_PKEY: UniqueKey<IdentityCredentialsRecord> = Internal.createUniqueKey(IdentityCredentials.IDENTITY_CREDENTIALS, DSL.name("identity_credentials_pkey"), arrayOf(IdentityCredentials.IDENTITY_CREDENTIALS.ID), true)
-val IDENTITY_RECOVERY_ADDRESSES_PKEY: UniqueKey<IdentityRecoveryAddressesRecord> = Internal.createUniqueKey(IdentityRecoveryAddresses.IDENTITY_RECOVERY_ADDRESSES, DSL.name("identity_recovery_addresses_pkey"), arrayOf(IdentityRecoveryAddresses.IDENTITY_RECOVERY_ADDRESSES.ID), true)
-val IDENTITY_RECOVERY_CODES_PKEY: UniqueKey<IdentityRecoveryCodesRecord> = Internal.createUniqueKey(IdentityRecoveryCodes.IDENTITY_RECOVERY_CODES, DSL.name("identity_recovery_codes_pkey"), arrayOf(IdentityRecoveryCodes.IDENTITY_RECOVERY_CODES.ID), true)
-val IDENTITY_RECOVERY_TOKENS_PKEY: UniqueKey<IdentityRecoveryTokensRecord> = Internal.createUniqueKey(IdentityRecoveryTokens.IDENTITY_RECOVERY_TOKENS, DSL.name("identity_recovery_tokens_pkey"), arrayOf(IdentityRecoveryTokens.IDENTITY_RECOVERY_TOKENS.ID), true)
-val IDENTITY_VERIFIABLE_ADDRESSES_PKEY: UniqueKey<IdentityVerifiableAddressesRecord> = Internal.createUniqueKey(IdentityVerifiableAddresses.IDENTITY_VERIFIABLE_ADDRESSES, DSL.name("identity_verifiable_addresses_pkey"), arrayOf(IdentityVerifiableAddresses.IDENTITY_VERIFIABLE_ADDRESSES.ID), true)
-val IDENTITY_VERIFICATION_CODES_PKEY: UniqueKey<IdentityVerificationCodesRecord> = Internal.createUniqueKey(IdentityVerificationCodes.IDENTITY_VERIFICATION_CODES, DSL.name("identity_verification_codes_pkey"), arrayOf(IdentityVerificationCodes.IDENTITY_VERIFICATION_CODES.ID), true)
-val IDENTITY_VERIFICATION_TOKENS_PKEY: UniqueKey<IdentityVerificationTokensRecord> = Internal.createUniqueKey(IdentityVerificationTokens.IDENTITY_VERIFICATION_TOKENS, DSL.name("identity_verification_tokens_pkey"), arrayOf(IdentityVerificationTokens.IDENTITY_VERIFICATION_TOKENS.ID), true)
-val NETWORKS_PKEY: UniqueKey<NetworksRecord> = Internal.createUniqueKey(Networks.NETWORKS, DSL.name("networks_pkey"), arrayOf(Networks.NETWORKS.ID), true)
 val PLAYER_PKEY: UniqueKey<PlayerRecord> = Internal.createUniqueKey(Player.PLAYER, DSL.name("player_pkey"), arrayOf(Player.PLAYER.ID), true)
 val SEAT_PKEY: UniqueKey<SeatRecord> = Internal.createUniqueKey(Seat.SEAT, DSL.name("seat_pkey"), arrayOf(Seat.SEAT.ID), true)
-val SELFSERVICE_ERRORS_PKEY: UniqueKey<SelfserviceErrorsRecord> = Internal.createUniqueKey(SelfserviceErrors.SELFSERVICE_ERRORS, DSL.name("selfservice_errors_pkey"), arrayOf(SelfserviceErrors.SELFSERVICE_ERRORS.ID), true)
-val SELFSERVICE_LOGIN_REQUESTS_PKEY: UniqueKey<SelfserviceLoginFlowsRecord> = Internal.createUniqueKey(SelfserviceLoginFlows.SELFSERVICE_LOGIN_FLOWS, DSL.name("selfservice_login_requests_pkey"), arrayOf(SelfserviceLoginFlows.SELFSERVICE_LOGIN_FLOWS.ID), true)
-val SELFSERVICE_RECOVERY_REQUESTS_PKEY: UniqueKey<SelfserviceRecoveryFlowsRecord> = Internal.createUniqueKey(SelfserviceRecoveryFlows.SELFSERVICE_RECOVERY_FLOWS, DSL.name("selfservice_recovery_requests_pkey"), arrayOf(SelfserviceRecoveryFlows.SELFSERVICE_RECOVERY_FLOWS.ID), true)
-val SELFSERVICE_REGISTRATION_REQUESTS_PKEY: UniqueKey<SelfserviceRegistrationFlowsRecord> = Internal.createUniqueKey(SelfserviceRegistrationFlows.SELFSERVICE_REGISTRATION_FLOWS, DSL.name("selfservice_registration_requests_pkey"), arrayOf(SelfserviceRegistrationFlows.SELFSERVICE_REGISTRATION_FLOWS.ID), true)
-val SELFSERVICE_PROFILE_MANAGEMENT_REQUESTS_PKEY: UniqueKey<SelfserviceSettingsFlowsRecord> = Internal.createUniqueKey(SelfserviceSettingsFlows.SELFSERVICE_SETTINGS_FLOWS, DSL.name("selfservice_profile_management_requests_pkey"), arrayOf(SelfserviceSettingsFlows.SELFSERVICE_SETTINGS_FLOWS.ID), true)
-val SELFSERVICE_VERIFICATION_REQUESTS_PKEY: UniqueKey<SelfserviceVerificationFlowsRecord> = Internal.createUniqueKey(SelfserviceVerificationFlows.SELFSERVICE_VERIFICATION_FLOWS, DSL.name("selfservice_verification_requests_pkey"), arrayOf(SelfserviceVerificationFlows.SELFSERVICE_VERIFICATION_FLOWS.ID), true)
-val SESSION_DEVICES_PKEY: UniqueKey<SessionDevicesRecord> = Internal.createUniqueKey(SessionDevices.SESSION_DEVICES, DSL.name("session_devices_pkey"), arrayOf(SessionDevices.SESSION_DEVICES.ID), true)
-val UNIQUE_SESSION_DEVICE: UniqueKey<SessionDevicesRecord> = Internal.createUniqueKey(SessionDevices.SESSION_DEVICES, DSL.name("unique_session_device"), arrayOf(SessionDevices.SESSION_DEVICES.NID, SessionDevices.SESSION_DEVICES.SESSION_ID, SessionDevices.SESSION_DEVICES.IP_ADDRESS, SessionDevices.SESSION_DEVICES.USER_AGENT), true)
-val SESSIONS_PKEY: UniqueKey<SessionsRecord> = Internal.createUniqueKey(Sessions.SESSIONS, DSL.name("sessions_pkey"), arrayOf(Sessions.SESSIONS.ID), true)
 val TRICK_PKEY: UniqueKey<TrickRecord> = Internal.createUniqueKey(Trick.TRICK, DSL.name("trick_pkey"), arrayOf(Trick.TRICK.ID), true)
 
 // -------------------------------------------------------------------------
 // FOREIGN KEY definitions
 // -------------------------------------------------------------------------
 
-val CONTINUITY_CONTAINERS__CONTINUITY_CONTAINERS_IDENTITY_ID_FKEY: ForeignKey<ContinuityContainersRecord, IdentitiesRecord> = Internal.createForeignKey(ContinuityContainers.CONTINUITY_CONTAINERS, DSL.name("continuity_containers_identity_id_fkey"), arrayOf(ContinuityContainers.CONTINUITY_CONTAINERS.IDENTITY_ID), ch.yass.db.keys.IDENTITIES_PKEY, arrayOf(Identities.IDENTITIES.ID), true)
-val CONTINUITY_CONTAINERS__CONTINUITY_CONTAINERS_NID_FK_IDX: ForeignKey<ContinuityContainersRecord, NetworksRecord> = Internal.createForeignKey(ContinuityContainers.CONTINUITY_CONTAINERS, DSL.name("continuity_containers_nid_fk_idx"), arrayOf(ContinuityContainers.CONTINUITY_CONTAINERS.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
-val COURIER_MESSAGE_DISPATCHES__COURIER_MESSAGE_DISPATCHES_MESSAGE_ID_FK: ForeignKey<CourierMessageDispatchesRecord, CourierMessagesRecord> = Internal.createForeignKey(CourierMessageDispatches.COURIER_MESSAGE_DISPATCHES, DSL.name("courier_message_dispatches_message_id_fk"), arrayOf(CourierMessageDispatches.COURIER_MESSAGE_DISPATCHES.MESSAGE_ID), ch.yass.db.keys.COURIER_MESSAGES_PKEY, arrayOf(CourierMessages.COURIER_MESSAGES.ID), true)
-val COURIER_MESSAGE_DISPATCHES__COURIER_MESSAGE_DISPATCHES_NID_FK: ForeignKey<CourierMessageDispatchesRecord, NetworksRecord> = Internal.createForeignKey(CourierMessageDispatches.COURIER_MESSAGE_DISPATCHES, DSL.name("courier_message_dispatches_nid_fk"), arrayOf(CourierMessageDispatches.COURIER_MESSAGE_DISPATCHES.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
-val COURIER_MESSAGES__COURIER_MESSAGES_NID_FK_IDX: ForeignKey<CourierMessagesRecord, NetworksRecord> = Internal.createForeignKey(CourierMessages.COURIER_MESSAGES, DSL.name("courier_messages_nid_fk_idx"), arrayOf(CourierMessages.COURIER_MESSAGES.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
 val HAND__FK_HAND_ON_GAME: ForeignKey<HandRecord, GameRecord> = Internal.createForeignKey(Hand.HAND, DSL.name("fk_hand_on_game"), arrayOf(Hand.HAND.GAME_ID), ch.yass.db.keys.GAME_PKEY, arrayOf(Game.GAME.ID), true)
 val HAND__FK_HAND_ON_STARTING_PLAYER: ForeignKey<HandRecord, PlayerRecord> = Internal.createForeignKey(Hand.HAND, DSL.name("fk_hand_on_starting_player"), arrayOf(Hand.HAND.STARTING_PLAYER_ID), ch.yass.db.keys.PLAYER_PKEY, arrayOf(Player.PLAYER.ID), true)
-val IDENTITIES__IDENTITIES_NID_FK_IDX: ForeignKey<IdentitiesRecord, NetworksRecord> = Internal.createForeignKey(Identities.IDENTITIES, DSL.name("identities_nid_fk_idx"), arrayOf(Identities.IDENTITIES.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
-val IDENTITY_CREDENTIAL_IDENTIFIERS__IDENTITY_CREDENTIAL_IDENTIFIERS_IDENTITY_CREDENTIAL_ID_FKEY: ForeignKey<IdentityCredentialIdentifiersRecord, IdentityCredentialsRecord> = Internal.createForeignKey(IdentityCredentialIdentifiers.IDENTITY_CREDENTIAL_IDENTIFIERS, DSL.name("identity_credential_identifiers_identity_credential_id_fkey"), arrayOf(IdentityCredentialIdentifiers.IDENTITY_CREDENTIAL_IDENTIFIERS.IDENTITY_CREDENTIAL_ID), ch.yass.db.keys.IDENTITY_CREDENTIALS_PKEY, arrayOf(IdentityCredentials.IDENTITY_CREDENTIALS.ID), true)
-val IDENTITY_CREDENTIAL_IDENTIFIERS__IDENTITY_CREDENTIAL_IDENTIFIERS_NID_FK_IDX: ForeignKey<IdentityCredentialIdentifiersRecord, NetworksRecord> = Internal.createForeignKey(IdentityCredentialIdentifiers.IDENTITY_CREDENTIAL_IDENTIFIERS, DSL.name("identity_credential_identifiers_nid_fk_idx"), arrayOf(IdentityCredentialIdentifiers.IDENTITY_CREDENTIAL_IDENTIFIERS.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
-val IDENTITY_CREDENTIAL_IDENTIFIERS__IDENTITY_CREDENTIAL_IDENTIFIERS_TYPE_ID_FK_IDX: ForeignKey<IdentityCredentialIdentifiersRecord, IdentityCredentialTypesRecord> = Internal.createForeignKey(IdentityCredentialIdentifiers.IDENTITY_CREDENTIAL_IDENTIFIERS, DSL.name("identity_credential_identifiers_type_id_fk_idx"), arrayOf(IdentityCredentialIdentifiers.IDENTITY_CREDENTIAL_IDENTIFIERS.IDENTITY_CREDENTIAL_TYPE_ID), ch.yass.db.keys.IDENTITY_CREDENTIAL_TYPES_PKEY, arrayOf(IdentityCredentialTypes.IDENTITY_CREDENTIAL_TYPES.ID), true)
-val IDENTITY_CREDENTIALS__IDENTITY_CREDENTIALS_IDENTITY_CREDENTIAL_TYPE_ID_FKEY: ForeignKey<IdentityCredentialsRecord, IdentityCredentialTypesRecord> = Internal.createForeignKey(IdentityCredentials.IDENTITY_CREDENTIALS, DSL.name("identity_credentials_identity_credential_type_id_fkey"), arrayOf(IdentityCredentials.IDENTITY_CREDENTIALS.IDENTITY_CREDENTIAL_TYPE_ID), ch.yass.db.keys.IDENTITY_CREDENTIAL_TYPES_PKEY, arrayOf(IdentityCredentialTypes.IDENTITY_CREDENTIAL_TYPES.ID), true)
-val IDENTITY_CREDENTIALS__IDENTITY_CREDENTIALS_IDENTITY_ID_FKEY: ForeignKey<IdentityCredentialsRecord, IdentitiesRecord> = Internal.createForeignKey(IdentityCredentials.IDENTITY_CREDENTIALS, DSL.name("identity_credentials_identity_id_fkey"), arrayOf(IdentityCredentials.IDENTITY_CREDENTIALS.IDENTITY_ID), ch.yass.db.keys.IDENTITIES_PKEY, arrayOf(Identities.IDENTITIES.ID), true)
-val IDENTITY_CREDENTIALS__IDENTITY_CREDENTIALS_NID_FK_IDX: ForeignKey<IdentityCredentialsRecord, NetworksRecord> = Internal.createForeignKey(IdentityCredentials.IDENTITY_CREDENTIALS, DSL.name("identity_credentials_nid_fk_idx"), arrayOf(IdentityCredentials.IDENTITY_CREDENTIALS.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
-val IDENTITY_RECOVERY_ADDRESSES__IDENTITY_RECOVERY_ADDRESSES_IDENTITY_ID_FKEY: ForeignKey<IdentityRecoveryAddressesRecord, IdentitiesRecord> = Internal.createForeignKey(IdentityRecoveryAddresses.IDENTITY_RECOVERY_ADDRESSES, DSL.name("identity_recovery_addresses_identity_id_fkey"), arrayOf(IdentityRecoveryAddresses.IDENTITY_RECOVERY_ADDRESSES.IDENTITY_ID), ch.yass.db.keys.IDENTITIES_PKEY, arrayOf(Identities.IDENTITIES.ID), true)
-val IDENTITY_RECOVERY_ADDRESSES__IDENTITY_RECOVERY_ADDRESSES_NID_FK_IDX: ForeignKey<IdentityRecoveryAddressesRecord, NetworksRecord> = Internal.createForeignKey(IdentityRecoveryAddresses.IDENTITY_RECOVERY_ADDRESSES, DSL.name("identity_recovery_addresses_nid_fk_idx"), arrayOf(IdentityRecoveryAddresses.IDENTITY_RECOVERY_ADDRESSES.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
-val IDENTITY_RECOVERY_CODES__IDENTITY_RECOVERY_CODES_IDENTITY_ID_FK: ForeignKey<IdentityRecoveryCodesRecord, IdentitiesRecord> = Internal.createForeignKey(IdentityRecoveryCodes.IDENTITY_RECOVERY_CODES, DSL.name("identity_recovery_codes_identity_id_fk"), arrayOf(IdentityRecoveryCodes.IDENTITY_RECOVERY_CODES.IDENTITY_ID), ch.yass.db.keys.IDENTITIES_PKEY, arrayOf(Identities.IDENTITIES.ID), true)
-val IDENTITY_RECOVERY_CODES__IDENTITY_RECOVERY_CODES_IDENTITY_RECOVERY_ADDRESSES_ID_FK: ForeignKey<IdentityRecoveryCodesRecord, IdentityRecoveryAddressesRecord> = Internal.createForeignKey(IdentityRecoveryCodes.IDENTITY_RECOVERY_CODES, DSL.name("identity_recovery_codes_identity_recovery_addresses_id_fk"), arrayOf(IdentityRecoveryCodes.IDENTITY_RECOVERY_CODES.IDENTITY_RECOVERY_ADDRESS_ID), ch.yass.db.keys.IDENTITY_RECOVERY_ADDRESSES_PKEY, arrayOf(IdentityRecoveryAddresses.IDENTITY_RECOVERY_ADDRESSES.ID), true)
-val IDENTITY_RECOVERY_CODES__IDENTITY_RECOVERY_CODES_NETWORKS_ID_FK: ForeignKey<IdentityRecoveryCodesRecord, NetworksRecord> = Internal.createForeignKey(IdentityRecoveryCodes.IDENTITY_RECOVERY_CODES, DSL.name("identity_recovery_codes_networks_id_fk"), arrayOf(IdentityRecoveryCodes.IDENTITY_RECOVERY_CODES.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
-val IDENTITY_RECOVERY_CODES__IDENTITY_RECOVERY_CODES_SELFSERVICE_RECOVERY_FLOWS_ID_FK: ForeignKey<IdentityRecoveryCodesRecord, SelfserviceRecoveryFlowsRecord> = Internal.createForeignKey(IdentityRecoveryCodes.IDENTITY_RECOVERY_CODES, DSL.name("identity_recovery_codes_selfservice_recovery_flows_id_fk"), arrayOf(IdentityRecoveryCodes.IDENTITY_RECOVERY_CODES.SELFSERVICE_RECOVERY_FLOW_ID), ch.yass.db.keys.SELFSERVICE_RECOVERY_REQUESTS_PKEY, arrayOf(SelfserviceRecoveryFlows.SELFSERVICE_RECOVERY_FLOWS.ID), true)
-val IDENTITY_RECOVERY_TOKENS__IDENTITY_RECOVERY_TOKENS_IDENTITY_ID_FK_IDX: ForeignKey<IdentityRecoveryTokensRecord, IdentitiesRecord> = Internal.createForeignKey(IdentityRecoveryTokens.IDENTITY_RECOVERY_TOKENS, DSL.name("identity_recovery_tokens_identity_id_fk_idx"), arrayOf(IdentityRecoveryTokens.IDENTITY_RECOVERY_TOKENS.IDENTITY_ID), ch.yass.db.keys.IDENTITIES_PKEY, arrayOf(Identities.IDENTITIES.ID), true)
-val IDENTITY_RECOVERY_TOKENS__IDENTITY_RECOVERY_TOKENS_IDENTITY_RECOVERY_ADDRESS_ID_FKEY: ForeignKey<IdentityRecoveryTokensRecord, IdentityRecoveryAddressesRecord> = Internal.createForeignKey(IdentityRecoveryTokens.IDENTITY_RECOVERY_TOKENS, DSL.name("identity_recovery_tokens_identity_recovery_address_id_fkey"), arrayOf(IdentityRecoveryTokens.IDENTITY_RECOVERY_TOKENS.IDENTITY_RECOVERY_ADDRESS_ID), ch.yass.db.keys.IDENTITY_RECOVERY_ADDRESSES_PKEY, arrayOf(IdentityRecoveryAddresses.IDENTITY_RECOVERY_ADDRESSES.ID), true)
-val IDENTITY_RECOVERY_TOKENS__IDENTITY_RECOVERY_TOKENS_NID_FK_IDX: ForeignKey<IdentityRecoveryTokensRecord, NetworksRecord> = Internal.createForeignKey(IdentityRecoveryTokens.IDENTITY_RECOVERY_TOKENS, DSL.name("identity_recovery_tokens_nid_fk_idx"), arrayOf(IdentityRecoveryTokens.IDENTITY_RECOVERY_TOKENS.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
-val IDENTITY_RECOVERY_TOKENS__IDENTITY_RECOVERY_TOKENS_SELFSERVICE_RECOVERY_REQUEST_ID_FKEY: ForeignKey<IdentityRecoveryTokensRecord, SelfserviceRecoveryFlowsRecord> = Internal.createForeignKey(IdentityRecoveryTokens.IDENTITY_RECOVERY_TOKENS, DSL.name("identity_recovery_tokens_selfservice_recovery_request_id_fkey"), arrayOf(IdentityRecoveryTokens.IDENTITY_RECOVERY_TOKENS.SELFSERVICE_RECOVERY_FLOW_ID), ch.yass.db.keys.SELFSERVICE_RECOVERY_REQUESTS_PKEY, arrayOf(SelfserviceRecoveryFlows.SELFSERVICE_RECOVERY_FLOWS.ID), true)
-val IDENTITY_VERIFIABLE_ADDRESSES__IDENTITY_VERIFIABLE_ADDRESSES_IDENTITY_ID_FKEY: ForeignKey<IdentityVerifiableAddressesRecord, IdentitiesRecord> = Internal.createForeignKey(IdentityVerifiableAddresses.IDENTITY_VERIFIABLE_ADDRESSES, DSL.name("identity_verifiable_addresses_identity_id_fkey"), arrayOf(IdentityVerifiableAddresses.IDENTITY_VERIFIABLE_ADDRESSES.IDENTITY_ID), ch.yass.db.keys.IDENTITIES_PKEY, arrayOf(Identities.IDENTITIES.ID), true)
-val IDENTITY_VERIFIABLE_ADDRESSES__IDENTITY_VERIFIABLE_ADDRESSES_NID_FK_IDX: ForeignKey<IdentityVerifiableAddressesRecord, NetworksRecord> = Internal.createForeignKey(IdentityVerifiableAddresses.IDENTITY_VERIFIABLE_ADDRESSES, DSL.name("identity_verifiable_addresses_nid_fk_idx"), arrayOf(IdentityVerifiableAddresses.IDENTITY_VERIFIABLE_ADDRESSES.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
-val IDENTITY_VERIFICATION_CODES__IDENTITY_VERIFICATION_CODES_IDENTITY_VERIFIABLE_ADDRESSES_ID_FK: ForeignKey<IdentityVerificationCodesRecord, IdentityVerifiableAddressesRecord> = Internal.createForeignKey(IdentityVerificationCodes.IDENTITY_VERIFICATION_CODES, DSL.name("identity_verification_codes_identity_verifiable_addresses_id_fk"), arrayOf(IdentityVerificationCodes.IDENTITY_VERIFICATION_CODES.IDENTITY_VERIFIABLE_ADDRESS_ID), ch.yass.db.keys.IDENTITY_VERIFIABLE_ADDRESSES_PKEY, arrayOf(IdentityVerifiableAddresses.IDENTITY_VERIFIABLE_ADDRESSES.ID), true)
-val IDENTITY_VERIFICATION_CODES__IDENTITY_VERIFICATION_CODES_NETWORKS_ID_FK: ForeignKey<IdentityVerificationCodesRecord, NetworksRecord> = Internal.createForeignKey(IdentityVerificationCodes.IDENTITY_VERIFICATION_CODES, DSL.name("identity_verification_codes_networks_id_fk"), arrayOf(IdentityVerificationCodes.IDENTITY_VERIFICATION_CODES.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
-val IDENTITY_VERIFICATION_CODES__IDENTITY_VERIFICATION_CODES_SELFSERVICE_VERIFICATION_FLOWS_ID_F: ForeignKey<IdentityVerificationCodesRecord, SelfserviceVerificationFlowsRecord> = Internal.createForeignKey(IdentityVerificationCodes.IDENTITY_VERIFICATION_CODES, DSL.name("identity_verification_codes_selfservice_verification_flows_id_f"), arrayOf(IdentityVerificationCodes.IDENTITY_VERIFICATION_CODES.SELFSERVICE_VERIFICATION_FLOW_ID), ch.yass.db.keys.SELFSERVICE_VERIFICATION_REQUESTS_PKEY, arrayOf(SelfserviceVerificationFlows.SELFSERVICE_VERIFICATION_FLOWS.ID), true)
-val IDENTITY_VERIFICATION_TOKENS__IDENTITY_VERIFICATION_TOKENS_IDENTITY_VERIFIABLE_ADDRESS_I_FKEY: ForeignKey<IdentityVerificationTokensRecord, IdentityVerifiableAddressesRecord> = Internal.createForeignKey(IdentityVerificationTokens.IDENTITY_VERIFICATION_TOKENS, DSL.name("identity_verification_tokens_identity_verifiable_address_i_fkey"), arrayOf(IdentityVerificationTokens.IDENTITY_VERIFICATION_TOKENS.IDENTITY_VERIFIABLE_ADDRESS_ID), ch.yass.db.keys.IDENTITY_VERIFIABLE_ADDRESSES_PKEY, arrayOf(IdentityVerifiableAddresses.IDENTITY_VERIFIABLE_ADDRESSES.ID), true)
-val IDENTITY_VERIFICATION_TOKENS__IDENTITY_VERIFICATION_TOKENS_NID_FK_IDX: ForeignKey<IdentityVerificationTokensRecord, NetworksRecord> = Internal.createForeignKey(IdentityVerificationTokens.IDENTITY_VERIFICATION_TOKENS, DSL.name("identity_verification_tokens_nid_fk_idx"), arrayOf(IdentityVerificationTokens.IDENTITY_VERIFICATION_TOKENS.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
-val IDENTITY_VERIFICATION_TOKENS__IDENTITY_VERIFICATION_TOKENS_SELFSERVICE_VERIFICATION_FLOW_FKEY: ForeignKey<IdentityVerificationTokensRecord, SelfserviceVerificationFlowsRecord> = Internal.createForeignKey(IdentityVerificationTokens.IDENTITY_VERIFICATION_TOKENS, DSL.name("identity_verification_tokens_selfservice_verification_flow_fkey"), arrayOf(IdentityVerificationTokens.IDENTITY_VERIFICATION_TOKENS.SELFSERVICE_VERIFICATION_FLOW_ID), ch.yass.db.keys.SELFSERVICE_VERIFICATION_REQUESTS_PKEY, arrayOf(SelfserviceVerificationFlows.SELFSERVICE_VERIFICATION_FLOWS.ID), true)
 val SEAT__FK_SEAT_ON_GAME: ForeignKey<SeatRecord, GameRecord> = Internal.createForeignKey(Seat.SEAT, DSL.name("fk_seat_on_game"), arrayOf(Seat.SEAT.GAME_ID), ch.yass.db.keys.GAME_PKEY, arrayOf(Game.GAME.ID), true)
 val SEAT__FK_SEAT_ON_PLAYER: ForeignKey<SeatRecord, PlayerRecord> = Internal.createForeignKey(Seat.SEAT, DSL.name("fk_seat_on_player"), arrayOf(Seat.SEAT.PLAYER_ID), ch.yass.db.keys.PLAYER_PKEY, arrayOf(Player.PLAYER.ID), true)
-val SELFSERVICE_ERRORS__SELFSERVICE_ERRORS_NID_FK_IDX: ForeignKey<SelfserviceErrorsRecord, NetworksRecord> = Internal.createForeignKey(SelfserviceErrors.SELFSERVICE_ERRORS, DSL.name("selfservice_errors_nid_fk_idx"), arrayOf(SelfserviceErrors.SELFSERVICE_ERRORS.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
-val SELFSERVICE_LOGIN_FLOWS__SELFSERVICE_LOGIN_FLOWS_NID_FK_IDX: ForeignKey<SelfserviceLoginFlowsRecord, NetworksRecord> = Internal.createForeignKey(SelfserviceLoginFlows.SELFSERVICE_LOGIN_FLOWS, DSL.name("selfservice_login_flows_nid_fk_idx"), arrayOf(SelfserviceLoginFlows.SELFSERVICE_LOGIN_FLOWS.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
-val SELFSERVICE_RECOVERY_FLOWS__SELFSERVICE_RECOVERY_FLOWS_NID_FK_IDX: ForeignKey<SelfserviceRecoveryFlowsRecord, NetworksRecord> = Internal.createForeignKey(SelfserviceRecoveryFlows.SELFSERVICE_RECOVERY_FLOWS, DSL.name("selfservice_recovery_flows_nid_fk_idx"), arrayOf(SelfserviceRecoveryFlows.SELFSERVICE_RECOVERY_FLOWS.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
-val SELFSERVICE_RECOVERY_FLOWS__SELFSERVICE_RECOVERY_REQUESTS_RECOVERED_IDENTITY_ID_FKEY: ForeignKey<SelfserviceRecoveryFlowsRecord, IdentitiesRecord> = Internal.createForeignKey(SelfserviceRecoveryFlows.SELFSERVICE_RECOVERY_FLOWS, DSL.name("selfservice_recovery_requests_recovered_identity_id_fkey"), arrayOf(SelfserviceRecoveryFlows.SELFSERVICE_RECOVERY_FLOWS.RECOVERED_IDENTITY_ID), ch.yass.db.keys.IDENTITIES_PKEY, arrayOf(Identities.IDENTITIES.ID), true)
-val SELFSERVICE_REGISTRATION_FLOWS__SELFSERVICE_REGISTRATION_FLOWS_NID_FK_IDX: ForeignKey<SelfserviceRegistrationFlowsRecord, NetworksRecord> = Internal.createForeignKey(SelfserviceRegistrationFlows.SELFSERVICE_REGISTRATION_FLOWS, DSL.name("selfservice_registration_flows_nid_fk_idx"), arrayOf(SelfserviceRegistrationFlows.SELFSERVICE_REGISTRATION_FLOWS.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
-val SELFSERVICE_SETTINGS_FLOWS__SELFSERVICE_PROFILE_MANAGEMENT_REQUESTS_IDENTITY_ID_FKEY: ForeignKey<SelfserviceSettingsFlowsRecord, IdentitiesRecord> = Internal.createForeignKey(SelfserviceSettingsFlows.SELFSERVICE_SETTINGS_FLOWS, DSL.name("selfservice_profile_management_requests_identity_id_fkey"), arrayOf(SelfserviceSettingsFlows.SELFSERVICE_SETTINGS_FLOWS.IDENTITY_ID), ch.yass.db.keys.IDENTITIES_PKEY, arrayOf(Identities.IDENTITIES.ID), true)
-val SELFSERVICE_SETTINGS_FLOWS__SELFSERVICE_SETTINGS_FLOWS_NID_FK_IDX: ForeignKey<SelfserviceSettingsFlowsRecord, NetworksRecord> = Internal.createForeignKey(SelfserviceSettingsFlows.SELFSERVICE_SETTINGS_FLOWS, DSL.name("selfservice_settings_flows_nid_fk_idx"), arrayOf(SelfserviceSettingsFlows.SELFSERVICE_SETTINGS_FLOWS.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
-val SELFSERVICE_VERIFICATION_FLOWS__SELFSERVICE_VERIFICATION_FLOWS_NID_FK_IDX: ForeignKey<SelfserviceVerificationFlowsRecord, NetworksRecord> = Internal.createForeignKey(SelfserviceVerificationFlows.SELFSERVICE_VERIFICATION_FLOWS, DSL.name("selfservice_verification_flows_nid_fk_idx"), arrayOf(SelfserviceVerificationFlows.SELFSERVICE_VERIFICATION_FLOWS.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
-val SESSION_DEVICES__SESSION_METADATA_NID_FK: ForeignKey<SessionDevicesRecord, NetworksRecord> = Internal.createForeignKey(SessionDevices.SESSION_DEVICES, DSL.name("session_metadata_nid_fk"), arrayOf(SessionDevices.SESSION_DEVICES.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
-val SESSION_DEVICES__SESSION_METADATA_SESSIONS_ID_FK: ForeignKey<SessionDevicesRecord, SessionsRecord> = Internal.createForeignKey(SessionDevices.SESSION_DEVICES, DSL.name("session_metadata_sessions_id_fk"), arrayOf(SessionDevices.SESSION_DEVICES.SESSION_ID), ch.yass.db.keys.SESSIONS_PKEY, arrayOf(Sessions.SESSIONS.ID), true)
-val SESSIONS__SESSIONS_IDENTITY_ID_FKEY: ForeignKey<SessionsRecord, IdentitiesRecord> = Internal.createForeignKey(Sessions.SESSIONS, DSL.name("sessions_identity_id_fkey"), arrayOf(Sessions.SESSIONS.IDENTITY_ID), ch.yass.db.keys.IDENTITIES_PKEY, arrayOf(Identities.IDENTITIES.ID), true)
-val SESSIONS__SESSIONS_NID_FK_IDX: ForeignKey<SessionsRecord, NetworksRecord> = Internal.createForeignKey(Sessions.SESSIONS, DSL.name("sessions_nid_fk_idx"), arrayOf(Sessions.SESSIONS.NID), ch.yass.db.keys.NETWORKS_PKEY, arrayOf(Networks.NETWORKS.ID), true)
 val TRICK__FK_TRICK_ON_HAND: ForeignKey<TrickRecord, HandRecord> = Internal.createForeignKey(Trick.TRICK, DSL.name("fk_trick_on_hand"), arrayOf(Trick.TRICK.HAND_ID), ch.yass.db.keys.HAND_PKEY, arrayOf(Hand.HAND.ID), true)

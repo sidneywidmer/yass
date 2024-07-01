@@ -11,7 +11,6 @@ import ch.yass.game.api.*
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.api.internal.NewBotPlayer
 import ch.yass.game.api.internal.NewHand
-import ch.yass.game.api.internal.NewOryPlayer
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Game
 import ch.yass.game.dto.db.Player
@@ -136,8 +135,7 @@ class GameService(
 
         repo.chooseTrump(chosenTrump, currentHand)
 
-        val actions = trumpChosenActions(repo.getState(game), chosenTrump)
-        publishForSeats(state.seats) { actions }
+        publishForSeats(state.seats) { seat -> trumpChosenActions(repo.getState(game), chosenTrump, seat) }
 
         gameLoop(game)
 
@@ -205,6 +203,8 @@ class GameService(
      * The delays make a better UX, so e.g a trick is not removed instantly by ClearPlayedCards action. The
      * other option would be to delay these actions client side, but I opted for this solution to keep the
      * client and server state as in-sync as possible.
+     *
+     * TODO: Move these delays to the client side??
      */
     context(Raise<GameError>)
     @OptIn(DelicateCoroutinesApi::class)
@@ -228,6 +228,7 @@ class GameService(
             State.PLAY_CARD_BOT -> GlobalScope.launch { delay(200).also { playAsBot(updatedState) } }
             State.TRUMP_BOT -> trumpAsBot(updatedState)
             State.SCHIEBE_BOT -> schiebeAsBot(updatedState)
+            State.WEISEN -> {}
             State.NEW_TRICK -> GlobalScope.launch {
                 delay(1000)
                 repo.createTrick(currentHand)

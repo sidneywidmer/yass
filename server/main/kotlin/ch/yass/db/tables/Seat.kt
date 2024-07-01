@@ -8,22 +8,29 @@ import ch.yass.db.Public
 import ch.yass.db.keys.SEAT_PKEY
 import ch.yass.db.keys.SEAT__FK_SEAT_ON_GAME
 import ch.yass.db.keys.SEAT__FK_SEAT_ON_PLAYER
+import ch.yass.db.tables.Game.GamePath
+import ch.yass.db.tables.Player.PlayerPath
 import ch.yass.db.tables.records.SeatRecord
 
 import java.time.LocalDateTime
-import java.util.function.Function
 
+import kotlin.collections.Collection
 import kotlin.collections.List
 
+import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.Identity
+import org.jooq.InverseForeignKey
 import org.jooq.Name
+import org.jooq.Path
+import org.jooq.PlainSQL
+import org.jooq.QueryPart
 import org.jooq.Record
-import org.jooq.Records
-import org.jooq.Row10
+import org.jooq.SQL
 import org.jooq.Schema
-import org.jooq.SelectField
+import org.jooq.Select
+import org.jooq.Stringly
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.TableOptions
@@ -40,19 +47,23 @@ import org.jooq.impl.TableImpl
 @Suppress("UNCHECKED_CAST")
 open class Seat(
     alias: Name,
-    child: Table<out Record>?,
-    path: ForeignKey<out Record, SeatRecord>?,
+    path: Table<out Record>?,
+    childPath: ForeignKey<out Record, SeatRecord>?,
+    parentPath: InverseForeignKey<out Record, SeatRecord>?,
     aliased: Table<SeatRecord>?,
-    parameters: Array<Field<*>?>?
+    parameters: Array<Field<*>?>?,
+    where: Condition?
 ): TableImpl<SeatRecord>(
     alias,
     Public.PUBLIC,
-    child,
     path,
+    childPath,
+    parentPath,
     aliased,
     parameters,
     DSL.comment(""),
-    TableOptions.table()
+    TableOptions.table(),
+    where,
 ) {
     companion object {
 
@@ -110,15 +121,16 @@ open class Seat(
     /**
      * The column <code>public.seat.player_ping</code>.
      */
-    val PLAYER_PING: TableField<SeatRecord, LocalDateTime?> = createField(DSL.name("player_ping"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field("'2023-01-01 00:00:00'::timestamp without time zone", SQLDataType.LOCALDATETIME)), this, "")
+    val PLAYER_PING: TableField<SeatRecord, LocalDateTime?> = createField(DSL.name("player_ping"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("'2023-01-01 00:00:00'::timestamp without time zone"), SQLDataType.LOCALDATETIME)), this, "")
 
     /**
      * The column <code>public.seat.status</code>.
      */
-    val STATUS: TableField<SeatRecord, String?> = createField(DSL.name("status"), SQLDataType.VARCHAR(255).nullable(false).defaultValue(DSL.field("'DISCONNECTED'::character varying", SQLDataType.VARCHAR)), this, "")
+    val STATUS: TableField<SeatRecord, String?> = createField(DSL.name("status"), SQLDataType.VARCHAR(255).nullable(false).defaultValue(DSL.field(DSL.raw("'DISCONNECTED'::character varying"), SQLDataType.VARCHAR)), this, "")
 
-    private constructor(alias: Name, aliased: Table<SeatRecord>?): this(alias, null, null, aliased, null)
-    private constructor(alias: Name, aliased: Table<SeatRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, aliased, parameters)
+    private constructor(alias: Name, aliased: Table<SeatRecord>?): this(alias, null, null, null, aliased, null, null)
+    private constructor(alias: Name, aliased: Table<SeatRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
+    private constructor(alias: Name, aliased: Table<SeatRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
 
     /**
      * Create an aliased <code>public.seat</code> table reference
@@ -135,43 +147,55 @@ open class Seat(
      */
     constructor(): this(DSL.name("seat"), null)
 
-    constructor(child: Table<out Record>, key: ForeignKey<out Record, SeatRecord>): this(Internal.createPathAlias(child, key), child, key, SEAT, null)
+    constructor(path: Table<out Record>, childPath: ForeignKey<out Record, SeatRecord>?, parentPath: InverseForeignKey<out Record, SeatRecord>?): this(Internal.createPathAlias(path, childPath, parentPath), path, childPath, parentPath, SEAT, null, null)
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    open class SeatPath : Seat, Path<SeatRecord> {
+        constructor(path: Table<out Record>, childPath: ForeignKey<out Record, SeatRecord>?, parentPath: InverseForeignKey<out Record, SeatRecord>?): super(path, childPath, parentPath)
+        private constructor(alias: Name, aliased: Table<SeatRecord>): super(alias, aliased)
+        override fun `as`(alias: String): SeatPath = SeatPath(DSL.name(alias), this)
+        override fun `as`(alias: Name): SeatPath = SeatPath(alias, this)
+        override fun `as`(alias: Table<*>): SeatPath = SeatPath(alias.qualifiedName, this)
+    }
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
     override fun getIdentity(): Identity<SeatRecord, Int?> = super.getIdentity() as Identity<SeatRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<SeatRecord> = SEAT_PKEY
     override fun getReferences(): List<ForeignKey<SeatRecord, *>> = listOf(SEAT__FK_SEAT_ON_PLAYER, SEAT__FK_SEAT_ON_GAME)
 
-    private lateinit var _player: Player
-    private lateinit var _game: Game
+    private lateinit var _player: PlayerPath
 
     /**
      * Get the implicit join path to the <code>public.player</code> table.
      */
-    fun player(): Player {
+    fun player(): PlayerPath {
         if (!this::_player.isInitialized)
-            _player = Player(this, SEAT__FK_SEAT_ON_PLAYER)
+            _player = PlayerPath(this, SEAT__FK_SEAT_ON_PLAYER, null)
 
         return _player;
     }
 
-    val player: Player
-        get(): Player = player()
+    val player: PlayerPath
+        get(): PlayerPath = player()
+
+    private lateinit var _game: GamePath
 
     /**
      * Get the implicit join path to the <code>public.game</code> table.
      */
-    fun game(): Game {
+    fun game(): GamePath {
         if (!this::_game.isInitialized)
-            _game = Game(this, SEAT__FK_SEAT_ON_GAME)
+            _game = GamePath(this, SEAT__FK_SEAT_ON_GAME, null)
 
         return _game;
     }
 
-    val game: Game
-        get(): Game = game()
+    val game: GamePath
+        get(): GamePath = game()
     override fun `as`(alias: String): Seat = Seat(DSL.name(alias), this)
     override fun `as`(alias: Name): Seat = Seat(alias, this)
-    override fun `as`(alias: Table<*>): Seat = Seat(alias.getQualifiedName(), this)
+    override fun `as`(alias: Table<*>): Seat = Seat(alias.qualifiedName, this)
 
     /**
      * Rename this table
@@ -186,21 +210,55 @@ open class Seat(
     /**
      * Rename this table
      */
-    override fun rename(name: Table<*>): Seat = Seat(name.getQualifiedName(), null)
-
-    // -------------------------------------------------------------------------
-    // Row10 type methods
-    // -------------------------------------------------------------------------
-    override fun fieldsRow(): Row10<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, String?, LocalDateTime?, LocalDateTime?, String?> = super.fieldsRow() as Row10<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, String?, LocalDateTime?, LocalDateTime?, String?>
+    override fun rename(name: Table<*>): Seat = Seat(name.qualifiedName, null)
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    fun <U> mapping(from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, String?, LocalDateTime?, LocalDateTime?, String?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
+    override fun where(condition: Condition?): Seat = Seat(qualifiedName, if (aliased()) this else null, condition)
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    fun <U> mapping(toType: Class<U>, from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, String?, LocalDateTime?, LocalDateTime?, String?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
+    override fun where(conditions: Collection<Condition>): Seat = where(DSL.and(conditions))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    override fun where(vararg conditions: Condition?): Seat = where(DSL.and(*conditions))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    override fun where(condition: Field<Boolean?>?): Seat = where(DSL.condition(condition))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @PlainSQL override fun where(condition: SQL): Seat = where(DSL.condition(condition))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @PlainSQL override fun where(@Stringly.SQL condition: String): Seat = where(DSL.condition(condition))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg binds: Any?): Seat = where(DSL.condition(condition, *binds))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg parts: QueryPart): Seat = where(DSL.condition(condition, *parts))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    override fun whereExists(select: Select<*>): Seat = where(DSL.exists(select))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    override fun whereNotExists(select: Select<*>): Seat = where(DSL.notExists(select))
 }

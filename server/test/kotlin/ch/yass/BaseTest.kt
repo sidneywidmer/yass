@@ -10,7 +10,7 @@ import org.kodein.di.instance
 open class BaseTest {
     @BeforeEach
     fun before() {
-        cleanDB()
+//        cleanDB()
     }
 
     private fun cleanDB() {

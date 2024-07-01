@@ -7,23 +7,29 @@ package ch.yass.db.tables
 import ch.yass.db.Public
 import ch.yass.db.keys.TRICK_PKEY
 import ch.yass.db.keys.TRICK__FK_TRICK_ON_HAND
+import ch.yass.db.tables.Hand.HandPath
 import ch.yass.db.tables.records.TrickRecord
 
 import java.time.LocalDateTime
-import java.util.function.Function
 
+import kotlin.collections.Collection
 import kotlin.collections.List
 
+import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.Identity
+import org.jooq.InverseForeignKey
 import org.jooq.JSON
 import org.jooq.Name
+import org.jooq.Path
+import org.jooq.PlainSQL
+import org.jooq.QueryPart
 import org.jooq.Record
-import org.jooq.Records
-import org.jooq.Row9
+import org.jooq.SQL
 import org.jooq.Schema
-import org.jooq.SelectField
+import org.jooq.Select
+import org.jooq.Stringly
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.TableOptions
@@ -40,19 +46,23 @@ import org.jooq.impl.TableImpl
 @Suppress("UNCHECKED_CAST")
 open class Trick(
     alias: Name,
-    child: Table<out Record>?,
-    path: ForeignKey<out Record, TrickRecord>?,
+    path: Table<out Record>?,
+    childPath: ForeignKey<out Record, TrickRecord>?,
+    parentPath: InverseForeignKey<out Record, TrickRecord>?,
     aliased: Table<TrickRecord>?,
-    parameters: Array<Field<*>?>?
+    parameters: Array<Field<*>?>?,
+    where: Condition?
 ): TableImpl<TrickRecord>(
     alias,
     Public.PUBLIC,
-    child,
     path,
+    childPath,
+    parentPath,
     aliased,
     parameters,
     DSL.comment(""),
-    TableOptions.table()
+    TableOptions.table(),
+    where,
 ) {
     companion object {
 
@@ -112,8 +122,9 @@ open class Trick(
      */
     val WEST: TableField<TrickRecord, JSON?> = createField(DSL.name("west"), SQLDataType.JSON, this, "")
 
-    private constructor(alias: Name, aliased: Table<TrickRecord>?): this(alias, null, null, aliased, null)
-    private constructor(alias: Name, aliased: Table<TrickRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, aliased, parameters)
+    private constructor(alias: Name, aliased: Table<TrickRecord>?): this(alias, null, null, null, aliased, null, null)
+    private constructor(alias: Name, aliased: Table<TrickRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
+    private constructor(alias: Name, aliased: Table<TrickRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
 
     /**
      * Create an aliased <code>public.trick</code> table reference
@@ -130,29 +141,40 @@ open class Trick(
      */
     constructor(): this(DSL.name("trick"), null)
 
-    constructor(child: Table<out Record>, key: ForeignKey<out Record, TrickRecord>): this(Internal.createPathAlias(child, key), child, key, TRICK, null)
+    constructor(path: Table<out Record>, childPath: ForeignKey<out Record, TrickRecord>?, parentPath: InverseForeignKey<out Record, TrickRecord>?): this(Internal.createPathAlias(path, childPath, parentPath), path, childPath, parentPath, TRICK, null, null)
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    open class TrickPath : Trick, Path<TrickRecord> {
+        constructor(path: Table<out Record>, childPath: ForeignKey<out Record, TrickRecord>?, parentPath: InverseForeignKey<out Record, TrickRecord>?): super(path, childPath, parentPath)
+        private constructor(alias: Name, aliased: Table<TrickRecord>): super(alias, aliased)
+        override fun `as`(alias: String): TrickPath = TrickPath(DSL.name(alias), this)
+        override fun `as`(alias: Name): TrickPath = TrickPath(alias, this)
+        override fun `as`(alias: Table<*>): TrickPath = TrickPath(alias.qualifiedName, this)
+    }
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
     override fun getIdentity(): Identity<TrickRecord, Int?> = super.getIdentity() as Identity<TrickRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<TrickRecord> = TRICK_PKEY
     override fun getReferences(): List<ForeignKey<TrickRecord, *>> = listOf(TRICK__FK_TRICK_ON_HAND)
 
-    private lateinit var _hand: Hand
+    private lateinit var _hand: HandPath
 
     /**
      * Get the implicit join path to the <code>public.hand</code> table.
      */
-    fun hand(): Hand {
+    fun hand(): HandPath {
         if (!this::_hand.isInitialized)
-            _hand = Hand(this, TRICK__FK_TRICK_ON_HAND)
+            _hand = HandPath(this, TRICK__FK_TRICK_ON_HAND, null)
 
         return _hand;
     }
 
-    val hand: Hand
-        get(): Hand = hand()
+    val hand: HandPath
+        get(): HandPath = hand()
     override fun `as`(alias: String): Trick = Trick(DSL.name(alias), this)
     override fun `as`(alias: Name): Trick = Trick(alias, this)
-    override fun `as`(alias: Table<*>): Trick = Trick(alias.getQualifiedName(), this)
+    override fun `as`(alias: Table<*>): Trick = Trick(alias.qualifiedName, this)
 
     /**
      * Rename this table
@@ -167,21 +189,55 @@ open class Trick(
     /**
      * Rename this table
      */
-    override fun rename(name: Table<*>): Trick = Trick(name.getQualifiedName(), null)
-
-    // -------------------------------------------------------------------------
-    // Row9 type methods
-    // -------------------------------------------------------------------------
-    override fun fieldsRow(): Row9<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, JSON?, JSON?, JSON?, JSON?> = super.fieldsRow() as Row9<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, JSON?, JSON?, JSON?, JSON?>
+    override fun rename(name: Table<*>): Trick = Trick(name.qualifiedName, null)
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    fun <U> mapping(from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, JSON?, JSON?, JSON?, JSON?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
+    override fun where(condition: Condition?): Trick = Trick(qualifiedName, if (aliased()) this else null, condition)
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    fun <U> mapping(toType: Class<U>, from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, JSON?, JSON?, JSON?, JSON?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
+    override fun where(conditions: Collection<Condition>): Trick = where(DSL.and(conditions))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    override fun where(vararg conditions: Condition?): Trick = where(DSL.and(*conditions))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    override fun where(condition: Field<Boolean?>?): Trick = where(DSL.condition(condition))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @PlainSQL override fun where(condition: SQL): Trick = where(DSL.condition(condition))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @PlainSQL override fun where(@Stringly.SQL condition: String): Trick = where(DSL.condition(condition))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg binds: Any?): Trick = where(DSL.condition(condition, *binds))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg parts: QueryPart): Trick = where(DSL.condition(condition, *parts))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    override fun whereExists(select: Select<*>): Trick = where(DSL.exists(select))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    override fun whereNotExists(select: Select<*>): Trick = where(DSL.notExists(select))
 }

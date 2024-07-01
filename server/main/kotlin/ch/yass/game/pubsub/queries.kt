@@ -26,6 +26,7 @@ fun newHandActions(state: GameState, seat: Seat): List<Action> {
         UpdateHand(cards, true),
         UpdatePoints(points),
         ClearPlayedCards(winningPos),
+        ClearPlayedCards(winningPos),
     )
 }
 
@@ -87,13 +88,17 @@ fun cardPlayedActions(state: GameState, card: Card, playedBy: Seat, seat: Seat):
     )
 }
 
-fun trumpChosenActions(state: GameState, trump: Trump): List<Action> {
+fun trumpChosenActions(state: GameState, trump: Trump, seat: Seat): List<Action> {
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
+    val hand = currentHand(state.hands)!!
+    val cards = hand.cardsOf(seat.position) // We don't care about CardInHand since the state is wurst
+    val weise = possibleWeise(cards, trump)
 
     return listOf(
         UpdateActive(activePosition),
         UpdateState(nextState),
+        UpdatePossibleWeise(weise),
         UpdateTrump(trump),
     )
 }
