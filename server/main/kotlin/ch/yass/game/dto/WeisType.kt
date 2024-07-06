@@ -11,5 +11,5 @@ enum class WeisType {
     VIER_GLEICHE,
     VIER_NELL,
     VIER_BUUR,
-    STEOCK
+    STOECK,
 }
