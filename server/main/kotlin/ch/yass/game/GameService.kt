@@ -228,7 +228,8 @@ class GameService(
             State.PLAY_CARD_BOT -> GlobalScope.launch { delay(200).also { playAsBot(updatedState) } }
             State.TRUMP_BOT -> trumpAsBot(updatedState)
             State.SCHIEBE_BOT -> schiebeAsBot(updatedState)
-            State.WEISEN -> {}
+            State.WEISEN_FIRST -> {}
+            State.WEISEN_SECOND -> {}
             State.NEW_TRICK -> GlobalScope.launch {
                 delay(1000)
                 repo.createTrick(currentHand)

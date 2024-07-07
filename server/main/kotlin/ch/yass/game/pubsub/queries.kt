@@ -26,7 +26,6 @@ fun newHandActions(state: GameState, seat: Seat): List<Action> {
         UpdateHand(cards, true),
         UpdatePoints(points),
         ClearPlayedCards(winningPos),
-        ClearPlayedCards(winningPos),
     )
 }
 
@@ -36,7 +35,7 @@ fun gameFinishedActions(state: GameState): List<Action> {
 
     // Calculate the sum of points for each pair
     val pointsSum = pairs.map { pair ->
-        val sum = points[pair.first]!! + points[pair.second]!!
+        val sum = points[pair.first]!!.total() + points[pair.second]!!.total()
         Pair(pair, sum)
     }
 
@@ -93,7 +92,7 @@ fun trumpChosenActions(state: GameState, trump: Trump, seat: Seat): List<Action>
     val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
     val hand = currentHand(state.hands)!!
     val cards = hand.cardsOf(seat.position) // We don't care about CardInHand since the state is wurst
-    val weise = possibleWeise(cards, trump)
+    val weise = possibleWeiseWithPoints(cards, trump)
 
     return listOf(
         UpdateActive(activePosition),

@@ -9,6 +9,7 @@ import ch.yass.core.error.GameWithCodeNotFound
 import ch.yass.core.helper.takeWhileInclusive
 import ch.yass.game.GameService
 import ch.yass.game.api.internal.GameState
+import ch.yass.game.dto.Points
 import ch.yass.game.dto.db.Hand
 import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Trick
@@ -24,12 +25,9 @@ class AnalyzeGameService(private val gameService: GameService) {
     fun analyze(code: String): AnalyzeGameStateResponse {
         val state = gameService.getStateByCode(code)
         val hands = state.hands.reversed().stream().map { mapHand(it, state) }.toList()
-        val totalPoints = hands.map { it.points }
-            .flatMap { it.entries }
-            .groupBy({ it.key }) { it.value }
-            .mapValues { it.value.sum() }
+        val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks, state.seats)
 
-        return AnalyzeGameStateResponse(hands, totalPoints, state.game.uuid)
+        return AnalyzeGameStateResponse(hands, points, state.game.uuid)
     }
 
     private fun mapHand(hand: Hand, state: GameState): ch.yass.admin.api.analzye.Hand {
@@ -37,7 +35,7 @@ class AnalyzeGameService(private val gameService: GameService) {
         val players = state.allPlayers.map { mapPlayer(it, hand, state) }.toList()
         val tricksOfHand = tricksOfHand(state.tricks, hand) // newest trick is index 0
         val tricks = tricksOfHand.map { mapTrick(it, state, tricksOfHand, hand) }
-        val points = pointsByPosition(hand, completeTricksOfHand(state.tricks, hand), state.seats)
+        val points = pointsByPositionTotal(listOf(hand), completeTricksOfHand(state.tricks, hand), state.seats)
 
         return AnalyzeHand(hand.trump, hand.gschobe, startingPlayer, players, tricks.reversed(), points)
     }
@@ -51,8 +49,8 @@ class AnalyzeGameService(private val gameService: GameService) {
         val winningPlayer = winningPosition?.let { playerAtPosition(winningPosition, state.seats, state.allPlayers) }
         val cards = positionsOrderedWithStart(leadPosition).map {
             PlayedCardWithPlayer(
-                playerAtPosition(it, state.seats, state.allPlayers)!!,
-                trick.cardOf(it)
+                    playerAtPosition(it, state.seats, state.allPlayers)!!,
+                    trick.cardOf(it)
             )
         }
 

@@ -75,9 +75,9 @@ class GameController(private val service: GameService, private val repo: GameRep
         val playedCards = currentTrick(state.tricks)!!.cardsByPosition()
         val otherPlayers = Position.entries
             .map { pos ->
-                val player = playerAtPosition(pos, state.seats, state.allPlayers)
-                val seat = player?.let { playerSeat(player, state.seats) }
-                Pair(seat, player)
+                val p = playerAtPosition(pos, state.seats, state.allPlayers)
+                val s = p?.let { playerSeat(p, state.seats) }
+                Pair(s, p)
             }
             .mapNotNull { pair ->
                 pair.second?.let {

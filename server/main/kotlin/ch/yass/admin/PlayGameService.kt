@@ -1,15 +1,10 @@
 package ch.yass.admin
 
 import arrow.core.raise.Raise
-import arrow.core.raise.fold
 import ch.yass.admin.api.PlayGameResponse
-import ch.yass.core.error.GameError
 import ch.yass.core.error.GameWithCodeNotFound
-import ch.yass.core.error.PlayerDoesNotOwnCard
 import ch.yass.game.GameService
 import ch.yass.game.api.internal.GameState
-import ch.yass.game.dto.CardInHand
-import ch.yass.game.dto.CardInHandState.*
 import ch.yass.game.dto.SeatState
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*

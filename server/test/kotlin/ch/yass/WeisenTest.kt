@@ -4,6 +4,7 @@ import ch.yass.game.dto.*
 import ch.yass.game.engine.blattWeise
 import ch.yass.game.engine.gleicheWeise
 import ch.yass.game.engine.possibleWeise
+import ch.yass.game.engine.possibleWeiseWithPoints
 import org.junit.jupiter.api.Test
 
 class WeisenTest : BaseTest() {
@@ -33,6 +34,26 @@ class WeisenTest : BaseTest() {
         assert(dreiBlatt !== null)
         assert(vierBlatt?.cards?.size == 4)
         assert(dreiBlatt?.cards?.size == 3)
+    }
+
+    @Test
+    fun testWeisPoints() {
+        val cards = listOf(
+                Card(Suit.CLUBS, Rank.SIX, ""),
+                Card(Suit.CLUBS, Rank.KING, ""),
+                Card(Suit.CLUBS, Rank.QUEEN, ""),
+                Card(Suit.CLUBS, Rank.SEVEN, ""),
+                Card(Suit.CLUBS, Rank.EIGHT, ""),
+                Card(Suit.CLUBS, Rank.JACK, ""),
+                Card(Suit.CLUBS, Rank.ACE, ""),
+                Card(Suit.HEARTS, Rank.NINE, ""),
+                Card(Suit.HEARTS, Rank.TEN, ""),
+                Card(Suit.HEARTS, Rank.JACK, ""),
+                Card(Suit.DIAMONDS, Rank.NINE, ""),
+        )
+
+        val result = possibleWeiseWithPoints(cards, Trump.CLUBS)
+        assert(result.sumOf { it.points } == 90)
     }
 
     @Test

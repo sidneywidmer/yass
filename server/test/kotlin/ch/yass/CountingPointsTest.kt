@@ -5,7 +5,7 @@ import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Gschobe
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.Trump
-import ch.yass.game.engine.pointsByPosition
+import ch.yass.game.engine.cardPointsByPosition
 import ch.yass.game.engine.tricksOfHand
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -40,7 +40,7 @@ class CountingPointsTest : BaseTest() {
         val state = getStateSpades()
         val hand = state.hands.first()
 
-        val points = pointsByPosition(hand, tricksOfHand(state.tricks, hand), state.seats)
+        val points = cardPointsByPosition(hand, tricksOfHand(state.tricks, hand), state.seats)
         assertEquals(50, points[Position.NORTH])
     }
 
