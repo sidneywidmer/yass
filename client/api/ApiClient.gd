@@ -1,7 +1,7 @@
 extends BaseClient
 
 func _init():
-	super._init("http://172.25.57.42:8080", 5, true, true)
+	super._init("http://localhost:8080", 5, true, true)
 
 func whoami(on_success: Callable, on_error: Callable) -> void:
 	_http_get(
@@ -47,6 +47,14 @@ func trump(game: String, trump_value: String, on_success: Callable, on_error: Ca
 	_http_post(
 		"/game/trump",
 		{"game": game, "trump": trump_value},
+		on_success,
+		on_error
+	)
+	
+func weisen(game: String, weis: Dictionary, on_success: Callable, on_error: Callable):
+	_http_post(
+		"/game/weisen",
+		{"game": game, "weis": weis},
 		on_success,
 		on_error
 	)

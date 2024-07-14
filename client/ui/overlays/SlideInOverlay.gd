@@ -6,6 +6,7 @@ extends Control
 
 var content = null
 var original_position = null
+var open: bool = false
 
 func _ready():
 	original_position = overlay.global_position.y
@@ -22,6 +23,10 @@ func pass_additional_params(params: Dictionary):
 	content.add_additional_params(params)
 
 func slide_in(params: Dictionary):
+	if open:
+		return
+		
+	open = true
 	content.before_slide_in(params)
 	overlay.position.y = -overlay.size.y
 	self.visible = true
@@ -34,6 +39,10 @@ func slide_in(params: Dictionary):
 	bg_tween.tween_property(background, "modulate:a", 0.5, 0.3)
 
 func slide_out():
+	if !open:
+		return
+		
+	open = false
 	var overlay_tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 	overlay_tween.tween_property(overlay, "position:y", -overlay.size.y, 0.3).finished.connect(_on_slide_out_complete)
 

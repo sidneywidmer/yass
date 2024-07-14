@@ -64,6 +64,7 @@ func socket_disconnect():
 func socket_seat_unsubscribe(uuid: String):
 	var channel = "seat:#{uuid}".format({"uuid": uuid})
 	_socket.send_text(JSON.stringify({"unsubscribe":{"channel": channel},"id":2}))
+	_ping_timer.timeout.disconnect(_on_ping_timeout)
 	_ping_timer.stop()
 
 func socket_seat_subscribe(uuid: String, on_message: Callable):
@@ -75,10 +76,13 @@ func socket_seat_subscribe(uuid: String, on_message: Callable):
 	_ping_timer.timeout.connect(_on_ping_timeout)
 	
 func _on_ping_timeout():
-	ApiClient.ping(Player.game_init_data["seat"]["uuid"], _on_ping_success, _on_ping_timeout)
+	ApiClient.ping(Player.game_init_data["seat"]["uuid"], _on_ping_success, _on_ping_failed)
 	
 func _on_ping_success(_data):
 	pass
+	
+func _on_ping_failed(_response_code: int, _result: int, _parsed):
+	print("Ping failed")
 	
 func _socket_subscribe(channel: String, on_message: Callable):
 	_socket.send_text(JSON.stringify({"subscribe":{"channel": channel},"id":2}))
@@ -146,3 +150,7 @@ func _process(_delta):
 	elif state == WebSocketPeer.STATE_CLOSED:
 		_socket_connected = false
 		_socket_poll = false
+		print("closed ws connection")
+		await get_tree().create_timer(2.0).timeout
+		print("trying to reconnect")
+		socket_connect()
