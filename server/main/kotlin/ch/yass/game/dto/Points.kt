@@ -6,5 +6,5 @@ data class TotalPoints(val cardPoints: Int, val weisPoints: Int) {
     }
 }
 typealias Points = Map<Position, TotalPoints>
-typealias SplitPoints = Map<Position, Int>
+typealias SplitPoints = Map<Position, Int> // Either points by Cards or by Weis
 

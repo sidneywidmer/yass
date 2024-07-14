@@ -135,7 +135,40 @@ class GameService(
 
         repo.chooseTrump(chosenTrump, currentHand)
 
-        publishForSeats(state.seats) { seat -> trumpChosenActions(repo.getState(game), chosenTrump, seat) }
+        val freshState = repo.getState(game)
+        publishForSeats(state.seats) { seat -> trumpChosenActions(freshState, chosenTrump, seat) }
+
+        gameLoop(game)
+
+        return repo.getState(game)
+    }
+
+    context(Raise<GameError>)
+    fun weisen(request: WeisenRequest, player: Player): GameState {
+        val game = repo.getByUUID(request.game)
+        val state = repo.getState(game)
+        val nextState = nextState(state)
+        val hand = currentHand(state.hands)!!
+        val seat = playerSeat(player, state.seats)
+
+        ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
+        ensure(expectedState(listOf(State.WEISEN_FIRST), nextState)) { InvalidState(nextState, state) }
+        ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
+        ensure(
+            possibleWeise(
+                hand.cardsOf(seat.position),
+                hand.trump!!
+            ).contains(request.weis)
+        ) { WeisInvalid(request.weis) }
+
+        val weise = hand.weiseOf(seat.position).orEmpty().toMutableList()
+        weise.add(request.weis)
+
+        repo.updateWeise(seat, hand, weise)
+
+        val freshState = repo.getState(game)
+        // TODO:
+//        publishForSeats(state.seats) { seat -> trumpChosenActions(repo.getState(game), chosenTrump, seat) }
 
         gameLoop(game)
 
@@ -298,4 +331,5 @@ class GameService(
 
         return schiebe(request, botPlayer)
     }
+
 }

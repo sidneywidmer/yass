@@ -29,15 +29,12 @@ fun unplayedCardsOfPlayer(player: Player, hands: List<Hand>, seats: List<Seat>, 
 
 fun isTrumpSet(hand: Hand?): Boolean = hand?.trump != null
 
-fun isAlreadyGewiesen(position: Position, hand: Hand?, tricks: List<Trick>): Boolean {
-    return tricks.count() == 1 && tricks[0].cardOf(position) == null && hand?.weiseOf(position) == null
-}
+fun isAlreadyGewiesen(position: Position, hand: Hand?, tricks: List<Trick>, weise: List<Weis>): Boolean =
+    tricks.count() != 1 || tricks[0].cardOf(position) != null || hand?.weiseOf(position) != null || weise.isEmpty()
 
 fun isAlreadyGschobe(hand: Hand?): Boolean = hand?.gschobe != Gschobe.NOT_YET
 
-fun playerInGame(player: Player, seats: List<Seat>): Boolean {
-    return seats.any { it.playerId == player.id }
-}
+fun playerInGame(player: Player, seats: List<Seat>): Boolean = seats.any { it.playerId == player.id }
 
 fun playerOwnsSeat(player: Player, seatUuid: String, seats: List<Seat>): Boolean =
     seats.firstOrNull { it.playerId == player.id }?.uuid.toString() == seatUuid

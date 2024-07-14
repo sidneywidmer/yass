@@ -1,10 +1,7 @@
 package ch.yass.core.error
 
 import ch.yass.game.api.internal.GameState
-import ch.yass.game.dto.Card
-import ch.yass.game.dto.GameSettings
-import ch.yass.game.dto.State
-import ch.yass.game.dto.Trump
+import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Player
 import org.valiktor.ConstraintViolation
 import sh.ory.ApiException
@@ -42,6 +39,7 @@ data class PlayerDoesNotOwnCard(val player: Player, val card: Card, val state: G
 data class CardNotPlayable(val card: Card, val player: Player, val state: GameState) : GameError
 data class InvalidState(val nextState: State, val state: GameState) : GameError
 data class TrumpInvalid(val trump: Trump) : GameError
+data class WeisInvalid(val weis: Weis) : GameError
 data class PlayerIsNotBot(val player: Player, val state: GameState) : GameError
 data class GameSettingsMaxBots(val settings: GameSettings) : GameError
 data class GameSettingsInvalidValue(val settings: GameSettings) : GameError

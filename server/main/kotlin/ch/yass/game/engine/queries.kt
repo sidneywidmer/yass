@@ -72,6 +72,7 @@ fun nextState(state: GameState): State {
     val position = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
     val player = playerAtPosition(position, state.seats, state.allPlayers)!!
     val tricks = hand?.let { tricksOfHand(state.tricks, it) } ?: emptyList()
+    val weise = hand?.trump?.let { possibleWeise(hand.cardsOf(position), it) }.orEmpty()
 
     return when {
         state.allPlayers.size < 4 -> State.WAITING_FOR_PLAYERS
@@ -85,7 +86,7 @@ fun nextState(state: GameState): State {
         isTrickFinished(trick) -> State.NEW_TRICK
         !isAlreadyGschobe(hand) -> if (player.bot) State.SCHIEBE_BOT else State.SCHIEBE
         !isTrumpSet(hand) -> if (player.bot) State.TRUMP_BOT else State.TRUMP
-        !isAlreadyGewiesen(position, hand, tricks) -> State.WEISEN_FIRST
+        !isAlreadyGewiesen(position, hand, tricks, weise) -> State.WEISEN_FIRST
         else -> if (player.bot) State.PLAY_CARD_BOT else State.PLAY_CARD
     }
 }

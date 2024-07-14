@@ -95,9 +95,9 @@ fun trumpChosenActions(state: GameState, trump: Trump, seat: Seat): List<Action>
     val weise = possibleWeiseWithPoints(cards, trump)
 
     return listOf(
+        UpdatePossibleWeise(weise),
         UpdateActive(activePosition),
         UpdateState(nextState),
-        UpdatePossibleWeise(weise),
         UpdateTrump(trump),
     )
 }

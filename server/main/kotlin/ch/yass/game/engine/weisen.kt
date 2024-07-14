@@ -14,6 +14,9 @@ fun stoeckWeis(cards: List<Card>, trump: Trump): List<Weis> {
     return listOf(Weis(WeisType.STOECK, match))
 }
 
+/**
+ * Find cards of the same rank, e.g. 4 7's
+ */
 fun gleicheWeise(cards: List<Card>): List<Weis> =
         cards.groupBy { it.rank }.values
                 .filter { it.size == 4 }
