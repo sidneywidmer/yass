@@ -20,11 +20,11 @@ text = "weis.lbl.choose"
 horizontal_alignment = 1
 
 [node name="HContainer" type="VBoxContainer" parent="."]
-visible = false
 layout_mode = 2
 
 [node name="WeisRepeatable" type="CenterContainer" parent="HContainer"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4

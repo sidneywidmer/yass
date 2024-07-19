@@ -8,6 +8,7 @@ extends Node2D
 @onready var _trump_label = %Trump
 @onready var _choose_trump_gui = %ChooseTrump
 @onready var _choose_weis_gui = %ChooseWeis
+@onready var _show_weis_gui = %ShowWeis
 @onready var _game_finished_gui = %GameFinished
 @onready var _status_label = %StatusLabel
 @onready var _confetti = %Confetti
@@ -30,6 +31,7 @@ var socket_actions: Dictionary = {
 	"PlayerDisconnected": _on_player_disconnected,
 	"GameFinished": _on_game_finished,
 	"UpdatePossibleWeise": _on_update_possible_weise,
+	"ShowWeis": _on_show_weis,
 }
 var trumps: Dictionary = {
 	"SPADES": "♠️",
@@ -53,6 +55,7 @@ func _ready():
 	_table.game_scene = self
 	_choose_trump_gui.pass_additional_params({"game_scene": self})
 	_choose_weis_gui.pass_additional_params({"game_scene": self})
+	_show_weis_gui.pass_additional_params({"game_scene": self})
 	
 	Player.game_scene = self
 	Player.position = Players.PositionsEnum[Player.game_init_data["seat"]["position"]]
@@ -64,7 +67,7 @@ func _ready():
 	_on_update_points(Player.game_init_data["seat"])
 	Player.game_init_data["otherPlayers"].map(func(player): _on_player_joined({"player": player}))
 	
-	# If we got some players already in the game at login we"ll 
+	# If we got some players already in the game at login we'll 
 	# show them here including any cards they might"ve played
 	for card in Player.game_init_data["cardsPlayed"]:
 		_players.play(
@@ -205,3 +208,13 @@ func _on_game_finished(data):
 	
 func _on_update_possible_weise(data):
 	possible_weise = data["weise"]
+	
+func _on_show_weis(data):
+	# Don't show the weis because it's us
+	if data["position"] == Player.game_init_data["seat"]["position"]:
+		return
+		
+	if _show_weis_gui.open:
+		_show_weis_gui.push_data(data)
+	else:
+		_show_weis_gui.slide_in(data)

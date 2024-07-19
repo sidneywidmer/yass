@@ -17,7 +17,6 @@ func before_slide_in(params: Dictionary):
 	# TODO: Display nice playing cards and not just the name e.g. VIER_BLATT
 	for weis in weise:
 		var instance = weis_repeatable.duplicate()
-		instance.queue_free()
 		duplicates.append(instance)
 		instance.show()
 		
@@ -27,9 +26,12 @@ func before_slide_in(params: Dictionary):
 		add_child(instance)
 	
 func _on_weis_selected(weis: Dictionary):
-	parent_overlay.slide_out()
 	for inst in duplicates:
-		inst.queue_free()
+		if inst != null: # No idea how this can be null but sometimes happens
+			inst.queue_free()
+	
+	duplicates = []
+	parent_overlay.slide_out()
 		
 	ApiClient.weisen(Player.game_init_data["gameUuid"], weis, _on_weis_success, _on_weis_failed)
 

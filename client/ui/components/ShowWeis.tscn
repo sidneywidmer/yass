@@ -1,0 +1,48 @@
+[gd_scene load_steps=2 format=3 uid="uid://bbotevggdt46y"]
+
+[ext_resource type="Script" path="res://ui/components/ShowWeis.gd" id="1_iempk"]
+
+[node name="ShowWeis" type="VBoxContainer"]
+offset_right = 256.0
+offset_bottom = 240.0
+script = ExtResource("1_iempk")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_bottom = 10
+
+[node name="Label" type="Label" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.909804, 0.921569, 0.94902, 1)
+theme_override_font_sizes/font_size = 25
+text = "weis.lbl.show"
+horizontal_alignment = 1
+
+[node name="HContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="WeisRepeatable" type="CenterContainer" parent="HContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Label" type="Label" parent="HContainer/WeisRepeatable"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.909804, 0.921569, 0.94902, 1)
+text = "asdf"
+
+[node name="HContainer2" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="HContainer2"]
+layout_mode = 2
+theme_override_constants/margin_top = 20
+
+[node name="Button" type="Button" parent="HContainer2/MarginContainer"]
+layout_mode = 2
+text = "weis.btn.close"
+
+[connection signal="pressed" from="HContainer2/MarginContainer/Button" to="." method="_on_button_pressed"]

@@ -14,6 +14,7 @@ func _ready():
 	# Content needs a script with two functions:
 	# - add_additional_params
 	# - before_slide_in
+	# Additionally there is push_data that can be implementet
 	# With these we can react to those two events, i bet there's a better 
 	# way with signals but for now this works :)
 	content = container.get_child(0)
@@ -21,6 +22,9 @@ func _ready():
 func pass_additional_params(params: Dictionary):
 	params["parent_overlay"] = self
 	content.add_additional_params(params)
+	
+func push_data(params: Dictionary):
+	content.push_data(params)
 
 func slide_in(params: Dictionary):
 	if open:
