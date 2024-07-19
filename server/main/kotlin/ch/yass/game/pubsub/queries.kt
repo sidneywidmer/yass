@@ -7,6 +7,15 @@ import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
 
+/**
+ * Important: The list returned by each of these queries is not just by accident like it is. It's for example
+ * crucial that the active player state is changed BEFORE the clients get notified about the actual
+ * new state of the game. Since the order of a json array is preserved we don't have any problems,
+ * but it has been a source of some hard to debug problems in the past.
+ *
+ * https://stackoverflow.com/questions/7214293/is-the-order-of-elements-in-a-json-list-preserved
+ */
+
 fun newHandActions(state: GameState, seat: Seat): List<Action> {
     val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks, state.seats)
     val hand = currentHand(state.hands)!!
@@ -21,8 +30,8 @@ fun newHandActions(state: GameState, seat: Seat): List<Action> {
         winningPositionOfLastTrick(lastHand, tricksOfHand(state.tricks, lastHand), state.seats) ?: Position.SOUTH
 
     return listOf(
-        UpdateState(nextState),
         UpdateActive(activePosition),
+        UpdateState(nextState),
         UpdateHand(cards, true),
         UpdatePoints(points),
         ClearPlayedCards(winningPos),
@@ -65,8 +74,8 @@ fun newTrickActions(state: GameState, seat: Seat): List<Action> {
     val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
 
     return listOf(
-        UpdateState(nextState),
         UpdateActive(activePosition),
+        UpdateState(nextState),
         UpdateHand(cards, false),
         ClearPlayedCards(winningPos!!)
     )
@@ -80,8 +89,8 @@ fun cardPlayedActions(state: GameState, card: Card, playedBy: Seat, seat: Seat):
     val nextState = nextState(state)
 
     return listOf(
-        UpdateState(nextState),
         UpdateActive(activePosition),
+        UpdateState(nextState),
         CardPlayed(CardOnTable(card.suit, card.rank, card.skin, playedBy.position)),
         UpdateHand(cards, false),
     )
@@ -102,7 +111,19 @@ fun trumpChosenActions(state: GameState, trump: Trump, seat: Seat): List<Action>
     )
 }
 
-fun schiebeActions(state: GameState): List<Action> {
+fun gewiesenActions(state: GameState, weis: Weis, playedBy: Seat): List<Action> {
+    val nextState = nextState(state)
+    val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
+    val hand = currentHand(state.hands)!!
+
+    return listOf(
+        UpdateActive(activePosition),
+        UpdateState(nextState),
+        ShowWeis(playedBy.position, toWeisWithPoints(weis, hand.trump!!)),
+    )
+}
+
+fun geschobenActions(state: GameState): List<Action> {
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
 

@@ -152,7 +152,12 @@ class GameService(
         val seat = playerSeat(player, state.seats)
 
         ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
-        ensure(expectedState(listOf(State.WEISEN_FIRST), nextState)) { InvalidState(nextState, state) }
+        ensure(expectedState(listOf(State.WEISEN_FIRST, State.WEISEN_FIRST_BOT), nextState)) {
+            InvalidState(
+                nextState,
+                state
+            )
+        }
         ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
         ensure(
             possibleWeise(
@@ -161,14 +166,12 @@ class GameService(
             ).contains(request.weis)
         ) { WeisInvalid(request.weis) }
 
-        val weise = hand.weiseOf(seat.position).orEmpty().toMutableList()
+        val weise = hand.weiseOf(seat.position).toMutableList()
         weise.add(request.weis)
 
         repo.updateWeise(seat, hand, weise)
 
-        val freshState = repo.getState(game)
-        // TODO:
-//        publishForSeats(state.seats) { seat -> trumpChosenActions(repo.getState(game), chosenTrump, seat) }
+        publishForSeats(state.seats) { s -> gewiesenActions(repo.getState(game), request.weis, seat) }
 
         gameLoop(game)
 
@@ -189,7 +192,7 @@ class GameService(
 
         repo.schiebe(gschobe, currentHand)
 
-        val actions = schiebeActions(repo.getState(game))
+        val actions = geschobenActions(repo.getState(game))
         publishForSeats(state.seats) { actions }
 
         gameLoop(game)
@@ -262,6 +265,7 @@ class GameService(
             State.TRUMP_BOT -> trumpAsBot(updatedState)
             State.SCHIEBE_BOT -> schiebeAsBot(updatedState)
             State.WEISEN_FIRST -> {}
+            State.WEISEN_FIRST_BOT -> GlobalScope.launch { delay(200).also { weisenAsBot(updatedState) } }
             State.WEISEN_SECOND -> {}
             State.NEW_TRICK -> GlobalScope.launch {
                 delay(1000)
@@ -330,6 +334,19 @@ class GameService(
         val request = SchiebeRequest(state.game.uuid.toString(), gschobe.name)
 
         return schiebe(request, botPlayer)
+    }
+
+
+    context(Raise<GameError>)
+    private fun weisenAsBot(state: GameState): GameState {
+        val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)!!
+
+        // TODO: Better decision
+        val weis = chooseWeisForBot(botPlayer, state)
+        val request = WeisenRequest(state.game.uuid.toString(), weis)
+
+
+        return weisen(request, botPlayer)
     }
 
 }

@@ -144,22 +144,22 @@ open class Hand(
     /**
      * The column <code>public.hand.north_weise</code>.
      */
-    val NORTH_WEISE: TableField<HandRecord, JSON?> = createField(DSL.name("north_weise"), SQLDataType.JSON, this, "")
+    val NORTH_WEISE: TableField<HandRecord, JSON?> = createField(DSL.name("north_weise"), SQLDataType.JSON.nullable(false).defaultValue(DSL.field(DSL.raw("'[]'::json"), SQLDataType.JSON)), this, "")
 
     /**
      * The column <code>public.hand.east_weise</code>.
      */
-    val EAST_WEISE: TableField<HandRecord, JSON?> = createField(DSL.name("east_weise"), SQLDataType.JSON, this, "")
+    val EAST_WEISE: TableField<HandRecord, JSON?> = createField(DSL.name("east_weise"), SQLDataType.JSON.nullable(false).defaultValue(DSL.field(DSL.raw("'[]'::json"), SQLDataType.JSON)), this, "")
 
     /**
      * The column <code>public.hand.south_weise</code>.
      */
-    val SOUTH_WEISE: TableField<HandRecord, JSON?> = createField(DSL.name("south_weise"), SQLDataType.JSON, this, "")
+    val SOUTH_WEISE: TableField<HandRecord, JSON?> = createField(DSL.name("south_weise"), SQLDataType.JSON.nullable(false).defaultValue(DSL.field(DSL.raw("'[]'::json"), SQLDataType.JSON)), this, "")
 
     /**
      * The column <code>public.hand.west_weise</code>.
      */
-    val WEST_WEISE: TableField<HandRecord, JSON?> = createField(DSL.name("west_weise"), SQLDataType.JSON, this, "")
+    val WEST_WEISE: TableField<HandRecord, JSON?> = createField(DSL.name("west_weise"), SQLDataType.JSON.nullable(false).defaultValue(DSL.field(DSL.raw("'[]'::json"), SQLDataType.JSON)), this, "")
 
     /**
      * The column <code>public.hand.north_stoeck</code>.

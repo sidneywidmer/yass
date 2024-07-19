@@ -29,8 +29,17 @@ fun unplayedCardsOfPlayer(player: Player, hands: List<Hand>, seats: List<Seat>, 
 
 fun isTrumpSet(hand: Hand?): Boolean = hand?.trump != null
 
-fun isAlreadyGewiesen(position: Position, hand: Hand?, tricks: List<Trick>, weise: List<Weis>): Boolean =
-    tricks.count() != 1 || tricks[0].cardOf(position) != null || hand?.weiseOf(position) != null || weise.isEmpty()
+/**
+ * Check if the given position already played a weis and if it's the right moment to weis. This is the case if:
+ * It's not the welcome hand, it has to be the first trick in the hand, the player has not played a card yet,
+ * and the player has the possibility to weis with valid weise.
+ */
+fun isAlreadyGewiesen(position: Position, hand: Hand, tricks: List<Trick>, weise: List<Weis>): Boolean =
+    hand.trump == Trump.FREESTYLE
+            || tricks.count() != 1
+            || tricks[0].cardOf(position) != null
+            || hand.weiseOf(position).isNotEmpty()
+            || weise.isEmpty() // No possible weise, we treat this like the player already has gewiesen
 
 fun isAlreadyGschobe(hand: Hand?): Boolean = hand?.gschobe != Gschobe.NOT_YET
 
