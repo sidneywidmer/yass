@@ -101,7 +101,7 @@ fun trumpChosenActions(state: GameState, trump: Trump, seat: Seat): List<Action>
     val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
     val hand = currentHand(state.hands)!!
     val cards = hand.cardsOf(seat.position) // We don't care about CardInHand since the state is wurst
-    val weise = possibleWeiseWithPoints(cards, trump)
+    val weise = withoutStoeckPoints(possibleWeiseWithPoints(cards, trump))
 
     return listOf(
         UpdatePossibleWeise(weise),
@@ -119,7 +119,7 @@ fun gewiesenActions(state: GameState, weis: Weis, playedBy: Seat): List<Action> 
     return listOf(
         UpdateActive(activePosition),
         UpdateState(nextState),
-        ShowWeis(playedBy.position, toWeisWithPoints(weis, hand.trump!!)),
+        ShowWeis(playedBy.position, weis.toWeisWithPoints(hand.trump!!)),
     )
 }
 

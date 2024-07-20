@@ -13,7 +13,8 @@ fun chooseCardForBot(botPlayer: Player, state: GameState): Card {
     return Card(match.suit, match.rank, match.skin)
 }
 
-fun chooseTrumpForBot(botPlayer: Player, state: GameState): Trump = playableTrumps().shuffled().first()
+//fun chooseTrumpForBot(botPlayer: Player, state: GameState): Trump = playableTrumps().shuffled().first()
+fun chooseTrumpForBot(botPlayer: Player, state: GameState): Trump = Trump.HEARTS
 
 fun chooseGschobeForBot(botPlayer: Player, state: GameState): Gschobe =
     if (Random.nextBoolean()) Gschobe.YES else Gschobe.NO
@@ -23,7 +24,7 @@ fun chooseWeisForBot(botPlayer: Player, state: GameState): Weis {
     val seat = playerSeat(botPlayer, state.seats)
     val cards = hand.cardsOf(seat.position)
 
-    return possibleWeiseWithPoints(cards, hand.trump!!)
+    return withoutStoeckPoints(possibleWeiseWithPoints(cards, hand.trump!!))
         .maxBy { weis -> weis.points }
         .let { Weis(it.type, it.cards) }
 }

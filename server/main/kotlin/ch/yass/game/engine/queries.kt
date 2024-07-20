@@ -29,6 +29,9 @@ fun completedHands(hands: List<Hand>, tricks: List<Trick>): List<Hand> =
 fun playerSeat(player: Player, seats: List<Seat>): Seat =
     seats.first { it.playerId == player.id }
 
+fun positionSeat(position: Position, seats: List<Seat>): Seat =
+    seats.first { it.position == position }
+
 fun tricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> {
     return tricks.filter { it.handId == hand.id }
 }
@@ -86,16 +89,18 @@ fun nextState(state: GameState): State {
         isTrickFinished(trick) -> State.NEW_TRICK
         !isAlreadyGschobe(hand) -> if (player.bot) State.SCHIEBE_BOT else State.SCHIEBE
         !isTrumpSet(hand) -> if (player.bot) State.TRUMP_BOT else State.TRUMP
+        !isStoeckGewiesen(hand!!, weise, position, tricks) -> State.STOECK
         !isAlreadyGewiesen(
             position,
-            hand!!,
+            hand,
             tricks,
-            weise
+            withoutStoeck(weise)
         ) -> if (player.bot) State.WEISEN_FIRST_BOT else State.WEISEN_FIRST
 
         else -> if (player.bot) State.PLAY_CARD_BOT else State.PLAY_CARD
     }
 }
+
 
 fun nextHandStartingPosition(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Position {
     val hand = currentHand(hands)!!
@@ -245,7 +250,7 @@ fun weisPointsByPositionTotal(hands: List<Hand>): SplitPoints {
 
     return hands.fold(initial) { accumulator, hand ->
         val posToWeise =
-            Position.entries.associateWith { pos -> hand.weiseOf(pos).map { toWeisWithPoints(it, hand.trump!!) } }
+            Position.entries.associateWith { pos -> hand.weiseOf(pos).map { it.toWeisWithPoints(hand.trump!!) } }
         val posToPoints = posToWeise.mapValues { it.value.sumOf { weis -> weis.points } }.toMutableMap()
         val pointsNS = posToPoints[Position.NORTH]!! + posToPoints[Position.SOUTH]!!
         val pointsEW = posToPoints[Position.EAST]!! + posToPoints[Position.WEST]!!
@@ -311,11 +316,17 @@ fun cardPointsByPosition(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Sp
     }
 }
 
-fun toWeisWithPoints(weis: Weis, trump: Trump): WeisWithPoints =
-    WeisWithPoints(weis.type, weis.cards, multiplyByTrump(weisPoints(weis.type), trump))
+fun Weis.toWeisWithPoints(trump: Trump): WeisWithPoints =
+    WeisWithPoints(this.type, this.cards, multiplyByTrump(weisPoints(this.type), trump))
 
 fun possibleWeiseWithPoints(cards: List<Card>, trump: Trump): List<WeisWithPoints> =
-    possibleWeise(cards, trump).map { toWeisWithPoints(it, trump) }
+    possibleWeise(cards, trump).map { it.toWeisWithPoints(trump) }
 
 fun possibleWeise(cards: List<Card>, trump: Trump): List<Weis> =
     blattWeise(cards) + gleicheWeise(cards) + stoeckWeis(cards, trump)
+
+/**
+ * Can't have the same name since generics get erased at runtime.
+ */
+fun withoutStoeckPoints(weise: List<WeisWithPoints>): List<WeisWithPoints> = weise.filter { w -> w.type != WeisType.STOECK }
+fun withoutStoeck(weise: List<Weis>): List<Weis> = weise.filter { w -> w.type != WeisType.STOECK }

@@ -1,11 +1,14 @@
 package ch.yass
 
 import ch.yass.game.dto.*
+import ch.yass.game.dto.db.Hand
+import ch.yass.game.dto.db.Trick
 import ch.yass.game.engine.blattWeise
 import ch.yass.game.engine.gleicheWeise
 import ch.yass.game.engine.possibleWeise
 import ch.yass.game.engine.possibleWeiseWithPoints
 import org.junit.jupiter.api.Test
+import java.util.*
 
 class WeisenTest : BaseTest() {
 
@@ -112,5 +115,10 @@ class WeisenTest : BaseTest() {
         assert(result.firstOrNull { it.type == WeisType.VIER_NELL } !== null)
         assert(result.firstOrNull { it.type == WeisType.DREI_BLATT } !== null)
         assert(result.firstOrNull { it.type == WeisType.STOECK } !== null)
+    }
+
+    @Test
+    fun testStoeck() {
+        TODO()
     }
 }

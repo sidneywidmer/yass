@@ -41,6 +41,25 @@ fun isAlreadyGewiesen(position: Position, hand: Hand, tricks: List<Trick>, weise
             || hand.weiseOf(position).isNotEmpty()
             || weise.isEmpty() // No possible weise, we treat this like the player already has gewiesen
 
+fun isStoeckGewiesen(hand: Hand, weise: List<Weis>, position: Position, tricks: List<Trick>): Boolean {
+    // Already played the stoeck
+    if (hand.weiseOf(position).any { w -> w.type == WeisType.STOECK }) {
+        return true
+    }
+
+    // Not even eligible for stoeck
+    val stoeck = weise.firstOrNull { w -> w.type == WeisType.STOECK }
+    if (stoeck == null) {
+        return true
+    }
+
+    val playedStoeckCards = tricks
+        .mapNotNull { trick -> trick.cardOf(position) }
+        .filter { stoeck.cards.any { c -> c.rank == it.rank } }
+
+    return playedStoeckCards.size == stoeck.cards.size // Usually 2 == 2 if both cards are played :)
+}
+
 fun isAlreadyGschobe(hand: Hand?): Boolean = hand?.gschobe != Gschobe.NOT_YET
 
 fun playerInGame(player: Player, seats: List<Seat>): Boolean = seats.any { it.playerId == player.id }

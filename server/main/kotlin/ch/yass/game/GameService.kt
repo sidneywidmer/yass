@@ -171,7 +171,8 @@ class GameService(
 
         repo.updateWeise(seat, hand, weise)
 
-        publishForSeats(state.seats) { s -> gewiesenActions(repo.getState(game), request.weis, seat) }
+        val freshState = repo.getState(game)
+        publishForSeats(state.seats) { gewiesenActions(freshState, request.weis, seat) }
 
         gameLoop(game)
 
@@ -246,7 +247,6 @@ class GameService(
     @OptIn(DelicateCoroutinesApi::class)
     private fun gameLoop(game: Game) {
         val updatedState = repo.getState(game)
-        val currentHand = currentHand(updatedState.hands)!!
         val nextStateLoop = nextState(updatedState)
 
         when (nextStateLoop) {
@@ -267,9 +267,10 @@ class GameService(
             State.WEISEN_FIRST -> {}
             State.WEISEN_FIRST_BOT -> GlobalScope.launch { delay(200).also { weisenAsBot(updatedState) } }
             State.WEISEN_SECOND -> {}
+            State.STOECK -> weisStoeck(updatedState)
             State.NEW_TRICK -> GlobalScope.launch {
                 delay(1000)
-                repo.createTrick(currentHand)
+                repo.createTrick(currentHand(updatedState.hands)!!)
                 val state = repo.getState(game)
                 publishForSeats(updatedState.seats) { seat -> newTrickActions(state, seat) }
                 gameLoop(game)
@@ -289,6 +290,31 @@ class GameService(
                 gameLoop(game)
             }
         }
+    }
+
+    /**
+     * Not sure if it makes sense to show the user a UI where he has to actually apply the stoeck so currently
+     * this is all done automatically within the game loop. This means that this function is pretty implicit
+     * without using a "request". It assumes the state is already correct.
+     */
+    context(Raise<GameError>)
+    private fun weisStoeck(state: GameState) {
+        val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
+        val currentHand = currentHand(state.hands)!!
+        val stoeck = possibleWeise(
+            currentHand.cardsOf(activePosition),
+            currentHand.trump!!
+        ).first { w -> w.type == WeisType.STOECK }
+        val currentWeise = currentHand.weiseOf(activePosition).toMutableList()
+        currentWeise.add(stoeck)
+        val seat = positionSeat(activePosition, state.seats)
+
+        repo.updateWeise(seat, currentHand, currentWeise)
+
+        val freshState = repo.getState(state.game)
+        publishForSeats(state.seats) { gewiesenActions(freshState, stoeck, seat) }
+
+        gameLoop(freshState.game)
     }
 
     context(Raise<GameError>)

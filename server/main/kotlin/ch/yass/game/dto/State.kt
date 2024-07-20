@@ -9,6 +9,7 @@ enum class State {
     WEISEN_FIRST, // Players bid their highest Weis
     WEISEN_FIRST_BOT, // Players bid their highest Weis
     WEISEN_SECOND, // Team with higher WEISEN_FIRST can add additional Weise
+    STOECK,
     TRUMP,
     TRUMP_BOT,
     NEW_TRICK,
