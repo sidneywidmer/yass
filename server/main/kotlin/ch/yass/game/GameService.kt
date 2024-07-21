@@ -13,6 +13,7 @@ import ch.yass.game.api.internal.NewBotPlayer
 import ch.yass.game.api.internal.NewHand
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Game
+import ch.yass.game.dto.db.Hand
 import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
@@ -113,6 +114,12 @@ class GameService(
         val updatedState = repo.getState(game)
 
         publishForSeats(state.seats) { seat -> cardPlayedActions(updatedState, playedCard, playerSeat, seat) }
+
+        val updatedHand = currentHand(updatedState.hands)
+        val weise = updatedHand?.trump?.let { possibleWeise(updatedHand.cardsOf(playerSeat.position), it) }.orEmpty()
+        if (!isStoeckGewiesen(updatedHand!!, weise, playerSeat.position, updatedState.tricks)) {
+            weisStoeck(playerSeat, updatedHand, weise, updatedState.seats)
+        }
 
         gameLoop(game)
 
@@ -267,7 +274,6 @@ class GameService(
             State.WEISEN_FIRST -> {}
             State.WEISEN_FIRST_BOT -> GlobalScope.launch { delay(200).also { weisenAsBot(updatedState) } }
             State.WEISEN_SECOND -> {}
-            State.STOECK -> weisStoeck(updatedState)
             State.NEW_TRICK -> GlobalScope.launch {
                 delay(1000)
                 repo.createTrick(currentHand(updatedState.hands)!!)
@@ -294,27 +300,17 @@ class GameService(
 
     /**
      * Not sure if it makes sense to show the user a UI where he has to actually apply the stoeck so currently
-     * this is all done automatically within the game loop. This means that this function is pretty implicit
+     * this is all done automatically within the card play request. This means that this function is pretty implicit
      * without using a "request". It assumes the state is already correct.
      */
-    context(Raise<GameError>)
-    private fun weisStoeck(state: GameState) {
-        val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
-        val currentHand = currentHand(state.hands)!!
-        val stoeck = possibleWeise(
-            currentHand.cardsOf(activePosition),
-            currentHand.trump!!
-        ).first { w -> w.type == WeisType.STOECK }
-        val currentWeise = currentHand.weiseOf(activePosition).toMutableList()
+    private fun weisStoeck(seat: Seat, hand: Hand, weise: List<Weis>, seats: List<Seat>) {
+        val stoeck = weise.first { w -> w.type == WeisType.STOECK }
+        val currentWeise = hand.weiseOf(seat.position).toMutableList()
         currentWeise.add(stoeck)
-        val seat = positionSeat(activePosition, state.seats)
 
-        repo.updateWeise(seat, currentHand, currentWeise)
+        repo.updateWeise(seat, hand, currentWeise)
 
-        val freshState = repo.getState(state.game)
-        publishForSeats(state.seats) { gewiesenActions(freshState, stoeck, seat) }
-
-        gameLoop(freshState.game)
+        publishForSeats(seats) { stoeckGewiesenActions(hand, stoeck, seat) }
     }
 
     context(Raise<GameError>)

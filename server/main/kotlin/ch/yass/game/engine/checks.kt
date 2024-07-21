@@ -53,11 +53,12 @@ fun isStoeckGewiesen(hand: Hand, weise: List<Weis>, position: Position, tricks: 
         return true
     }
 
+    // Comparing rank is enough, it wouldn't be a valid weis otherweis (haha get it?)
     val playedStoeckCards = tricks
         .mapNotNull { trick -> trick.cardOf(position) }
         .filter { stoeck.cards.any { c -> c.rank == it.rank } }
 
-    return playedStoeckCards.size == stoeck.cards.size // Usually 2 == 2 if both cards are played :)
+    return playedStoeckCards.size != stoeck.cards.size // Usually 2 == 2 if both cards are played :)
 }
 
 fun isAlreadyGschobe(hand: Hand?): Boolean = hand?.gschobe != Gschobe.NOT_YET

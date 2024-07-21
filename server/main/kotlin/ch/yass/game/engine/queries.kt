@@ -89,10 +89,9 @@ fun nextState(state: GameState): State {
         isTrickFinished(trick) -> State.NEW_TRICK
         !isAlreadyGschobe(hand) -> if (player.bot) State.SCHIEBE_BOT else State.SCHIEBE
         !isTrumpSet(hand) -> if (player.bot) State.TRUMP_BOT else State.TRUMP
-        !isStoeckGewiesen(hand!!, weise, position, tricks) -> State.STOECK
         !isAlreadyGewiesen(
             position,
-            hand,
+            hand!!,
             tricks,
             withoutStoeck(weise)
         ) -> if (player.bot) State.WEISEN_FIRST_BOT else State.WEISEN_FIRST

@@ -3,6 +3,7 @@ package ch.yass.game.pubsub
 import ch.yass.core.pubsub.Action
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.*
+import ch.yass.game.dto.db.Hand
 import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
@@ -121,6 +122,14 @@ fun gewiesenActions(state: GameState, weis: Weis, playedBy: Seat): List<Action> 
         UpdateState(nextState),
         ShowWeis(playedBy.position, weis.toWeisWithPoints(hand.trump!!)),
     )
+}
+
+/**
+ * Lightweight version of gewiesenActions, but we don't need to publish state update yet since this
+ * is happening in the context of playing a card.
+ */
+fun stoeckGewiesenActions(hand: Hand, weis: Weis, playedBy: Seat): List<Action> {
+    return listOf(ShowWeis(playedBy.position, weis.toWeisWithPoints(hand.trump!!)))
 }
 
 fun geschobenActions(state: GameState): List<Action> {

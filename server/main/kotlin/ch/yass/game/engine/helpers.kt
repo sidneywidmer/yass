@@ -44,8 +44,8 @@ fun randomHand(): Map<Position, List<Card>> {
     return mapOf(
         Position.NORTH to sort(interpretCards("S6,S7,S8,S9,S10,SJ,SQ,SK,SA")),
         Position.EAST to sort(interpretCards("D6,D7,D8,D9,D10,DJ,DQ,DK,DA")),
-        Position.SOUTH to sort(interpretCards("H6,H7,H8,H9,H10,HJ,HQ,HK,HA")),
-        Position.WEST to sort(interpretCards("C6,C7,C8,C9,C10,CJ,CQ,CK,CA")),
+        Position.SOUTH to sort(interpretCards("C6,C7,C8,C9,C10,CJ,CQ,CK,CA")),
+        Position.WEST to sort(interpretCards("H6,H7,H8,H9,H10,HJ,HQ,HK,HA")),
     )
 }
 
