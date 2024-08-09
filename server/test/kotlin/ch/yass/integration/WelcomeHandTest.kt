@@ -1,6 +1,7 @@
-package ch.yass
+package ch.yass.integration
 
 import arrow.core.raise.fold
+import ch.yass.Yass
 import ch.yass.admin.dsl.game
 import ch.yass.core.error.GameNotFound
 import ch.yass.core.error.PlayerDoesNotOwnCard
@@ -18,7 +19,7 @@ import org.junit.jupiter.api.Test
 import org.kodein.di.direct
 import org.kodein.di.instance
 
-class WelcomeHandTest : BaseTest() {
+class WelcomeHandTest : Integration() {
     private val service: GameService = Yass.container.direct.instance()
 
     /**
@@ -78,7 +79,6 @@ class WelcomeHandTest : BaseTest() {
         )
     }
 
-
     @Test
     fun testNewHandCreated() {
         val state = getState()
@@ -87,6 +87,7 @@ class WelcomeHandTest : BaseTest() {
         val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)!!
         val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "HELLO", "french"))
 
+        // TODO: don't launch in global scope, manage this somehow
         fold(
             { service.play(request, player) },
             { fail() },
