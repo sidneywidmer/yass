@@ -95,9 +95,12 @@ fun nextState(state: GameState): State {
             tricks,
             withoutStoeck(weise)
         ) -> if (player.bot) State.WEISEN_FIRST_BOT else State.WEISEN_FIRST
+        !isAlreadyGewiesenSecond(tricks, hand) -> State.WEISEN_SECOND
 
         else -> if (player.bot) State.PLAY_CARD_BOT else State.PLAY_CARD
     }
+    // we need: all tricks -> get the current from that
+    // we also need: all possible weise and all already gewiesen weise -> on hand
 }
 
 

@@ -115,6 +115,9 @@ class GameService(
 
         publishForSeats(state.seats) { seat -> cardPlayedActions(updatedState, playedCard, playerSeat, seat) }
 
+        // TODO: Move this logic to game state but watch out: playing a card means it's the next players active
+        //      turn per activePosition logic so the stoeck can't be played anymore. We need to update
+        //      the activePosition logic for that
         val updatedHand = currentHand(updatedState.hands)
         val weise = updatedHand?.trump?.let { possibleWeise(updatedHand.cardsOf(playerSeat.position), it) }.orEmpty()
         if (!isStoeckGewiesen(updatedHand!!, weise, playerSeat.position, updatedState.tricks)) {
@@ -273,7 +276,10 @@ class GameService(
             State.SCHIEBE_BOT -> schiebeAsBot(updatedState)
             State.WEISEN_FIRST -> {}
             State.WEISEN_FIRST_BOT -> GlobalScope.launch { delay(200).also { weisenAsBot(updatedState) } }
-            State.WEISEN_SECOND -> {}
+            State.WEISEN_SECOND -> {
+                // Get the "weis" winner team and show their possible "other" weises, exclude Stoeck
+                val foo = "bar"
+            }
             State.NEW_TRICK -> GlobalScope.launch {
                 delay(1000)
                 repo.createTrick(currentHand(updatedState.hands)!!)

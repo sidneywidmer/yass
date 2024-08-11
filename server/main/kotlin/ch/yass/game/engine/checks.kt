@@ -29,6 +29,32 @@ fun unplayedCardsOfPlayer(player: Player, hands: List<Hand>, seats: List<Seat>, 
 
 fun isTrumpSet(hand: Hand?): Boolean = hand?.trump != null
 
+fun isAlreadyGewiesenSecond(tricks: List<Trick>, hand: Hand): Boolean {
+    if (tricks.size != 1) {
+        return false
+    }
+
+    val currentTrick = currentTrick(tricks)!!
+    if (currentTrick.cards().size != 4) {
+        return false
+    }
+
+    // Is there still a weis to make by the team that ha the most weise?
+    val playedWeise = Position.entries.associateWith { withoutStoeck(hand.weiseOf(it)) }
+    val possibleWeise = Position.entries.associateWith { withoutStoeck(possibleWeise(hand.cardsOf(it), hand.trump!!)) }
+
+    // res == map indexed by position containing all weise that they COULD still weis now
+    hier gehts weiter
+    // TODO: question? who is the current weis winner team? if they have possible weise then return true
+    //      then later this subset of weise has to be played, do we need to query again? should state be
+    //      able to return data with it for exactly this case?
+    val res = possibleWeise.mapValues { (position, weise) -> weise.filterNot { playedWeise[position]!!.contains(it) } }
+
+
+    // exist possible weise that are not yet gewiesen? -> false
+    return true // default to true
+}
+
 /**
  * Check if the given position already played a weis and if it's the right moment to weis. This is the case if:
  * It's not the welcome hand, it has to be the first trick in the hand, the player has not played a card yet,
