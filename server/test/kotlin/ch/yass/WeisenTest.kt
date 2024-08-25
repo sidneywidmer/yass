@@ -6,11 +6,16 @@ import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Hand
 import ch.yass.game.dto.db.Trick
 import ch.yass.game.engine.*
+import ch.yass.game.engine.blattWeise
+import ch.yass.game.engine.gleicheWeise
+import ch.yass.game.engine.possibleWeise
+import ch.yass.game.engine.possibleWeiseWithPoints
+import ch.yass.integration.Integration
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.util.*
 
-class WeisenTest : BaseTest() {
+class WeisenTest {
 
     @Test
     fun testBlattWeise() {

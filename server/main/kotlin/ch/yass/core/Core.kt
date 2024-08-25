@@ -114,9 +114,8 @@ object Core {
             jdbcUrl = config.getString("db.url")
             username = config.getString("db.username")
             password = config.getString("db.password")
-            maximumPoolSize = 10 // Adjust the pool size according to your needs
+            maximumPoolSize = 10
         }
-
         val conn = HikariDataSource(hikariConfig)
 
         return DSL.using(conn, SQLDialect.POSTGRES)

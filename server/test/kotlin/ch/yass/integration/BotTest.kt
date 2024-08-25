@@ -1,20 +1,24 @@
-package ch.yass
+package ch.yass.integration
 
-import arrow.core.raise.fold
+import arrow.core.raise.either
 import ch.yass.admin.dsl.game
+import ch.yass.game.GameRepository
 import ch.yass.game.GameService
 import ch.yass.game.api.PlayCardRequest
 import ch.yass.game.api.PlayedCard
 import ch.yass.game.api.internal.GameState
-import ch.yass.game.dto.*
+import ch.yass.game.dto.Gschobe
+import ch.yass.game.dto.Position
+import ch.yass.game.dto.Trump
 import ch.yass.game.engine.playerAtPosition
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 import org.kodein.di.direct
 import org.kodein.di.instance
 
-class BotTest : BaseTest() {
-    private val service: GameService = Yass.container.direct.instance()
+class BotTest : Integration() {
+    private val service: GameService = container.direct.instance()
+    private val repo: GameRepository = container.direct.instance()
 
     /**
      * 4 Players in the game and the welcome hand is already played. Clubs is trump and in the first
@@ -61,13 +65,12 @@ class BotTest : BaseTest() {
         val playedCard = PlayedCard("CLUBS", "NINE", "french")
         val request = PlayCardRequest(state.game.uuid.toString(), playedCard)
 
-        fold(
-            { service.play(request, player) },
-            { fail() },
-            {
-                // we passed, yay!
-            }
-        )
+        val result = either {
+            service.play(request, player)
+        }.onLeft { fail() }
+
+        // TODO: Refactor so global scope is somehow tracked and we can wait until everything is completed
+        val foo = "bar"
     }
 
 }

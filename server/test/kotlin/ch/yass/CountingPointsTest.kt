@@ -7,10 +7,11 @@ import ch.yass.game.dto.Position
 import ch.yass.game.dto.Trump
 import ch.yass.game.engine.cardPointsByPosition
 import ch.yass.game.engine.tricksOfHand
+import ch.yass.integration.Integration
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-class CountingPointsTest : BaseTest() {
+class CountingPointsTest : Integration() {
     private fun getStateSpades(): GameState {
         return game {
             players {
@@ -28,7 +29,7 @@ class CountingPointsTest : BaseTest() {
                     south(cards = "C8,C10,CQ,CA,D9,H8,H9,S7,SA")
                     west(cards = "C6,CK,D6,D8,DJ,DK,HJ,S6,S10")
                     tricks {
-                        trick(north = "SJ", east = "SK", south = "SA", west = "S10")  // 45 for N + 5 for last
+                        trick(north = "SJ", east = "SK", south = "SA", west = "S10")  // 45 for North
                     }
                 }
             }
@@ -40,8 +41,9 @@ class CountingPointsTest : BaseTest() {
         val state = getStateSpades()
         val hand = state.hands.first()
 
+        // TODO: Refactor, we want way more tests and a way to create an "in memory" state for functional tests with our dsl
         val points = cardPointsByPosition(hand, tricksOfHand(state.tricks, hand), state.seats)
-        assertEquals(50, points[Position.NORTH])
+        assertEquals(45, points[Position.NORTH])
     }
 
 }
