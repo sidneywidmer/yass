@@ -3,9 +3,19 @@ package ch.yass.game.pubsub
 import ch.yass.core.pubsub.Action
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.*
+import ch.yass.game.dto.db.Hand
 import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
+
+/**
+ * Important: The list returned by each of these queries is not just by accident like it is. It's for example
+ * crucial that the active player state is changed BEFORE the clients get notified about the actual
+ * new state of the game. Since the order of a json array is preserved we don't have any problems,
+ * but it has been a source of some hard to debug problems in the past.
+ *
+ * https://stackoverflow.com/questions/7214293/is-the-order-of-elements-in-a-json-list-preserved
+ */
 
 fun newHandActions(state: GameState, seat: Seat): List<Action> {
     val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks, state.seats)
@@ -21,8 +31,8 @@ fun newHandActions(state: GameState, seat: Seat): List<Action> {
         winningPositionOfLastTrick(lastHand, tricksOfHand(state.tricks, lastHand), state.seats) ?: Position.SOUTH
 
     return listOf(
-        UpdateState(nextState),
         UpdateActive(activePosition),
+        UpdateState(nextState),
         UpdateHand(cards, true),
         UpdatePoints(points),
         ClearPlayedCards(winningPos),
@@ -35,7 +45,7 @@ fun gameFinishedActions(state: GameState): List<Action> {
 
     // Calculate the sum of points for each pair
     val pointsSum = pairs.map { pair ->
-        val sum = points[pair.first]!! + points[pair.second]!!
+        val sum = points[pair.first]!!.total() + points[pair.second]!!.total()
         Pair(pair, sum)
     }
 
@@ -65,8 +75,8 @@ fun newTrickActions(state: GameState, seat: Seat): List<Action> {
     val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
 
     return listOf(
-        UpdateState(nextState),
         UpdateActive(activePosition),
+        UpdateState(nextState),
         UpdateHand(cards, false),
         ClearPlayedCards(winningPos!!)
     )
@@ -78,27 +88,63 @@ fun cardPlayedActions(state: GameState, card: Card, playedBy: Seat, seat: Seat):
     val cards = cardsInHand(hand, player, state)
     val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
     val nextState = nextState(state)
+    val points = pointsByPositionTotal(state.hands, state.tricks, state.seats)
 
     return listOf(
-        UpdateState(nextState),
         UpdateActive(activePosition),
+        UpdateState(nextState),
         CardPlayed(CardOnTable(card.suit, card.rank, card.skin, playedBy.position)),
         UpdateHand(cards, false),
+        UpdatePoints(points)
     )
 }
 
-fun trumpChosenActions(state: GameState, trump: Trump): List<Action> {
+fun trumpChosenActions(state: GameState, trump: Trump, seat: Seat): List<Action> {
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
+    val hand = currentHand(state.hands)!!
+    val cards = hand.cardsOf(seat.position) // We don't care about CardInHand since the state is wurst
+    val weise = withoutStoeckPoints(possibleWeiseWithPoints(cards, trump))
 
     return listOf(
+        UpdatePossibleWeise(weise),
         UpdateActive(activePosition),
         UpdateState(nextState),
         UpdateTrump(trump),
     )
 }
 
-fun schiebeActions(state: GameState): List<Action> {
+fun gewiesenActions(state: GameState, weis: Weis, playedBy: Seat, seat: Seat): List<Action> {
+    val nextState = nextState(state)
+    val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
+    val hand = currentHand(state.hands)!!
+
+    val actions = listOf(
+        UpdateActive(activePosition),
+        UpdateState(nextState),
+    ).toMutableList()
+
+    // We don't need to show this weis to the player who just played it - they already know
+    if (seat != playedBy) {
+        actions.add(ShowWeis(playedBy.position, weis.toWeisWithPoints(hand.trump!!)))
+    }
+
+    return actions
+}
+
+/**
+ * Lightweight version of gewiesenActions, but we don't need to publish state update yet since this
+ * is happening in the context of playing a card.
+ */
+fun stoeckGewiesenActions(hand: Hand, weis: Weis, playedBy: Seat, state: GameState): List<Action> {
+    val points = pointsByPositionTotal(state.hands, state.tricks, state.seats)
+    return listOf(
+        ShowWeis(playedBy.position, weis.toWeisWithPoints(hand.trump!!)),
+        UpdatePoints(points)
+    )
+}
+
+fun geschobenActions(state: GameState): List<Action> {
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
 

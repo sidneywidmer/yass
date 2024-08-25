@@ -7,11 +7,14 @@ extends Node2D
 @onready var _points_we_label = %PointsWE
 @onready var _trump_label = %Trump
 @onready var _choose_trump_gui = %ChooseTrump
+@onready var _choose_weis_gui = %ChooseWeis
+@onready var _show_weis_gui = %ShowWeis
 @onready var _game_finished_gui = %GameFinished
 @onready var _status_label = %StatusLabel
 @onready var _confetti = %Confetti
 
 var position_icon_tweens: Array
+var possible_weise: Array
 var active_position: Players.PositionsEnum
 var state: String
 var trump: String
@@ -27,6 +30,8 @@ var socket_actions: Dictionary = {
 	"PlayerJoined": _on_player_joined,
 	"PlayerDisconnected": _on_player_disconnected,
 	"GameFinished": _on_game_finished,
+	"UpdatePossibleWeise": _on_update_possible_weise,
+	"ShowWeis": _on_show_weis,
 }
 var trumps: Dictionary = {
 	"SPADES": "♠️",
@@ -49,17 +54,20 @@ func _ready():
 	_players.game_scene = self
 	_table.game_scene = self
 	_choose_trump_gui.pass_additional_params({"game_scene": self})
+	_choose_weis_gui.pass_additional_params({"game_scene": self})
+	_show_weis_gui.pass_additional_params({"game_scene": self})
 	
 	Player.game_scene = self
 	Player.position = Players.PositionsEnum[Player.game_init_data["seat"]["position"]]
 	
+	_on_update_possible_weise(Player.game_init_data["seat"])
 	_on_update_active_position({"position": Player.game_init_data["seat"]["activePosition"]})
 	_on_update_state(Player.game_init_data["seat"])
 	_on_update_trump(Player.game_init_data["seat"])
 	_on_update_points(Player.game_init_data["seat"])
 	Player.game_init_data["otherPlayers"].map(func(player): _on_player_joined({"player": player}))
 	
-	# If we got some players already in the game at login we"ll 
+	# If we got some players already in the game at login we'll 
 	# show them here including any cards they might"ve played
 	for card in Player.game_init_data["cardsPlayed"]:
 		_players.play(
@@ -92,7 +100,7 @@ func _on_message(data):
 func _on_card_played(data):
 	var card = data["card"]
 	
-	# Don"t play card since the client already did that for us
+	# Don't play card since the client already did that for us
 	if card["position"] == Player.game_init_data["seat"]["position"]:
 		return
 		
@@ -123,6 +131,9 @@ func _on_update_state(data):
 		
 	if (state == "TRUMP" or state == "SCHIEBE") and active_position == Player.position:
 		_choose_trump_gui.slide_in({"state": state})
+		
+	if state == "WEISEN_FIRST" and active_position == Player.position and possible_weise.size() > 0:
+		_choose_weis_gui.slide_in({"weise": possible_weise})
 
 # Update the active_position and handle the position icon animations
 func _on_update_active_position(data):
@@ -147,13 +158,12 @@ func _on_update_trump(data):
 	if data["trump"] == null:
 		return
 		
-	trump = data["trump"]
-	_trump_label.text = trumps[trump]
+	_trump_label.text = trumps[data["trump"]]
 
 func _on_update_points(data):
 	points = data["points"]
-	_points_ns_label.text = str(points["NORTH"] + points["SOUTH"])
-	_points_we_label.text = str(points["WEST"] + points["EAST"])
+	_points_ns_label.text = str(points["NORTH"]["cardPoints"] + points["NORTH"]["weisPoints"] + points["SOUTH"]["cardPoints"] + points["SOUTH"]["weisPoints"])
+	_points_we_label.text = str(points["WEST"]["cardPoints"] + points["WEST"]["weisPoints"] + points["EAST"]["cardPoints"] + points["SOUTH"]["weisPoints"])
 
 func _on_player_joined(data):
 	var player_position = _players.relative_position(data["player"]["position"])
@@ -195,3 +205,12 @@ func _on_player_disconnected(data):
 func _on_game_finished(data):
 	_confetti.start()
 	_game_finished_gui.slide_in(data)
+	
+func _on_update_possible_weise(data):
+	possible_weise = data["weise"]
+	
+func _on_show_weis(data):
+	if _show_weis_gui.open:
+		_show_weis_gui.push_data(data)
+	else:
+		_show_weis_gui.slide_in(data)

@@ -36,7 +36,7 @@ services:
       - kratos-migrate
     image: oryd/kratos-selfservice-ui-node:v1.1.0
     environment:
-      - KRATOS_PUBLIC_URL=http://kratos:4433/
+      - KRATOS_PUBLIC_URL=http://127.0.0.1:4433/
       - KRATOS_BROWSER_URL=http://127.0.0.1:4433/
       - COOKIE_SECRET=changeme
       - CSRF_COOKIE_NAME=ory_csrf_ui

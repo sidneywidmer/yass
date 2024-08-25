@@ -8,23 +8,32 @@ import ch.yass.db.Public
 import ch.yass.db.keys.HAND_PKEY
 import ch.yass.db.keys.HAND__FK_HAND_ON_GAME
 import ch.yass.db.keys.HAND__FK_HAND_ON_STARTING_PLAYER
+import ch.yass.db.keys.TRICK__FK_TRICK_ON_HAND
+import ch.yass.db.tables.Game.GamePath
+import ch.yass.db.tables.Player.PlayerPath
+import ch.yass.db.tables.Trick.TrickPath
 import ch.yass.db.tables.records.HandRecord
 
 import java.time.LocalDateTime
-import java.util.function.Function
 
+import kotlin.collections.Collection
 import kotlin.collections.List
 
+import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.Identity
+import org.jooq.InverseForeignKey
 import org.jooq.JSON
 import org.jooq.Name
+import org.jooq.Path
+import org.jooq.PlainSQL
+import org.jooq.QueryPart
 import org.jooq.Record
-import org.jooq.Records
-import org.jooq.Row12
+import org.jooq.SQL
 import org.jooq.Schema
-import org.jooq.SelectField
+import org.jooq.Select
+import org.jooq.Stringly
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.TableOptions
@@ -41,19 +50,23 @@ import org.jooq.impl.TableImpl
 @Suppress("UNCHECKED_CAST")
 open class Hand(
     alias: Name,
-    child: Table<out Record>?,
-    path: ForeignKey<out Record, HandRecord>?,
+    path: Table<out Record>?,
+    childPath: ForeignKey<out Record, HandRecord>?,
+    parentPath: InverseForeignKey<out Record, HandRecord>?,
     aliased: Table<HandRecord>?,
-    parameters: Array<Field<*>?>?
+    parameters: Array<Field<*>?>?,
+    where: Condition?
 ): TableImpl<HandRecord>(
     alias,
     Public.PUBLIC,
-    child,
     path,
+    childPath,
+    parentPath,
     aliased,
     parameters,
     DSL.comment(""),
-    TableOptions.table()
+    TableOptions.table(),
+    where,
 ) {
     companion object {
 
@@ -128,8 +141,29 @@ open class Hand(
      */
     val WEST: TableField<HandRecord, JSON?> = createField(DSL.name("west"), SQLDataType.JSON.nullable(false), this, "")
 
-    private constructor(alias: Name, aliased: Table<HandRecord>?): this(alias, null, null, aliased, null)
-    private constructor(alias: Name, aliased: Table<HandRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, aliased, parameters)
+    /**
+     * The column <code>public.hand.north_weise</code>.
+     */
+    val NORTH_WEISE: TableField<HandRecord, JSON?> = createField(DSL.name("north_weise"), SQLDataType.JSON.nullable(false).defaultValue(DSL.field(DSL.raw("'[]'::json"), SQLDataType.JSON)), this, "")
+
+    /**
+     * The column <code>public.hand.east_weise</code>.
+     */
+    val EAST_WEISE: TableField<HandRecord, JSON?> = createField(DSL.name("east_weise"), SQLDataType.JSON.nullable(false).defaultValue(DSL.field(DSL.raw("'[]'::json"), SQLDataType.JSON)), this, "")
+
+    /**
+     * The column <code>public.hand.south_weise</code>.
+     */
+    val SOUTH_WEISE: TableField<HandRecord, JSON?> = createField(DSL.name("south_weise"), SQLDataType.JSON.nullable(false).defaultValue(DSL.field(DSL.raw("'[]'::json"), SQLDataType.JSON)), this, "")
+
+    /**
+     * The column <code>public.hand.west_weise</code>.
+     */
+    val WEST_WEISE: TableField<HandRecord, JSON?> = createField(DSL.name("west_weise"), SQLDataType.JSON.nullable(false).defaultValue(DSL.field(DSL.raw("'[]'::json"), SQLDataType.JSON)), this, "")
+
+    private constructor(alias: Name, aliased: Table<HandRecord>?): this(alias, null, null, null, aliased, null, null)
+    private constructor(alias: Name, aliased: Table<HandRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
+    private constructor(alias: Name, aliased: Table<HandRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
 
     /**
      * Create an aliased <code>public.hand</code> table reference
@@ -146,43 +180,70 @@ open class Hand(
      */
     constructor(): this(DSL.name("hand"), null)
 
-    constructor(child: Table<out Record>, key: ForeignKey<out Record, HandRecord>): this(Internal.createPathAlias(child, key), child, key, HAND, null)
+    constructor(path: Table<out Record>, childPath: ForeignKey<out Record, HandRecord>?, parentPath: InverseForeignKey<out Record, HandRecord>?): this(Internal.createPathAlias(path, childPath, parentPath), path, childPath, parentPath, HAND, null, null)
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    open class HandPath : Hand, Path<HandRecord> {
+        constructor(path: Table<out Record>, childPath: ForeignKey<out Record, HandRecord>?, parentPath: InverseForeignKey<out Record, HandRecord>?): super(path, childPath, parentPath)
+        private constructor(alias: Name, aliased: Table<HandRecord>): super(alias, aliased)
+        override fun `as`(alias: String): HandPath = HandPath(DSL.name(alias), this)
+        override fun `as`(alias: Name): HandPath = HandPath(alias, this)
+        override fun `as`(alias: Table<*>): HandPath = HandPath(alias.qualifiedName, this)
+    }
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
     override fun getIdentity(): Identity<HandRecord, Int?> = super.getIdentity() as Identity<HandRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<HandRecord> = HAND_PKEY
     override fun getReferences(): List<ForeignKey<HandRecord, *>> = listOf(HAND__FK_HAND_ON_GAME, HAND__FK_HAND_ON_STARTING_PLAYER)
 
-    private lateinit var _game: Game
-    private lateinit var _player: Player
+    private lateinit var _game: GamePath
 
     /**
      * Get the implicit join path to the <code>public.game</code> table.
      */
-    fun game(): Game {
+    fun game(): GamePath {
         if (!this::_game.isInitialized)
-            _game = Game(this, HAND__FK_HAND_ON_GAME)
+            _game = GamePath(this, HAND__FK_HAND_ON_GAME, null)
 
         return _game;
     }
 
-    val game: Game
-        get(): Game = game()
+    val game: GamePath
+        get(): GamePath = game()
+
+    private lateinit var _player: PlayerPath
 
     /**
      * Get the implicit join path to the <code>public.player</code> table.
      */
-    fun player(): Player {
+    fun player(): PlayerPath {
         if (!this::_player.isInitialized)
-            _player = Player(this, HAND__FK_HAND_ON_STARTING_PLAYER)
+            _player = PlayerPath(this, HAND__FK_HAND_ON_STARTING_PLAYER, null)
 
         return _player;
     }
 
-    val player: Player
-        get(): Player = player()
+    val player: PlayerPath
+        get(): PlayerPath = player()
+
+    private lateinit var _trick: TrickPath
+
+    /**
+     * Get the implicit to-many join path to the <code>public.trick</code> table
+     */
+    fun trick(): TrickPath {
+        if (!this::_trick.isInitialized)
+            _trick = TrickPath(this, null, TRICK__FK_TRICK_ON_HAND.inverseKey)
+
+        return _trick;
+    }
+
+    val trick: TrickPath
+        get(): TrickPath = trick()
     override fun `as`(alias: String): Hand = Hand(DSL.name(alias), this)
     override fun `as`(alias: Name): Hand = Hand(alias, this)
-    override fun `as`(alias: Table<*>): Hand = Hand(alias.getQualifiedName(), this)
+    override fun `as`(alias: Table<*>): Hand = Hand(alias.qualifiedName, this)
 
     /**
      * Rename this table
@@ -197,21 +258,55 @@ open class Hand(
     /**
      * Rename this table
      */
-    override fun rename(name: Table<*>): Hand = Hand(name.getQualifiedName(), null)
-
-    // -------------------------------------------------------------------------
-    // Row12 type methods
-    // -------------------------------------------------------------------------
-    override fun fieldsRow(): Row12<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, String?, String?, JSON?, JSON?, JSON?, JSON?> = super.fieldsRow() as Row12<Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, String?, String?, JSON?, JSON?, JSON?, JSON?>
+    override fun rename(name: Table<*>): Hand = Hand(name.qualifiedName, null)
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    fun <U> mapping(from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, String?, String?, JSON?, JSON?, JSON?, JSON?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
+    override fun where(condition: Condition?): Hand = Hand(qualifiedName, if (aliased()) this else null, condition)
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    fun <U> mapping(toType: Class<U>, from: (Int?, String?, LocalDateTime?, LocalDateTime?, Int?, Int?, String?, String?, JSON?, JSON?, JSON?, JSON?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
+    override fun where(conditions: Collection<Condition>): Hand = where(DSL.and(conditions))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    override fun where(vararg conditions: Condition?): Hand = where(DSL.and(*conditions))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    override fun where(condition: Field<Boolean?>?): Hand = where(DSL.condition(condition))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @PlainSQL override fun where(condition: SQL): Hand = where(DSL.condition(condition))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @PlainSQL override fun where(@Stringly.SQL condition: String): Hand = where(DSL.condition(condition))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg binds: Any?): Hand = where(DSL.condition(condition, *binds))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg parts: QueryPart): Hand = where(DSL.condition(condition, *parts))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    override fun whereExists(select: Select<*>): Hand = where(DSL.exists(select))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    override fun whereNotExists(select: Select<*>): Hand = where(DSL.notExists(select))
 }

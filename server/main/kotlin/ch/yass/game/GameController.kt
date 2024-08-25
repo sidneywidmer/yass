@@ -31,6 +31,7 @@ class GameController(private val service: GameService, private val repo: GameRep
         post("/join", ::join)
         post("/play", ::play)
         post("/trump", ::trump)
+        post("/weisen", ::weisen)
         post("/schiebe", ::schiebe)
         post("/ping", ::ping)
     }
@@ -75,9 +76,9 @@ class GameController(private val service: GameService, private val repo: GameRep
         val playedCards = currentTrick(state.tricks)!!.cardsByPosition()
         val otherPlayers = Position.entries
             .map { pos ->
-                val player = playerAtPosition(pos, state.seats, state.allPlayers)
-                val seat = player?.let { playerSeat(player, state.seats) }
-                Pair(seat, player)
+                val p = playerAtPosition(pos, state.seats, state.allPlayers)
+                val s = p?.let { playerSeat(p, state.seats) }
+                Pair(s, p)
             }
             .mapNotNull { pair ->
                 pair.second?.let {
@@ -104,8 +105,9 @@ class GameController(private val service: GameService, private val repo: GameRep
         val cards = cardsInHand(hand, player, state)
         val nextState = nextState(state)
         val active = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
+        val weise = hand.trump?.let { possibleWeiseWithPoints(hand.cardsOf(seat.position), hand.trump) }.orEmpty()
 
-        return SeatState(seat.uuid, cards, seat.position, player, points, nextState, active, hand.trump)
+        return SeatState(seat.uuid, cards, seat.position, player, points, nextState, active, hand.trump, weise)
     }
 
     private fun play(ctx: Context) = either {
@@ -124,6 +126,17 @@ class GameController(private val service: GameService, private val repo: GameRep
         val player = player(ctx)
 
         service.trump(request, player)
+        SuccessfulActionResponse()
+    }.fold(
+        { errorResponse(ctx, it) },
+        { successResponse(ctx, it) }
+    )
+
+    private fun weisen(ctx: Context) = either {
+        val request = validate<WeisenRequest>(ctx.body())
+        val player = player(ctx)
+
+        service.weisen(request, player)
         SuccessfulActionResponse()
     }.fold(
         { errorResponse(ctx, it) },

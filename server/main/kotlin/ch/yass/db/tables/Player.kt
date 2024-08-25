@@ -5,21 +5,31 @@ package ch.yass.db.tables
 
 
 import ch.yass.db.Public
+import ch.yass.db.keys.HAND__FK_HAND_ON_STARTING_PLAYER
 import ch.yass.db.keys.PLAYER_PKEY
+import ch.yass.db.keys.SEAT__FK_SEAT_ON_PLAYER
+import ch.yass.db.tables.Hand.HandPath
+import ch.yass.db.tables.Seat.SeatPath
 import ch.yass.db.tables.records.PlayerRecord
 
 import java.time.LocalDateTime
-import java.util.function.Function
 
+import kotlin.collections.Collection
+
+import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.Identity
+import org.jooq.InverseForeignKey
 import org.jooq.Name
+import org.jooq.Path
+import org.jooq.PlainSQL
+import org.jooq.QueryPart
 import org.jooq.Record
-import org.jooq.Records
-import org.jooq.Row8
+import org.jooq.SQL
 import org.jooq.Schema
-import org.jooq.SelectField
+import org.jooq.Select
+import org.jooq.Stringly
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.TableOptions
@@ -36,19 +46,23 @@ import org.jooq.impl.TableImpl
 @Suppress("UNCHECKED_CAST")
 open class Player(
     alias: Name,
-    child: Table<out Record>?,
-    path: ForeignKey<out Record, PlayerRecord>?,
+    path: Table<out Record>?,
+    childPath: ForeignKey<out Record, PlayerRecord>?,
+    parentPath: InverseForeignKey<out Record, PlayerRecord>?,
     aliased: Table<PlayerRecord>?,
-    parameters: Array<Field<*>?>?
+    parameters: Array<Field<*>?>?,
+    where: Condition?
 ): TableImpl<PlayerRecord>(
     alias,
     Public.PUBLIC,
-    child,
     path,
+    childPath,
+    parentPath,
     aliased,
     parameters,
     DSL.comment(""),
-    TableOptions.table()
+    TableOptions.table(),
+    where,
 ) {
     companion object {
 
@@ -91,7 +105,7 @@ open class Player(
     /**
      * The column <code>public.player.bot</code>.
      */
-    val BOT: TableField<PlayerRecord, Boolean?> = createField(DSL.name("bot"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field("false", SQLDataType.BOOLEAN)), this, "")
+    val BOT: TableField<PlayerRecord, Boolean?> = createField(DSL.name("bot"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("false"), SQLDataType.BOOLEAN)), this, "")
 
     /**
      * The column <code>public.player.ory_uuid</code>.
@@ -103,8 +117,9 @@ open class Player(
      */
     val ANON_TOKEN: TableField<PlayerRecord, String?> = createField(DSL.name("anon_token"), SQLDataType.VARCHAR(255), this, "")
 
-    private constructor(alias: Name, aliased: Table<PlayerRecord>?): this(alias, null, null, aliased, null)
-    private constructor(alias: Name, aliased: Table<PlayerRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, aliased, parameters)
+    private constructor(alias: Name, aliased: Table<PlayerRecord>?): this(alias, null, null, null, aliased, null, null)
+    private constructor(alias: Name, aliased: Table<PlayerRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
+    private constructor(alias: Name, aliased: Table<PlayerRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
 
     /**
      * Create an aliased <code>public.player</code> table reference
@@ -121,13 +136,54 @@ open class Player(
      */
     constructor(): this(DSL.name("player"), null)
 
-    constructor(child: Table<out Record>, key: ForeignKey<out Record, PlayerRecord>): this(Internal.createPathAlias(child, key), child, key, PLAYER, null)
+    constructor(path: Table<out Record>, childPath: ForeignKey<out Record, PlayerRecord>?, parentPath: InverseForeignKey<out Record, PlayerRecord>?): this(Internal.createPathAlias(path, childPath, parentPath), path, childPath, parentPath, PLAYER, null, null)
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    open class PlayerPath : Player, Path<PlayerRecord> {
+        constructor(path: Table<out Record>, childPath: ForeignKey<out Record, PlayerRecord>?, parentPath: InverseForeignKey<out Record, PlayerRecord>?): super(path, childPath, parentPath)
+        private constructor(alias: Name, aliased: Table<PlayerRecord>): super(alias, aliased)
+        override fun `as`(alias: String): PlayerPath = PlayerPath(DSL.name(alias), this)
+        override fun `as`(alias: Name): PlayerPath = PlayerPath(alias, this)
+        override fun `as`(alias: Table<*>): PlayerPath = PlayerPath(alias.qualifiedName, this)
+    }
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
     override fun getIdentity(): Identity<PlayerRecord, Int?> = super.getIdentity() as Identity<PlayerRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<PlayerRecord> = PLAYER_PKEY
+
+    private lateinit var _hand: HandPath
+
+    /**
+     * Get the implicit to-many join path to the <code>public.hand</code> table
+     */
+    fun hand(): HandPath {
+        if (!this::_hand.isInitialized)
+            _hand = HandPath(this, null, HAND__FK_HAND_ON_STARTING_PLAYER.inverseKey)
+
+        return _hand;
+    }
+
+    val hand: HandPath
+        get(): HandPath = hand()
+
+    private lateinit var _seat: SeatPath
+
+    /**
+     * Get the implicit to-many join path to the <code>public.seat</code> table
+     */
+    fun seat(): SeatPath {
+        if (!this::_seat.isInitialized)
+            _seat = SeatPath(this, null, SEAT__FK_SEAT_ON_PLAYER.inverseKey)
+
+        return _seat;
+    }
+
+    val seat: SeatPath
+        get(): SeatPath = seat()
     override fun `as`(alias: String): Player = Player(DSL.name(alias), this)
     override fun `as`(alias: Name): Player = Player(alias, this)
-    override fun `as`(alias: Table<*>): Player = Player(alias.getQualifiedName(), this)
+    override fun `as`(alias: Table<*>): Player = Player(alias.qualifiedName, this)
 
     /**
      * Rename this table
@@ -142,21 +198,55 @@ open class Player(
     /**
      * Rename this table
      */
-    override fun rename(name: Table<*>): Player = Player(name.getQualifiedName(), null)
-
-    // -------------------------------------------------------------------------
-    // Row8 type methods
-    // -------------------------------------------------------------------------
-    override fun fieldsRow(): Row8<Int?, String?, LocalDateTime?, LocalDateTime?, String?, Boolean?, String?, String?> = super.fieldsRow() as Row8<Int?, String?, LocalDateTime?, LocalDateTime?, String?, Boolean?, String?, String?>
+    override fun rename(name: Table<*>): Player = Player(name.qualifiedName, null)
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     * Create an inline derived table from this table
      */
-    fun <U> mapping(from: (Int?, String?, LocalDateTime?, LocalDateTime?, String?, Boolean?, String?, String?) -> U): SelectField<U> = convertFrom(Records.mapping(from))
+    override fun where(condition: Condition?): Player = Player(qualifiedName, if (aliased()) this else null, condition)
 
     /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
+     * Create an inline derived table from this table
      */
-    fun <U> mapping(toType: Class<U>, from: (Int?, String?, LocalDateTime?, LocalDateTime?, String?, Boolean?, String?, String?) -> U): SelectField<U> = convertFrom(toType, Records.mapping(from))
+    override fun where(conditions: Collection<Condition>): Player = where(DSL.and(conditions))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    override fun where(vararg conditions: Condition?): Player = where(DSL.and(*conditions))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    override fun where(condition: Field<Boolean?>?): Player = where(DSL.condition(condition))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @PlainSQL override fun where(condition: SQL): Player = where(DSL.condition(condition))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @PlainSQL override fun where(@Stringly.SQL condition: String): Player = where(DSL.condition(condition))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg binds: Any?): Player = where(DSL.condition(condition, *binds))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @PlainSQL override fun where(@Stringly.SQL condition: String, vararg parts: QueryPart): Player = where(DSL.condition(condition, *parts))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    override fun whereExists(select: Select<*>): Player = where(DSL.exists(select))
+
+    /**
+     * Create an inline derived table from this table
+     */
+    override fun whereNotExists(select: Select<*>): Player = where(DSL.notExists(select))
 }

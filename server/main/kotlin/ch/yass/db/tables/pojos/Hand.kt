@@ -26,89 +26,117 @@ data class Hand(
     var north: JSON? = null,
     var east: JSON? = null,
     var south: JSON? = null,
-    var west: JSON? = null
+    var west: JSON? = null,
+    var northWeise: JSON? = null,
+    var eastWeise: JSON? = null,
+    var southWeise: JSON? = null,
+    var westWeise: JSON? = null
 ): Serializable {
 
 
     override fun equals(other: Any?): Boolean {
         if (this === other)
             return true
-        if (other === null)
+        if (other == null)
             return false
         if (this::class != other::class)
             return false
         val o: Hand = other as Hand
-        if (this.id === null) {
-            if (o.id !== null)
+        if (this.id == null) {
+            if (o.id != null)
                 return false
         }
         else if (this.id != o.id)
             return false
-        if (this.uuid === null) {
-            if (o.uuid !== null)
+        if (this.uuid == null) {
+            if (o.uuid != null)
                 return false
         }
         else if (this.uuid != o.uuid)
             return false
-        if (this.createdAt === null) {
-            if (o.createdAt !== null)
+        if (this.createdAt == null) {
+            if (o.createdAt != null)
                 return false
         }
         else if (this.createdAt != o.createdAt)
             return false
-        if (this.updatedAt === null) {
-            if (o.updatedAt !== null)
+        if (this.updatedAt == null) {
+            if (o.updatedAt != null)
                 return false
         }
         else if (this.updatedAt != o.updatedAt)
             return false
-        if (this.gameId === null) {
-            if (o.gameId !== null)
+        if (this.gameId == null) {
+            if (o.gameId != null)
                 return false
         }
         else if (this.gameId != o.gameId)
             return false
-        if (this.startingPlayerId === null) {
-            if (o.startingPlayerId !== null)
+        if (this.startingPlayerId == null) {
+            if (o.startingPlayerId != null)
                 return false
         }
         else if (this.startingPlayerId != o.startingPlayerId)
             return false
-        if (this.trump === null) {
-            if (o.trump !== null)
+        if (this.trump == null) {
+            if (o.trump != null)
                 return false
         }
         else if (this.trump != o.trump)
             return false
-        if (this.gschobe === null) {
-            if (o.gschobe !== null)
+        if (this.gschobe == null) {
+            if (o.gschobe != null)
                 return false
         }
         else if (this.gschobe != o.gschobe)
             return false
-        if (this.north === null) {
-            if (o.north !== null)
+        if (this.north == null) {
+            if (o.north != null)
                 return false
         }
         else if (this.north != o.north)
             return false
-        if (this.east === null) {
-            if (o.east !== null)
+        if (this.east == null) {
+            if (o.east != null)
                 return false
         }
         else if (this.east != o.east)
             return false
-        if (this.south === null) {
-            if (o.south !== null)
+        if (this.south == null) {
+            if (o.south != null)
                 return false
         }
         else if (this.south != o.south)
             return false
-        if (this.west === null) {
-            if (o.west !== null)
+        if (this.west == null) {
+            if (o.west != null)
                 return false
         }
         else if (this.west != o.west)
+            return false
+        if (this.northWeise == null) {
+            if (o.northWeise != null)
+                return false
+        }
+        else if (this.northWeise != o.northWeise)
+            return false
+        if (this.eastWeise == null) {
+            if (o.eastWeise != null)
+                return false
+        }
+        else if (this.eastWeise != o.eastWeise)
+            return false
+        if (this.southWeise == null) {
+            if (o.southWeise != null)
+                return false
+        }
+        else if (this.southWeise != o.southWeise)
+            return false
+        if (this.westWeise == null) {
+            if (o.westWeise != null)
+                return false
+        }
+        else if (this.westWeise != o.westWeise)
             return false
         return true
     }
@@ -116,18 +144,22 @@ data class Hand(
     override fun hashCode(): Int {
         val prime = 31
         var result = 1
-        result = prime * result + (if (this.id === null) 0 else this.id.hashCode())
-        result = prime * result + (if (this.uuid === null) 0 else this.uuid.hashCode())
-        result = prime * result + (if (this.createdAt === null) 0 else this.createdAt.hashCode())
-        result = prime * result + (if (this.updatedAt === null) 0 else this.updatedAt.hashCode())
-        result = prime * result + (if (this.gameId === null) 0 else this.gameId.hashCode())
-        result = prime * result + (if (this.startingPlayerId === null) 0 else this.startingPlayerId.hashCode())
-        result = prime * result + (if (this.trump === null) 0 else this.trump.hashCode())
-        result = prime * result + (if (this.gschobe === null) 0 else this.gschobe.hashCode())
-        result = prime * result + (if (this.north === null) 0 else this.north.hashCode())
-        result = prime * result + (if (this.east === null) 0 else this.east.hashCode())
-        result = prime * result + (if (this.south === null) 0 else this.south.hashCode())
-        result = prime * result + (if (this.west === null) 0 else this.west.hashCode())
+        result = prime * result + (if (this.id == null) 0 else this.id.hashCode())
+        result = prime * result + (if (this.uuid == null) 0 else this.uuid.hashCode())
+        result = prime * result + (if (this.createdAt == null) 0 else this.createdAt.hashCode())
+        result = prime * result + (if (this.updatedAt == null) 0 else this.updatedAt.hashCode())
+        result = prime * result + (if (this.gameId == null) 0 else this.gameId.hashCode())
+        result = prime * result + (if (this.startingPlayerId == null) 0 else this.startingPlayerId.hashCode())
+        result = prime * result + (if (this.trump == null) 0 else this.trump.hashCode())
+        result = prime * result + (if (this.gschobe == null) 0 else this.gschobe.hashCode())
+        result = prime * result + (if (this.north == null) 0 else this.north.hashCode())
+        result = prime * result + (if (this.east == null) 0 else this.east.hashCode())
+        result = prime * result + (if (this.south == null) 0 else this.south.hashCode())
+        result = prime * result + (if (this.west == null) 0 else this.west.hashCode())
+        result = prime * result + (if (this.northWeise == null) 0 else this.northWeise.hashCode())
+        result = prime * result + (if (this.eastWeise == null) 0 else this.eastWeise.hashCode())
+        result = prime * result + (if (this.southWeise == null) 0 else this.southWeise.hashCode())
+        result = prime * result + (if (this.westWeise == null) 0 else this.westWeise.hashCode())
         return result
     }
 
@@ -146,6 +178,10 @@ data class Hand(
         sb.append(", ").append(east)
         sb.append(", ").append(south)
         sb.append(", ").append(west)
+        sb.append(", ").append(northWeise)
+        sb.append(", ").append(eastWeise)
+        sb.append(", ").append(southWeise)
+        sb.append(", ").append(westWeise)
 
         sb.append(")")
         return sb.toString()

@@ -11,9 +11,9 @@ import ch.yass.game.api.*
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.api.internal.NewBotPlayer
 import ch.yass.game.api.internal.NewHand
-import ch.yass.game.api.internal.NewOryPlayer
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Game
+import ch.yass.game.dto.db.Hand
 import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
@@ -115,6 +115,15 @@ class GameService(
 
         publishForSeats(state.seats) { seat -> cardPlayedActions(updatedState, playedCard, playerSeat, seat) }
 
+        // TODO: Move this logic to game state but watch out: playing a card means it's the next players active
+        //      turn per activePosition logic so the stoeck can't be played anymore. We need to update
+        //      the activePosition logic for that
+        val updatedHand = currentHand(updatedState.hands)
+        val weise = updatedHand?.trump?.let { possibleWeise(updatedHand.cardsOf(playerSeat.position), it) }.orEmpty()
+        if (!isStoeckGewiesen(updatedHand!!, weise, playerSeat.position, updatedState.tricks)) {
+            weisStoeck(updatedState, playerSeat, updatedHand, weise)
+        }
+
         gameLoop(game)
 
         return updatedState
@@ -136,12 +145,69 @@ class GameService(
 
         repo.chooseTrump(chosenTrump, currentHand)
 
-        val actions = trumpChosenActions(repo.getState(game), chosenTrump)
-        publishForSeats(state.seats) { actions }
+        val freshState = repo.getState(game)
+        publishForSeats(state.seats) { seat -> trumpChosenActions(freshState, chosenTrump, seat) }
 
         gameLoop(game)
 
         return repo.getState(game)
+    }
+
+    context(Raise<GameError>)
+    fun weisen(request: WeisenRequest, player: Player): GameState {
+        val game = repo.getByUUID(request.game)
+        val state = repo.getState(game)
+        val nextState = nextState(state)
+        val hand = currentHand(state.hands)!!
+        val seat = playerSeat(player, state.seats)
+
+        ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
+        ensure(expectedState(listOf(State.WEISEN_FIRST, State.WEISEN_FIRST_BOT), nextState)) {
+            InvalidState(nextState, state)
+        }
+        ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
+        ensure(possibleWeise(hand.cardsOf(seat.position), hand.trump!!).contains(request.weis)) {
+            WeisInvalid(request.weis)
+        }
+
+        val weise = hand.weiseOf(seat.position).toMutableList()
+        weise.add(request.weis)
+
+        repo.updateWeise(seat, hand, weise)
+
+        val freshState = repo.getState(game)
+        publishForSeats(state.seats) { gewiesenActions(freshState, request.weis, seat, it) }
+
+        gameLoop(game)
+
+        return repo.getState(game)
+    }
+
+    /**
+     * After every player played the first card in the trick and showed their weise, the team who has wisen
+     * the most can weis the rest of their potentially not yet shown weise.
+     */
+    context(Raise<GameError>)
+    private fun weisenSecond(state: GameState) {
+        val hand = currentHand(state.hands)!!
+        val remainingWeise = remainingWeise(hand)
+
+        weisWinner(hand, state.tricks, state.seats).map { position ->
+            val weise = hand.weiseOf(position).toMutableList()
+            val actions = withoutStoeck(remainingWeise[position]!!)
+                .map {
+                    weise.add(it)
+                    ShowWeis(position, it.toWeisWithPoints(hand.trump!!))
+                }
+
+            repo.updateWeise(positionSeat(position, state.seats), hand, weise)
+            publishForSeats(state.seats) { actions }
+        }
+
+        val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks, state.seats)
+        publishForSeats(state.seats) { listOf(UpdatePoints(points)) }
+
+        gameLoop(state.game)
     }
 
     context(Raise<GameError>)
@@ -158,7 +224,7 @@ class GameService(
 
         repo.schiebe(gschobe, currentHand)
 
-        val actions = schiebeActions(repo.getState(game))
+        val actions = geschobenActions(repo.getState(game))
         publishForSeats(state.seats) { actions }
 
         gameLoop(game)
@@ -205,15 +271,14 @@ class GameService(
      * The delays make a better UX, so e.g a trick is not removed instantly by ClearPlayedCards action. The
      * other option would be to delay these actions client side, but I opted for this solution to keep the
      * client and server state as in-sync as possible.
+     *
+     * TODO: Move these delays to the client side??
      */
     context(Raise<GameError>)
     @OptIn(DelicateCoroutinesApi::class)
     private fun gameLoop(game: Game) {
         val updatedState = repo.getState(game)
-        val currentHand = currentHand(updatedState.hands)!!
-        val nextStateLoop = nextState(updatedState)
-
-        when (nextStateLoop) {
+        when (val nextStateLoop = nextState(updatedState)) {
             State.WAITING_FOR_PLAYERS -> {}
             State.FINISHED -> {
                 repo.finishGame(game)
@@ -222,15 +287,31 @@ class GameService(
                 publishForSeats(updatedState.seats) { actions }
             }
 
-            State.PLAY_CARD -> {}
+            State.PLAY_CARD -> {
+                val activePosition =
+                    activePosition(updatedState.hands, updatedState.allPlayers, updatedState.seats, updatedState.tricks)
+                val actions = listOf(
+                    UpdateActive(activePosition),
+                    UpdateState(nextStateLoop),
+                )
+                publishForSeats(updatedState.seats) { actions }
+            }
+
             State.TRUMP -> {}
             State.SCHIEBE -> {}
             State.PLAY_CARD_BOT -> GlobalScope.launch { delay(200).also { playAsBot(updatedState) } }
-            State.TRUMP_BOT -> trumpAsBot(updatedState)
-            State.SCHIEBE_BOT -> schiebeAsBot(updatedState)
+            State.TRUMP_BOT -> GlobalScope.launch { delay(200) }.also { trumpAsBot(updatedState) }
+            State.SCHIEBE_BOT -> GlobalScope.launch { delay(200) }.also { schiebeAsBot(updatedState) }
+            State.WEISEN_FIRST -> {}
+            State.WEISEN_FIRST_BOT -> GlobalScope.launch { delay(200).also { weisenAsBot(updatedState) } }
+            State.WEISEN_SECOND -> GlobalScope.launch {
+                delay(200).also { weisenSecond(updatedState) }
+            }
+
+            State.WEISEN_SECOND_BOT -> GlobalScope.launch { delay(200).also { weisenAsBot(updatedState) } }
             State.NEW_TRICK -> GlobalScope.launch {
                 delay(1000)
-                repo.createTrick(currentHand)
+                repo.createTrick(currentHand(updatedState.hands)!!)
                 val state = repo.getState(game)
                 publishForSeats(updatedState.seats) { seat -> newTrickActions(state, seat) }
                 gameLoop(game)
@@ -250,6 +331,22 @@ class GameService(
                 gameLoop(game)
             }
         }
+    }
+
+    /**
+     * Not sure if it makes sense to show the user a UI where he has to actually apply the stoeck so currently
+     * this is all done automatically within the card play request. This means that this function is pretty implicit
+     * without using a "request". It assumes the state is already correct.
+     */
+    private fun weisStoeck(state: GameState, seat: Seat, hand: Hand, weise: List<Weis>) {
+        val stoeck = weise.first { w -> w.type == WeisType.STOECK }
+        val currentWeise = hand.weiseOf(seat.position).toMutableList()
+        currentWeise.add(stoeck)
+
+        repo.updateWeise(seat, hand, currentWeise)
+
+        val actions = stoeckGewiesenActions(hand, stoeck, seat, state)
+        publishForSeats(state.seats) { actions }
     }
 
     context(Raise<GameError>)
@@ -296,4 +393,17 @@ class GameService(
 
         return schiebe(request, botPlayer)
     }
+
+
+    context(Raise<GameError>)
+    private fun weisenAsBot(state: GameState): GameState {
+        val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)!!
+
+        // TODO: Better decision
+        val weis = chooseWeisForBot(botPlayer, state)
+        val request = WeisenRequest(state.game.uuid.toString(), weis)
+
+        return weisen(request, botPlayer)
+    }
+
 }

@@ -30,8 +30,11 @@ fun cardToNotation(card: Card): String {
 }
 
 fun notationToCard(rank: String, suit: String): Card {
-    val suitEnum = suitMap.filter { suit == it.value }.keys.first()
-    val rankEnum = rankMap.filter { rank == it.value }.keys.first()
+    val suitEnum = suitMap.filter { suit == it.value }.keys.firstOrNull()
+    val rankEnum = rankMap.filter { rank == it.value }.keys.firstOrNull()
+    if (suitEnum == null|| rankEnum == null) {
+        throw IllegalArgumentException("Could not parse notation $rank$suit")
+    }
 
     return Card(suitEnum, rankEnum, "french")
 }

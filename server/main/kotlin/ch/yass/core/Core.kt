@@ -14,27 +14,26 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import okhttp3.OkHttpClient
 import org.jobrunr.configuration.JobRunr
-import org.jobrunr.configuration.JobRunrConfiguration
 import org.jobrunr.scheduling.JobScheduler
 import org.jobrunr.server.BackgroundJobServerConfiguration
 import org.jobrunr.server.JobActivator
 import org.jobrunr.storage.InMemoryStorageProvider
-import org.jobrunr.storage.StorageProviderUtils.DatabaseOptions
-import org.jobrunr.storage.sql.common.DefaultSqlStorageProvider
 import org.jooq.DSLContext
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
-import org.kodein.di.*
+import org.kodein.di.DI
+import org.kodein.di.bindSingleton
+import org.kodein.di.direct
+import org.kodein.di.instance
 import org.kodein.type.erased
-import org.kodein.type.typeToken
 import org.slf4j.LoggerFactory
 import org.zalando.logbook.Logbook
-import org.zalando.logbook.core.*
+import org.zalando.logbook.core.DefaultHttpLogWriter
+import org.zalando.logbook.core.DefaultSink
 import org.zalando.logbook.core.HeaderFilters.replaceCookies
 import org.zalando.logbook.core.HeaderFilters.replaceHeaders
 import org.zalando.logbook.json.JsonHttpLogFormatter
 import org.zalando.logbook.okhttp.LogbookInterceptor
-import java.sql.DriverManager
 import com.typesafe.config.Config as ConfigSettings
 
 

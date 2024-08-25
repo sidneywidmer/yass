@@ -6,6 +6,7 @@ extends Control
 
 var content = null
 var original_position = null
+var open: bool = false
 
 func _ready():
 	original_position = overlay.global_position.y
@@ -13,6 +14,7 @@ func _ready():
 	# Content needs a script with two functions:
 	# - add_additional_params
 	# - before_slide_in
+	# Additionally there is push_data that can be implementet
 	# With these we can react to those two events, i bet there's a better 
 	# way with signals but for now this works :)
 	content = container.get_child(0)
@@ -20,8 +22,15 @@ func _ready():
 func pass_additional_params(params: Dictionary):
 	params["parent_overlay"] = self
 	content.add_additional_params(params)
+	
+func push_data(params: Dictionary):
+	content.push_data(params)
 
 func slide_in(params: Dictionary):
+	if open:
+		return
+		
+	open = true
 	content.before_slide_in(params)
 	overlay.position.y = -overlay.size.y
 	self.visible = true
@@ -34,6 +43,10 @@ func slide_in(params: Dictionary):
 	bg_tween.tween_property(background, "modulate:a", 0.5, 0.3)
 
 func slide_out():
+	if !open:
+		return
+		
+	open = false
 	var overlay_tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 	overlay_tween.tween_property(overlay, "position:y", -overlay.size.y, 0.3).finished.connect(_on_slide_out_complete)
 

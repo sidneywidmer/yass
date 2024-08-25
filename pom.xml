@@ -109,7 +109,7 @@
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq</artifactId>
-            <version>3.18.0</version>
+            <version>3.19.10</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -257,7 +257,7 @@
             <plugin>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-codegen-maven</artifactId>
-                <version>3.19.7</version>
+                <version>3.19.10</version>
                 <configuration>
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
@@ -273,7 +273,13 @@
                             <name>
                                 org.jooq.meta.postgres.PostgresDatabase
                             </name>
-                            <includes>.*</includes>
+                            <includes>
+                                game
+                                | hand
+                                | player
+                                | seat
+                                | trick
+                            </includes>
                             <excludes/>
                             <inputSchema>public</inputSchema>
                         </database>

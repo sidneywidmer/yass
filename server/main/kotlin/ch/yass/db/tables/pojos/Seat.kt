@@ -29,67 +29,67 @@ data class Seat(
     override fun equals(other: Any?): Boolean {
         if (this === other)
             return true
-        if (other === null)
+        if (other == null)
             return false
         if (this::class != other::class)
             return false
         val o: Seat = other as Seat
-        if (this.id === null) {
-            if (o.id !== null)
+        if (this.id == null) {
+            if (o.id != null)
                 return false
         }
         else if (this.id != o.id)
             return false
-        if (this.uuid === null) {
-            if (o.uuid !== null)
+        if (this.uuid == null) {
+            if (o.uuid != null)
                 return false
         }
         else if (this.uuid != o.uuid)
             return false
-        if (this.createdAt === null) {
-            if (o.createdAt !== null)
+        if (this.createdAt == null) {
+            if (o.createdAt != null)
                 return false
         }
         else if (this.createdAt != o.createdAt)
             return false
-        if (this.updatedAt === null) {
-            if (o.updatedAt !== null)
+        if (this.updatedAt == null) {
+            if (o.updatedAt != null)
                 return false
         }
         else if (this.updatedAt != o.updatedAt)
             return false
-        if (this.playerId === null) {
-            if (o.playerId !== null)
+        if (this.playerId == null) {
+            if (o.playerId != null)
                 return false
         }
         else if (this.playerId != o.playerId)
             return false
-        if (this.gameId === null) {
-            if (o.gameId !== null)
+        if (this.gameId == null) {
+            if (o.gameId != null)
                 return false
         }
         else if (this.gameId != o.gameId)
             return false
-        if (this.position === null) {
-            if (o.position !== null)
+        if (this.position == null) {
+            if (o.position != null)
                 return false
         }
         else if (this.position != o.position)
             return false
-        if (this.rejoinedAt === null) {
-            if (o.rejoinedAt !== null)
+        if (this.rejoinedAt == null) {
+            if (o.rejoinedAt != null)
                 return false
         }
         else if (this.rejoinedAt != o.rejoinedAt)
             return false
-        if (this.playerPing === null) {
-            if (o.playerPing !== null)
+        if (this.playerPing == null) {
+            if (o.playerPing != null)
                 return false
         }
         else if (this.playerPing != o.playerPing)
             return false
-        if (this.status === null) {
-            if (o.status !== null)
+        if (this.status == null) {
+            if (o.status != null)
                 return false
         }
         else if (this.status != o.status)
@@ -100,16 +100,16 @@ data class Seat(
     override fun hashCode(): Int {
         val prime = 31
         var result = 1
-        result = prime * result + (if (this.id === null) 0 else this.id.hashCode())
-        result = prime * result + (if (this.uuid === null) 0 else this.uuid.hashCode())
-        result = prime * result + (if (this.createdAt === null) 0 else this.createdAt.hashCode())
-        result = prime * result + (if (this.updatedAt === null) 0 else this.updatedAt.hashCode())
-        result = prime * result + (if (this.playerId === null) 0 else this.playerId.hashCode())
-        result = prime * result + (if (this.gameId === null) 0 else this.gameId.hashCode())
-        result = prime * result + (if (this.position === null) 0 else this.position.hashCode())
-        result = prime * result + (if (this.rejoinedAt === null) 0 else this.rejoinedAt.hashCode())
-        result = prime * result + (if (this.playerPing === null) 0 else this.playerPing.hashCode())
-        result = prime * result + (if (this.status === null) 0 else this.status.hashCode())
+        result = prime * result + (if (this.id == null) 0 else this.id.hashCode())
+        result = prime * result + (if (this.uuid == null) 0 else this.uuid.hashCode())
+        result = prime * result + (if (this.createdAt == null) 0 else this.createdAt.hashCode())
+        result = prime * result + (if (this.updatedAt == null) 0 else this.updatedAt.hashCode())
+        result = prime * result + (if (this.playerId == null) 0 else this.playerId.hashCode())
+        result = prime * result + (if (this.gameId == null) 0 else this.gameId.hashCode())
+        result = prime * result + (if (this.position == null) 0 else this.position.hashCode())
+        result = prime * result + (if (this.rejoinedAt == null) 0 else this.rejoinedAt.hashCode())
+        result = prime * result + (if (this.playerPing == null) 0 else this.playerPing.hashCode())
+        result = prime * result + (if (this.status == null) 0 else this.status.hashCode())
         return result
     }
 

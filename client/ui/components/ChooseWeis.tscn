@@ -1,0 +1,36 @@
+[gd_scene load_steps=2 format=3 uid="uid://b86gm2wdkavnd"]
+
+[ext_resource type="Script" path="res://ui/components/ChooseWeis.gd" id="1_mqyr8"]
+
+[node name="ChooseWeis" type="VBoxContainer"]
+offset_right = 256.0
+offset_bottom = 240.0
+script = ExtResource("1_mqyr8")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_bottom = 10
+
+[node name="Label" type="Label" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.909804, 0.921569, 0.94902, 1)
+theme_override_font_sizes/font_size = 25
+text = "weis.lbl.choose"
+horizontal_alignment = 1
+
+[node name="HContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="WeisRepeatable" type="CenterContainer" parent="HContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Button" type="Button" parent="HContainer/WeisRepeatable"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.909804, 0.921569, 0.94902, 1)
+text = "2 gleiche (30)"
+flat = true

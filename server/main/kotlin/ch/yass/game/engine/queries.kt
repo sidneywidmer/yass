@@ -11,6 +11,7 @@ import ch.yass.game.dto.db.Hand
 import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.dto.db.Trick
+import java.util.EnumMap
 import kotlin.collections.contains
 
 fun currentTrick(tricks: List<Trick>): Trick? = tricks.firstOrNull()
@@ -28,6 +29,9 @@ fun completedHands(hands: List<Hand>, tricks: List<Trick>): List<Hand> =
 fun playerSeat(player: Player, seats: List<Seat>): Seat =
     seats.first { it.playerId == player.id }
 
+fun positionSeat(position: Position, seats: List<Seat>): Seat =
+    seats.first { it.position == position }
+
 fun tricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> {
     return tricks.filter { it.handId == hand.id }
 }
@@ -37,7 +41,7 @@ fun completeTricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> {
 }
 
 /**
- * Get the player sitting at the given position.
+ * Can return null because maybe the game is not full yet.
  */
 fun playerAtPosition(position: Position, seats: List<Seat>, players: List<Player>): Player? {
     return seats.firstOrNull { it.position == position }
@@ -68,21 +72,37 @@ fun currentLeadPositionOfHand(hand: Hand, tricks: List<Trick>, seats: List<Seat>
 fun nextState(state: GameState): State {
     val trick = currentTrick(state.tricks)
     val hand = currentHand(state.hands)
-    val player = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)!!
+    val position = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
+    val player = playerAtPosition(position, state.seats, state.allPlayers)!!
     val tricks = hand?.let { tricksOfHand(state.tricks, it) } ?: emptyList()
+    val weise = hand?.trump?.let { possibleWeise(hand.cardsOf(position), it) }.orEmpty()
 
+    // The order of these checks is VERY relevant
     return when {
         state.allPlayers.size < 4 -> State.WAITING_FOR_PLAYERS
         trick == null -> State.NEW_TRICK
+        hand == null -> State.NEW_HAND
         isGameFinished(state) -> State.FINISHED
 
         // Special case for "welcome" trick, only one card is played per player
         isWelcomeHandFinished(trick, state.hands) -> State.NEW_HAND
 
+        !isAlreadyGewiesenSecond(
+            tricks,
+            hand,
+            state.seats
+        ) -> State.WEISEN_SECOND  // check for second weis before dealing new hand
         isHandFinished(tricks) -> State.NEW_HAND
         isTrickFinished(trick) -> State.NEW_TRICK
         !isAlreadyGschobe(hand) -> if (player.bot) State.SCHIEBE_BOT else State.SCHIEBE
         !isTrumpSet(hand) -> if (player.bot) State.TRUMP_BOT else State.TRUMP
+        !isAlreadyGewiesen(
+            position,
+            hand,
+            tricks,
+            withoutStoeck(weise)
+        ) -> if (player.bot) State.WEISEN_FIRST_BOT else State.WEISEN_FIRST
+
         else -> if (player.bot) State.PLAY_CARD_BOT else State.PLAY_CARD
     }
 }
@@ -219,6 +239,55 @@ fun playableCards(hand: Hand, cards: List<Card>): List<Card> =
     }
 
 fun pointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>, seats: List<Seat>): Points {
+    val weis = weisPointsByPositionTotal(hands, tricks, seats)
+    val card = cardPointsByPositionTotal(hands, tricks, seats)
+
+    return Position.entries.associateWith { TotalPoints(card[it]!!, weis[it]!!) }
+}
+
+fun weisPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>, seats: List<Seat>): SplitPoints {
+    val initial = mapOf(
+        Position.NORTH to 0,
+        Position.EAST to 0,
+        Position.SOUTH to 0,
+        Position.WEST to 0,
+    )
+
+    return hands.fold(initial) { accumulator, hand ->
+        val validForWeis = tricksOfHand(tricks, hand).any { it.cards().size == 4 }
+        // Don't count the weis points of this hand. This could be the case if not yet all players had a chance
+        // to show their weis. After the first trick has 4 cards we know for a fact that everyone had their chance.
+        if (!validForWeis) {
+            return accumulator
+        }
+
+        val startingSeat = seats.first { it.playerId == hand.startingPlayerId }
+        val posToWeise =
+            Position.entries.associateWith { pos -> hand.weiseOf(pos).map { it.toWeisWithPoints(hand.trump!!) } }
+        val posToPoints = posToWeise.mapValues { it.value.sumOf { weis -> weis.points } }.toMutableMap()
+        val teamToPoints = Team.entries.associateWith { it.positions.sumOf { pos -> posToPoints[pos]!! } }
+
+        // Only the team with most weis points gets them. If they have the same amount,
+        // the team with the starting player wins.
+        if (teamToPoints[Team.NS]!! < teamToPoints[Team.EW]!!) {
+            Team.NS.positions.map { posToPoints.put(it, 0) }
+        } else if (teamToPoints[Team.NS]!! > teamToPoints[Team.EW]!!) {
+            Team.EW.positions.map { posToPoints.put(it, 0) }
+        } else {
+            Team.entries.first { startingSeat.position !in it.positions }.positions.map { posToPoints.put(it, 0) }
+        }
+
+        // Find the position having the STOECK Weis and if found, add the points to that position
+        posToWeise.entries
+            .flatMap { (pos, weise) -> weise.map { pos to it } }
+            .firstOrNull { it.second.type == WeisType.STOECK }
+            ?.let { posToPoints[it.first] = it.second.points }
+
+        accumulator.mapValues { (position, points) -> points + posToPoints[position]!! }
+    }
+}
+
+fun cardPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>, seats: List<Seat>): SplitPoints {
     val initial = mapOf(
         Position.NORTH to 0,
         Position.EAST to 0,
@@ -228,7 +297,7 @@ fun pointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>, seats: List<Se
 
     return hands.fold(initial) { accumulator, hand ->
         val tricksOfHand = completeTricksOfHand(tricks, hand)
-        val pointsNew = pointsByPosition(hand, tricksOfHand, seats)
+        val pointsNew = cardPointsByPosition(hand, tricksOfHand, seats)
         accumulator.mapValues { (position, points) -> points + pointsNew[position]!! }
     }
 }
@@ -237,7 +306,7 @@ fun pointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>, seats: List<Se
  * Splits all tricks to a map with key POSITION and value a list of tricks that position won. The given
  * tricks are ordered descending where index 0 is the newest trick, so we reverse the list.
  */
-fun pointsByPosition(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Points {
+fun cardPointsByPosition(hand: Hand, tricks: List<Trick>, seats: List<Seat>): SplitPoints {
     val startPosition = seats.first { it.playerId == hand.startingPlayerId }.position
     val positionMap = Position.entries.associateWith { emptyList<Trick>() }
     val positionToTricksMap = tricks.reversed().fold(
@@ -257,4 +326,34 @@ fun pointsByPosition(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Points
     }
 }
 
+fun Weis.toWeisWithPoints(trump: Trump): WeisWithPoints =
+    WeisWithPoints(this.type, this.cards, multiplyByTrump(weisPoints(this.type), trump))
 
+fun possibleWeiseWithPoints(cards: List<Card>, trump: Trump): List<WeisWithPoints> =
+    possibleWeise(cards, trump).map { it.toWeisWithPoints(trump) }
+
+fun possibleWeise(cards: List<Card>, trump: Trump): List<Weis> =
+    blattWeise(cards) + gleicheWeise(cards) + stoeckWeis(cards, trump)
+
+/**
+ * Can't have the same name since generics get erased at runtime.
+ */
+fun withoutStoeckPoints(weise: List<WeisWithPoints>): List<WeisWithPoints> =
+    weise.filter { w -> w.type != WeisType.STOECK }
+
+fun withoutStoeck(weise: List<Weis>): List<Weis> = weise.filter { w -> w.type != WeisType.STOECK }
+
+fun weisWinner(hand: Hand, tricks: List<Trick>, seats: List<Seat>): List<Position> {
+    val points = weisPointsByPositionTotal(listOf(hand), tricks, seats)
+    return Team.entries
+        .associateWith { it.positions.sumOf { pos -> points[pos]!! } }
+        .maxBy { it.value }
+        .key.positions
+}
+
+fun remainingWeise(hand: Hand): Map<Position, List<Weis>> {
+    val playedWeise = Position.entries.associateWith { withoutStoeck(hand.weiseOf(it)) }
+    val possibleWeise = Position.entries.associateWith { withoutStoeck(possibleWeise(hand.cardsOf(it), hand.trump!!)) }
+
+    return possibleWeise.mapValues { (position, weise) -> weise.filterNot { playedWeise[position]!!.contains(it) } }
+}
