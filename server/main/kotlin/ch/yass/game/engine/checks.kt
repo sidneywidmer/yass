@@ -29,30 +29,22 @@ fun unplayedCardsOfPlayer(player: Player, hands: List<Hand>, seats: List<Seat>, 
 
 fun isTrumpSet(hand: Hand?): Boolean = hand?.trump != null
 
-fun isAlreadyGewiesenSecond(tricks: List<Trick>, hand: Hand): Boolean {
+fun isAlreadyGewiesenSecond(tricks: List<Trick>, hand: Hand, seats: List<Seat>): Boolean {
+    if (hand.trump == Trump.FREESTYLE) {
+        return true;
+    }
+
     if (tricks.size != 1) {
-        return false
+        return true
     }
 
     val currentTrick = currentTrick(tricks)!!
     if (currentTrick.cards().size != 4) {
-        return false
+        return true
     }
 
-    // Is there still a weis to make by the team that ha the most weise?
-    val playedWeise = Position.entries.associateWith { withoutStoeck(hand.weiseOf(it)) }
-    val possibleWeise = Position.entries.associateWith { withoutStoeck(possibleWeise(hand.cardsOf(it), hand.trump!!)) }
-
-    // res == map indexed by position containing all weise that they COULD still weis now
-    hier gehts weiter
-    // TODO: question? who is the current weis winner team? if they have possible weise then return true
-    //      then later this subset of weise has to be played, do we need to query again? should state be
-    //      able to return data with it for exactly this case?
-    val res = possibleWeise.mapValues { (position, weise) -> weise.filterNot { playedWeise[position]!!.contains(it) } }
-
-
-    // exist possible weise that are not yet gewiesen? -> false
-    return true // default to true
+    val remainingWeise = remainingWeise(hand)
+    return weisWinner(hand, tricks, seats).flatMap { position -> remainingWeise[position] ?: emptyList() }.isEmpty()
 }
 
 /**
@@ -62,7 +54,7 @@ fun isAlreadyGewiesenSecond(tricks: List<Trick>, hand: Hand): Boolean {
  */
 fun isAlreadyGewiesen(position: Position, hand: Hand, tricks: List<Trick>, weise: List<Weis>): Boolean =
     hand.trump == Trump.FREESTYLE
-            || tricks.count() != 1
+            || tricks.size != 1
             || tricks[0].cardOf(position) != null
             || hand.weiseOf(position).isNotEmpty()
             || weise.isEmpty() // No possible weise, we treat this like the player already has gewiesen
@@ -112,18 +104,18 @@ fun playerHasActivePosition(player: Player, state: GameState): Boolean {
     return activePlayer.id == player.id
 }
 
-fun isLastCard(cards: List<Card>) = cards.count() == 1
+fun isLastCard(cards: List<Card>) = cards.size == 1
 
 fun isFollowingLead(lead: Card?, card: Card) = lead?.suit == card.suit
 
 fun couldNotFollowLead(hand: Hand, cards: List<Card>, lead: Card?): Boolean =
     !playableCards(hand, cards).any { it.suit == lead?.suit }
 
-fun isWelcomeHandFinished(trick: Trick, hands: List<Hand>): Boolean = trick.cards().count() == 4 && hands.count() == 1
+fun isWelcomeHandFinished(trick: Trick, hands: List<Hand>): Boolean = trick.cards().size == 4 && hands.size == 1
 
-fun isHandFinished(tricks: List<Trick>): Boolean = tricks.count() == 9 && tricks.first().cards().count() == 4
+fun isHandFinished(tricks: List<Trick>): Boolean = tricks.size == 9 && tricks.first().cards().size == 4
 
-fun isTrickFinished(trick: Trick): Boolean = trick.cards().count() == 4
+fun isTrickFinished(trick: Trick): Boolean = trick.cards().size == 4
 
 fun isGameFinished(state: GameState): Boolean {
     val settings = state.game.settings

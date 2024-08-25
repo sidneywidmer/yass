@@ -88,12 +88,14 @@ fun cardPlayedActions(state: GameState, card: Card, playedBy: Seat, seat: Seat):
     val cards = cardsInHand(hand, player, state)
     val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
     val nextState = nextState(state)
+    val points = pointsByPositionTotal(state.hands, state.tricks, state.seats)
 
     return listOf(
         UpdateActive(activePosition),
         UpdateState(nextState),
         CardPlayed(CardOnTable(card.suit, card.rank, card.skin, playedBy.position)),
         UpdateHand(cards, false),
+        UpdatePoints(points)
     )
 }
 
@@ -112,24 +114,34 @@ fun trumpChosenActions(state: GameState, trump: Trump, seat: Seat): List<Action>
     )
 }
 
-fun gewiesenActions(state: GameState, weis: Weis, playedBy: Seat): List<Action> {
+fun gewiesenActions(state: GameState, weis: Weis, playedBy: Seat, seat: Seat): List<Action> {
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
     val hand = currentHand(state.hands)!!
 
-    return listOf(
+    val actions = listOf(
         UpdateActive(activePosition),
         UpdateState(nextState),
-        ShowWeis(playedBy.position, weis.toWeisWithPoints(hand.trump!!)),
-    )
+    ).toMutableList()
+
+    // We don't need to show this weis to the player who just played it - they already know
+    if (seat != playedBy) {
+        actions.add(ShowWeis(playedBy.position, weis.toWeisWithPoints(hand.trump!!)))
+    }
+
+    return actions
 }
 
 /**
  * Lightweight version of gewiesenActions, but we don't need to publish state update yet since this
  * is happening in the context of playing a card.
  */
-fun stoeckGewiesenActions(hand: Hand, weis: Weis, playedBy: Seat): List<Action> {
-    return listOf(ShowWeis(playedBy.position, weis.toWeisWithPoints(hand.trump!!)))
+fun stoeckGewiesenActions(hand: Hand, weis: Weis, playedBy: Seat, state: GameState): List<Action> {
+    val points = pointsByPositionTotal(state.hands, state.tricks, state.seats)
+    return listOf(
+        ShowWeis(playedBy.position, weis.toWeisWithPoints(hand.trump!!)),
+        UpdatePoints(points)
+    )
 }
 
 fun geschobenActions(state: GameState): List<Action> {

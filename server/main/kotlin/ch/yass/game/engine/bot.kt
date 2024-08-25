@@ -13,8 +13,7 @@ fun chooseCardForBot(botPlayer: Player, state: GameState): Card {
     return Card(match.suit, match.rank, match.skin)
 }
 
-//fun chooseTrumpForBot(botPlayer: Player, state: GameState): Trump = playableTrumps().shuffled().first()
-fun chooseTrumpForBot(botPlayer: Player, state: GameState): Trump = Trump.HEARTS
+fun chooseTrumpForBot(botPlayer: Player, state: GameState): Trump = playableTrumps().shuffled().first()
 
 fun chooseGschobeForBot(botPlayer: Player, state: GameState): Gschobe =
     if (Random.nextBoolean()) Gschobe.YES else Gschobe.NO

@@ -161,26 +161,6 @@ open class Hand(
      */
     val WEST_WEISE: TableField<HandRecord, JSON?> = createField(DSL.name("west_weise"), SQLDataType.JSON.nullable(false).defaultValue(DSL.field(DSL.raw("'[]'::json"), SQLDataType.JSON)), this, "")
 
-    /**
-     * The column <code>public.hand.north_stoeck</code>.
-     */
-    val NORTH_STOECK: TableField<HandRecord, Boolean?> = createField(DSL.name("north_stoeck"), SQLDataType.BOOLEAN, this, "")
-
-    /**
-     * The column <code>public.hand.east_stoeck</code>.
-     */
-    val EAST_STOECK: TableField<HandRecord, Boolean?> = createField(DSL.name("east_stoeck"), SQLDataType.BOOLEAN, this, "")
-
-    /**
-     * The column <code>public.hand.south_stoeck</code>.
-     */
-    val SOUTH_STOECK: TableField<HandRecord, Boolean?> = createField(DSL.name("south_stoeck"), SQLDataType.BOOLEAN, this, "")
-
-    /**
-     * The column <code>public.hand.west_stoeck</code>.
-     */
-    val WEST_STOECK: TableField<HandRecord, Boolean?> = createField(DSL.name("west_stoeck"), SQLDataType.BOOLEAN, this, "")
-
     private constructor(alias: Name, aliased: Table<HandRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<HandRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
     private constructor(alias: Name, aliased: Table<HandRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)

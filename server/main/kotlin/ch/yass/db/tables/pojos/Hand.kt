@@ -30,11 +30,7 @@ data class Hand(
     var northWeise: JSON? = null,
     var eastWeise: JSON? = null,
     var southWeise: JSON? = null,
-    var westWeise: JSON? = null,
-    var northStoeck: Boolean? = null,
-    var eastStoeck: Boolean? = null,
-    var southStoeck: Boolean? = null,
-    var westStoeck: Boolean? = null
+    var westWeise: JSON? = null
 ): Serializable {
 
 
@@ -142,30 +138,6 @@ data class Hand(
         }
         else if (this.westWeise != o.westWeise)
             return false
-        if (this.northStoeck == null) {
-            if (o.northStoeck != null)
-                return false
-        }
-        else if (this.northStoeck != o.northStoeck)
-            return false
-        if (this.eastStoeck == null) {
-            if (o.eastStoeck != null)
-                return false
-        }
-        else if (this.eastStoeck != o.eastStoeck)
-            return false
-        if (this.southStoeck == null) {
-            if (o.southStoeck != null)
-                return false
-        }
-        else if (this.southStoeck != o.southStoeck)
-            return false
-        if (this.westStoeck == null) {
-            if (o.westStoeck != null)
-                return false
-        }
-        else if (this.westStoeck != o.westStoeck)
-            return false
         return true
     }
 
@@ -188,10 +160,6 @@ data class Hand(
         result = prime * result + (if (this.eastWeise == null) 0 else this.eastWeise.hashCode())
         result = prime * result + (if (this.southWeise == null) 0 else this.southWeise.hashCode())
         result = prime * result + (if (this.westWeise == null) 0 else this.westWeise.hashCode())
-        result = prime * result + (if (this.northStoeck == null) 0 else this.northStoeck.hashCode())
-        result = prime * result + (if (this.eastStoeck == null) 0 else this.eastStoeck.hashCode())
-        result = prime * result + (if (this.southStoeck == null) 0 else this.southStoeck.hashCode())
-        result = prime * result + (if (this.westStoeck == null) 0 else this.westStoeck.hashCode())
         return result
     }
 
@@ -214,10 +182,6 @@ data class Hand(
         sb.append(", ").append(eastWeise)
         sb.append(", ").append(southWeise)
         sb.append(", ").append(westWeise)
-        sb.append(", ").append(northStoeck)
-        sb.append(", ").append(eastStoeck)
-        sb.append(", ").append(southStoeck)
-        sb.append(", ").append(westStoeck)
 
         sb.append(")")
         return sb.toString()

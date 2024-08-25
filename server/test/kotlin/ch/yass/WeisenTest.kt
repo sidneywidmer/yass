@@ -120,8 +120,6 @@ class WeisenTest : BaseTest() {
     @Test
     fun testStoeck() {
         TODO()
-
-
     }
 
     @Test
@@ -147,17 +145,19 @@ class WeisenTest : BaseTest() {
             1,
             Trump.CLUBS,
             Gschobe.NO,
-            interpretCards("S6,S7,S8,S9,S10,SJ,DJ,CJ,HJ"), // 4 jacks, 5 blatt
+            interpretCards("S6,S7,S8,S9,S10,SJ,DJ,CJ,HJ"), // 4 jacks, 6 blatt
             interpretCards("D6,D7,D8,D9,D10,SQ,DQ,DK,DA"),
             interpretCards("C6,C7,C8,C9,C10,SK,CQ,CK,CA"),
             interpretCards("H6,H7,H8,H9,H10,SA,HQ,HK,HA"),
             listOf(Weis(WeisType.VIER_BUUR, interpretCards("SJ,DJ,CJ,HJ"))),
-            listOf(Weis(WeisType.FUENF_BLATT, interpretCards("D6,D7,D8,D9,D10"))),
+            emptyList(),
             listOf(Weis(WeisType.FUENF_BLATT, interpretCards("C6,C7,C8,C9,C10"))),
-            listOf(Weis(WeisType.FUENF_BLATT, interpretCards("H6,H7,H8,H9,H10"))),
+            emptyList(),
         )
 
-        val result = isAlreadyGewiesenSecond(listOf(trick), hand)
-        val foo = "bar"
+        // N/S won the weis in the first round, so now they play another one since north still has SECHS_BLATT
+        // meaning they can still play this weis
+        val result = isAlreadyGewiesenSecond(listOf(trick), hand, state.seats)
+        assert(!result)
     }
 }

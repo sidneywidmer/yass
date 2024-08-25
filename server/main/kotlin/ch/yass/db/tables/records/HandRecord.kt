@@ -83,22 +83,6 @@ open class HandRecord() : UpdatableRecordImpl<HandRecord>(Hand.HAND) {
         set(value): Unit = set(15, value)
         get(): JSON? = get(15) as JSON?
 
-    open var northStoeck: Boolean?
-        set(value): Unit = set(16, value)
-        get(): Boolean? = get(16) as Boolean?
-
-    open var eastStoeck: Boolean?
-        set(value): Unit = set(17, value)
-        get(): Boolean? = get(17) as Boolean?
-
-    open var southStoeck: Boolean?
-        set(value): Unit = set(18, value)
-        get(): Boolean? = get(18) as Boolean?
-
-    open var westStoeck: Boolean?
-        set(value): Unit = set(19, value)
-        get(): Boolean? = get(19) as Boolean?
-
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -108,7 +92,7 @@ open class HandRecord() : UpdatableRecordImpl<HandRecord>(Hand.HAND) {
     /**
      * Create a detached, initialised HandRecord
      */
-    constructor(id: Int? = null, uuid: String? = null, createdAt: LocalDateTime? = null, updatedAt: LocalDateTime? = null, gameId: Int? = null, startingPlayerId: Int? = null, trump: String? = null, gschobe: String? = null, north: JSON? = null, east: JSON? = null, south: JSON? = null, west: JSON? = null, northWeise: JSON? = null, eastWeise: JSON? = null, southWeise: JSON? = null, westWeise: JSON? = null, northStoeck: Boolean? = null, eastStoeck: Boolean? = null, southStoeck: Boolean? = null, westStoeck: Boolean? = null): this() {
+    constructor(id: Int? = null, uuid: String? = null, createdAt: LocalDateTime? = null, updatedAt: LocalDateTime? = null, gameId: Int? = null, startingPlayerId: Int? = null, trump: String? = null, gschobe: String? = null, north: JSON? = null, east: JSON? = null, south: JSON? = null, west: JSON? = null, northWeise: JSON? = null, eastWeise: JSON? = null, southWeise: JSON? = null, westWeise: JSON? = null): this() {
         this.id = id
         this.uuid = uuid
         this.createdAt = createdAt
@@ -125,10 +109,6 @@ open class HandRecord() : UpdatableRecordImpl<HandRecord>(Hand.HAND) {
         this.eastWeise = eastWeise
         this.southWeise = southWeise
         this.westWeise = westWeise
-        this.northStoeck = northStoeck
-        this.eastStoeck = eastStoeck
-        this.southStoeck = southStoeck
-        this.westStoeck = westStoeck
         resetChangedOnNotNull()
     }
 
@@ -153,10 +133,6 @@ open class HandRecord() : UpdatableRecordImpl<HandRecord>(Hand.HAND) {
             this.eastWeise = value.eastWeise
             this.southWeise = value.southWeise
             this.westWeise = value.westWeise
-            this.northStoeck = value.northStoeck
-            this.eastStoeck = value.eastStoeck
-            this.southStoeck = value.southStoeck
-            this.westStoeck = value.westStoeck
             resetChangedOnNotNull()
         }
     }
