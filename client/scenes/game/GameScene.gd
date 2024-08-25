@@ -210,8 +210,9 @@ func _on_update_possible_weise(data):
 	possible_weise = data["weise"]
 	
 func _on_show_weis(data):
-	# Don't show the weis because it's us
-	if data["position"] == Player.game_init_data["seat"]["position"]:
+	# Don't show the weis because it's us (except for stoeck, they are automatically gewiesen and 
+	# we want to indicate for the user that this happened
+	if data["position"] == Player.game_init_data["seat"]["position"] && data["weis"]["type"] != "STOECK":
 		return
 		
 	if _show_weis_gui.open:
