@@ -9,7 +9,6 @@ import ch.yass.core.pubsub.Channel
 import ch.yass.core.pubsub.PubSub
 import ch.yass.game.api.*
 import ch.yass.game.api.internal.GameState
-import ch.yass.game.api.internal.NewBotPlayer
 import ch.yass.game.api.internal.NewHand
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Game
@@ -52,11 +51,9 @@ class GameService(
             "Giuseppe", "Maria", "Marco", "Lucia", "Roberto", "Gian", "Anna", "Silvan", "Petra", "Lukas"
         )
 
-        // TODO: This will need som refactoring: We should not create a new player for every bot but instead
-        //       move some of this logic to the seat and all bots can have the same names...
         settings.botPositions().map { position ->
             val botName = botNames.removeAt((0 until botNames.size).random()) // Avoids duplicate names
-            val botPlayer = playerService.create(NewBotPlayer(botName))
+            val botPlayer = playerService.create(botName, position)
             repo.takeASeat(game, botPlayer, position)
         }
         repo.takeASeat(game, player)

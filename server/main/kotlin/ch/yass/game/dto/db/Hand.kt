@@ -11,6 +11,7 @@ data class Hand(
     val uuid: UUID,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
+    Hier gehts weiter, dass muss refactored werden zu start position
     val startingPlayerId: Int,
     val gameId: Int,
     val trump: Trump?,
