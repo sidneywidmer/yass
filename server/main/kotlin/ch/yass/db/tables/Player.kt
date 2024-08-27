@@ -5,10 +5,8 @@ package ch.yass.db.tables
 
 
 import ch.yass.db.Public
-import ch.yass.db.keys.HAND__FK_HAND_ON_STARTING_PLAYER
 import ch.yass.db.keys.PLAYER_PKEY
 import ch.yass.db.keys.SEAT__FK_SEAT_ON_PLAYER
-import ch.yass.db.tables.Hand.HandPath
 import ch.yass.db.tables.Seat.SeatPath
 import ch.yass.db.tables.records.PlayerRecord
 
@@ -151,21 +149,6 @@ open class Player(
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
     override fun getIdentity(): Identity<PlayerRecord, Int?> = super.getIdentity() as Identity<PlayerRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<PlayerRecord> = PLAYER_PKEY
-
-    private lateinit var _hand: HandPath
-
-    /**
-     * Get the implicit to-many join path to the <code>public.hand</code> table
-     */
-    fun hand(): HandPath {
-        if (!this::_hand.isInitialized)
-            _hand = HandPath(this, null, HAND__FK_HAND_ON_STARTING_PLAYER.inverseKey)
-
-        return _hand;
-    }
-
-    val hand: HandPath
-        get(): HandPath = hand()
 
     private lateinit var _seat: SeatPath
 

@@ -13,6 +13,7 @@ import ch.yass.game.api.internal.NewSeat
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.*
 import ch.yass.game.dto.db.Game
+import ch.yass.game.engine.botId
 import ch.yass.game.engine.randomFreePosition
 import org.jooq.DSLContext
 import org.jooq.Records.mapping
@@ -52,15 +53,29 @@ class GameRepository(private val db: DSLContext) {
      * to interpret the given data.
      */
     fun getState(game: Game): GameState {
+        // Fake an id if this seat belongs to a bot
         val seats = getSeats(game)
+            .map { seat -> seat.takeIf { it.status == SeatStatus.BOT }?.copy(playerId = botId(seat.position)) ?: seat }
 
-        // Currently the first player to join a room is also starting the game, maybe randomize?
-        // I also don't like that we pass the player just to create the first hand...
         val hands = getHands(game)
         val tricks = getTricks(hands.map { it.id })
-        val players = getPlayers(seats)
+        val players = getPlayers(seats.filter { it.status != SeatStatus.BOT }) // Exclude Bots, you won't find anything
+        val bots = seats
+            .filter { it.status == SeatStatus.BOT }
+            .map {
+                Player(
+                    id = botId(it.position),
+                    uuid = UUID.randomUUID(),
+                    oryUuid = null,
+                    name = "Bot", // TODO: When bot takeASeat, persist some data like name on the seat table
+                    bot = true,
+                    anonToken = null,
+                    createdAt = LocalDateTime.now(),
+                    updatedAt = LocalDateTime.now()
+                )
+            }
 
-        return GameState(game, players, seats, hands, tricks)
+        return GameState(game, players + bots, seats, hands, tricks)
     }
 
     context(Raise<GameWithCodeNotFound>)
@@ -139,7 +154,7 @@ class GameRepository(private val db: DSLContext) {
             HAND.CREATED_AT,
             HAND.UPDATED_AT,
             HAND.GAME_ID,
-            HAND.STARTING_PLAYER_ID,
+            HAND.STARTING_POSITION,
             HAND.TRUMP,
             HAND.GSCHOBE,
             HAND.NORTH,
@@ -152,7 +167,7 @@ class GameRepository(private val db: DSLContext) {
                 LocalDateTime.now(ZoneOffset.UTC),
                 LocalDateTime.now(ZoneOffset.UTC),
                 hand.game.id,
-                hand.startingPlayer.id,
+                hand.startingPosition.name,
                 hand.trump?.name,
                 hand.gschobe?.name ?: Gschobe.NOT_YET.name,
                 toDbJson(hand.positions[Position.NORTH]),
@@ -194,7 +209,7 @@ class GameRepository(private val db: DSLContext) {
             )
             .values(
                 UUID.randomUUID().toString(),
-                seat.player.id,
+                if (seat.player.bot) null else seat.player.id,
                 seat.game.id,
                 seat.position.toString(),
                 LocalDateTime.now(ZoneOffset.UTC), // Everyone gets one free ping, just to avoid false positive PlayerDisconnected events

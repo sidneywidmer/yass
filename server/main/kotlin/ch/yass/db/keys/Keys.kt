@@ -37,7 +37,6 @@ val TRICK_PKEY: UniqueKey<TrickRecord> = Internal.createUniqueKey(Trick.TRICK, D
 // -------------------------------------------------------------------------
 
 val HAND__FK_HAND_ON_GAME: ForeignKey<HandRecord, GameRecord> = Internal.createForeignKey(Hand.HAND, DSL.name("fk_hand_on_game"), arrayOf(Hand.HAND.GAME_ID), ch.yass.db.keys.GAME_PKEY, arrayOf(Game.GAME.ID), true)
-val HAND__FK_HAND_ON_STARTING_PLAYER: ForeignKey<HandRecord, PlayerRecord> = Internal.createForeignKey(Hand.HAND, DSL.name("fk_hand_on_starting_player"), arrayOf(Hand.HAND.STARTING_PLAYER_ID), ch.yass.db.keys.PLAYER_PKEY, arrayOf(Player.PLAYER.ID), true)
 val SEAT__FK_SEAT_ON_GAME: ForeignKey<SeatRecord, GameRecord> = Internal.createForeignKey(Seat.SEAT, DSL.name("fk_seat_on_game"), arrayOf(Seat.SEAT.GAME_ID), ch.yass.db.keys.GAME_PKEY, arrayOf(Game.GAME.ID), true)
 val SEAT__FK_SEAT_ON_PLAYER: ForeignKey<SeatRecord, PlayerRecord> = Internal.createForeignKey(Seat.SEAT, DSL.name("fk_seat_on_player"), arrayOf(Seat.SEAT.PLAYER_ID), ch.yass.db.keys.PLAYER_PKEY, arrayOf(Player.PLAYER.ID), true)
 val TRICK__FK_TRICK_ON_HAND: ForeignKey<TrickRecord, HandRecord> = Internal.createForeignKey(Trick.TRICK, DSL.name("fk_trick_on_hand"), arrayOf(Trick.TRICK.HAND_ID), ch.yass.db.keys.HAND_PKEY, arrayOf(Hand.HAND.ID), true)

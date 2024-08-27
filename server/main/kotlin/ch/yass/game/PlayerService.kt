@@ -8,10 +8,11 @@ import ch.yass.core.error.StringNoValidUUID
 import ch.yass.core.helper.toUUID
 import ch.yass.db.tables.references.PLAYER
 import ch.yass.game.api.internal.NewAnonPlayer
-import ch.yass.game.api.internal.NewBotPlayer
 import ch.yass.game.api.internal.NewOryPlayer
 import ch.yass.game.api.internal.UpdatePlayer
+import ch.yass.game.dto.Position
 import ch.yass.game.dto.db.Player
+import ch.yass.game.engine.botId
 import com.google.gson.internal.LinkedTreeMap
 import org.jooq.DSLContext
 import sh.ory.model.Identity
@@ -61,13 +62,20 @@ class PlayerService(private val db: DSLContext) {
         )
     }
 
-    fun create(player: NewBotPlayer): Player {
-        return createInternal(
+    /**
+     * Special handling for bots: we don't create an actual entry in the db and just map the id to the
+     * position. When loading the game state again in GameRepository.getState we again fake the player object.
+     */
+    fun create(name: String, position: Position): Player {
+        return Player(
+            id = botId(position),
             uuid = UUID.randomUUID(),
             oryUuid = null,
-            name = player.name,
+            name = name,
             bot = true,
-            anonToken = null
+            anonToken = null,
+            createdAt = LocalDateTime.now(),
+            updatedAt = LocalDateTime.now()
         )
     }
 

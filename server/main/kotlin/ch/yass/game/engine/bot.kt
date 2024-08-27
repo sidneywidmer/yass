@@ -5,6 +5,15 @@ import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Player
 import kotlin.random.Random
 
+fun botId(position: Position): Int {
+    return when (position) {
+        Position.NORTH -> -1
+        Position.EAST -> -2
+        Position.SOUTH -> -3
+        Position.WEST -> -4
+    }
+}
+
 fun chooseCardForBot(botPlayer: Player, state: GameState): Card {
     val hand = currentHand(state.hands)!!
     val cards = cardsInHand(hand, botPlayer, state)

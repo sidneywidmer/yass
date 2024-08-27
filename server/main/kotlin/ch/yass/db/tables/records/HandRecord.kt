@@ -39,49 +39,49 @@ open class HandRecord() : UpdatableRecordImpl<HandRecord>(Hand.HAND) {
         set(value): Unit = set(4, value)
         get(): Int? = get(4) as Int?
 
-    open var startingPlayerId: Int?
-        set(value): Unit = set(5, value)
-        get(): Int? = get(5) as Int?
-
     open var trump: String?
+        set(value): Unit = set(5, value)
+        get(): String? = get(5) as String?
+
+    open var gschobe: String?
         set(value): Unit = set(6, value)
         get(): String? = get(6) as String?
 
-    open var gschobe: String?
-        set(value): Unit = set(7, value)
-        get(): String? = get(7) as String?
-
     open var north: JSON?
+        set(value): Unit = set(7, value)
+        get(): JSON? = get(7) as JSON?
+
+    open var east: JSON?
         set(value): Unit = set(8, value)
         get(): JSON? = get(8) as JSON?
 
-    open var east: JSON?
+    open var south: JSON?
         set(value): Unit = set(9, value)
         get(): JSON? = get(9) as JSON?
 
-    open var south: JSON?
+    open var west: JSON?
         set(value): Unit = set(10, value)
         get(): JSON? = get(10) as JSON?
 
-    open var west: JSON?
+    open var northWeise: JSON?
         set(value): Unit = set(11, value)
         get(): JSON? = get(11) as JSON?
 
-    open var northWeise: JSON?
+    open var eastWeise: JSON?
         set(value): Unit = set(12, value)
         get(): JSON? = get(12) as JSON?
 
-    open var eastWeise: JSON?
+    open var southWeise: JSON?
         set(value): Unit = set(13, value)
         get(): JSON? = get(13) as JSON?
 
-    open var southWeise: JSON?
+    open var westWeise: JSON?
         set(value): Unit = set(14, value)
         get(): JSON? = get(14) as JSON?
 
-    open var westWeise: JSON?
+    open var startingPosition: String?
         set(value): Unit = set(15, value)
-        get(): JSON? = get(15) as JSON?
+        get(): String? = get(15) as String?
 
     // -------------------------------------------------------------------------
     // Primary key information
@@ -92,13 +92,12 @@ open class HandRecord() : UpdatableRecordImpl<HandRecord>(Hand.HAND) {
     /**
      * Create a detached, initialised HandRecord
      */
-    constructor(id: Int? = null, uuid: String? = null, createdAt: LocalDateTime? = null, updatedAt: LocalDateTime? = null, gameId: Int? = null, startingPlayerId: Int? = null, trump: String? = null, gschobe: String? = null, north: JSON? = null, east: JSON? = null, south: JSON? = null, west: JSON? = null, northWeise: JSON? = null, eastWeise: JSON? = null, southWeise: JSON? = null, westWeise: JSON? = null): this() {
+    constructor(id: Int? = null, uuid: String? = null, createdAt: LocalDateTime? = null, updatedAt: LocalDateTime? = null, gameId: Int? = null, trump: String? = null, gschobe: String? = null, north: JSON? = null, east: JSON? = null, south: JSON? = null, west: JSON? = null, northWeise: JSON? = null, eastWeise: JSON? = null, southWeise: JSON? = null, westWeise: JSON? = null, startingPosition: String? = null): this() {
         this.id = id
         this.uuid = uuid
         this.createdAt = createdAt
         this.updatedAt = updatedAt
         this.gameId = gameId
-        this.startingPlayerId = startingPlayerId
         this.trump = trump
         this.gschobe = gschobe
         this.north = north
@@ -109,6 +108,7 @@ open class HandRecord() : UpdatableRecordImpl<HandRecord>(Hand.HAND) {
         this.eastWeise = eastWeise
         this.southWeise = southWeise
         this.westWeise = westWeise
+        this.startingPosition = startingPosition
         resetChangedOnNotNull()
     }
 
@@ -122,7 +122,6 @@ open class HandRecord() : UpdatableRecordImpl<HandRecord>(Hand.HAND) {
             this.createdAt = value.createdAt
             this.updatedAt = value.updatedAt
             this.gameId = value.gameId
-            this.startingPlayerId = value.startingPlayerId
             this.trump = value.trump
             this.gschobe = value.gschobe
             this.north = value.north
@@ -133,6 +132,7 @@ open class HandRecord() : UpdatableRecordImpl<HandRecord>(Hand.HAND) {
             this.eastWeise = value.eastWeise
             this.southWeise = value.southWeise
             this.westWeise = value.westWeise
+            this.startingPosition = value.startingPosition
             resetChangedOnNotNull()
         }
     }

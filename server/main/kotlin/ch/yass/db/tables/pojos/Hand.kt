@@ -20,7 +20,6 @@ data class Hand(
     var createdAt: LocalDateTime? = null,
     var updatedAt: LocalDateTime? = null,
     var gameId: Int? = null,
-    var startingPlayerId: Int? = null,
     var trump: String? = null,
     var gschobe: String? = null,
     var north: JSON? = null,
@@ -30,7 +29,8 @@ data class Hand(
     var northWeise: JSON? = null,
     var eastWeise: JSON? = null,
     var southWeise: JSON? = null,
-    var westWeise: JSON? = null
+    var westWeise: JSON? = null,
+    var startingPosition: String? = null
 ): Serializable {
 
 
@@ -71,12 +71,6 @@ data class Hand(
                 return false
         }
         else if (this.gameId != o.gameId)
-            return false
-        if (this.startingPlayerId == null) {
-            if (o.startingPlayerId != null)
-                return false
-        }
-        else if (this.startingPlayerId != o.startingPlayerId)
             return false
         if (this.trump == null) {
             if (o.trump != null)
@@ -138,6 +132,12 @@ data class Hand(
         }
         else if (this.westWeise != o.westWeise)
             return false
+        if (this.startingPosition == null) {
+            if (o.startingPosition != null)
+                return false
+        }
+        else if (this.startingPosition != o.startingPosition)
+            return false
         return true
     }
 
@@ -149,7 +149,6 @@ data class Hand(
         result = prime * result + (if (this.createdAt == null) 0 else this.createdAt.hashCode())
         result = prime * result + (if (this.updatedAt == null) 0 else this.updatedAt.hashCode())
         result = prime * result + (if (this.gameId == null) 0 else this.gameId.hashCode())
-        result = prime * result + (if (this.startingPlayerId == null) 0 else this.startingPlayerId.hashCode())
         result = prime * result + (if (this.trump == null) 0 else this.trump.hashCode())
         result = prime * result + (if (this.gschobe == null) 0 else this.gschobe.hashCode())
         result = prime * result + (if (this.north == null) 0 else this.north.hashCode())
@@ -160,6 +159,7 @@ data class Hand(
         result = prime * result + (if (this.eastWeise == null) 0 else this.eastWeise.hashCode())
         result = prime * result + (if (this.southWeise == null) 0 else this.southWeise.hashCode())
         result = prime * result + (if (this.westWeise == null) 0 else this.westWeise.hashCode())
+        result = prime * result + (if (this.startingPosition == null) 0 else this.startingPosition.hashCode())
         return result
     }
 
@@ -171,7 +171,6 @@ data class Hand(
         sb.append(", ").append(createdAt)
         sb.append(", ").append(updatedAt)
         sb.append(", ").append(gameId)
-        sb.append(", ").append(startingPlayerId)
         sb.append(", ").append(trump)
         sb.append(", ").append(gschobe)
         sb.append(", ").append(north)
@@ -182,6 +181,7 @@ data class Hand(
         sb.append(", ").append(eastWeise)
         sb.append(", ").append(southWeise)
         sb.append(", ").append(westWeise)
+        sb.append(", ").append(startingPosition)
 
         sb.append(")")
         return sb.toString()
