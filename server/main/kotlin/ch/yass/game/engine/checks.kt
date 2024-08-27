@@ -149,7 +149,7 @@ fun cardFollowsLead(card: Card, player: Player, state: GameState): Boolean {
     val seat = playerSeat(player, state.seats)
     val cards = hand.cardsOf(seat.position).filter { playerOwnsCard(player, it, state) }
 
-    val leadPosition = currentLeadPositionOfHand(hand, tricks, state.seats, state.allPlayers)
+    val leadPosition = currentLeadPositionOfHand(hand, tricks, state.seats)
     val lead = trick.cardOf(leadPosition)
 
     return when {

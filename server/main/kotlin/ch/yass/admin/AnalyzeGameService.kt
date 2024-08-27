@@ -31,7 +31,7 @@ class AnalyzeGameService(private val gameService: GameService) {
     }
 
     private fun mapHand(hand: Hand, state: GameState): ch.yass.admin.api.analzye.Hand {
-        val startingPlayer = state.allPlayers.first { it.id == hand.startingPlayerId }
+        val startingPlayer = playerAtPosition(hand.startingPosition, state.seats, state.allPlayers)!!
         val players = state.allPlayers.map { mapPlayer(it, hand, state) }.toList()
         val tricksOfHand = tricksOfHand(state.tricks, hand) // newest trick is index 0
         val tricks = tricksOfHand.map { mapTrick(it, state, tricksOfHand, hand) }
@@ -42,7 +42,7 @@ class AnalyzeGameService(private val gameService: GameService) {
 
     private fun mapTrick(trick: Trick, state: GameState, tricksOfHand: List<Trick>, hand: Hand): TrickWithCards {
         val tricksUptoGivenTrick = tricksOfHand.reversed().takeWhileInclusive { it.id != trick.id }.reversed()
-        val leadPosition = currentLeadPositionOfHand(hand, tricksUptoGivenTrick, state.seats, state.allPlayers)
+        val leadPosition = currentLeadPositionOfHand(hand, tricksUptoGivenTrick, state.seats)
         val leadPlayer = playerAtPosition(leadPosition, state.seats, state.allPlayers)!!
         val leadCard = trick.cardOf(leadPosition)
         val winningPosition = winningPositionOfCurrentTrick(hand, tricksUptoGivenTrick, state.seats)

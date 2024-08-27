@@ -7,10 +7,8 @@ package ch.yass.db.tables
 import ch.yass.db.Public
 import ch.yass.db.keys.HAND_PKEY
 import ch.yass.db.keys.HAND__FK_HAND_ON_GAME
-import ch.yass.db.keys.HAND__FK_HAND_ON_STARTING_PLAYER
 import ch.yass.db.keys.TRICK__FK_TRICK_ON_HAND
 import ch.yass.db.tables.Game.GamePath
-import ch.yass.db.tables.Player.PlayerPath
 import ch.yass.db.tables.Trick.TrickPath
 import ch.yass.db.tables.records.HandRecord
 
@@ -107,11 +105,6 @@ open class Hand(
     val GAME_ID: TableField<HandRecord, Int?> = createField(DSL.name("game_id"), SQLDataType.INTEGER, this, "")
 
     /**
-     * The column <code>public.hand.starting_player_id</code>.
-     */
-    val STARTING_PLAYER_ID: TableField<HandRecord, Int?> = createField(DSL.name("starting_player_id"), SQLDataType.INTEGER.nullable(false), this, "")
-
-    /**
      * The column <code>public.hand.trump</code>.
      */
     val TRUMP: TableField<HandRecord, String?> = createField(DSL.name("trump"), SQLDataType.VARCHAR(10), this, "")
@@ -161,6 +154,11 @@ open class Hand(
      */
     val WEST_WEISE: TableField<HandRecord, JSON?> = createField(DSL.name("west_weise"), SQLDataType.JSON.nullable(false).defaultValue(DSL.field(DSL.raw("'[]'::json"), SQLDataType.JSON)), this, "")
 
+    /**
+     * The column <code>public.hand.starting_position</code>.
+     */
+    val STARTING_POSITION: TableField<HandRecord, String?> = createField(DSL.name("starting_position"), SQLDataType.VARCHAR(255).nullable(false).defaultValue(DSL.field(DSL.raw("'INVALID'::character varying"), SQLDataType.VARCHAR)), this, "")
+
     private constructor(alias: Name, aliased: Table<HandRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<HandRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
     private constructor(alias: Name, aliased: Table<HandRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
@@ -195,7 +193,7 @@ open class Hand(
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
     override fun getIdentity(): Identity<HandRecord, Int?> = super.getIdentity() as Identity<HandRecord, Int?>
     override fun getPrimaryKey(): UniqueKey<HandRecord> = HAND_PKEY
-    override fun getReferences(): List<ForeignKey<HandRecord, *>> = listOf(HAND__FK_HAND_ON_GAME, HAND__FK_HAND_ON_STARTING_PLAYER)
+    override fun getReferences(): List<ForeignKey<HandRecord, *>> = listOf(HAND__FK_HAND_ON_GAME)
 
     private lateinit var _game: GamePath
 
@@ -211,21 +209,6 @@ open class Hand(
 
     val game: GamePath
         get(): GamePath = game()
-
-    private lateinit var _player: PlayerPath
-
-    /**
-     * Get the implicit join path to the <code>public.player</code> table.
-     */
-    fun player(): PlayerPath {
-        if (!this::_player.isInitialized)
-            _player = PlayerPath(this, HAND__FK_HAND_ON_STARTING_PLAYER, null)
-
-        return _player;
-    }
-
-    val player: PlayerPath
-        get(): PlayerPath = player()
 
     private lateinit var _trick: TrickPath
 

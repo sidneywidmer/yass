@@ -42,7 +42,7 @@ class CountingPointsTest : Integration() {
         val hand = state.hands.first()
 
         // TODO: Refactor, we want way more tests and a way to create an "in memory" state for functional tests with our dsl
-        val points = cardPointsByPosition(hand, tricksOfHand(state.tricks, hand), state.seats)
+        val points = cardPointsByPosition(hand, tricksOfHand(state.tricks, hand))
         assertEquals(45, points[Position.NORTH])
     }
 

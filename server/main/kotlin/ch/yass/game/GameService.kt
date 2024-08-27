@@ -46,24 +46,19 @@ class GameService(
         ensure(validWcValue) { GameSettingsInvalidValue(settings) }
 
         val game = repo.createGame(settings)
-        val botNames = arrayListOf(
-            "Rolf", "Heidi", "Urs", "Elsbeth", "Matthias", "François", "Chantal", "Pierre", "Brigitte", "Michel",
-            "Giuseppe", "Maria", "Marco", "Lucia", "Roberto", "Gian", "Anna", "Silvan", "Petra", "Lukas"
-        )
 
         settings.botPositions().map { position ->
-            val botName = botNames.removeAt((0 until botNames.size).random()) // Avoids duplicate names
-            val botPlayer = playerService.create(botName, position)
+            val botPlayer = playerService.create("Bot", position)
             repo.takeASeat(game, botPlayer, position)
         }
-        repo.takeASeat(game, player)
+        val newSeat = repo.takeASeat(game, player)
 
         // TODO: This will need some refactoring: The welcome hand should be related to what cards the player
         //       unlocked so we can't deal the full hand yet if we don't know all the players. This should
         //       be done when the player joins at the table.
         // Creating player always starts game
         val cards = Position.entries.associateWith { interpretCards("welcome") }
-        val hand = repo.createHand(NewHand(game, player, cards, Trump.FREESTYLE, Gschobe.NO))
+        val hand = repo.createHand(NewHand(game, newSeat.position, cards, Trump.FREESTYLE, Gschobe.NO))
         repo.createTrick(hand)
 
         return game.code
@@ -321,7 +316,8 @@ class GameService(
                     updatedState.allPlayers,
                     updatedState.seats
                 )
-                val newHand = repo.createHand(NewHand(game, startingPlayer, randomHand()))
+                val startingPosition = playerSeat(startingPlayer, updatedState.seats).position
+                val newHand = repo.createHand(NewHand(game, startingPosition, randomHand()))
                 repo.createTrick(newHand)
                 val state = repo.getState(game)
                 publishForSeats(updatedState.seats) { seat -> newHandActions(state, seat) }

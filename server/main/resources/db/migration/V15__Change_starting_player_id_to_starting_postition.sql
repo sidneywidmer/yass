@@ -1,0 +1,5 @@
+ALTER TABLE hand
+    DROP COLUMN IF EXISTS starting_player_id;
+
+ALTER TABLE hand
+    ADD COLUMN starting_position VARCHAR(255) NOT NULL DEFAULT 'INVALID';

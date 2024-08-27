@@ -66,8 +66,8 @@ fun cardsInHand(hand: Hand, player: Player, state: GameState): List<CardInHand> 
  * the case the starting player of the current hands card is the lead. We pass in the list of tricks so we can
  * also use this function the get the lead of an arbitrary trick within a hand and not just the last one.
  */
-fun currentLeadPositionOfHand(hand: Hand, tricks: List<Trick>, seats: List<Seat>, allPlayers: List<Player>): Position =
-    winningPositionOfLastTrick(hand, tricks, seats) ?: startingPlayersSeatOfHand(hand, allPlayers, seats).position
+fun currentLeadPositionOfHand(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position =
+    winningPositionOfLastTrick(hand, tricks) ?: startingPlayersSeatOfHand(hand, seats).position
 
 fun nextState(state: GameState): State {
     val trick = currentTrick(state.tricks)
@@ -109,7 +109,7 @@ fun nextState(state: GameState): State {
 
 fun nextHandStartingPosition(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Position {
     val hand = currentHand(hands)!!
-    val seat = startingPlayersSeatOfHand(hand, players, seats)
+    val seat = startingPlayersSeatOfHand(hand, seats)
     return positionsOrderedWithStart(seat.position)[1]
 }
 
@@ -132,7 +132,7 @@ fun activePosition(
     val tricksOfHand = tricksOfHand(tricks, hand)
     val trick = tricksOfHand(tricks, hand).first()
 
-    val currentLead = currentLeadPositionOfHand(hand, tricksOfHand, seats, players)
+    val currentLead = currentLeadPositionOfHand(hand, tricksOfHand, seats)
     val positions = positionsOrderedWithStart(currentLead)
 
     // This is the first trick of the hand and the lead player has gschobe, it's their partners turn to choose
@@ -153,11 +153,11 @@ fun winningPositionOfCurrentTrick(hand: Hand, tricks: List<Trick>, seats: List<S
         return null
     }
 
-    return winningPositionOfTricks(hand, tricks, seats)
+    return winningPositionOfTricks(hand, tricks)
 }
 
 
-fun winningPositionOfLastTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position? {
+fun winningPositionOfLastTrick(hand: Hand, tricks: List<Trick>): Position? {
     if (tricks.count() < 2) {
         return null
     }
@@ -171,7 +171,7 @@ fun winningPositionOfLastTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat
         return null
     }
 
-    return winningPositionOfTricks(hand, tricksWithoutNewest, seats)
+    return winningPositionOfTricks(hand, tricksWithoutNewest)
 }
 
 fun winningPositionOfTrick(trick: Trick, lead: Position, trump: Trump): Position {
@@ -193,14 +193,8 @@ fun winningPositionOfTrick(trick: Trick, lead: Position, trump: Trump): Position
  * To figure this out we need to recursively loop all played tricks in the given hand. Figures out
  * the winner of the last trick in the tricks list.
  */
-fun winningPositionOfTricks(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position {
-    val startPosition = seats.first { it.playerId == hand.startingPlayerId }.position
-
-    return tricks.reversed().fold(startPosition) { lead, trick ->
-        winningPositionOfTrick(trick, lead, hand.trump!!)
-    }
-}
-
+fun winningPositionOfTricks(hand: Hand, tricks: List<Trick>): Position =
+    tricks.reversed().fold(hand.startingPosition) { lead, trick -> winningPositionOfTrick(trick, lead, hand.trump!!) }
 
 /**
  * See activePosition, this is just a helper to map a player to a position.
@@ -216,11 +210,8 @@ fun randomFreePosition(occupiedSeats: List<Seat>): Position {
     return all.minus(occupied).randomOrNull() ?: raise(GameAlreadyFull)
 }
 
-fun startingPlayersSeatOfHand(hand: Hand, players: List<Player>, seats: List<Seat>): Seat {
-    val startingPlayer = players.firstOrNull { it.id == hand.startingPlayerId }!!
-
-    return seats.first { it.playerId == startingPlayer.id }
-}
+fun startingPlayersSeatOfHand(hand: Hand, seats: List<Seat>): Seat =
+    seats.first { it.position == hand.startingPosition }
 
 /**
  * If it's a "suit" trump, all cards must follow suit except the Trump Jack a.k.a Buur.
@@ -261,7 +252,7 @@ fun weisPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>, seats: Lis
             return accumulator
         }
 
-        val startingSeat = seats.first { it.playerId == hand.startingPlayerId }
+        val startingSeat = startingPlayersSeatOfHand(hand, seats)
         val posToWeise =
             Position.entries.associateWith { pos -> hand.weiseOf(pos).map { it.toWeisWithPoints(hand.trump!!) } }
         val posToPoints = posToWeise.mapValues { it.value.sumOf { weis -> weis.points } }.toMutableMap()
@@ -297,7 +288,7 @@ fun cardPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>, seats: Lis
 
     return hands.fold(initial) { accumulator, hand ->
         val tricksOfHand = completeTricksOfHand(tricks, hand)
-        val pointsNew = cardPointsByPosition(hand, tricksOfHand, seats)
+        val pointsNew = cardPointsByPosition(hand, tricksOfHand)
         accumulator.mapValues { (position, points) -> points + pointsNew[position]!! }
     }
 }
@@ -306,11 +297,10 @@ fun cardPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>, seats: Lis
  * Splits all tricks to a map with key POSITION and value a list of tricks that position won. The given
  * tricks are ordered descending where index 0 is the newest trick, so we reverse the list.
  */
-fun cardPointsByPosition(hand: Hand, tricks: List<Trick>, seats: List<Seat>): SplitPoints {
-    val startPosition = seats.first { it.playerId == hand.startingPlayerId }.position
+fun cardPointsByPosition(hand: Hand, tricks: List<Trick>): SplitPoints {
     val positionMap = Position.entries.associateWith { emptyList<Trick>() }
     val positionToTricksMap = tricks.reversed().fold(
-        PositionToTrickAccumulator(positionMap, startPosition)
+        PositionToTrickAccumulator(positionMap, hand.startingPosition)
     ) { accumulator, trick ->
         val winner = winningPositionOfTrick(trick, accumulator.lead, hand.trump!!)
         val wonTricks = accumulator.positions[winner]!! + trick

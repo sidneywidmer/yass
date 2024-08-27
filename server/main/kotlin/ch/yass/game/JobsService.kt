@@ -34,6 +34,9 @@ class JobsService(scheduler: JobScheduler, private val db: DSLContext, private v
         scheduler.createRecurrently(gameStatus)
     }
 
+    /**
+     * Needs to be public for JobRunr to pick it up
+     */
     fun playerPing() {
         logger().debug("Job [Player Ping]: Start checking player pings")
 
@@ -60,6 +63,9 @@ class JobsService(scheduler: JobScheduler, private val db: DSLContext, private v
         logger().debug("Job [Player Ping]: Done! Dispatched PlayerDisconnected events to ${dcRecords.size} seats.")
     }
 
+    /**
+     * Needs to be public for JobRunr to pick it up
+     */
     fun gameStatus() {
         logger().debug("Job [Game Status]: Start updating game status")
 

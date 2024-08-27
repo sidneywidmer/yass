@@ -11,8 +11,7 @@ data class Hand(
     val uuid: UUID,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
-    Hier gehts weiter, dass muss refactored werden zu start position
-    val startingPlayerId: Int,
+    val startingPosition: Position,
     val gameId: Int,
     val trump: Trump?,
     val gschobe: Gschobe,
@@ -32,7 +31,7 @@ data class Hand(
                 UUID.fromString(hand.uuid)!!,
                 hand.createdAt!!,
                 hand.updatedAt!!,
-                hand.startingPlayerId!!,
+                Position.entries.first { it.name == hand.startingPosition },
                 hand.gameId!!,
                 Trump.entries.firstOrNull { it.name == hand.trump },
                 Gschobe.entries.first { it.name == hand.gschobe },
