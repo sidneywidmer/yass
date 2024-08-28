@@ -12,15 +12,19 @@ import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.path
 import io.javalin.config.EventConfig
 import io.javalin.json.JavalinJackson
+import jakarta.servlet.DispatcherType
 import org.flywaydb.core.Flyway
 import org.kodein.di.DI
 import org.kodein.di.allInstances
 import org.kodein.di.direct
 import org.kodein.di.instance
 import org.slf4j.LoggerFactory
+import org.zalando.logbook.Logbook
+import org.zalando.logbook.servlet.LogbookFilter
+import java.util.*
 import com.typesafe.config.Config as ConfigSettings
 
-class Bootstrap(private val config: ConfigSettings) {
+class Bootstrap(private val config: ConfigSettings, private val logbook: Logbook) {
     fun start(di: DI) {
         setupFlyway()
 
@@ -37,6 +41,10 @@ class Bootstrap(private val config: ConfigSettings) {
                     it.allowHost("http://127.0.0.1:5173")
                     it.allowCredentials = true
                 }
+            }
+            Hier gehts weiter, wieso erkennts Logbook filter nicht?
+            javalinConfig.jetty.modifyServletContextHandler { handler ->
+                handler.addFilter(LogbookFilter(logbook), "/*", EnumSet.of(DispatcherType.REQUEST) )
             }
         }
 

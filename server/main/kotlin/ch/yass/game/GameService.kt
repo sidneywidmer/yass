@@ -249,7 +249,8 @@ class GameService(
     }
 
     private fun publishForSeats(seats: List<Seat>, action: (Seat) -> List<Action>) =
-        seats.forEach { pubSub.publish(action.invoke(it), Channel("seat", it.uuid)) }
+        seats.filter { it.status !in listOf(SeatStatus.BOT, SeatStatus.DISCONNECTED) }
+            .forEach { pubSub.publish(action.invoke(it), Channel("seat", it.uuid)) }
 
     /**
      * Controlling our game state. There are some special cases where the game engine is responsible

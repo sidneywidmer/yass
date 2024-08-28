@@ -41,11 +41,11 @@ object Core {
     val module = DI.Module("Core module") {
         bindSingleton { ConfigFactory.load() }
         bindSingleton { createDSLContext(instance()) }
-        bindSingleton { Bootstrap(instance()) }
+        bindSingleton { createLogbook() }
+        bindSingleton { Bootstrap(instance(), instance()) }
         bindSingleton { MDCMiddleware() }
         bindSingleton { LoggerFactory.getLogger("Yass") }
         bindSingleton { createJsonMapper() }
-        bindSingleton { createLogbook() }
         bindSingleton { createCentrifugoClient(instance()) }
         bindSingleton { PubSub(instance(), instance()) }
         bindSingleton { createJobRunr() }
