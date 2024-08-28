@@ -13,7 +13,7 @@
                 <appender-ref ref="Console"/>
             </root>
             <logger name="Yass" level="INFO"/>
-            <logger name="org.zalando.logbook" level="TRACE"/>
+            <!--            <logger name="org.zalando.logbook" level="TRACE"/>-->
         </then>
         <else>
             <root level="INFO">

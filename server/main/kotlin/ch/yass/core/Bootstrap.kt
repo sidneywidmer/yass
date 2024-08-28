@@ -13,6 +13,7 @@ import io.javalin.apibuilder.ApiBuilder.path
 import io.javalin.config.EventConfig
 import io.javalin.json.JavalinJackson
 import jakarta.servlet.DispatcherType
+import org.eclipse.jetty.servlet.FilterHolder
 import org.flywaydb.core.Flyway
 import org.kodein.di.DI
 import org.kodein.di.allInstances
@@ -42,9 +43,8 @@ class Bootstrap(private val config: ConfigSettings, private val logbook: Logbook
                     it.allowCredentials = true
                 }
             }
-            Hier gehts weiter, wieso erkennts Logbook filter nicht?
             javalinConfig.jetty.modifyServletContextHandler { handler ->
-                handler.addFilter(LogbookFilter(logbook), "/*", EnumSet.of(DispatcherType.REQUEST) )
+                handler.addFilter(FilterHolder(LogbookFilter(logbook)), "/*", EnumSet.of(DispatcherType.REQUEST) )
             }
         }
 
