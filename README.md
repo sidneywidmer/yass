@@ -1,5 +1,11 @@
 # Yass
 
+## Start
+
+Start the application for local development like so:
+  1. `$ docker compse up`
+  2. `$ ./mvnw exec:java -Dexec.mainClass="ch.yass.Yass"`
+
 ## DB Changes
 
 - Add migration to resources
@@ -17,4 +23,4 @@ of errors we currently have.
 ## Config
 
 Config file is under resources/application.conf. The environment variables need to be provided otherwise the application
-won't start.
+won't start (direnv is a good solution for this `direnv`)

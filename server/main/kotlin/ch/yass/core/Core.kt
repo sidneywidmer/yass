@@ -115,6 +115,7 @@ object Core {
             username = config.getString("db.username")
             password = config.getString("db.password")
             maximumPoolSize = 10
+            driverClassName = "org.postgresql.Driver"
         }
         val conn = HikariDataSource(hikariConfig)
 

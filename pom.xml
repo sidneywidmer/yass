@@ -231,6 +231,11 @@
     <build>
         <sourceDirectory>server/main/kotlin</sourceDirectory>
         <testSourceDirectory>server/test/kotlin</testSourceDirectory>
+        <resources>
+            <resource>
+                <directory>server/main/resources</directory>
+            </resource>
+        </resources>
         <testResources>
             <testResource>
                 <directory>server/test/resources</directory>
@@ -238,6 +243,20 @@
         </testResources>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>ch.yass.Yass</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.1.2</version>
@@ -250,33 +269,28 @@
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
                 <version>1.9.24</version>
-                <configuration>
-                    <jvmTarget>21</jvmTarget>
-                </configuration>
                 <executions>
                     <execution>
                         <id>compile</id>
+                        <phase>compile</phase>
                         <goals>
                             <goal>compile</goal>
                         </goals>
                         <configuration>
-                            <args>
-                                <arg>-Xcontext-receivers</arg>
-                            </args>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
-                        <configuration>
-                            <args>
-                                <arg>-Xcontext-receivers</arg>
-                            </args>
+                            <sourceDirs>
+                                <source>server/main/kotlin</source>
+                                <source>target/generated-sources/annotations</source>
+                            </sourceDirs>
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <jvmTarget>21</jvmTarget>
+                    <args>
+                        <arg>-Xcontext-receivers</arg>
+                        <arg>-opt-in=kotlin.ExperimentalStdlibApi</arg>
+                    </args>
+                </configuration>
             </plugin>
 
             <!-- The jOOQ code generator plugin -->
