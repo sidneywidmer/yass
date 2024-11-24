@@ -25,7 +25,7 @@ open class Integration {
             System.setProperty("db.url", db.jdbcUrl)
             System.setProperty("db.username", db.username)
             System.setProperty("db.password", db.password)
-            System.setProperty("db.migrate", "false") // Migrations are handles by postgres container
+            System.setProperty("db.migrate", "false") // Migrations are handled by postgres container
             System.setProperty("environment", "test")
         }
     }

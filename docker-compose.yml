@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   db-test:
     image: postgres:15.4-alpine
@@ -18,11 +17,13 @@ services:
       - '5432:5432'
     volumes:
       - db:/var/lib/postgresql/data
+    networks:
+      - intranet
 
   kratos-migrate:
     depends_on:
       - db
-    image: oryd/kratos:v1.1.0
+    image: oryd/kratos:v1.3.0
     environment:
       - DSN=postgres://postgres:postgres@db:5432/yass
     volumes:
@@ -30,24 +31,30 @@ services:
         source: ./.docker/kratos/email-password
         target: /etc/config/kratos
     command: -c /etc/config/kratos/kratos.yml migrate sql -e --yes
+    networks:
+      - intranet
+
 
   kratos-self-service-ui-node:
     depends_on:
       - kratos-migrate
-    image: oryd/kratos-selfservice-ui-node:v1.1.0
+      - kratos
+    image: oryd/kratos-selfservice-ui-node:v1.3.0
     environment:
-      - KRATOS_PUBLIC_URL=http://127.0.0.1:4433/
+      - KRATOS_PUBLIC_URL=http://kratos:4433/
       - KRATOS_BROWSER_URL=http://127.0.0.1:4433/
       - COOKIE_SECRET=changeme
       - CSRF_COOKIE_NAME=ory_csrf_ui
       - CSRF_COOKIE_SECRET=changeme
     ports:
       - '4455:3000'
+    networks:
+      - intranet
 
   kratos:
     depends_on:
       - kratos-migrate
-    image: oryd/kratos:v1.1.0
+    image: oryd/kratos:v1.3.0
     ports:
       - '4433:4433' # public
       - '4434:4434' # admin
@@ -58,6 +65,8 @@ services:
       - type: bind
         source: ./.docker/kratos/email-password
         target: /etc/config/kratos
+    networks:
+      - intranet
 
   centrifugo:
     extra_hosts:
@@ -73,13 +82,19 @@ services:
       nofile:
         soft: 65535
         hard: 65535
+    networks:
+      - intranet
 
   mailslurper:
     image: oryd/mailslurper:latest-smtps
     ports:
       - '4436:4436'
       - '4437:4437'
+    networks:
+      - intranet
 
+networks:
+  intranet:
 volumes:
   db:
     driver: local

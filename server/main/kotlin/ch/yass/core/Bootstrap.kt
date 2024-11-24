@@ -25,6 +25,7 @@ import org.zalando.logbook.servlet.LogbookFilter
 import java.util.*
 import com.typesafe.config.Config as ConfigSettings
 
+
 class Bootstrap(private val config: ConfigSettings, private val logbook: Logbook) {
     fun start(di: DI) {
         setupFlyway()

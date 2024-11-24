@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test
 import org.kodein.di.direct
 import org.kodein.di.instance
 
+
 class BotTest : Integration() {
     private val service: GameService = container.direct.instance()
     private val repo: GameRepository = container.direct.instance()
