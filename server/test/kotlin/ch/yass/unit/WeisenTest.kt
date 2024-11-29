@@ -4,6 +4,7 @@ import ch.yass.admin.dsl.interpretCard
 import ch.yass.admin.dsl.interpretCards
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Hand
+import ch.yass.game.dto.db.Seat
 import ch.yass.game.dto.db.Trick
 import ch.yass.game.engine.*
 import ch.yass.game.engine.blattWeise
@@ -123,11 +124,6 @@ class WeisenTest {
     }
 
     @Test
-    fun testStoeck() {
-        TODO()
-    }
-
-    @Test
     fun testisAlreadyGewiesenSecond() {
         val trick = Trick(
             1,
@@ -160,9 +156,24 @@ class WeisenTest {
             emptyList(),
         )
 
+        val seats = Position.entries.mapIndexed { index, position ->
+            Seat(
+                id = index + 1,
+                uuid = UUID.randomUUID(),
+                createdAt = LocalDateTime.now(),
+                updatedAt = LocalDateTime.now(),
+                playerId = index + 1,
+                gameId = 1,
+                position = position,
+                status = SeatStatus.CONNECTED,
+                rejoinedAt = null,
+                playerPing = LocalDateTime.now()
+            )
+        }
+
         // N/S won the weis in the first round, so now they play another one since north still has SECHS_BLATT
         // meaning they can still play this weis
-        // val result = isAlreadyGewiesenSecond(listOf(trick), hand, state.seats)
-        // assert(!result)
+        val result = isAlreadyGewiesenSecond(listOf(trick), hand, seats)
+        assert(!result)
     }
 }

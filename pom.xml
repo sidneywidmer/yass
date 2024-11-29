@@ -50,6 +50,11 @@
             <version>1.2.4</version>
         </dependency>
         <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
+            <version>1.9.0</version>
+        </dependency>
+        <dependency>
             <groupId>io.arrow-kt</groupId>
             <artifactId>arrow-fx-coroutines</artifactId>
             <version>1.2.4</version>
@@ -133,6 +138,12 @@
         </dependency>
 
         <!-- Testing -->
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-test</artifactId>
+            <version>1.9.0</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.wiremock</groupId>
             <artifactId>wiremock</artifactId>

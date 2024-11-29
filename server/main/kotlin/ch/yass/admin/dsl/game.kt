@@ -57,6 +57,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
             gameId = game.id
             position = p.position.name
             rejoinedAt = null
+            status = if(player.bot!!) "BOT" else "CONNECTED"
             store()
         }
 

@@ -9,13 +9,22 @@ import ch.yass.game.api.PlayedCard
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Gschobe
 import ch.yass.game.dto.Position
+import ch.yass.game.dto.State
 import ch.yass.game.dto.Trump
 import ch.yass.game.engine.playerAtPosition
+import ch.yass.game.pubsub.GameFinished
+import ch.yass.game.pubsub.UpdateState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 import org.kodein.di.direct
 import org.kodein.di.instance
-
 
 class BotTest : Integration() {
     private val service: GameService = container.direct.instance()
@@ -59,19 +68,42 @@ class BotTest : Integration() {
     }
 
     @Test
-    fun testBotsPlayAFullGame() {
+    fun testBotsPlayAFullGame() = runBlocking {
         val state = getState()
 
         val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)!!
         val playedCard = PlayedCard("CLUBS", "NINE", "french")
         val request = PlayCardRequest(state.game.uuid.toString(), playedCard)
 
-        val result = either {
-            service.play(request, player)
-        }.onLeft { fail() }
+        waitUntilEvent(
+            service.scope,
+            service.eventChannel,
+            { current, history -> current is GameFinished },
+            { either { service.play(request, player) }.onLeft { fail() } }
+        )
 
-        // TODO: Refactor so global scope is somehow tracked and we can wait until everything is completed
-        val foo = "bar"
+        val currentState = repo.getState(state.game)
+        assert(currentState.tricks.size == 91)
+        assert(currentState.hands.size == 11)
     }
 
+    suspend fun <T> waitUntilEvent(
+        scope: CoroutineScope,
+        channel: Channel<T>,
+        predicate: (T, List<T>) -> Boolean,
+        action: suspend () -> Unit
+    ) {
+        suspendCancellableCoroutine { continuation ->
+            val history = mutableListOf<T>()
+            scope.launch {
+                channel.consumeEach { value ->
+                    history.add(value)
+                    if (!continuation.isCompleted && predicate(value, history.toList())) {
+                        continuation.resumeWith(Result.success(Unit))
+                    }
+                }
+            }
+            scope.launch { action() }
+        }
+    }
 }

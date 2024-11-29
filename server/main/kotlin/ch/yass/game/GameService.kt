@@ -17,17 +17,24 @@ import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
 import ch.yass.game.pubsub.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
+import kotlinx.coroutines.channels.Channel as EventChannel
 
 class GameService(
     private val repo: GameRepository,
     private val pubSub: PubSub,
-    private val playerService: PlayerService
+    private val playerService: PlayerService,
 ) {
+    /**
+     * We use scope and eventChannel to also emmit our publishForSeats Actions. This helps greatly with
+     * writing integration tests since we can wait for specific actions to complete in our coroutine contexts.
+     */
+    var scope = CoroutineScope(Dispatchers.Default)
+    var eventChannel: EventChannel<Action> = EventChannel()
 
     /**
      * Validate settings, create a new game in the db, create players for all bots and seat them
@@ -120,7 +127,6 @@ class GameService(
 
         return updatedState
     }
-
 
     context(Raise<GameError>)
     fun trump(request: ChooseTrumpRequest, player: Player): GameState {
@@ -248,9 +254,12 @@ class GameService(
         publishForSeats(state.seats) { actions }
     }
 
-    private fun publishForSeats(seats: List<Seat>, action: (Seat) -> List<Action>) =
+    private fun publishForSeats(seats: List<Seat>, action: (Seat) -> List<Action>) {
+        scope.launch { seats.forEach { action.invoke(it).forEach { a -> eventChannel.send(a) } } }
+
         seats.filter { it.status !in listOf(SeatStatus.BOT, SeatStatus.DISCONNECTED) }
             .forEach { pubSub.publish(action.invoke(it), Channel("seat", it.uuid)) }
+    }
 
     /**
      * Controlling our game state. There are some special cases where the game engine is responsible
@@ -261,11 +270,7 @@ class GameService(
      * - NEW_TRICK -> Call gameLoop again, the next state could e.g. be PLAY_CARD_BOT
      * - NEW_HAND -> Call gameLoop again, the next state again could be a BOT action
      *
-     * The delays make a better UX, so e.g a trick is not removed instantly by ClearPlayedCards action. The
-     * other option would be to delay these actions client side, but I opted for this solution to keep the
-     * client and server state as in-sync as possible.
-     *
-     * TODO: Move these delays to the client side??
+     * TODO: Add delays on client side
      */
     context(Raise<GameError>)
     @OptIn(DelicateCoroutinesApi::class)
@@ -292,26 +297,22 @@ class GameService(
 
             State.TRUMP -> {}
             State.SCHIEBE -> {}
-            State.PLAY_CARD_BOT -> GlobalScope.launch { delay(200).also { playAsBot(updatedState) } }
-            State.TRUMP_BOT -> GlobalScope.launch { delay(200) }.also { trumpAsBot(updatedState) }
-            State.SCHIEBE_BOT -> GlobalScope.launch { delay(200) }.also { schiebeAsBot(updatedState) }
+            State.PLAY_CARD_BOT -> scope.launch { playAsBot(updatedState) }
+            State.TRUMP_BOT -> scope.launch { trumpAsBot(updatedState) }
+            State.SCHIEBE_BOT -> scope.launch { schiebeAsBot(updatedState) }
             State.WEISEN_FIRST -> {}
-            State.WEISEN_FIRST_BOT -> GlobalScope.launch { delay(200).also { weisenAsBot(updatedState) } }
-            State.WEISEN_SECOND -> GlobalScope.launch {
-                delay(200).also { weisenSecond(updatedState) }
-            }
+            State.WEISEN_FIRST_BOT -> scope.launch { weisenAsBot(updatedState) }
+            State.WEISEN_SECOND -> weisenSecond(updatedState)
 
-            State.WEISEN_SECOND_BOT -> GlobalScope.launch { delay(200).also { weisenAsBot(updatedState) } }
-            State.NEW_TRICK -> GlobalScope.launch {
-                delay(1000)
+            State.WEISEN_SECOND_BOT -> scope.launch { weisenAsBot(updatedState) }
+            State.NEW_TRICK -> {
                 repo.createTrick(currentHand(updatedState.hands)!!)
                 val state = repo.getState(game)
                 publishForSeats(updatedState.seats) { seat -> newTrickActions(state, seat) }
                 gameLoop(game)
             }
 
-            State.NEW_HAND -> GlobalScope.launch {
-                delay(1000)
+            State.NEW_HAND -> {
                 val startingPlayer = nextHandStartingPlayer(
                     updatedState.hands,
                     updatedState.allPlayers,
