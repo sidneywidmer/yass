@@ -1,6 +1,5 @@
 package ch.yass.game.engine
 
-import ch.yass.admin.dsl.interpretCards
 import ch.yass.core.helper.cartesianProduct
 import ch.yass.game.dto.*
 
@@ -32,14 +31,18 @@ fun positionsOrderedWithStart(position: Position): List<Position> {
 
 fun deck(): List<Pair<Rank, Suit>> = cartesianProduct(regularRanks(), regularSuits()).shuffled()
 
-fun randomHand(): Map<Position, List<Card>> {
-    val deck = deck()
+/**
+ * nextDeck allows us to inject a not so random deck in case we need it to replicate
+ * errors or for testing.
+ */
+fun randomHand(forcedDeck: List<Card>?): Map<Position, List<Card>> {
+    val deck = forcedDeck?.map { Pair(it.rank, it.suit) } ?: deck()
 
     return mapOf(
-        Position.EAST to sort(deck.subList(0, 9).map { Card(it.second, it.first, "french") }),
-        Position.SOUTH to sort(deck.subList(9, 18).map { Card(it.second, it.first, "french") }),
-        Position.WEST to sort(deck.subList(18, 27).map { Card(it.second, it.first, "french") }),
-        Position.NORTH to sort(deck.subList(27, 36).map { Card(it.second, it.first, "french") }),
+        Position.NORTH to sort(deck.subList(0, 9).map { Card(it.second, it.first, "french") }),
+        Position.EAST to sort(deck.subList(9, 18).map { Card(it.second, it.first, "french") }),
+        Position.SOUTH to sort(deck.subList(18, 27).map { Card(it.second, it.first, "french") }),
+        Position.WEST to sort(deck.subList(27, 36).map { Card(it.second, it.first, "french") }),
     )
 }
 

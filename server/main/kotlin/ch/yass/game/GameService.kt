@@ -17,6 +17,7 @@ import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
 import ch.yass.game.pubsub.*
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -28,12 +29,16 @@ class GameService(
     private val repo: GameRepository,
     private val pubSub: PubSub,
     private val playerService: PlayerService,
+    private val foresight: Foresight,
 ) {
     /**
      * We use scope and eventChannel to also emmit our publishForSeats Actions. This helps greatly with
      * writing integration tests since we can wait for specific actions to complete in our coroutine contexts.
      */
-    var scope = CoroutineScope(Dispatchers.Default)
+    var scope = CoroutineScope(Dispatchers.Default + CoroutineExceptionHandler { _, exception ->
+        // TODO: we should fire an action so our clients know the game is stuck because
+        //  tome bot ran into a bug.
+    })
     var eventChannel: EventChannel<Action> = EventChannel()
 
     /**
@@ -125,7 +130,7 @@ class GameService(
 
         gameLoop(game)
 
-        return updatedState
+        return repo.getState(game)
     }
 
     context(Raise<GameError>)
@@ -257,6 +262,7 @@ class GameService(
     private fun publishForSeats(seats: List<Seat>, action: (Seat) -> List<Action>) {
         scope.launch { seats.forEach { action.invoke(it).forEach { a -> eventChannel.send(a) } } }
 
+        // Don't send ws events for bots or disconnected clients
         seats.filter { it.status !in listOf(SeatStatus.BOT, SeatStatus.DISCONNECTED) }
             .forEach { pubSub.publish(action.invoke(it), Channel("seat", it.uuid)) }
     }
@@ -319,7 +325,7 @@ class GameService(
                     updatedState.seats
                 )
                 val startingPosition = playerSeat(startingPlayer, updatedState.seats).position
-                val newHand = repo.createHand(NewHand(game, startingPosition, randomHand()))
+                val newHand = repo.createHand(NewHand(game, startingPosition, randomHand(foresight.nextDeck())))
                 repo.createTrick(newHand)
                 val state = repo.getState(game)
                 publishForSeats(updatedState.seats) { seat -> newHandActions(state, seat) }

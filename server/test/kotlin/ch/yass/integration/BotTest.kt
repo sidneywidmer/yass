@@ -1,5 +1,6 @@
 package ch.yass.integration
 
+import kotlinx.coroutines.Job
 import arrow.core.raise.either
 import ch.yass.admin.dsl.game
 import ch.yass.game.GameRepository
@@ -9,13 +10,11 @@ import ch.yass.game.api.PlayedCard
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Gschobe
 import ch.yass.game.dto.Position
-import ch.yass.game.dto.State
 import ch.yass.game.dto.Trump
 import ch.yass.game.engine.playerAtPosition
 import ch.yass.game.pubsub.GameFinished
-import ch.yass.game.pubsub.UpdateState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
@@ -25,6 +24,8 @@ import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 import org.kodein.di.direct
 import org.kodein.di.instance
+import kotlin.coroutines.resumeWithException
+
 
 class BotTest : Integration() {
     private val service: GameService = container.direct.instance()
@@ -67,6 +68,11 @@ class BotTest : Integration() {
         }
     }
 
+    /**
+     * Broad test that let's 4 bots play against each other. The test is pretty expensive
+     * since it takes around 5s to play a full game. This gives us a good overview
+     * that most things should work and not throw any weird errors.
+     */
     @Test
     fun testBotsPlayAFullGame() = runBlocking {
         val state = getState()
@@ -95,6 +101,16 @@ class BotTest : Integration() {
     ) {
         suspendCancellableCoroutine { continuation ->
             val history = mutableListOf<T>()
+
+            // Monitor the scope's job for failures and if there are any resume our suspended coroutine
+            scope.coroutineContext[Job]?.invokeOnCompletion { throwable ->
+                throwable?.let { exception ->
+                    if (!continuation.isCompleted) {
+                        continuation.resumeWithException(exception)
+                    }
+                }
+            }
+
             scope.launch {
                 channel.consumeEach { value ->
                     history.add(value)
@@ -103,6 +119,7 @@ class BotTest : Integration() {
                     }
                 }
             }
+
             scope.launch { action() }
         }
     }

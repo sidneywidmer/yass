@@ -9,11 +9,12 @@ import org.kodein.di.instance
 
 object Game {
     val module = DI.Module("Game module") {
+        bindSingleton { Foresight() }
         bindSingleton { createDispatcher() }
         bindSingleton { GameController(instance(), instance()) }
         bindSingleton { PlayerService(instance()) }
         bindSingleton { GameRepository(instance()) }
-        bindSingleton { GameService(instance(), instance(), instance()) }
+        bindSingleton { GameService(instance(), instance(), instance(), instance()) }
         bindEagerSingleton { JobsService(instance(), instance(), instance()) }
     }
 
