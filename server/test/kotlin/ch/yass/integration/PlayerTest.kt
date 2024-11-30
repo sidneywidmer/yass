@@ -1,11 +1,11 @@
 package ch.yass.integration
+
 import arrow.core.raise.recover
 import ch.yass.admin.dsl.game
 import ch.yass.admin.dsl.interpretCards
 import ch.yass.core.error.InvalidState
 import ch.yass.core.error.PlayerIsLocked
 import ch.yass.game.Foresight
-import ch.yass.game.GameRepository
 import ch.yass.game.GameService
 import ch.yass.game.api.ChooseTrumpRequest
 import ch.yass.game.api.PlayCardRequest
@@ -32,7 +32,6 @@ import org.kodein.di.instance
 
 class PlayerTest : Integration() {
     private val service: GameService = container.direct.instance()
-    private val repo: GameRepository = container.direct.instance()
     private val foresight: Foresight = container.direct.instance()
 
     /**
@@ -66,13 +65,64 @@ class PlayerTest : Integration() {
      */
     @Test
     fun testManuallyPlayGame() {
-        val state = getState()
+        var state = getState()
 
         checkWrongStartPlayer(state)
 
-        prepareHand1() // We do this here because the last card in the welcome hand will init the new hand automatically
-        playWelcomeHand(state)
-        playHand1Trick1(state).also { checkPointsTrick1(it) }
+        prepareHand1()
+        state = playWelcomeHand(state)
+
+        state = playHand1Trick1(state)
+        checkPointsTrick1(state)
+
+        state = playHand1Trick2(state)
+        checkPointsTrick2(state)
+    }
+
+    private fun checkPointsTrick2(state: GameState) {
+        val points = pointsByPositionTotal(state.hands, state.tricks, state.seats)
+        assertThat(points[Position.NORTH]!!.cardPoints, equalTo(0))
+        assertThat(points[Position.NORTH]!!.weisPoints, equalTo(40))
+        assertThat(points[Position.EAST]!!.cardPoints, equalTo(26))
+        assertThat(points[Position.EAST]!!.weisPoints, equalTo(40)) // +40 Stoeck
+        assertThat(points[Position.SOUTH]!!.cardPoints, equalTo(0))
+        assertThat(points[Position.SOUTH]!!.weisPoints, equalTo(140))
+        assertThat(points[Position.WEST]!!.cardPoints, equalTo(30)) // +30 (King plus Ace)
+        assertThat(points[Position.WEST]!!.weisPoints, equalTo(0))
+    }
+
+    private fun playHand1Trick2(state: GameState): GameState {
+        val north = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)!!
+        val east = playerAtPosition(Position.EAST, state.seats, state.allPlayers)!!
+        val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)!!
+        val west = playerAtPosition(Position.WEST, state.seats, state.allPlayers)!!
+
+        // East one the last trick so they go again first and again start with HEARTS which is also Stoeck
+        var stateAfterStoeck = recover({
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "KING", "french"))
+            service.play(request, east)
+        }) { fail() }
+
+        assertTrue(stateAfterStoeck.hands[0].weiseOf(Position.EAST).any { it.type == WeisType.STOECK })
+
+        recover({
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("SPADES", "SEVEN", "french"))
+            service.play(request, south)
+        }) { fail() }
+
+        recover({
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "ACE", "french"))
+            service.play(request, west)
+        }) { fail() }
+
+        val stateAfterAllCards = recover({
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("DIAMONDS", "NINE", "french"))
+            service.play(request, north)
+        }) { fail() }
+
+        assertThat(stateAfterAllCards.tricks.size, equalTo(4))
+
+        return stateAfterAllCards
     }
 
     private fun checkPointsTrick1(state: GameState) {
@@ -195,13 +245,13 @@ class PlayerTest : Integration() {
         assertThat(stateAfterAllCards.hands[0].weiseOf(Position.EAST).size, equalTo(0))
         assertThat(stateAfterAllCards.hands[0].weiseOf(Position.WEST).size, equalTo(1))
         assertThat(stateAfterAllCards.hands[0].weiseOf(Position.SOUTH).size, equalTo(2))
-        assertTrue(stateAfterAllCards.hands[0].weiseOf(Position.SOUTH).any { it.type ==  WeisType.DREI_BLATT})
-        assertTrue(stateAfterAllCards.hands[0].weiseOf(Position.SOUTH).any { it.type ==  WeisType.VIER_BLATT})
+        assertTrue(stateAfterAllCards.hands[0].weiseOf(Position.SOUTH).any { it.type == WeisType.DREI_BLATT })
+        assertTrue(stateAfterAllCards.hands[0].weiseOf(Position.SOUTH).any { it.type == WeisType.VIER_BLATT })
 
         return stateAfterAllCards
     }
 
-    private fun playWelcomeHand(state: GameState) {
+    private fun playWelcomeHand(state: GameState): GameState {
         val north = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)!!
         val east = playerAtPosition(Position.EAST, state.seats, state.allPlayers)!!
         val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)!!
@@ -247,6 +297,8 @@ class PlayerTest : Integration() {
         assertThat(state.hands[0].gschobe, equalTo(Gschobe.NOT_YET))
         assertThat(Position.entries.flatMap { state.hands[0].cardsOf(it) }.size, equalTo(36)) // all cards are dealt
         assertThat(Position.entries.flatMap { state.hands[0].weiseOf(it) }.size, equalTo(0))
+
+        return state
     }
 
     private fun checkWrongStartPlayer(state: GameState) {
