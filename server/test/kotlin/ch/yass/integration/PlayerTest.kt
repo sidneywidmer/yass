@@ -2,6 +2,7 @@ package ch.yass.integration
 
 import arrow.core.raise.recover
 import ch.yass.admin.dsl.game
+import ch.yass.admin.dsl.interpretCard
 import ch.yass.admin.dsl.interpretCards
 import ch.yass.core.error.InvalidState
 import ch.yass.core.error.PlayerIsLocked
@@ -19,6 +20,8 @@ import ch.yass.game.dto.State
 import ch.yass.game.dto.Trump
 import ch.yass.game.dto.Weis
 import ch.yass.game.dto.WeisType
+import ch.yass.game.dto.WinningConditionType
+import ch.yass.game.engine.completedHands
 import ch.yass.game.engine.playerAtPosition
 import ch.yass.game.engine.pointsByPositionTotal
 import org.hamcrest.CoreMatchers.equalTo
@@ -30,6 +33,8 @@ import org.junit.jupiter.api.Test
 import org.kodein.di.direct
 import org.kodein.di.instance
 
+data class PlayCard(val position: Position, val card: String)
+
 class PlayerTest : Integration() {
     private val service: GameService = container.direct.instance()
     private val foresight: Foresight = container.direct.instance()
@@ -39,6 +44,10 @@ class PlayerTest : Integration() {
      */
     private fun getState(): GameState {
         return game {
+            settings {
+                wcValue(400) // We'll be achieved in the first trick of the second hand
+                wcType(WinningConditionType.POINTS)
+            }
             players {
                 north(name = "ueli", bot = false)
                 east(name = "doris", bot = false)
@@ -70,6 +79,7 @@ class PlayerTest : Integration() {
         checkWrongStartPlayer(state)
 
         prepareHand1()
+        prepareHand2()
         state = playWelcomeHand(state)
 
         state = playHand1Trick1(state)
@@ -77,6 +87,142 @@ class PlayerTest : Integration() {
 
         state = playHand1Trick2(state)
         checkPointsTrick2(state)
+
+        state = playHand1Trick3To9(state)
+        checkPointsForHand1(state)
+
+        state = playHand2Trick1(state)
+        checkPointsForHand2(state)
+    }
+
+    private fun checkPointsForHand2(state: GameState) {
+        val points = pointsByPositionTotal(state.hands, state.tricks, state.seats)
+        assertThat(points[Position.NORTH]!!.weisPoints, equalTo(40))
+        assertThat(points[Position.EAST]!!.weisPoints, equalTo(40))
+        assertThat(points[Position.SOUTH]!!.weisPoints, equalTo(140))
+        assertThat(points[Position.WEST]!!.weisPoints, equalTo(0))
+
+        assertThat(points[Position.NORTH]!!.cardPoints, equalTo(179)) // Only change versus points in hand 1
+        assertThat(points[Position.EAST]!!.cardPoints, equalTo(26))
+        assertThat(points[Position.SOUTH]!!.cardPoints, equalTo(64))
+        assertThat(points[Position.WEST]!!.cardPoints, equalTo(102))
+    }
+
+    private fun playHand2Trick1(state: GameState): GameState {
+        val north = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)!!
+        val east = playerAtPosition(Position.EAST, state.seats, state.allPlayers)!!
+        val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)!!
+        val west = playerAtPosition(Position.WEST, state.seats, state.allPlayers)!!
+
+        // EAST started the first hand, so it's now SOUTH's turn. They don't want to schiebe and choose UNEUFE trump
+        recover({ service.schiebe(SchiebeRequest(state.game.uuid.toString(), "NO"), south) }) { fail() }
+        recover({ service.trump(ChooseTrumpRequest(state.game.uuid.toString(), "UNEUFE"), south) }) { fail() }
+
+        // SOUTH plays the first card in the first trick of the second hand
+        recover({
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("SPADES", "EIGHT", "french"))
+            service.play(request, south)
+        }) { fail() }
+
+        recover({
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("SPADES", "NINE", "french"))
+            service.play(request, west)
+        }) { fail() }
+
+        // NORTH will win the trick, S6 is bock
+        recover({
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("SPADES", "SIX", "french"))
+            service.play(request, north)
+        }) { fail() }
+
+        var updatedState = recover({
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("SPADES", "SEVEN", "french"))
+            service.play(request, east)
+        }) { fail() }
+
+        getState doesn't refetch game LOL, fix this
+        var foo = recover({ service.getStateByCode(state.game.code) }) { fail() }
+        assertThat(updatedState.game.status, equalTo(State.FINISHED))
+
+        return updatedState
+    }
+
+    private fun checkPointsForHand1(state: GameState) {
+        val points = pointsByPositionTotal(state.hands, state.tricks, state.seats)
+        assertThat(points[Position.NORTH]!!.weisPoints, equalTo(40))
+        assertThat(points[Position.EAST]!!.weisPoints, equalTo(40))
+        assertThat(points[Position.SOUTH]!!.weisPoints, equalTo(140))
+        assertThat(points[Position.WEST]!!.weisPoints, equalTo(0))
+
+        assertThat(points[Position.NORTH]!!.cardPoints, equalTo(122))
+        assertThat(points[Position.EAST]!!.cardPoints, equalTo(26))
+        assertThat(points[Position.SOUTH]!!.cardPoints, equalTo(64))
+        assertThat(points[Position.WEST]!!.cardPoints, equalTo(102))
+    }
+
+    private fun playHand1Trick3To9(state: GameState): GameState {
+        // Let's speed this up a little. After meticulously asserting everything for trick 1 and 2 we can
+        // just let the hand be played out and check if our state is correct at the end.
+        val cardsPlayed = listOf(
+            // Trick3: E->S->W*->N
+            PlayCard(Position.WEST, "HJ"),
+            PlayCard(Position.NORTH, "S9"),
+            PlayCard(Position.EAST, "H6"),
+            PlayCard(Position.SOUTH, "C8"),
+
+            // Trick4: E->S->W*->N
+            PlayCard(Position.WEST, "H9"),
+            PlayCard(Position.NORTH, "SJ"),
+            PlayCard(Position.EAST, "H7"),
+            PlayCard(Position.SOUTH, "S8"),
+
+            // Trick5: E->S->W->N*
+            PlayCard(Position.WEST, "SK"),
+            PlayCard(Position.NORTH, "SA"),
+            PlayCard(Position.EAST, "SQ"),
+            PlayCard(Position.SOUTH, "C10"),
+
+            // Trick6: E->S*->W->N
+            PlayCard(Position.NORTH, "DQ"),
+            PlayCard(Position.EAST, "DK"),
+            PlayCard(Position.SOUTH, "DA"),
+            PlayCard(Position.WEST, "D6"),
+
+            // Trick7: E->S*->W->N
+            PlayCard(Position.SOUTH, "CA"),
+            PlayCard(Position.WEST, "D7"),
+            PlayCard(Position.NORTH, "CQ"),
+            PlayCard(Position.EAST, "C6"),
+
+            // Trick8: E->S->W->N*
+            PlayCard(Position.SOUTH, "CJ"),
+            PlayCard(Position.WEST, "D8"),
+            PlayCard(Position.NORTH, "CK"),
+            PlayCard(Position.EAST, "C7"),
+
+            // Trick9: E->S->W->N* (last stich)
+            PlayCard(Position.NORTH, "S10"),
+            PlayCard(Position.EAST, "DJ"),
+            PlayCard(Position.SOUTH, "C9"),
+            PlayCard(Position.WEST, "D10")
+        )
+
+        val uuid = state.game.uuid.toString()
+        var state: GameState = state
+        cardsPlayed.forEach { c ->
+            val player = playerAtPosition(c.position, state.seats, state.allPlayers)!!
+            val card = interpretCard(c.card)!!
+            state = recover({
+                val request = PlayCardRequest(uuid, PlayedCard(card.suit.name, card.rank.name, "french"))
+                service.play(request, player)
+            }) { fail() }
+        }
+
+        assertThat(state.hands.size, equalTo(3)) // New empty hand automatically created
+        assertThat(state.tricks.size, equalTo(11)) // 1 (welcome) + 9 (normal hand) + 1 (empty trick in new hand)
+        assertThat(state.hands[0].startingPosition, equalTo(Position.SOUTH))
+
+        return state
     }
 
     private fun checkPointsTrick2(state: GameState) {
@@ -136,6 +282,15 @@ class PlayerTest : Integration() {
         assertThat(points[Position.SOUTH]!!.weisPoints, equalTo(140)) // DREI_BLATT and VIER_BLATT
         assertThat(points[Position.WEST]!!.cardPoints, equalTo(0))
         assertThat(points[Position.WEST]!!.weisPoints, equalTo(0))
+    }
+
+    private fun prepareHand2() {
+        val cardsN = interpretCards("S6,H7,D6,C9,S10,HJ,DQ,CK,HA")
+        val cardsE = interpretCards("S7,H8,D9,C10,SJ,HQ,DK,CA,H6")
+        val cardsS = interpretCards("S8,H9,D10,CJ,SQ,HK,DA,C6,H10")
+        val cardsW = interpretCards("S9,H10,DJ,CQ,SK,SA,D8,C7,D7")
+
+        foresight.pushDeck(cardsN + cardsE + cardsS + cardsW)
     }
 
     private fun prepareHand1() {

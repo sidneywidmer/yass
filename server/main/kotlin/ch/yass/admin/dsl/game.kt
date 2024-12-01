@@ -34,7 +34,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
         createdAt = LocalDateTime.now(ZoneOffset.UTC)
         updatedAt = LocalDateTime.now(ZoneOffset.UTC)
         code = (1..5).map { ('A'..'Z').random() }.joinToString("")
-        settings = toDbJson(GameSettings(false, false, false, false, WinningConditionType.HANDS, 10))
+        settings = toDbJson(GameSettings(false, false, false, false, state.settings.wcType, state.settings.wcValue))
         store()
     }
     val game = recover({ repo.getByUUID(gameRecord.uuid!!) }, { throw Exception("invalid uuid") })

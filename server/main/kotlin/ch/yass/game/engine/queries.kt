@@ -11,7 +11,6 @@ import ch.yass.game.dto.db.Hand
 import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.dto.db.Trick
-import java.util.EnumMap
 import kotlin.collections.contains
 
 fun currentTrick(tricks: List<Trick>): Trick? = tricks.firstOrNull()
@@ -248,9 +247,7 @@ fun weisPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>, seats: Lis
         val validForWeis = tricksOfHand(tricks, hand).any { it.cards().size == 4 }
         // Don't count the weis points of this hand. This could be the case if not yet all players had a chance
         // to show their weis. After the first trick has 4 cards we know for a fact that everyone had their chance.
-        if (!validForWeis) {
-            return accumulator
-        }
+        if (!validForWeis) return@fold accumulator
 
         val startingSeat = startingPlayersSeatOfHand(hand, seats)
         val posToWeise =
@@ -310,8 +307,9 @@ fun cardPointsByPosition(hand: Hand, tricks: List<Trick>): SplitPoints {
     return positionToTricksMap.positions.mapValues { (_, tricksOfPosition) ->
         tricksOfPosition.sumOf { trick ->
             // First means last played in this context, you get the bonus if the hand is complete
-            val lastTrickBonus = if (trick.id == tricks.first().id && tricks.count() == 9) 5 else 0
-            trick.cards().sumOf { card -> multiplyByTrump(cardPoints(card, hand.trump!!), hand.trump) } + lastTrickBonus
+            val bonus = multiplyByTrump(5, hand.trump!!)
+            val lastTrickBonus = if (trick.id == tricks.first().id && tricks.count() == 9) bonus else 0
+            trick.cards().sumOf { card -> multiplyByTrump(cardPoints(card, hand.trump), hand.trump) } + lastTrickBonus
         }
     }
 }

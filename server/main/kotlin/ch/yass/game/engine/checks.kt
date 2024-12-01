@@ -126,10 +126,8 @@ fun isGameFinished(state: GameState): Boolean {
         }
 
         WinningConditionType.POINTS -> {
-            val allComplete = completedHands(state.hands, state.tricks).size == state.hands.size
-            (allComplete.takeIf { it }
-                ?.let { cardPointsByPositionTotal(state.hands, state.tricks, state.seats).values.sum() }
-                ?: 0) == settings.winningConditionValue
+            val points = pointsByPositionTotal(state.hands, state.tricks, state.seats)
+            Team.entries.any { team -> team.positions.sumOf { points[it]!!.total() } >= settings.winningConditionValue }
         }
     }
 }

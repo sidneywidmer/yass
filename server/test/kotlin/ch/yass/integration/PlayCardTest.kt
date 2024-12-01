@@ -3,9 +3,9 @@ package ch.yass.integration
 import arrow.core.raise.fold
 import arrow.core.raise.recover
 import ch.yass.Yass
+import ch.yass.admin.dsl.game
 import ch.yass.core.error.CardNotPlayable
 import ch.yass.core.error.PlayerDoesNotOwnCard
-import ch.yass.admin.dsl.game
 import ch.yass.game.GameService
 import ch.yass.game.api.PlayCardRequest
 import ch.yass.game.api.PlayedCard
@@ -101,8 +101,8 @@ class PlayCardTest : Integration() {
             { service.play(request, player) },
             { fail() },
             {
-                assertEquals(Card.from(playedCard), it.tricks[0].west)
-                assertEquals(3, it.tricks.size)
+                assertEquals(Card.from(playedCard), it.tricks[1].west)
+                assertEquals(4, it.tricks.size)
             }
         )
     }
