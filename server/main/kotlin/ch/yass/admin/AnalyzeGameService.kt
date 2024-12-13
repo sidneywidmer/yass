@@ -25,7 +25,7 @@ class AnalyzeGameService(private val gameService: GameService) {
     fun analyze(code: String): AnalyzeGameStateResponse {
         val state = gameService.getStateByCode(code)
         val hands = state.hands.reversed().stream().map { mapHand(it, state) }.toList()
-        val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks, state.seats)
+        val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks)
 
         return AnalyzeGameStateResponse(hands, points, state.game.uuid)
     }
@@ -35,7 +35,7 @@ class AnalyzeGameService(private val gameService: GameService) {
         val players = state.allPlayers.map { mapPlayer(it, hand, state) }.toList()
         val tricksOfHand = tricksOfHand(state.tricks, hand) // newest trick is index 0
         val tricks = tricksOfHand.map { mapTrick(it, state, tricksOfHand, hand) }
-        val points = pointsByPositionTotal(listOf(hand), completeTricksOfHand(state.tricks, hand), state.seats)
+        val points = pointsByPositionTotal(listOf(hand), completeTricksOfHand(state.tricks, hand))
 
         return AnalyzeHand(hand.trump, hand.gschobe, startingPlayer, players, tricks.reversed(), points)
     }
@@ -45,7 +45,7 @@ class AnalyzeGameService(private val gameService: GameService) {
         val leadPosition = currentLeadPositionOfHand(hand, tricksUptoGivenTrick, state.seats)
         val leadPlayer = playerAtPosition(leadPosition, state.seats, state.allPlayers)!!
         val leadCard = trick.cardOf(leadPosition)
-        val winningPosition = winningPositionOfCurrentTrick(hand, tricksUptoGivenTrick, state.seats)
+        val winningPosition = winningPositionOfCurrentTrick(hand, tricksUptoGivenTrick)
         val winningPlayer = winningPosition?.let { playerAtPosition(winningPosition, state.seats, state.allPlayers) }
         val cards = positionsOrderedWithStart(leadPosition).map {
             PlayedCardWithPlayer(

@@ -22,8 +22,10 @@ fun chooseCardForBot(botPlayer: Player, state: GameState): Card {
     return Card(match.suit, match.rank, match.skin)
 }
 
+@Suppress("UNUSED_PARAMETER")
 fun chooseTrumpForBot(botPlayer: Player, state: GameState): Trump = playableTrumps().shuffled().first()
 
+@Suppress("UNUSED_PARAMETER")
 fun chooseGschobeForBot(botPlayer: Player, state: GameState): Gschobe =
     if (Random.nextBoolean()) Gschobe.YES else Gschobe.NO
 

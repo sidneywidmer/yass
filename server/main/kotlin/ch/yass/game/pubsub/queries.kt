@@ -18,13 +18,13 @@ import ch.yass.game.engine.*
  */
 
 fun newHandActions(state: GameState, seat: Seat): List<Action> {
-    val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks, state.seats)
+    val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks)
     val hand = currentHand(state.hands)!!
     val lastHand = lastHand(state.hands)!!
     val player = playerAtPosition(seat.position, state.seats, state.allPlayers)!!
     val cards = cardsInHand(hand, player, state)
     val nextState = nextState(state)
-    val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
+    val activePosition = activePosition(state.hands, state.seats, state.tricks)
 
     // If no winner found it's probably the welcome hand, and we just move the cards to SOUTH as default
     val winningPos = winningPositionOfLastTrick(lastHand, tricksOfHand(state.tricks, lastHand)) ?: Position.SOUTH
@@ -39,7 +39,7 @@ fun newHandActions(state: GameState, seat: Seat): List<Action> {
 }
 
 fun gameFinishedActions(state: GameState): List<Action> {
-    val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks, state.seats)
+    val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks)
     val pairs = listOf(Pair(Position.NORTH, Position.SOUTH), Pair(Position.EAST, Position.WEST))
 
     // Calculate the sum of points for each pair
@@ -71,7 +71,7 @@ fun newTrickActions(state: GameState, seat: Seat): List<Action> {
     val tricks = tricksOfHand(state.tricks, hand)
     val winningPos = winningPositionOfLastTrick(hand, tricks)
     val nextState = nextState(state)
-    val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
+    val activePosition = activePosition(state.hands, state.seats, state.tricks)
 
     return listOf(
         UpdateActive(activePosition),
@@ -85,9 +85,9 @@ fun cardPlayedActions(state: GameState, card: Card, playedBy: Seat, seat: Seat):
     val hand = currentHand(state.hands)!!
     val player = playerAtPosition(seat.position, state.seats, state.allPlayers)!!
     val cards = cardsInHand(hand, player, state)
-    val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
+    val activePosition = activePosition(state.hands, state.seats, state.tricks)
     val nextState = nextState(state)
-    val points = pointsByPositionTotal(state.hands, state.tricks, state.seats)
+    val points = pointsByPositionTotal(state.hands, state.tricks)
 
     return listOf(
         UpdateActive(activePosition),
@@ -100,7 +100,7 @@ fun cardPlayedActions(state: GameState, card: Card, playedBy: Seat, seat: Seat):
 
 fun trumpChosenActions(state: GameState, trump: Trump, seat: Seat): List<Action> {
     val nextState = nextState(state)
-    val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
+    val activePosition = activePosition(state.hands, state.seats, state.tricks)
     val hand = currentHand(state.hands)!!
     val cards = hand.cardsOf(seat.position) // We don't care about CardInHand since the state is wurst
     val weise = withoutStoeckPoints(possibleWeiseWithPoints(cards, trump))
@@ -115,7 +115,7 @@ fun trumpChosenActions(state: GameState, trump: Trump, seat: Seat): List<Action>
 
 fun gewiesenActions(state: GameState, weis: Weis, playedBy: Seat, seat: Seat): List<Action> {
     val nextState = nextState(state)
-    val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
+    val activePosition = activePosition(state.hands, state.seats, state.tricks)
     val hand = currentHand(state.hands)!!
 
     val actions = listOf(
@@ -136,7 +136,7 @@ fun gewiesenActions(state: GameState, weis: Weis, playedBy: Seat, seat: Seat): L
  * is happening in the context of playing a card.
  */
 fun stoeckGewiesenActions(hand: Hand, weis: Weis, playedBy: Seat, state: GameState): List<Action> {
-    val points = pointsByPositionTotal(state.hands, state.tricks, state.seats)
+    val points = pointsByPositionTotal(state.hands, state.tricks)
     return listOf(
         ShowWeis(playedBy.position, weis.toWeisWithPoints(hand.trump!!)),
         UpdatePoints(points)
@@ -145,7 +145,7 @@ fun stoeckGewiesenActions(hand: Hand, weis: Weis, playedBy: Seat, state: GameSta
 
 fun geschobenActions(state: GameState): List<Action> {
     val nextState = nextState(state)
-    val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
+    val activePosition = activePosition(state.hands, state.seats, state.tricks)
 
     return listOf(
         UpdateActive(activePosition),
@@ -155,7 +155,7 @@ fun geschobenActions(state: GameState): List<Action> {
 
 fun playerJoinedActions(state: GameState, newPlayer: Player, joinedAtSeat: Seat): List<Action> {
     val nextState = nextState(state)
-    val activePosition = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
+    val activePosition = activePosition(state.hands, state.seats, state.tricks)
 
     return listOf(
         PlayerJoined(

@@ -94,7 +94,7 @@ class TrumpTest : Integration() {
 
         val currentHand = currentHand(state.hands)!!
         val currentTrick = tricksOfHand(state.tricks, currentHand)
-        val wp = winningPositionOfCurrentTrick(currentHand, currentTrick, state.seats)
+        val wp = winningPositionOfCurrentTrick(currentHand, currentTrick)
 
         assertEquals(Position.EAST, wp)
     }

@@ -35,11 +35,18 @@ class GameService(
      * We use scope and eventChannel to also emmit our publishForSeats Actions. This helps greatly with
      * writing integration tests since we can wait for specific actions to complete in our coroutine contexts.
      */
+    @Suppress("UNUSED_PARAMETER")
     var scope = CoroutineScope(Dispatchers.Default + CoroutineExceptionHandler { _, exception ->
         // TODO: we should fire an action so our clients know the game is stuck because
         //  tome bot ran into a bug.
     })
-    var eventChannel: EventChannel<Action> = EventChannel()
+
+    data class AsyncEvent(val seatUUID: UUID, val action: Action)
+
+    /**
+     * Gives us visibility on what the async bots are doing day in day out.
+     */
+    var eventChannel: EventChannel<AsyncEvent> = EventChannel()
 
     /**
      * Validate settings, create a new game in the db, create players for all bots and seat them
@@ -195,7 +202,7 @@ class GameService(
         val hand = currentHand(state.hands)!!
         val remainingWeise = remainingWeise(hand)
 
-        weisWinner(hand, state.tricks, state.seats).map { position ->
+        weisWinner(hand, state.tricks).map { position ->
             val weise = hand.weiseOf(position).toMutableList()
             val actions = withoutStoeck(remainingWeise[position]!!)
                 .map {
@@ -207,7 +214,7 @@ class GameService(
             publishForSeats(state.seats) { actions }
         }
 
-        val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks, state.seats)
+        val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks)
         publishForSeats(state.seats) { listOf(UpdatePoints(points)) }
 
         gameLoop(state.game)
@@ -260,7 +267,12 @@ class GameService(
     }
 
     private fun publishForSeats(seats: List<Seat>, action: (Seat) -> List<Action>) {
-        scope.launch { seats.forEach { action.invoke(it).forEach { a -> eventChannel.send(a) } } }
+        scope.launch {
+            seats.forEach { seat ->
+                action.invoke(seat)
+                    .forEach { action -> eventChannel.send(AsyncEvent(seat.uuid, action)) }
+            }
+        }
 
         // Don't send ws events for bots or disconnected clients
         seats.filter { it.status !in listOf(SeatStatus.BOT, SeatStatus.DISCONNECTED) }
@@ -292,8 +304,7 @@ class GameService(
             }
 
             State.PLAY_CARD -> {
-                val activePosition =
-                    activePosition(updatedState.hands, updatedState.allPlayers, updatedState.seats, updatedState.tricks)
+                val activePosition = activePosition(updatedState.hands, updatedState.seats, updatedState.tricks)
                 val actions = listOf(
                     UpdateActive(activePosition),
                     UpdateState(nextStateLoop),

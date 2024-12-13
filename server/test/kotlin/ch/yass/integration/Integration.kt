@@ -33,7 +33,7 @@ open class Integration {
     @BeforeEach
     fun before() {
         cleanDB()
-        centrifugo.resetAll()
+        centrifugo.resetRequests()
     }
 
     private fun cleanDB() {

@@ -37,6 +37,7 @@ import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.fail
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.kodein.di.direct
 import org.kodein.di.instance
@@ -117,7 +118,7 @@ class PlayerTest : Integration() {
             hasWinner(north)
             hasWinner(south)
         }
-        centrifugo.resetAll()
+        centrifugo.resetRequests()
     }
 
     private fun checkCentrifugoWelcomeHand(state: GameState) {
@@ -131,7 +132,7 @@ class PlayerTest : Integration() {
             hasState(State.SCHIEBE) // And instantly goes to state SCHIEBE (first state in new trick)
             hasPlayedCard(Suit.WELCOME, Rank.HELLO) // Actually 4 of those where played
         }
-        centrifugo.resetAll()
+        centrifugo.resetRequests()
     }
 
     private fun checkCentrifugoTrick1(state: GameState) {
@@ -146,11 +147,11 @@ class PlayerTest : Integration() {
             hasWeis(WeisType.VIER_BLATT, 100)
             hasCount(ClearPlayedCards::class, 1)
         }
-        centrifugo.resetAll()
+        centrifugo.resetRequests()
     }
 
     private fun checkPointsForHand2(state: GameState) {
-        val points = pointsByPositionTotal(state.hands, state.tricks, state.seats)
+        val points = pointsByPositionTotal(state.hands, state.tricks)
         assertThat(points[Position.NORTH]!!.weisPoints, equalTo(40))
         assertThat(points[Position.EAST]!!.weisPoints, equalTo(40))
         assertThat(points[Position.SOUTH]!!.weisPoints, equalTo(140))
@@ -200,7 +201,7 @@ class PlayerTest : Integration() {
     }
 
     private fun checkPointsForHand1(state: GameState) {
-        val points = pointsByPositionTotal(state.hands, state.tricks, state.seats)
+        val points = pointsByPositionTotal(state.hands, state.tricks)
         assertThat(points[Position.NORTH]!!.weisPoints, equalTo(40))
         assertThat(points[Position.EAST]!!.weisPoints, equalTo(40))
         assertThat(points[Position.SOUTH]!!.weisPoints, equalTo(140))
@@ -260,25 +261,25 @@ class PlayerTest : Integration() {
         )
 
         val uuid = state.game.uuid.toString()
-        var state: GameState = state
+        var newState: GameState = state
         cardsPlayed.forEach { c ->
-            val player = playerAtPosition(c.position, state.seats, state.allPlayers)!!
+            val player = playerAtPosition(c.position, newState.seats, newState.allPlayers)!!
             val card = interpretCard(c.card)!!
-            state = recover({
+            newState = recover({
                 val request = PlayCardRequest(uuid, PlayedCard(card.suit.name, card.rank.name, "french"))
                 service.play(request, player)
             }) { fail() }
         }
 
-        assertThat(state.hands.size, equalTo(3)) // New empty hand automatically created
-        assertThat(state.tricks.size, equalTo(11)) // 1 (welcome) + 9 (normal hand) + 1 (empty trick in new hand)
-        assertThat(state.hands[0].startingPosition, equalTo(Position.SOUTH))
+        assertThat(newState.hands.size, equalTo(3)) // New empty hand automatically created
+        assertThat(newState.tricks.size, equalTo(11)) // 1 (welcome) + 9 (normal hand) + 1 (empty trick in new hand)
+        assertThat(newState.hands[0].startingPosition, equalTo(Position.SOUTH))
 
-        return state
+        return newState
     }
 
     private fun checkPointsTrick2(state: GameState) {
-        val points = pointsByPositionTotal(state.hands, state.tricks, state.seats)
+        val points = pointsByPositionTotal(state.hands, state.tricks)
         assertThat(points[Position.NORTH]!!.cardPoints, equalTo(0))
         assertThat(points[Position.NORTH]!!.weisPoints, equalTo(40))
         assertThat(points[Position.EAST]!!.cardPoints, equalTo(26))
@@ -325,7 +326,7 @@ class PlayerTest : Integration() {
 
     private fun checkPointsTrick1(state: GameState) {
         // All points are times 2 because trump is HEARTS
-        val points = pointsByPositionTotal(state.hands, state.tricks, state.seats)
+        val points = pointsByPositionTotal(state.hands, state.tricks)
         assertThat(points[Position.NORTH]!!.cardPoints, equalTo(0))
         assertThat(points[Position.NORTH]!!.weisPoints, equalTo(40)) // DREI_BLATT
         assertThat(points[Position.EAST]!!.cardPoints, equalTo(26)) // 10 and Queen
@@ -483,29 +484,29 @@ class PlayerTest : Integration() {
         }) { fail() }
 
         // WEST
-        var state = recover({
+        var newState = recover({
             val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "HELLO", "french"))
             service.play(request, west)
         }) { fail() }
 
         // By now we should have a new hand dealt (should be deterministic), a new trick started and check for Centrifugo calls
-        assertThat(state.hands.size, equalTo(2))
-        assertThat(state.tricks.size, equalTo(2))
+        assertThat(newState.hands.size, equalTo(2))
+        assertThat(newState.tricks.size, equalTo(2))
 
-        assertThat(state.tricks[1].cards().size, equalTo(4)) // all welcome cards
-        assertThat(state.hands[1].trump, equalTo(Trump.FREESTYLE))
-        assertThat(state.hands[1].startingPosition, equalTo(Position.NORTH)) // see game state above start = ...
-        assertThat(state.hands[1].gschobe, equalTo(Gschobe.NO))
-        assertThat(Position.entries.flatMap { state.hands[1].weiseOf(it) }.size, equalTo(0))
+        assertThat(newState.tricks[1].cards().size, equalTo(4)) // all welcome cards
+        assertThat(newState.hands[1].trump, equalTo(Trump.FREESTYLE))
+        assertThat(newState.hands[1].startingPosition, equalTo(Position.NORTH)) // see game state above start = ...
+        assertThat(newState.hands[1].gschobe, equalTo(Gschobe.NO))
+        assertThat(Position.entries.flatMap { newState.hands[1].weiseOf(it) }.size, equalTo(0))
 
-        assertThat(state.tricks[0].cards().size, equalTo(0)) // no cards played in new trick yet
-        assertThat(state.hands[0].trump, nullValue())
-        assertThat(state.hands[0].startingPosition, equalTo(Position.EAST)) // comes next after NORTH
-        assertThat(state.hands[0].gschobe, equalTo(Gschobe.NOT_YET))
-        assertThat(Position.entries.flatMap { state.hands[0].cardsOf(it) }.size, equalTo(36)) // all cards are dealt
-        assertThat(Position.entries.flatMap { state.hands[0].weiseOf(it) }.size, equalTo(0))
+        assertThat(newState.tricks[0].cards().size, equalTo(0)) // no cards played in new trick yet
+        assertThat(newState.hands[0].trump, nullValue())
+        assertThat(newState.hands[0].startingPosition, equalTo(Position.EAST)) // comes next after NORTH
+        assertThat(newState.hands[0].gschobe, equalTo(Gschobe.NOT_YET))
+        assertThat(Position.entries.flatMap { newState.hands[0].cardsOf(it) }.size, equalTo(36)) // all cards are dealt
+        assertThat(Position.entries.flatMap { newState.hands[0].weiseOf(it) }.size, equalTo(0))
 
-        return state
+        return newState
     }
 
     private fun checkWrongStartPlayer(state: GameState) {
