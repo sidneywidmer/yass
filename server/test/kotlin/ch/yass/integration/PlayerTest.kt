@@ -14,16 +14,24 @@ import ch.yass.game.api.PlayedCard
 import ch.yass.game.api.SchiebeRequest
 import ch.yass.game.api.WeisenRequest
 import ch.yass.game.api.internal.GameState
+import ch.yass.game.dto.GameStatus
 import ch.yass.game.dto.Gschobe
 import ch.yass.game.dto.Position
+import ch.yass.game.dto.Rank
 import ch.yass.game.dto.State
+import ch.yass.game.dto.Suit
 import ch.yass.game.dto.Trump
 import ch.yass.game.dto.Weis
 import ch.yass.game.dto.WeisType
 import ch.yass.game.dto.WinningConditionType
-import ch.yass.game.engine.completedHands
 import ch.yass.game.engine.playerAtPosition
 import ch.yass.game.engine.pointsByPositionTotal
+import ch.yass.game.engine.positionSeat
+import ch.yass.game.pubsub.CardPlayed
+import ch.yass.game.pubsub.ClearPlayedCards
+import ch.yass.game.pubsub.GameFinished
+import ch.yass.game.pubsub.UpdatePossibleWeise
+import ch.yass.integration.helper.CentrifugoTestHelper
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
@@ -38,6 +46,7 @@ data class PlayCard(val position: Position, val card: String)
 class PlayerTest : Integration() {
     private val service: GameService = container.direct.instance()
     private val foresight: Foresight = container.direct.instance()
+    private val cth = CentrifugoTestHelper(container.direct.instance())
 
     /**
      * 4 Players in the game and the welcome hand is dealt but not played. s turn.
@@ -69,8 +78,8 @@ class PlayerTest : Integration() {
     }
 
     /**
-     * Init empty game and manually play cards for players and always check if points and
-     * game state are correct.
+     * Init empty game and manually play cards for players and always check if points, overall
+     * game state and any external services are correct or correctly called.
      */
     @Test
     fun testManuallyPlayGame() {
@@ -81,9 +90,11 @@ class PlayerTest : Integration() {
         prepareHand1()
         prepareHand2()
         state = playWelcomeHand(state)
+        checkCentrifugoWelcomeHand(state)
 
         state = playHand1Trick1(state)
         checkPointsTrick1(state)
+        checkCentrifugoTrick1(state)
 
         state = playHand1Trick2(state)
         checkPointsTrick2(state)
@@ -93,6 +104,49 @@ class PlayerTest : Integration() {
 
         state = playHand2Trick1(state)
         checkPointsForHand2(state)
+        checkCentrifugoHand2(state)
+    }
+
+    private fun checkCentrifugoHand2(state: GameState) {
+        var northSeat = positionSeat(Position.NORTH, state.seats)
+        val north = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)!!
+        val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)!!
+
+        cth.assertActions(northSeat.uuid, cth.parseActions(centrifugo.allServeEvents)).apply {
+            hasCount(GameFinished::class, 1)
+            hasWinner(north)
+            hasWinner(south)
+        }
+        centrifugo.resetAll()
+    }
+
+    private fun checkCentrifugoWelcomeHand(state: GameState) {
+        // There is so many of those events sent and we're not testing all of them yet but focus on the
+        // most important ones.
+        var north = positionSeat(Position.NORTH, state.seats)
+        cth.assertActions(north.uuid, cth.parseActions(centrifugo.allServeEvents)).apply {
+            hasCount(CardPlayed::class, 4) // Every player played a welcome hand
+            hasCount(ClearPlayedCards::class, 1)
+            hasState(State.NEW_HAND) // When welcome hand is finished new hand is dealt
+            hasState(State.SCHIEBE) // And instantly goes to state SCHIEBE (first state in new trick)
+            hasPlayedCard(Suit.WELCOME, Rank.HELLO) // Actually 4 of those where played
+        }
+        centrifugo.resetAll()
+    }
+
+    private fun checkCentrifugoTrick1(state: GameState) {
+        var north = positionSeat(Position.NORTH, state.seats)
+        cth.assertActions(north.uuid, cth.parseActions(centrifugo.allServeEvents)).apply {
+            hasTrump(Trump.HEARTS)
+            hasCount(UpdatePossibleWeise::class, 1)
+            hasPlayedCard(Suit.HEARTS, Rank.TEN)
+            hasPlayedCard(Suit.HEARTS, Rank.EIGHT)
+            hasPlayedCard(Suit.SPADES, Rank.SIX)
+            hasPlayedCard(Suit.HEARTS, Rank.QUEEN)
+            hasWeis(WeisType.VIER_BLATT, 100)
+            hasCount(ClearPlayedCards::class, 1)
+        }
+        centrifugo.resetAll()
     }
 
     private fun checkPointsForHand2(state: GameState) {
@@ -140,9 +194,7 @@ class PlayerTest : Integration() {
             service.play(request, east)
         }) { fail() }
 
-        getState doesn't refetch game LOL, fix this
-        var foo = recover({ service.getStateByCode(state.game.code) }) { fail() }
-        assertThat(updatedState.game.status, equalTo(State.FINISHED))
+        assertThat(updatedState.game.status, equalTo(GameStatus.FINISHED))
 
         return updatedState
     }
