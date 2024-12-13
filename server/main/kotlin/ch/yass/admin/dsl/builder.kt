@@ -3,10 +3,12 @@ package ch.yass.admin.dsl
 import ch.yass.game.dto.Gschobe
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.Trump
+import ch.yass.game.dto.WinningConditionType
 
 class GameStateBuilder(
     private var players: List<PlayerDSL> = emptyList(),
-    private var hands: List<HandDSL> = emptyList()
+    private var hands: List<HandDSL> = emptyList(),
+    private var settings: GameSettingsDSL = GameSettingsDSL(WinningConditionType.HANDS, 10)
 ) {
     fun players(lambda: PlayersBuilder.() -> Unit) {
         players = PlayersBuilder().apply(lambda).build()
@@ -16,7 +18,11 @@ class GameStateBuilder(
         hands = HandsBuilder().apply(lambda).build()
     }
 
-    fun build() = GameStateDSL(players, hands)
+    fun settings(lambda: GameSettingsBuilder.() -> Unit) {
+        settings = GameSettingsBuilder().apply(lambda).build()
+    }
+
+    fun build() = GameStateDSL(players, hands, settings)
 }
 
 class HandsBuilder(
@@ -94,4 +100,19 @@ class PlayersBuilder(
     fun south(name: String, bot: Boolean): Boolean = players.add(PlayerDSL(name, bot, Position.SOUTH))
     fun west(name: String, bot: Boolean): Boolean = players.add(PlayerDSL(name, bot, Position.WEST))
     fun build(): List<PlayerDSL> = players
+}
+
+class GameSettingsBuilder(
+    private var wcType: WinningConditionType = WinningConditionType.HANDS,
+    private var wcValue: Int = 10
+) {
+    fun wcType(type: WinningConditionType) {
+        this.wcType = type
+    }
+
+    fun wcValue(value: Int) {
+        this.wcValue = value
+    }
+
+    fun build() = GameSettingsDSL(wcType, wcValue)
 }

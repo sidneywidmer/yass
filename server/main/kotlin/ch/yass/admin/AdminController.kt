@@ -133,7 +133,7 @@ class AdminController(
     }
 
     private fun generateHand(ctx: Context) {
-        val hand = randomHand()
+        val hand = randomHand(null)
         successResponse(
             ctx, GenerateHandResponse(
                 north = hand[Position.NORTH]!!.joinToString(",") { cardToNotation(it) },

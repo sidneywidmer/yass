@@ -1,6 +1,5 @@
 package ch.yass.game.engine
 
-import ch.yass.admin.dsl.interpretCards
 import ch.yass.core.helper.cartesianProduct
 import ch.yass.game.dto.*
 
@@ -32,31 +31,18 @@ fun positionsOrderedWithStart(position: Position): List<Position> {
 
 fun deck(): List<Pair<Rank, Suit>> = cartesianProduct(regularRanks(), regularSuits()).shuffled()
 
-fun randomHand(): Map<Position, List<Card>> {
-    val deck = deck()
-//    return mapOf(
-//        Position.NORTH to sort(deck.subList(0, 9).map { Card(it.second, it.first, "french") }),
-//        Position.EAST to sort(deck.subList(9, 18).map { Card(it.second, it.first, "french") }),
-//        Position.SOUTH to sort(deck.subList(18, 27).map { Card(it.second, it.first, "french") }),
-//        Position.WEST to sort(deck.subList(27, 36).map { Card(it.second, it.first, "french") }),
-//    )
+/**
+ * nextDeck allows us to inject a not so random deck in case we need it to replicate
+ * errors or for testing.
+ */
+fun randomHand(forcedDeck: List<Card>?): Map<Position, List<Card>> {
+    val deck = forcedDeck?.map { Pair(it.rank, it.suit) } ?: deck()
 
-    // Everyone with 9 blatt
-//    return mapOf(
-//        Position.NORTH to sort(interpretCards("S6,S7,S8,S9,S10,SJ,SQ,SK,SA")),
-//        Position.EAST to sort(interpretCards("D6,D7,D8,D9,D10,DJ,DQ,DK,DA")),
-//        Position.SOUTH to sort(interpretCards("C6,C7,C8,C9,C10,CJ,CQ,CK,CA")),
-//        Position.WEST to sort(interpretCards("H6,H7,H8,H9,H10,HJ,HQ,HK,HA")),
-//    )
-
-    // North with 3 weise
-    val c = interpretCards("S6,S7,S8,D6,D7,D8,C7,C8,C9")
-    val newDeck = deck.filter { Card(it.second, it.first, "french") !in c }
     return mapOf(
-        Position.NORTH to sort(interpretCards("S6,S7,S8,D6,D7,D8,C7,C8,C9")),
-        Position.EAST to sort(newDeck.subList(0, 9).map { Card(it.second, it.first, "french") }),
-        Position.SOUTH to sort(newDeck.subList(9, 18).map { Card(it.second, it.first, "french") }),
-        Position.WEST to sort(newDeck.subList(18, 27).map { Card(it.second, it.first, "french") }),
+        Position.NORTH to sort(deck.subList(0, 9).map { Card(it.second, it.first, "french") }),
+        Position.EAST to sort(deck.subList(9, 18).map { Card(it.second, it.first, "french") }),
+        Position.SOUTH to sort(deck.subList(18, 27).map { Card(it.second, it.first, "french") }),
+        Position.WEST to sort(deck.subList(27, 36).map { Card(it.second, it.first, "french") }),
     )
 }
 

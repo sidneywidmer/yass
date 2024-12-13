@@ -1,28 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="false">
-
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <Pattern>%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</Pattern>
         </encoder>
     </appender>
 
+    <root level="INFO">
+        <appender-ref ref="Console"/>
+    </root>
+
+    <!-- Development Environment -->
     <if condition='property("ENVIRONMENT").contains("development")'>
         <then>
-            <root level="INFO">
-                <appender-ref ref="Console"/>
-            </root>
             <logger name="Yass" level="INFO"/>
-            <!--            <logger name="org.zalando.logbook" level="TRACE"/>-->
         </then>
-        <else>
-            <root level="INFO">
-                <appender-ref ref="Console"/>
-            </root>
-            <logger name="org.zalando.logbook" level="TRACE"/>
-        </else>
     </if>
 
-    <!-- Ignore all the logback gedoens at the beginning -->
+    <!-- Test Environment -->
+    <if condition='property("ENVIRONMENT").contains("TEST")'>
+        <then>
+            <logger name="Yass" level="INFO"/>
+        </then>
+    </if>
+
+    <!-- Acceptance Environment -->
+    <if condition='property("ENVIRONMENT").contains("acceptance")'>
+        <then>
+            <logger name="Yass" level="INFO"/>
+            <logger name="org.zalando.logbook" level="TRACE"/>
+        </then>
+    </if>
+
+    <!-- Production Environment -->
+    <if condition='property("ENVIRONMENT").contains("production")'>
+        <then>
+            <logger name="Yass" level="INFO"/>
+            <logger name="org.zalando.logbook" level="TRACE"/>
+        </then>
+    </if>
+
     <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
 </configuration>

@@ -1,4 +1,4 @@
-package ch.yass
+package ch.yass.integration
 
 import ch.yass.admin.dsl.game
 import ch.yass.game.api.internal.GameState
@@ -7,7 +7,6 @@ import ch.yass.game.dto.Position
 import ch.yass.game.dto.Trump
 import ch.yass.game.engine.cardPointsByPosition
 import ch.yass.game.engine.tricksOfHand
-import ch.yass.integration.Integration
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 

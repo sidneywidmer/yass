@@ -53,11 +53,14 @@ class GameRepository(private val db: DSLContext) {
      * to interpret the given data.
      */
     fun getState(game: Game): GameState {
+        // Not a lot of changes on the game normally, BUT it could be finished so we need to re-fetch
+        var refreshedGame = refresh(game)
+
         // Fake an id if this seat belongs to a bot
-        val seats = getSeats(game)
+        val seats = getSeats(refreshedGame)
             .map { seat -> seat.takeIf { it.status == SeatStatus.BOT }?.copy(playerId = botId(seat.position)) ?: seat }
 
-        val hands = getHands(game)
+        val hands = getHands(refreshedGame)
         val tricks = getTricks(hands.map { it.id })
         val players = getPlayers(seats.filter { it.status != SeatStatus.BOT }) // Exclude Bots, you won't find anything
         val bots = seats
@@ -75,7 +78,7 @@ class GameRepository(private val db: DSLContext) {
                 )
             }
 
-        return GameState(game, players + bots, seats, hands, tricks)
+        return GameState(refreshedGame, players + bots, seats, hands, tricks)
     }
 
     context(Raise<GameWithCodeNotFound>)
@@ -91,6 +94,12 @@ class GameRepository(private val db: DSLContext) {
             .fetchOneInto(Game::class.java)
 
         return game ?: raise(GameNotFound(uuid))
+    }
+
+    fun refresh(game: Game): Game {
+        return db.selectFrom(GAME)
+            .where(GAME.UUID.eq(game.uuid.toString()))
+            .fetchOneInto(Game::class.java)!!
     }
 
     context(Raise<SeatNotFound>)
