@@ -29,7 +29,7 @@ fun unplayedCardsOfPlayer(player: Player, hands: List<Hand>, seats: List<Seat>, 
 
 fun isTrumpSet(hand: Hand?): Boolean = hand?.trump != null
 
-fun isAlreadyGewiesenSecond(tricks: List<Trick>, hand: Hand, seats: List<Seat>): Boolean {
+fun isAlreadyGewiesenSecond(tricks: List<Trick>, hand: Hand): Boolean {
     if (hand.trump == Trump.FREESTYLE) {
         return true;
     }
@@ -44,7 +44,7 @@ fun isAlreadyGewiesenSecond(tricks: List<Trick>, hand: Hand, seats: List<Seat>):
     }
 
     val remainingWeise = remainingWeise(hand)
-    return weisWinner(hand, tricks, seats).flatMap { position -> remainingWeise[position] ?: emptyList() }.isEmpty()
+    return weisWinner(hand, tricks).flatMap { position -> remainingWeise[position] ?: emptyList() }.isEmpty()
 }
 
 /**
@@ -126,7 +126,7 @@ fun isGameFinished(state: GameState): Boolean {
         }
 
         WinningConditionType.POINTS -> {
-            val points = pointsByPositionTotal(state.hands, state.tricks, state.seats)
+            val points = pointsByPositionTotal(state.hands, state.tricks)
             Team.entries.any { team -> team.positions.sumOf { points[it]!!.total() } >= settings.winningConditionValue }
         }
     }

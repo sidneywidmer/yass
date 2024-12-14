@@ -39,7 +39,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
     }
     val game = recover({ repo.getByUUID(gameRecord.uuid!!) }, { throw Exception("invalid uuid") })
 
-    val playerMap = state.players.map { p ->
+    state.players.forEach { p ->
         val player = db.newRecord(PLAYER).apply {
             uuid = UUID.randomUUID().toString()
             createdAt = LocalDateTime.now(ZoneOffset.UTC)

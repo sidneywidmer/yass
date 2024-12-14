@@ -71,7 +71,7 @@ fun currentLeadPositionOfHand(hand: Hand, tricks: List<Trick>, seats: List<Seat>
 fun nextState(state: GameState): State {
     val trick = currentTrick(state.tricks)
     val hand = currentHand(state.hands)
-    val position = activePosition(state.hands, state.allPlayers, state.seats, state.tricks)
+    val position = activePosition(state.hands, state.seats, state.tricks)
     val player = playerAtPosition(position, state.seats, state.allPlayers)!!
     val tricks = hand?.let { tricksOfHand(state.tricks, it) } ?: emptyList()
     val weise = hand?.trump?.let { possibleWeise(hand.cardsOf(position), it) }.orEmpty()
@@ -86,11 +86,7 @@ fun nextState(state: GameState): State {
         // Special case for "welcome" trick, only one card is played per player
         isWelcomeHandFinished(trick, state.hands) -> State.NEW_HAND
 
-        !isAlreadyGewiesenSecond(
-            tricks,
-            hand,
-            state.seats
-        ) -> State.WEISEN_SECOND  // check for second weis before dealing new hand
+        !isAlreadyGewiesenSecond(tricks, hand) -> State.WEISEN_SECOND  // check for second weis before dealing new hand
         isHandFinished(tricks) -> State.NEW_HAND
         isTrickFinished(trick) -> State.NEW_TRICK
         !isAlreadyGschobe(hand) -> if (player.bot) State.SCHIEBE_BOT else State.SCHIEBE
@@ -106,14 +102,14 @@ fun nextState(state: GameState): State {
     }
 }
 
-fun nextHandStartingPosition(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Position {
+fun nextHandStartingPosition(hands: List<Hand>, seats: List<Seat>): Position {
     val hand = currentHand(hands)!!
     val seat = startingPlayersSeatOfHand(hand, seats)
     return positionsOrderedWithStart(seat.position)[1]
 }
 
 fun nextHandStartingPlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Player {
-    return playerAtPosition(nextHandStartingPosition(hands, players, seats), seats, players)!!
+    return playerAtPosition(nextHandStartingPosition(hands, seats), seats, players)!!
 }
 
 /**
@@ -123,7 +119,6 @@ fun nextHandStartingPlayer(hands: List<Hand>, players: List<Player>, seats: List
  */
 fun activePosition(
     hands: List<Hand>,
-    players: List<Player>,
     seats: List<Seat>,
     tricks: List<Trick>
 ): Position {
@@ -144,10 +139,10 @@ fun activePosition(
         return positions.first { trick.cardOf(it) == null }
     }
 
-    return nextHandStartingPosition(hands, players, seats)
+    return nextHandStartingPosition(hands, seats)
 }
 
-fun winningPositionOfCurrentTrick(hand: Hand, tricks: List<Trick>, seats: List<Seat>): Position? {
+fun winningPositionOfCurrentTrick(hand: Hand, tricks: List<Trick>): Position? {
     if (tricks.first().cards().size < 4) {
         return null
     }
@@ -199,7 +194,7 @@ fun winningPositionOfTricks(hand: Hand, tricks: List<Trick>): Position =
  * See activePosition, this is just a helper to map a player to a position.
  */
 fun activePlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>, tricks: List<Trick>): Player? =
-    playerAtPosition(activePosition(hands, players, seats, tricks), seats, players)
+    playerAtPosition(activePosition(hands, seats, tricks), seats, players)
 
 context(Raise<GameAlreadyFull>)
 fun randomFreePosition(occupiedSeats: List<Seat>): Position {
@@ -228,14 +223,14 @@ fun playableCards(hand: Hand, cards: List<Card>): List<Card> =
         else -> cards
     }
 
-fun pointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>, seats: List<Seat>): Points {
-    val weis = weisPointsByPositionTotal(hands, tricks, seats)
-    val card = cardPointsByPositionTotal(hands, tricks, seats)
+fun pointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>): Points {
+    val weis = weisPointsByPositionTotal(hands, tricks)
+    val card = cardPointsByPositionTotal(hands, tricks)
 
     return Position.entries.associateWith { TotalPoints(card[it]!!, weis[it]!!) }
 }
 
-fun weisPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>, seats: List<Seat>): SplitPoints {
+fun weisPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>): SplitPoints {
     val initial = mapOf(
         Position.NORTH to 0,
         Position.EAST to 0,
@@ -249,7 +244,6 @@ fun weisPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>, seats: Lis
         // to show their weis. After the first trick has 4 cards we know for a fact that everyone had their chance.
         if (!validForWeis) return@fold accumulator
 
-        val startingSeat = startingPlayersSeatOfHand(hand, seats)
         val posToWeise =
             Position.entries.associateWith { pos -> hand.weiseOf(pos).map { it.toWeisWithPoints(hand.trump!!) } }
         val posToPoints = posToWeise.mapValues { it.value.sumOf { weis -> weis.points } }.toMutableMap()
@@ -262,7 +256,7 @@ fun weisPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>, seats: Lis
         } else if (teamToPoints[Team.NS]!! > teamToPoints[Team.EW]!!) {
             Team.EW.positions.map { posToPoints.put(it, 0) }
         } else {
-            Team.entries.first { startingSeat.position !in it.positions }.positions.map { posToPoints.put(it, 0) }
+            Team.entries.first { hand.startingPosition !in it.positions }.positions.map { posToPoints.put(it, 0) }
         }
 
         // Find the position having the STOECK Weis and if found, add the points to that position
@@ -275,7 +269,7 @@ fun weisPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>, seats: Lis
     }
 }
 
-fun cardPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>, seats: List<Seat>): SplitPoints {
+fun cardPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>): SplitPoints {
     val initial = mapOf(
         Position.NORTH to 0,
         Position.EAST to 0,
@@ -331,8 +325,8 @@ fun withoutStoeckPoints(weise: List<WeisWithPoints>): List<WeisWithPoints> =
 
 fun withoutStoeck(weise: List<Weis>): List<Weis> = weise.filter { w -> w.type != WeisType.STOECK }
 
-fun weisWinner(hand: Hand, tricks: List<Trick>, seats: List<Seat>): List<Position> {
-    val points = weisPointsByPositionTotal(listOf(hand), tricks, seats)
+fun weisWinner(hand: Hand, tricks: List<Trick>): List<Position> {
+    val points = weisPointsByPositionTotal(listOf(hand), tricks)
     return Team.entries
         .associateWith { it.positions.sumOf { pos -> points[pos]!! } }
         .maxBy { it.value }
