@@ -4,6 +4,7 @@ import arrow.core.raise.Raise
 import arrow.core.raise.ensure
 import ch.yass.admin.dsl.interpretCards
 import ch.yass.core.error.*
+import ch.yass.core.helper.associateWithToEnum
 import ch.yass.core.pubsub.Action
 import ch.yass.core.pubsub.Channel
 import ch.yass.core.pubsub.PubSub
@@ -76,7 +77,7 @@ class GameService(
         //       unlocked so we can't deal the full hand yet if we don't know all the players. This should
         //       be done when the player joins at the table.
         // Creating player always starts game
-        val cards = Position.entries.associateWith { interpretCards("welcome") }
+        val cards = Position.entries.associateWithToEnum { interpretCards("welcome") }
         val hand = repo.createHand(NewHand(game, newSeat.position, cards, Trump.FREESTYLE, Gschobe.NO))
         repo.createTrick(hand)
 

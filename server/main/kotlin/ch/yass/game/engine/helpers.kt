@@ -1,7 +1,9 @@
 package ch.yass.game.engine
 
 import ch.yass.core.helper.cartesianProduct
+import ch.yass.core.helper.toEnumMap
 import ch.yass.game.dto.*
+import java.util.EnumMap
 
 fun regularRanks(): List<Rank> {
     return listOf(Rank.SIX, Rank.SEVEN, Rank.EIGHT, Rank.NINE, Rank.TEN, Rank.JACK, Rank.QUEEN, Rank.KING, Rank.ACE)
@@ -35,7 +37,7 @@ fun deck(): List<Pair<Rank, Suit>> = cartesianProduct(regularRanks(), regularSui
  * nextDeck allows us to inject a not so random deck in case we need it to replicate
  * errors or for testing.
  */
-fun randomHand(forcedDeck: List<Card>?): Map<Position, List<Card>> {
+fun randomHand(forcedDeck: List<Card>?): EnumMap<Position, List<Card>> {
     val deck = forcedDeck?.map { Pair(it.rank, it.suit) } ?: deck()
 
     return mapOf(
@@ -43,7 +45,7 @@ fun randomHand(forcedDeck: List<Card>?): Map<Position, List<Card>> {
         Position.EAST to sort(deck.subList(9, 18).map { Card(it.second, it.first, "french") }),
         Position.SOUTH to sort(deck.subList(18, 27).map { Card(it.second, it.first, "french") }),
         Position.WEST to sort(deck.subList(27, 36).map { Card(it.second, it.first, "french") }),
-    )
+    ).toEnumMap()
 }
 
 fun sort(cards: List<Card>): List<Card> {

@@ -5,12 +5,15 @@ import arrow.core.raise.fold
 import ch.yass.core.error.GameAlreadyFull
 import ch.yass.core.error.GameError
 import ch.yass.core.error.PlayerDoesNotOwnCard
+import ch.yass.core.helper.associateWithToEnum
+import ch.yass.core.helper.mapValuesToEnum
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Hand
 import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.dto.db.Trick
+import java.util.EnumMap
 import kotlin.collections.contains
 
 fun currentTrick(tricks: List<Trick>): Trick? = tricks.firstOrNull()
@@ -227,60 +230,56 @@ fun pointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>): Points {
     val weis = weisPointsByPositionTotal(hands, tricks)
     val card = cardPointsByPositionTotal(hands, tricks)
 
-    return Position.entries.associateWith { TotalPoints(card[it]!!, weis[it]!!) }
+    return Position.entries.associateWithToEnum { TotalPoints(card.getValue(it), weis.getValue(it)) }
 }
 
 fun weisPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>): SplitPoints {
-    val initial = mapOf(
-        Position.NORTH to 0,
-        Position.EAST to 0,
-        Position.SOUTH to 0,
-        Position.WEST to 0,
-    )
+    val initial = Position.entries.associateWithToEnum { 0 }
 
     return hands.fold(initial) { accumulator, hand ->
         val validForWeis = tricksOfHand(tricks, hand).any { it.cards().size == 4 }
-        // Don't count the weis points of this hand. This could be the case if not yet all players had a chance
-        // to show their weis. After the first trick has 4 cards we know for a fact that everyone had their chance.
         if (!validForWeis) return@fold accumulator
 
-        val posToWeise =
-            Position.entries.associateWith { pos -> hand.weiseOf(pos).map { it.toWeisWithPoints(hand.trump!!) } }
-        val posToPoints = posToWeise.mapValues { it.value.sumOf { weis -> weis.points } }.toMutableMap()
-        val teamToPoints = Team.entries.associateWith { it.positions.sumOf { pos -> posToPoints[pos]!! } }
-
-        // Only the team with most weis points gets them. If they have the same amount,
-        // the team with the starting player wins.
-        if (teamToPoints[Team.NS]!! < teamToPoints[Team.EW]!!) {
-            Team.NS.positions.map { posToPoints.put(it, 0) }
-        } else if (teamToPoints[Team.NS]!! > teamToPoints[Team.EW]!!) {
-            Team.EW.positions.map { posToPoints.put(it, 0) }
-        } else {
-            Team.entries.first { hand.startingPosition !in it.positions }.positions.map { posToPoints.put(it, 0) }
+        val posToWeise = Position.entries.associateWithToEnum { pos ->
+            hand.weiseOf(pos).map { it.toWeisWithPoints(hand.trump!!) }
         }
 
-        // Find the position having the STOECK Weis and if found, add the points to that position
+        val posToPoints = posToWeise.mapValuesToEnum { it.value.sumOf { weis -> weis.points } }
+        val teamToPoints = Team.entries.associateWithToEnum { team ->
+            team.positions.sumOf { posToPoints.getValue(it) }
+        }
+
+        when {
+            teamToPoints.getValue(Team.NS) < teamToPoints.getValue(Team.EW) -> {
+                Team.NS.positions.forEach { posToPoints[it] = 0 }
+            }
+
+            teamToPoints.getValue(Team.NS) > teamToPoints.getValue(Team.EW) -> {
+                Team.EW.positions.forEach { posToPoints[it] = 0 }
+            }
+
+            else -> {
+                Team.entries.first { hand.startingPosition !in it.positions }
+                    .positions.forEach { posToPoints[it] = 0 }
+            }
+        }
+
         posToWeise.entries
             .flatMap { (pos, weise) -> weise.map { pos to it } }
             .firstOrNull { it.second.type == WeisType.STOECK }
-            ?.let { posToPoints[it.first] = it.second.points }
+            ?.let { (pos, weis) -> posToPoints[pos] = weis.points }
 
-        accumulator.mapValues { (position, points) -> points + posToPoints[position]!! }
+        accumulator.mapValuesToEnum { (position, points) -> points + posToPoints.getValue(position) }
     }
 }
 
 fun cardPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>): SplitPoints {
-    val initial = mapOf(
-        Position.NORTH to 0,
-        Position.EAST to 0,
-        Position.SOUTH to 0,
-        Position.WEST to 0,
-    )
+    val initial = Position.entries.associateWithToEnum { 0 }
 
     return hands.fold(initial) { accumulator, hand ->
         val tricksOfHand = completeTricksOfHand(tricks, hand)
         val pointsNew = cardPointsByPosition(hand, tricksOfHand)
-        accumulator.mapValues { (position, points) -> points + pointsNew[position]!! }
+        accumulator.mapValuesToEnum { (position, points) -> points + pointsNew.getValue(position) }
     }
 }
 
@@ -289,16 +288,16 @@ fun cardPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>): SplitPoin
  * tricks are ordered descending where index 0 is the newest trick, so we reverse the list.
  */
 fun cardPointsByPosition(hand: Hand, tricks: List<Trick>): SplitPoints {
-    val positionMap = Position.entries.associateWith { emptyList<Trick>() }
+    val positionMap = Position.entries.associateWithToEnum { emptyList<Trick>() }
     val positionToTricksMap = tricks.reversed().fold(
         PositionToTrickAccumulator(positionMap, hand.startingPosition)
     ) { accumulator, trick ->
         val winner = winningPositionOfTrick(trick, accumulator.lead, hand.trump!!)
-        val wonTricks = accumulator.positions[winner]!! + trick
-        PositionToTrickAccumulator(accumulator.positions + (winner to wonTricks), winner)
+        val wonTricks = accumulator.positions.getValue(winner) + trick
+        PositionToTrickAccumulator(EnumMap(accumulator.positions).apply { put(winner, wonTricks) }, winner)
     }
 
-    return positionToTricksMap.positions.mapValues { (_, tricksOfPosition) ->
+    return positionToTricksMap.positions.mapValuesToEnum { (_, tricksOfPosition) ->
         tricksOfPosition.sumOf { trick ->
             // First means last played in this context, you get the bonus if the hand is complete
             val bonus = multiplyByTrump(5, hand.trump!!)
@@ -333,9 +332,14 @@ fun weisWinner(hand: Hand, tricks: List<Trick>): List<Position> {
         .key.positions
 }
 
-fun remainingWeise(hand: Hand): Map<Position, List<Weis>> {
-    val playedWeise = Position.entries.associateWith { withoutStoeck(hand.weiseOf(it)) }
-    val possibleWeise = Position.entries.associateWith { withoutStoeck(possibleWeise(hand.cardsOf(it), hand.trump!!)) }
+fun remainingWeise(hand: Hand): EnumMap<Position, List<Weis>> {
+    val playedWeise = Position.entries.associateWithToEnum { withoutStoeck(hand.weiseOf(it)) }
+    val possibleWeise = Position.entries
+        .associateWithToEnum { withoutStoeck(possibleWeise(hand.cardsOf(it), hand.trump!!)) }
 
-    return possibleWeise.mapValues { (position, weise) -> weise.filterNot { playedWeise[position]!!.contains(it) } }
+    return possibleWeise.mapValuesToEnum { (position, weise) ->
+        weise.filterNot {
+            playedWeise.getValue(position).contains(it)
+        }
+    }
 }
