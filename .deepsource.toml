@@ -1,0 +1,11 @@
+version = 1
+
+[[analyzers]]
+name = "javascript"
+
+[[analyzers]]
+name = "kotlin"
+
+  [analyzers.meta]
+  runtime_version = "19"
+  language_version = "1.9"
