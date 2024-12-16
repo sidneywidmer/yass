@@ -15,7 +15,7 @@ object Game {
         bindSingleton { PlayerService(instance()) }
         bindSingleton { GameRepository(instance()) }
         bindSingleton { GameService(instance(), instance(), instance(), instance()) }
-        bindEagerSingleton { JobsService(instance(), instance(), instance()) }
+        bindEagerSingleton { JobsService(instance(), instance(), instance(), instance()) }
     }
 
     private fun createDispatcher(): CoroutineDispatcher = Dispatchers.Default

@@ -255,6 +255,35 @@
 
         <plugins>
             <plugin>
+                <groupId>org.jetbrains.kotlinx</groupId>
+                <artifactId>kover-maven-plugin</artifactId>
+                <version>0.9.0</version>
+                <executions>
+                    <execution>
+                        <id>instr</id>
+                        <goals>
+                            <goal>instrumentation</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <goals>
+                            <goal>report-xml</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <filters>
+                        <includes>
+                            <classes>ch.yass.*</classes>
+                        </includes>
+                        <excludes>
+                            <classes>ch.yass.db.*</classes>
+                        </excludes>
+                    </filters>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.4.2</version>
@@ -273,6 +302,7 @@
                 <version>3.1.2</version>
                 <configuration>
                     <argLine>-XX:+EnableDynamicAgentLoading</argLine>
+                    <argLine>${argLine}</argLine>
                 </configuration>
             </plugin>
 

@@ -8,6 +8,7 @@ import ch.yass.db.tables.references.PLAYER
 import ch.yass.db.tables.references.SEAT
 import ch.yass.game.dto.GameStatus
 import ch.yass.game.dto.SeatStatus
+import com.typesafe.config.Config
 import org.jobrunr.scheduling.JobScheduler
 import org.jobrunr.scheduling.RecurringJobBuilder.aRecurringJob
 import org.jooq.DSLContext
@@ -18,27 +19,39 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 
-class JobsService(scheduler: JobScheduler, private val db: DSLContext, private val gameService: GameService) {
+class JobsService(
+    scheduler: JobScheduler,
+    private val db: DSLContext,
+    private val gameService: GameService,
+    private val config: Config
+) {
     init {
-        val playerPing = aRecurringJob()
-            .withId("PLAYER_PING_JOB")
-            .withDuration(Duration.ofSeconds(10))
-            .withDetails { playerPing() }
+        // Funny Bug: If I run this locally I never had a problem. As soon es I integrated the CI pipeline
+        // I got some strange flaky tests with centrifugo. Turns out since the GitHub runner is not as fast
+        // the tests take longer than 5 seconds and since to polling from any clients is happening the player
+        // gets "disconnected" - and disconnected players don't receive centrifugo pushes :)
+        if (config.getString("environment") != "test") {
+            val playerPing = aRecurringJob()
+                .withId("PLAYER_PING_JOB")
+                .withDuration(Duration.ofSeconds(10))
+                .withDetails { playerPing() }
 
-        val gameStatus = aRecurringJob()
-            .withId("GAMES_STATUS_JOB")
-            .withDuration(Duration.ofSeconds(30))
-            .withDetails { gameStatus() }
+            val gameStatus = aRecurringJob()
+                .withId("GAMES_STATUS_JOB")
+                .withDuration(Duration.ofSeconds(30))
+                .withDetails { gameStatus() }
 
-        scheduler.createRecurrently(playerPing)
-        scheduler.createRecurrently(gameStatus)
+            scheduler.createRecurrently(playerPing)
+            scheduler.createRecurrently(gameStatus)
+        }
+
     }
 
     /**
      * Needs to be public for JobRunr to pick it up
      */
     fun playerPing() {
-        logger().debug("Job [Player Ping]: Start checking player pings")
+        logger().info("Job [Player Ping]: Start checking player pings")
 
         val sevenSecondsAgo = LocalDateTime.now(ZoneOffset.UTC).minusSeconds(7)  // Player ping is every 5
 
@@ -60,14 +73,14 @@ class JobsService(scheduler: JobScheduler, private val db: DSLContext, private v
             )
         }
 
-        logger().debug("Job [Player Ping]: Done! Dispatched PlayerDisconnected events to ${dcRecords.size} seats.")
+        logger().info("Job [Player Ping]: Done! Dispatched PlayerDisconnected events to ${dcRecords.size} seats.")
     }
 
     /**
      * Needs to be public for JobRunr to pick it up
      */
     fun gameStatus() {
-        logger().debug("Job [Game Status]: Start updating game status")
+        logger().info("Job [Game Status]: Start updating game status")
 
         val fiveMinutesAgo = LocalDateTime.now(ZoneOffset.UTC).minusMinutes(5)
         val update: Int = db
@@ -83,6 +96,6 @@ class JobsService(scheduler: JobScheduler, private val db: DSLContext, private v
             .and(GAME.STATUS.eq(GameStatus.RUNNING.name))
             .execute()
 
-        logger().debug("Job [Game Status]: Done! Set game status STALE for $update game entries.")
+        logger().info("Job [Game Status]: Done! Set game status STALE for $update game entries.")
     }
 }

@@ -13,6 +13,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up JDK 21
         uses: actions/setup-java@v3
@@ -21,13 +23,16 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Cache Maven local repository
-        uses: actions/cache@v3
-        with:
-          path: "~/.m2/repository"
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
       - name: Build and test with Maven
-        run: mvn -B test
+        run: mvn verify
+        env:
+          ENVIRONMENT: test
+
+      - name: Install DeepSource CLI
+        run: curl https://deepsource.io/cli | sh
+
+      - name: Upload to DeepSource
+        env:
+          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
+        run: |
+          ./bin/deepsource report --analyzer test-coverage --key kotlin --value-file ./target/site/kover/report.xml

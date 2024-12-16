@@ -1,6 +1,5 @@
 package ch.yass.integration
 
-import org.hamcrest.MatcherAssert.assertThat
 import arrow.core.raise.either
 import ch.yass.admin.dsl.game
 import ch.yass.game.GameRepository
@@ -22,6 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 import org.kodein.di.direct
