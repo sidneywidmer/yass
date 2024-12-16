@@ -30,4 +30,14 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Build and test with Maven
-        run: mvn -B test
+        run: mvn clean test kover:report-xml
+
+      - name: Install DeepSource CLI
+        run: curl https://deepsource.io/cli | sh
+
+      - name: Upload to DeepSource
+        env:
+          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
+        run: |
+          ./bin/deepsource report --analyzer test-coverage --key kotlin --value-file ./target/site/kover/report.xml
+          ./bin/deepsource analyze
