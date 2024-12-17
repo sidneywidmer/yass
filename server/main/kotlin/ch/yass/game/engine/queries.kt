@@ -34,21 +34,17 @@ fun playerSeat(player: Player, seats: List<Seat>): Seat =
 fun positionSeat(position: Position, seats: List<Seat>): Seat =
     seats.first { it.position == position }
 
-fun tricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> {
-    return tricks.filter { it.handId == hand.id }
-}
+fun tricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> = tricks.filter { it.handId == hand.id }
 
-fun completeTricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> {
-    return tricks.filter { it.handId == hand.id && it.cards().count() == 4 }
-}
+fun completeTricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> =
+    tricks.filter { it.handId == hand.id && it.cards().count() == 4 }
 
 /**
  * Can return null because maybe the game is not full yet.
  */
-fun playerAtPosition(position: Position, seats: List<Seat>, players: List<Player>): Player? {
-    return seats.firstOrNull { it.position == position }
+fun playerAtPosition(position: Position, seats: List<Seat>, players: List<Player>): Player? =
+    seats.firstOrNull { it.position == position }
         .let { players.firstOrNull { player -> player.id == it?.playerId } }
-}
 
 fun cardsInHand(hand: Hand, player: Player, state: GameState): List<CardInHand> {
     val seat = playerSeat(player, state.seats)
@@ -111,9 +107,8 @@ fun nextHandStartingPosition(hands: List<Hand>, seats: List<Seat>): Position {
     return positionsOrderedWithStart(seat.position)[1]
 }
 
-fun nextHandStartingPlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Player {
-    return playerAtPosition(nextHandStartingPosition(hands, seats), seats, players)!!
-}
+fun nextHandStartingPlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Player =
+    playerAtPosition(nextHandStartingPosition(hands, seats), seats, players)!!
 
 /**
  * Which player is expected to take the next action? If the trick is not complete yet, it's the person sitting

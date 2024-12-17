@@ -5,17 +5,13 @@ import ch.yass.core.helper.toEnumMap
 import ch.yass.game.dto.*
 import java.util.EnumMap
 
-fun regularRanks(): List<Rank> {
-    return listOf(Rank.SIX, Rank.SEVEN, Rank.EIGHT, Rank.NINE, Rank.TEN, Rank.JACK, Rank.QUEEN, Rank.KING, Rank.ACE)
-}
+fun regularRanks(): List<Rank> =
+    listOf(Rank.SIX, Rank.SEVEN, Rank.EIGHT, Rank.NINE, Rank.TEN, Rank.JACK, Rank.QUEEN, Rank.KING, Rank.ACE)
 
-fun regularSuits(): List<Suit> {
-    return listOf(Suit.CLUBS, Suit.DIAMONDS, Suit.HEARTS, Suit.SPADES)
-}
+fun regularSuits(): List<Suit> = listOf(Suit.CLUBS, Suit.DIAMONDS, Suit.HEARTS, Suit.SPADES)
 
-fun playableTrumps(): List<Trump> {
-    return listOf(Trump.CLUBS, Trump.SPADES, Trump.HEARTS, Trump.DIAMONDS, Trump.UNEUFE, Trump.OBEABE)
-}
+fun playableTrumps(): List<Trump> =
+    listOf(Trump.CLUBS, Trump.SPADES, Trump.HEARTS, Trump.DIAMONDS, Trump.UNEUFE, Trump.OBEABE)
 
 /**
  * Get the order of a round based on a position. So if it's EAST's turn we
@@ -48,6 +44,4 @@ fun randomHand(forcedDeck: List<Card>?): EnumMap<Position, List<Card>> {
     ).toEnumMap()
 }
 
-fun sort(cards: List<Card>): List<Card> {
-    return cards.sortedWith(compareBy<Card> { it.suit }.thenBy { it.rank })
-}
+fun sort(cards: List<Card>): List<Card> = cards.sortedWith(compareBy<Card> { it.suit }.thenBy { it.rank })

@@ -41,6 +41,4 @@ class ImpersonateMiddleware(
             ctx.attribute(CtxAttributes.BEFORE_IMPERSONATION.name, player)
         }
     }
-
-    override fun after(ctx: Context) {}
 }

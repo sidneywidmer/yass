@@ -25,16 +25,13 @@ val suitMap = mapOf(
     Suit.WELCOME to "W",
 )
 
-fun cardToNotation(card: Card): String {
-    return suitMap[card.suit] + rankMap[card.rank]
-}
+fun cardToNotation(card: Card): String = suitMap[card.suit] + rankMap[card.rank]
 
 fun notationToCard(rank: String, suit: String): Card {
     val suitEnum = suitMap.filter { suit == it.value }.keys.firstOrNull()
     val rankEnum = rankMap.filter { rank == it.value }.keys.firstOrNull()
-    if (suitEnum == null|| rankEnum == null) {
-        throw IllegalArgumentException("Could not parse notation $rank$suit")
-    }
+
+    require(suitEnum != null && rankEnum != null) { "Could not parse notation $rank$suit" }
 
     return Card(suitEnum, rankEnum, "french")
 }

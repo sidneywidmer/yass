@@ -11,14 +11,8 @@ import org.slf4j.Logger
 /**
  * Global helper for quick access to the logging instance.
  */
-fun logger(): Logger {
-    return Yass.container.direct.instance()
-}
+fun logger(): Logger = Yass.container.direct.instance()
 
-fun config(): Config {
-    return Yass.container.direct.instance()
-}
+fun config(): Config = Yass.container.direct.instance()
 
-fun jackson(): ObjectMapper {
-    return Yass.container.direct.instance<ObjectMapper>()
-}
+fun jackson(): ObjectMapper = Yass.container.direct.instance<ObjectMapper>()
