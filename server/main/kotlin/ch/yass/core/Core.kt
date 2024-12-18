@@ -57,9 +57,7 @@ object Core {
 
         // JobRunr needs to be able to resolve dependencies from our kodein container
         val jobActivator: JobActivator = object : JobActivator {
-            override fun <T : Any> activateJob(jobClass: Class<T>): T {
-                return Yass.container.direct.Instance(erased(jobClass))
-            }
+            override fun <T : Any> activateJob(jobClass: Class<T>): T = Yass.container.direct.Instance(erased(jobClass))
         }
 
         return JobRunr.configure()

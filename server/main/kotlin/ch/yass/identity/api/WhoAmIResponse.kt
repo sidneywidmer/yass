@@ -8,9 +8,7 @@ data class WhoAmIResponse(
     val name: String,
 ) {
     companion object {
-        fun from(player: Player): WhoAmIResponse {
-            return WhoAmIResponse(player.uuid, player.name)
-        }
+        fun from(player: Player): WhoAmIResponse = WhoAmIResponse(player.uuid, player.name)
     }
 }
 

@@ -48,8 +48,6 @@ class AuthMiddleware(
         }
     }
 
-    override fun after(ctx: Context) {}
-
     context(Raise<Unauthorized>)
     private fun getSession(session: String?, cookie: String?): Session =
         catch({

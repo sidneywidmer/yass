@@ -19,7 +19,5 @@ data class HandDSL(
     val west: HandPositionDSL,
     val tricks: List<TrickDSL>
 ) {
-    fun positions(): List<HandPositionDSL> {
-        return listOfNotNull(north, east, south, west)
-    }
+    fun positions(): List<HandPositionDSL> = listOfNotNull(north, east, south, west)
 }

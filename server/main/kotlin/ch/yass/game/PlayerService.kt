@@ -143,7 +143,7 @@ class PlayerService(private val db: DSLContext) {
 
     context(Raise<OryIdentityWithoutName>)
     private fun getNameFromIdentity(identity: Identity): String {
-        val email = with(identity.traits as LinkedTreeMap<*, *>) { get("name") as String? }
+        val email = with(identity.traits as LinkedTreeMap<*, *>) { get("name") as? String? }
 
         return email ?: raise(OryIdentityWithoutName(identity))
     }

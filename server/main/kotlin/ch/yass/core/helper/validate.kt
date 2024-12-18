@@ -1,14 +1,11 @@
 package ch.yass.core.helper
 
 import arrow.core.raise.Raise
-import ch.yass.Yass
 import ch.yass.core.error.JsonNotMappable
 import ch.yass.core.error.ValidationError
 import ch.yass.core.error.ValiktorError
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.core.JacksonException
 import com.fasterxml.jackson.databind.exc.ValueInstantiationException
-import org.kodein.di.direct
-import org.kodein.di.instance
 import org.valiktor.ConstraintViolationException
 
 /**
@@ -25,7 +22,7 @@ inline fun <reified T> validate(json: String): T {
             is ConstraintViolationException -> raise(ValiktorError((exception.cause as ConstraintViolationException).constraintViolations))
             else -> raise(JsonNotMappable(null, exception.cause))
         }
-    } catch (exception: Exception) {
+    } catch (exception: JacksonException) {
         raise(JsonNotMappable(T::class.java.toString(), exception))
     }
 }

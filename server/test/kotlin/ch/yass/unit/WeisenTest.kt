@@ -1,10 +1,9 @@
-package ch.yass
+package ch.yass.unit
 
 import ch.yass.admin.dsl.interpretCard
 import ch.yass.admin.dsl.interpretCards
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Hand
-import ch.yass.game.dto.db.Seat
 import ch.yass.game.dto.db.Trick
 import ch.yass.game.engine.*
 import ch.yass.game.engine.blattWeise
