@@ -10,15 +10,19 @@ class GameStateBuilder(
     private var hands: List<HandDSL> = emptyList(),
     private var settings: GameSettingsDSL = GameSettingsDSL(WinningConditionType.HANDS, 10)
 ) {
-    fun players(lambda: PlayersBuilder.() -> Unit) = PlayersBuilder().apply(lambda).build()
+    fun players(lambda: PlayersBuilder.() -> Unit) {
+        players =PlayersBuilder().apply(lambda).build()
+    }
 
-    fun hands(lambda: HandsBuilder.() -> Unit) = HandsBuilder().apply(lambda).build()
+    fun hands(lambda: HandsBuilder.() -> Unit) {
+        hands = HandsBuilder().apply(lambda).build()
+    }
 
     fun settings(lambda: GameSettingsBuilder.() -> Unit) {
         settings = GameSettingsBuilder().apply(lambda).build()
     }
 
-    fun build() = GameStateDSL(players, hands, settings)
+    fun build(): GameStateDSL = GameStateDSL(players, hands, settings)
 }
 
 class HandsBuilder(private var hands: MutableList<HandDSL> = mutableListOf()) {
@@ -75,9 +79,7 @@ class TricksBuilder(
         this.tricks.add(TrickDSL(north, east, south, west))
     }
 
-    fun build(): MutableList<TrickDSL> {
-        return tricks
-    }
+    fun build(): MutableList<TrickDSL> = tricks
 }
 
 class PlayersBuilder(

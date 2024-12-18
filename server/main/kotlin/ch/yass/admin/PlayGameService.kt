@@ -15,14 +15,14 @@ class PlayGameService(private val gameService: GameService) {
     fun play(code: String): PlayGameResponse {
         val state = gameService.getStateByCode(code)
         val seats = state.seats.map { mapSeat(it, state) }
-        val playedCards = currentTrick(state.tricks)!!.cardsByPosition()
+        val playedCards = currentTrick(state.tricks).cardsByPosition()
 
         return PlayGameResponse(state.game.uuid, seats, playedCards)
     }
 
     private fun mapSeat(seat: Seat, state: GameState): SeatState {
-        val player = playerAtPosition(seat.position, state.seats, state.allPlayers)!!
-        val hand = currentHand(state.hands)!!
+        val player = playerAtPosition(seat.position, state.seats, state.allPlayers)
+        val hand = currentHand(state.hands)
         val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks)
         val cards = cardsInHand(hand, player, state)
         val nextState = nextState(state)

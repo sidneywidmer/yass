@@ -73,23 +73,19 @@ class GameController(private val service: GameService, private val repo: GameRep
         val state = service.join(request, player)
 
         val seat = mapSeat(playerSeat(player, state.seats), state)
-        val playedCards = currentTrick(state.tricks)!!.cardsByPosition()
+        val playedCards = currentTrick(state.tricks).cardsByPosition()
         val otherPlayers = Position.entries
-            .map { pos ->
-                val p = playerAtPosition(pos, state.seats, state.allPlayers)
-                val s = p?.let { playerSeat(p, state.seats) }
-                Pair(s, p)
-            }
-            .mapNotNull { pair ->
-                pair.second?.let {
-                    PlayerAtTable(
-                        it.uuid,
-                        it.name,
-                        it.bot,
-                        pair.first!!.position,
-                        pair.first!!.status
-                    )
-                }
+            .map { pos -> maybePlayerAtPosition(pos, state.seats, state.allPlayers) }
+            .filterNotNull()
+            .map { player -> Pair(player, playerSeat(player, state.seats)) }
+            .map { pair ->
+                PlayerAtTable(
+                    pair.first.uuid,
+                    pair.first.name,
+                    pair.first.bot,
+                    pair.second.position,
+                    pair.second.status
+                )
             }
 
         JoinGameResponse(state.game.uuid, state.game.code, seat, playedCards, otherPlayers)
@@ -99,8 +95,8 @@ class GameController(private val service: GameService, private val repo: GameRep
     )
 
     private fun mapSeat(seat: Seat, state: GameState): SeatState {
-        val player = playerAtPosition(seat.position, state.seats, state.allPlayers)!!
-        val hand = currentHand(state.hands)!!
+        val player = playerAtPosition(seat.position, state.seats, state.allPlayers)
+        val hand = currentHand(state.hands)
         val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks)
         val cards = cardsInHand(hand, player, state)
         val nextState = nextState(state)

@@ -110,8 +110,8 @@ class PlayerTest : Integration() {
 
     private fun checkCentrifugoHand2(state: GameState) {
         var northSeat = positionSeat(Position.NORTH, state.seats)
-        val north = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)!!
-        val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)!!
+        val north = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
+        val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)
 
         cth.assertActions(northSeat.uuid, cth.parseActions(centrifugo.allServeEvents)).apply {
             hasCount(GameFinished::class, 1)
@@ -164,10 +164,10 @@ class PlayerTest : Integration() {
     }
 
     private fun playHand2Trick1(state: GameState): GameState {
-        val north = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)!!
-        val east = playerAtPosition(Position.EAST, state.seats, state.allPlayers)!!
-        val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)!!
-        val west = playerAtPosition(Position.WEST, state.seats, state.allPlayers)!!
+        val north = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
+        val east = playerAtPosition(Position.EAST, state.seats, state.allPlayers)
+        val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)
+        val west = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
 
         // EAST started the first hand, so it's now SOUTH's turn. They don't want to schiebe and choose UNEUFE trump
         recover({ service.schiebe(SchiebeRequest(state.game.uuid.toString(), "NO"), south) }) { fail() }
@@ -263,7 +263,7 @@ class PlayerTest : Integration() {
         val uuid = state.game.uuid.toString()
         var newState: GameState = state
         cardsPlayed.forEach { c ->
-            val player = playerAtPosition(c.position, newState.seats, newState.allPlayers)!!
+            val player = playerAtPosition(c.position, newState.seats, newState.allPlayers)
             val card = interpretCard(c.card)!!
             newState = recover({
                 val request = PlayCardRequest(uuid, PlayedCard(card.suit.name, card.rank.name, "french"))
@@ -291,10 +291,10 @@ class PlayerTest : Integration() {
     }
 
     private fun playHand1Trick2(state: GameState): GameState {
-        val north = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)!!
-        val east = playerAtPosition(Position.EAST, state.seats, state.allPlayers)!!
-        val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)!!
-        val west = playerAtPosition(Position.WEST, state.seats, state.allPlayers)!!
+        val north = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
+        val east = playerAtPosition(Position.EAST, state.seats, state.allPlayers)
+        val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)
+        val west = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
 
         // East one the last trick so they go again first and again start with HEARTS which is also Stoeck
         var stateAfterStoeck = recover({
@@ -361,10 +361,10 @@ class PlayerTest : Integration() {
     }
 
     private fun playHand1Trick1(state: GameState): GameState {
-        val north = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)!!
-        val east = playerAtPosition(Position.EAST, state.seats, state.allPlayers)!!
-        val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)!!
-        val west = playerAtPosition(Position.WEST, state.seats, state.allPlayers)!!
+        val north = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
+        val east = playerAtPosition(Position.EAST, state.seats, state.allPlayers)
+        val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)
+        val west = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
 
         // EAST is our start player, let's quickly make sure the state waits for schiebe and we can't just play a card
         recover({
@@ -460,10 +460,10 @@ class PlayerTest : Integration() {
     }
 
     private fun playWelcomeHand(state: GameState): GameState {
-        val north = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)!!
-        val east = playerAtPosition(Position.EAST, state.seats, state.allPlayers)!!
-        val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)!!
-        val west = playerAtPosition(Position.WEST, state.seats, state.allPlayers)!!
+        val north = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
+        val east = playerAtPosition(Position.EAST, state.seats, state.allPlayers)
+        val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)
+        val west = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
 
         // NORTH plays the first card
         recover({
@@ -511,7 +511,7 @@ class PlayerTest : Integration() {
 
     private fun checkWrongStartPlayer(state: GameState) {
         // We start off with a bang, it's not souths turn so this should not be possible
-        val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)!!
+        val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)
         recover({
             val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "HELLO", "french"))
             service.play(request, south)

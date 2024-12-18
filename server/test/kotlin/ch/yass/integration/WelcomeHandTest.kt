@@ -55,7 +55,7 @@ class WelcomeHandTest : Integration() {
     fun testPlayerLocked() {
         val state = getState()
 
-        val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)!!
+        val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
         val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "HELLO", "french"))
 
         fold(
@@ -69,7 +69,7 @@ class WelcomeHandTest : Integration() {
     fun testCantPlayNotOwnedCard() {
         val state = getState()
 
-        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)!!
+        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
         val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("CLUBS", "TEN", "french"))
 
         fold(
@@ -84,7 +84,7 @@ class WelcomeHandTest : Integration() {
         val state = getState()
 
         // WEST plays the last missing card in this trick -> should result in a new hand
-        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)!!
+        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
         val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "HELLO", "french"))
 
         // TODO: don't launch in global scope, manage this somehow
@@ -103,7 +103,7 @@ class WelcomeHandTest : Integration() {
         val state = getState()
         val unknonwId = "b562227b-cc63-48cc-919e-9a115bbf7c6e"
 
-        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)!!
+        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
         val request = PlayCardRequest(unknonwId, PlayedCard("WELCOME", "HELLO", "french"))
 
         fold(

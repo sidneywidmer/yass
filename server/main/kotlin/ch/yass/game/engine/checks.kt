@@ -17,7 +17,7 @@ import ch.yass.game.dto.db.Trick
  * cards he already played in the tricks of this hand.
  */
 fun unplayedCardsOfPlayer(player: Player, hands: List<Hand>, seats: List<Seat>, tricks: List<Trick>): List<Card> {
-    val hand = currentHand(hands)!!
+    val hand = currentHand(hands)
     val seat = playerSeat(player, seats)
 
     val allCards = hand.cardsOf(seat.position)
@@ -38,7 +38,7 @@ fun isAlreadyGewiesenSecond(tricks: List<Trick>, hand: Hand): Boolean {
         return true
     }
 
-    val currentTrick = currentTrick(tricks)!!
+    val currentTrick = currentTrick(tricks)
     if (currentTrick.cards().size != 4) {
         return true
     }
@@ -141,8 +141,8 @@ fun cardIsPlayable(card: Card, player: Player, state: GameState): Boolean {
 }
 
 fun cardFollowsLead(card: Card, player: Player, state: GameState): Boolean {
-    val trick = currentTrick(state.tricks)!!
-    val hand = currentHand(state.hands)!!
+    val trick = currentTrick(state.tricks)
+    val hand = currentHand(state.hands)
     val tricks = tricksOfHand(state.tricks, hand)
     val seat = playerSeat(player, state.seats)
     val cards = hand.cardsOf(seat.position).filter { playerOwnsCard(player, it, state) }

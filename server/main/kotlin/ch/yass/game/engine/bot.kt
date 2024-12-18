@@ -15,7 +15,7 @@ fun botId(position: Position): Int {
 }
 
 fun chooseCardForBot(botPlayer: Player, state: GameState): Card {
-    val hand = currentHand(state.hands)!!
+    val hand = currentHand(state.hands)
     val cards = cardsInHand(hand, botPlayer, state)
     val match = cards.shuffled().first { it.state == CardInHandState.PLAYABLE }
 
@@ -30,7 +30,7 @@ fun chooseGschobeForBot(botPlayer: Player, state: GameState): Gschobe =
     if (Random.nextBoolean()) Gschobe.YES else Gschobe.NO
 
 fun chooseWeisForBot(botPlayer: Player, state: GameState): Weis {
-    val hand = currentHand(state.hands)!!
+    val hand = currentHand(state.hands)
     val seat = playerSeat(botPlayer, state.seats)
     val cards = hand.cardsOf(seat.position)
 

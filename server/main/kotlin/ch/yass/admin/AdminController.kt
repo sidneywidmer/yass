@@ -122,7 +122,7 @@ class AdminController(
             }
         }
 
-        val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)!!
+        val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
         val playedCard = PlayedCard("CLUBS", "NINE", "french")
         val request = PlayCardRequest(state.game.uuid.toString(), playedCard)
         val newState = recover({ gameService.play(request, player) }, { throw Exception("something went wrong") })

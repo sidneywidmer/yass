@@ -18,9 +18,7 @@ enum class Trump {
 
     FREESTYLE;
 
-    fun equalsSuit(suit: Suit): Boolean {
-        return this.toString() == suit.toString()
-    }
+    fun equalsSuit(suit: Suit): Boolean = this.toString() == suit.toString()
 
     fun toSuit(): Suit? = regularSuits().firstOrNull { it.toString() == this.toString() }
 }

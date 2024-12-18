@@ -137,9 +137,8 @@ class PlayerService(private val db: DSLContext) {
             .fetchOneInto(Player::class.java)!!
     }
 
-    private fun getOrCreateByOry(oryUuid: UUID, newOryPlayer: NewOryPlayer): Player {
-        return getByOryUuid(oryUuid) ?: create(newOryPlayer)
-    }
+    private fun getOrCreateByOry(oryUuid: UUID, newOryPlayer: NewOryPlayer): Player =
+        getByOryUuid(oryUuid) ?: create(newOryPlayer)
 
     context(Raise<OryIdentityWithoutName>)
     private fun getNameFromIdentity(identity: Identity): String {

@@ -45,9 +45,7 @@ data class Trick(
         }
     }
 
-    fun cards(): List<Card> {
-        return listOfNotNull(this.north, this.east, this.south, this.west)
-    }
+    fun cards(): List<Card> = listOfNotNull(this.north, this.east, this.south, this.west)
 
     fun cardsByPosition(): List<CardOnTable> {
         return Position.entries
