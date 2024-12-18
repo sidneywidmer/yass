@@ -19,10 +19,9 @@ import ch.yass.game.engine.*
 
 fun newHandActions(state: GameState, seat: Seat): List<Action> {
     val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks)
-    val hand = currentHand(state.hands)!!
-    val lastHand = lastHand(state.hands)!!
-    val player = playerAtPosition(seat.position, state.seats, state.allPlayers)!!
-    val cards = cardsInHand(hand, player, state)
+    val lastHand = lastHand(state.hands)
+    val player = playerAtPosition(seat.position, state.seats, state.allPlayers)
+    val cards = cardsInHand(currentHand(state.hands), player, state)
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.seats, state.tricks)
 
@@ -56,8 +55,8 @@ fun gameFinishedActions(state: GameState): List<Action> {
     return listOf(
         UpdatePoints(points),
         GameFinished(
-            winnerPositions.map { position -> playerAtPosition(position, state.seats, state.allPlayers)!! },
-            loserPositions.map { position -> playerAtPosition(position, state.seats, state.allPlayers)!! },
+            winnerPositions.map { position -> playerAtPosition(position, state.seats, state.allPlayers) },
+            loserPositions.map { position -> playerAtPosition(position, state.seats, state.allPlayers) },
             maxPoints,
             minPoints
         )
@@ -65,8 +64,8 @@ fun gameFinishedActions(state: GameState): List<Action> {
 }
 
 fun newTrickActions(state: GameState, seat: Seat): List<Action> {
-    val hand = currentHand(state.hands)!!
-    val player = playerAtPosition(seat.position, state.seats, state.allPlayers)!!
+    val hand = currentHand(state.hands)
+    val player = playerAtPosition(seat.position, state.seats, state.allPlayers)
     val cards = cardsInHand(hand, player, state)
     val tricks = tricksOfHand(state.tricks, hand)
     val winningPos = winningPositionOfLastTrick(hand, tricks)
@@ -82,9 +81,8 @@ fun newTrickActions(state: GameState, seat: Seat): List<Action> {
 }
 
 fun cardPlayedActions(state: GameState, card: Card, playedBy: Seat, seat: Seat): List<Action> {
-    val hand = currentHand(state.hands)!!
-    val player = playerAtPosition(seat.position, state.seats, state.allPlayers)!!
-    val cards = cardsInHand(hand, player, state)
+    val player = playerAtPosition(seat.position, state.seats, state.allPlayers)
+    val cards = cardsInHand(currentHand(state.hands), player, state)
     val activePosition = activePosition(state.hands, state.seats, state.tricks)
     val nextState = nextState(state)
     val points = pointsByPositionTotal(state.hands, state.tricks)
@@ -101,8 +99,7 @@ fun cardPlayedActions(state: GameState, card: Card, playedBy: Seat, seat: Seat):
 fun trumpChosenActions(state: GameState, trump: Trump, seat: Seat): List<Action> {
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.seats, state.tricks)
-    val hand = currentHand(state.hands)!!
-    val cards = hand.cardsOf(seat.position) // We don't care about CardInHand since the state is wurst
+    val cards = currentHand(state.hands).cardsOf(seat.position) // We don't care about CardInHand since the state is wurst
     val weise = withoutStoeckPoints(possibleWeiseWithPoints(cards, trump))
 
     return listOf(
@@ -116,16 +113,12 @@ fun trumpChosenActions(state: GameState, trump: Trump, seat: Seat): List<Action>
 fun gewiesenActions(state: GameState, weis: Weis, playedBy: Seat, seat: Seat): List<Action> {
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.seats, state.tricks)
-    val hand = currentHand(state.hands)!!
 
-    val actions = listOf(
-        UpdateActive(activePosition),
-        UpdateState(nextState),
-    ).toMutableList()
+    val actions = listOf(UpdateActive(activePosition), UpdateState(nextState)).toMutableList()
 
     // We don't need to show this weis to the player who just played it - they already know
     if (seat != playedBy) {
-        actions.add(ShowWeis(playedBy.position, weis.toWeisWithPoints(hand.trump!!)))
+        actions.add(ShowWeis(playedBy.position, weis.toWeisWithPoints(currentHand(state.hands).trump!!)))
     }
 
     return actions

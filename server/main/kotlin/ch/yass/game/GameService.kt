@@ -119,7 +119,7 @@ class GameService(
 
         cardIsPlayable(playedCard, player, state)
 
-        val currentTrick = currentTrick(state.tricks)!!
+        val currentTrick = currentTrick(state.tricks)
         val playerSeat = playerSeat(player, state.seats)
 
         repo.playCard(playedCard, currentTrick, playerSeat)
@@ -131,8 +131,8 @@ class GameService(
         //      turn per activePosition logic so the stoeck can't be played anymore. We need to update
         //      the activePosition logic for that
         val updatedHand = currentHand(updatedState.hands)
-        val weise = updatedHand?.trump?.let { possibleWeise(updatedHand.cardsOf(playerSeat.position), it) }.orEmpty()
-        if (!isStoeckGewiesen(updatedHand!!, weise, playerSeat.position, updatedState.tricks)) {
+        val weise = updatedHand.trump?.let { possibleWeise(updatedHand.cardsOf(playerSeat.position), it) }.orEmpty()
+        if (!isStoeckGewiesen(updatedHand, weise, playerSeat.position, updatedState.tricks)) {
             weisStoeck(updatedState, playerSeat, updatedHand, weise)
         }
 
@@ -147,14 +147,13 @@ class GameService(
         val state = repo.getState(game)
         val chosenTrump = Trump.valueOf(request.trump)
         val nextState = nextState(state)
-        val currentHand = currentHand(state.hands)!!
 
         ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
         ensure(expectedState(listOf(State.TRUMP, State.TRUMP_BOT), nextState)) { InvalidState(nextState, state) }
         ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
         ensure(playableTrumps().contains(chosenTrump)) { TrumpInvalid(chosenTrump) }
 
-        repo.chooseTrump(chosenTrump, currentHand)
+        repo.chooseTrump(chosenTrump, currentHand(state.hands))
 
         val freshState = repo.getState(game)
         publishForSeats(state.seats) { seat -> trumpChosenActions(freshState, chosenTrump, seat) }
@@ -169,7 +168,7 @@ class GameService(
         val game = repo.getByUUID(request.game)
         val state = repo.getState(game)
         val nextState = nextState(state)
-        val hand = currentHand(state.hands)!!
+        val hand = currentHand(state.hands)
         val seat = playerSeat(player, state.seats)
 
         ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
@@ -200,7 +199,7 @@ class GameService(
      */
     context(Raise<GameError>)
     private fun weisenSecond(state: GameState) {
-        val hand = currentHand(state.hands)!!
+        val hand = currentHand(state.hands)
         val remainingWeise = remainingWeise(hand)
 
         weisWinner(hand, state.tricks).map { position ->
@@ -227,7 +226,7 @@ class GameService(
         val state = repo.getState(game)
         val nextState = nextState(state)
         val gschobe = Gschobe.valueOf(request.gschobe)
-        val currentHand = currentHand(state.hands)!!
+        val currentHand = currentHand(state.hands)
 
         ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
         ensure(expectedState(listOf(State.SCHIEBE, State.SCHIEBE_BOT), nextState)) { InvalidState(nextState, state) }
@@ -249,7 +248,7 @@ class GameService(
         val state = repo.getState(game)
 
         val dcSeat = state.seats.first { it.uuid == seatUUID }
-        val dcPlayer = playerAtPosition(dcSeat.position, state.seats, state.allPlayers)!!
+        val dcPlayer = playerAtPosition(dcSeat.position, state.seats, state.allPlayers)
         val actions = playerDisconnectedActions(dcSeat, dcPlayer)
 
         repo.updateSeatStatus(dcSeat, SeatStatus.DISCONNECTED)
@@ -260,7 +259,7 @@ class GameService(
     fun connectSeat(seat: Seat) {
         val game = repo.getBySeatUUID(seat.uuid.toString())
         val state = repo.getState(game)
-        val player = playerAtPosition(seat.position, state.seats, state.allPlayers)!!
+        val player = playerAtPosition(seat.position, state.seats, state.allPlayers)
         val actions = playerJoinedActions(state, player, seat)
 
         repo.updateSeatStatus(seat, SeatStatus.CONNECTED)
@@ -324,7 +323,7 @@ class GameService(
 
             State.WEISEN_SECOND_BOT -> scope.launch { weisenAsBot(updatedState) }
             State.NEW_TRICK -> {
-                repo.createTrick(currentHand(updatedState.hands)!!)
+                repo.createTrick(currentHand(updatedState.hands))
                 val state = repo.getState(game)
                 publishForSeats(updatedState.seats) { seat -> newTrickActions(state, seat) }
                 gameLoop(game)

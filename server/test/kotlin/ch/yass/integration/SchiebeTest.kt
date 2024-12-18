@@ -64,7 +64,7 @@ class SchiebeTest : Integration() {
     fun testPlayerCantPlayCardIfNotYetGschobe() {
         val state = getState()
 
-        val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)!!
+        val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
         val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("CLUBS", "NINE", "french"))
 
         recover({ service.play(request, player) }) {
@@ -76,8 +76,8 @@ class SchiebeTest : Integration() {
     fun testAfterSchiebeCorrectPlayersTurn() {
         val state = getState()
 
-        val playerNorth = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)!!
-        val playerSouth = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)!!
+        val playerNorth = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
+        val playerSouth = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)
         val schiebeRequest = SchiebeRequest(state.game.uuid.toString(), Gschobe.YES.name)
         val trumpRequest = ChooseTrumpRequest(state.game.uuid.toString(), "CLUBS")
 

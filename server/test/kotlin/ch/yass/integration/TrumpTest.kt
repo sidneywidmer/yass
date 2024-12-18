@@ -61,11 +61,11 @@ class TrumpTest : Integration() {
     fun testPlayerCanPlayUneufeTrump() {
         val state = getState()
 
-        val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)!!
+        val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
         val request = ChooseTrumpRequest(state.game.uuid.toString(), "UNEUFE")
 
         val newState = recover({ service.trump(request, player) }) { fail() }
-        assertEquals(Trump.UNEUFE, currentHand(newState.hands)!!.trump)
+        assertEquals(Trump.UNEUFE, currentHand(newState.hands).trump)
     }
 
     @Test
@@ -92,7 +92,7 @@ class TrumpTest : Integration() {
             }
         }
 
-        val currentHand = currentHand(state.hands)!!
+        val currentHand = currentHand(state.hands)
         val currentTrick = tricksOfHand(state.tricks, currentHand)
         val wp = winningPositionOfCurrentTrick(currentHand, currentTrick)
 

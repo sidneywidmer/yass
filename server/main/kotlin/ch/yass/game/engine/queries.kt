@@ -16,11 +16,11 @@ import ch.yass.game.dto.db.Trick
 import java.util.EnumMap
 import kotlin.collections.contains
 
-fun currentTrick(tricks: List<Trick>): Trick? = tricks.firstOrNull()
+fun currentTrick(tricks: List<Trick>): Trick = tricks.first()
 
-fun currentHand(hands: List<Hand>): Hand? = hands.firstOrNull()
+fun currentHand(hands: List<Hand>): Hand = hands.first()
 
-fun lastHand(hands: List<Hand>): Hand? = hands.getOrNull(1)
+fun lastHand(hands: List<Hand>): Hand = hands[1]
 
 /**
  * Hands that have 9 tricks with 4 cards each. Welcome hand is NOT counted since it only has 1 card and 1 trick.
@@ -42,9 +42,11 @@ fun completeTricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> =
 /**
  * Can return null because maybe the game is not full yet.
  */
-fun playerAtPosition(position: Position, seats: List<Seat>, players: List<Player>): Player? =
-    seats.firstOrNull { it.position == position }
-        .let { players.firstOrNull { player -> player.id == it?.playerId } }
+fun maybePlayerAtPosition(position: Position, seats: List<Seat>, players: List<Player>): Player? =
+    seats.firstOrNull { it.position == position }.let { players.firstOrNull { player -> player.id == it?.playerId } }
+
+fun playerAtPosition(position: Position, seats: List<Seat>, players: List<Player>): Player =
+    seats.first { it.position == position }.let { players.first { player -> player.id == it.playerId } }
 
 fun cardsInHand(hand: Hand, player: Player, state: GameState): List<CardInHand> {
     val seat = playerSeat(player, state.seats)
@@ -71,15 +73,13 @@ fun nextState(state: GameState): State {
     val trick = currentTrick(state.tricks)
     val hand = currentHand(state.hands)
     val position = activePosition(state.hands, state.seats, state.tricks)
-    val player = playerAtPosition(position, state.seats, state.allPlayers)!!
-    val tricks = hand?.let { tricksOfHand(state.tricks, it) } ?: emptyList()
-    val weise = hand?.trump?.let { possibleWeise(hand.cardsOf(position), it) }.orEmpty()
+    val player = playerAtPosition(position, state.seats, state.allPlayers)
+    val tricks = tricksOfHand(state.tricks, hand)
+    val weise = hand.trump?.let { possibleWeise(hand.cardsOf(position), it) }.orEmpty()
 
     // The order of these checks is VERY relevant
     return when {
         state.allPlayers.size < 4 -> State.WAITING_FOR_PLAYERS
-        trick == null -> State.NEW_TRICK
-        hand == null -> State.NEW_HAND
         isGameFinished(state) -> State.FINISHED
 
         // Special case for "welcome" trick, only one card is played per player
@@ -102,13 +102,13 @@ fun nextState(state: GameState): State {
 }
 
 fun nextHandStartingPosition(hands: List<Hand>, seats: List<Seat>): Position {
-    val hand = currentHand(hands)!!
+    val hand = currentHand(hands)
     val seat = startingPlayersSeatOfHand(hand, seats)
     return positionsOrderedWithStart(seat.position)[1]
 }
 
 fun nextHandStartingPlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Player =
-    playerAtPosition(nextHandStartingPosition(hands, seats), seats, players)!!
+    playerAtPosition(nextHandStartingPosition(hands, seats), seats, players)
 
 /**
  * Which player is expected to take the next action? If the trick is not complete yet, it's the person sitting
@@ -120,7 +120,7 @@ fun activePosition(
     seats: List<Seat>,
     tricks: List<Trick>
 ): Position {
-    val hand = currentHand(hands)!!
+    val hand = currentHand(hands)
     val tricksOfHand = tricksOfHand(tricks, hand)
     val trick = tricksOfHand(tricks, hand).first()
 

@@ -64,7 +64,7 @@ class PlayCardTest : Integration() {
     fun testPlayerCantPlayCardTwice() {
         val state = getState()
 
-        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)!!
+        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
         val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("CLUBS", "SEVEN", "french"))
 
         recover({ service.play(request, player) }) {
@@ -76,7 +76,7 @@ class PlayCardTest : Integration() {
     fun testPlayerMustFollowSuitIfPossible() {
         val state = getState()
 
-        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)!!
+        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
         val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "JACK", "french"))
 
         fold(
@@ -93,7 +93,7 @@ class PlayCardTest : Integration() {
     fun testPlayerCanPlayValidCard() {
         val state = getState()
 
-        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)!!
+        val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
         val playedCard = PlayedCard("SPADES", "SIX", "french")
         val request = PlayCardRequest(state.game.uuid.toString(), playedCard)
 
