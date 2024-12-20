@@ -11,7 +11,7 @@ data class TrickDSL(val north: String?, val east: String?, val south: String?, v
 data class HandPositionDSL(val cards: String, val start: Boolean = false, val position: Position)
 data class GameSettingsDSL(val wcType: WinningConditionType, val wcValue: Int)
 data class HandDSL(
-    val trump: Trump?,
+    val trump: Trump,
     val gschobe: Gschobe,
     val north: HandPositionDSL,
     val east: HandPositionDSL,

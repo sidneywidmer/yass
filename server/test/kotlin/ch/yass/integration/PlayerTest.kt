@@ -33,11 +33,9 @@ import ch.yass.game.pubsub.GameFinished
 import ch.yass.game.pubsub.UpdatePossibleWeise
 import ch.yass.integration.helper.CentrifugoTestHelper
 import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.fail
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.kodein.di.direct
 import org.kodein.di.instance
@@ -378,7 +376,7 @@ class PlayerTest : Integration() {
             service.schiebe(request, east)
         }) { fail() }
 
-        assertThat(stateAfterSchiebe.hands[0].trump, nullValue())
+        assertThat(stateAfterSchiebe.hands[0].trump, equalTo(Trump.NONE))
         assertThat(stateAfterSchiebe.hands[0].gschobe, equalTo(Gschobe.YES))
 
         var stateAfterTrump = recover({
@@ -500,7 +498,7 @@ class PlayerTest : Integration() {
         assertThat(Position.entries.flatMap { newState.hands[1].weiseOf(it) }.size, equalTo(0))
 
         assertThat(newState.tricks[0].cards().size, equalTo(0)) // no cards played in new trick yet
-        assertThat(newState.hands[0].trump, nullValue())
+        assertThat(newState.hands[0].trump, equalTo(Trump.NONE))
         assertThat(newState.hands[0].startingPosition, equalTo(Position.EAST)) // comes next after NORTH
         assertThat(newState.hands[0].gschobe, equalTo(Gschobe.NOT_YET))
         assertThat(Position.entries.flatMap { newState.hands[0].cardsOf(it) }.size, equalTo(36)) // all cards are dealt

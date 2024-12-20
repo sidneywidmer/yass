@@ -46,7 +46,7 @@ class SchiebeTest : Integration() {
                     }
                 }
                 hand {
-                    trump(null)
+                    trump(Trump.NONE)
                     gschobe(Gschobe.NOT_YET)
                     north(cards = "C9,D7,D10,DQ,H6,HQ,HK,S9,SJ", start = true)
                     east(cards = "C7,CJ,DA,H7,H10,HA,S8,SQ,SK")

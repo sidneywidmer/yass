@@ -74,7 +74,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
             updatedAt = LocalDateTime.now(ZoneOffset.UTC)
             startingPosition = position?.position?.name
             gameId = game.id
-            trump = h.trump?.name
+            trump = h.trump.name
             gschobe = h.gschobe.name
             north = toDbJson(interpretCards(h.north.cards))
             east = toDbJson(interpretCards(h.east.cards))

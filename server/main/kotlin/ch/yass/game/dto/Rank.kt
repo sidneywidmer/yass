@@ -11,5 +11,9 @@ enum class Rank {
     KING,
     ACE,
 
-    HELLO
+    HELLO;
+
+    companion object {
+        fun regular(): List<Rank> = listOf(SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE)
+    }
 }

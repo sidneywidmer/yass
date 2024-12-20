@@ -131,7 +131,7 @@ class GameService(
         //      turn per activePosition logic so the stoeck can't be played anymore. We need to update
         //      the activePosition logic for that
         val updatedHand = currentHand(updatedState.hands)
-        val weise = updatedHand.trump?.let { possibleWeise(updatedHand.cardsOf(playerSeat.position), it) }.orEmpty()
+        val weise = possibleWeise(updatedHand.cardsOf(playerSeat.position), updatedHand.trump)
         if (!isStoeckGewiesen(updatedHand, weise, playerSeat.position, updatedState.tricks)) {
             weisStoeck(updatedState, playerSeat, updatedHand, weise)
         }
@@ -151,7 +151,7 @@ class GameService(
         ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
         ensure(expectedState(listOf(State.TRUMP, State.TRUMP_BOT), nextState)) { InvalidState(nextState, state) }
         ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
-        ensure(playableTrumps().contains(chosenTrump)) { TrumpInvalid(chosenTrump) }
+        ensure(Trump.playable().contains(chosenTrump)) { TrumpInvalid(chosenTrump) }
 
         repo.chooseTrump(chosenTrump, currentHand(state.hands))
 
@@ -176,7 +176,7 @@ class GameService(
             InvalidState(nextState, state)
         }
         ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
-        ensure(possibleWeise(hand.cardsOf(seat.position), hand.trump!!).contains(request.weis)) {
+        ensure(possibleWeise(hand.cardsOf(seat.position), hand.trump).contains(request.weis)) {
             WeisInvalid(request.weis)
         }
 
@@ -207,7 +207,7 @@ class GameService(
             val actions = withoutStoeck(remainingWeise[position]!!)
                 .map {
                     weise.add(it)
-                    ShowWeis(position, it.toWeisWithPoints(hand.trump!!))
+                    ShowWeis(position, it.toWeisWithPoints(hand.trump))
                 }
 
             repo.updateWeise(positionSeat(position, state.seats), hand, weise)

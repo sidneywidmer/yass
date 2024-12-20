@@ -5,14 +5,6 @@ import ch.yass.core.helper.toEnumMap
 import ch.yass.game.dto.*
 import java.util.EnumMap
 
-fun regularRanks(): List<Rank> =
-    listOf(Rank.SIX, Rank.SEVEN, Rank.EIGHT, Rank.NINE, Rank.TEN, Rank.JACK, Rank.QUEEN, Rank.KING, Rank.ACE)
-
-fun regularSuits(): List<Suit> = listOf(Suit.CLUBS, Suit.DIAMONDS, Suit.HEARTS, Suit.SPADES)
-
-fun playableTrumps(): List<Trump> =
-    listOf(Trump.CLUBS, Trump.SPADES, Trump.HEARTS, Trump.DIAMONDS, Trump.UNEUFE, Trump.OBEABE)
-
 /**
  * Get the order of a round based on a position. So if it's EAST's turn we
  * know the next player is SOUTH. I bet there's a million clever
@@ -27,7 +19,7 @@ fun positionsOrderedWithStart(position: Position): List<Position> {
     }
 }
 
-fun deck(): List<Pair<Rank, Suit>> = cartesianProduct(regularRanks(), regularSuits()).shuffled()
+fun deck(): List<Pair<Rank, Suit>> = cartesianProduct(Rank.regular(), Suit.regular()).shuffled()
 
 /**
  * nextDeck allows us to inject a not so random deck in case we need it to replicate

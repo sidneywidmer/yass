@@ -11,6 +11,6 @@ data class NewHand(
     val game: Game,
     val startingPosition: Position,
     val positions: EnumMap<Position, List<Card>>,
-    val trump: Trump? = null,
-    val gschobe: Gschobe? = null
+    val trump: Trump = Trump.NONE,
+    val gschobe: Gschobe = Gschobe.NOT_YET
 )

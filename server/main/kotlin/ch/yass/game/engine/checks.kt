@@ -27,7 +27,7 @@ fun unplayedCardsOfPlayer(player: Player, hands: List<Hand>, seats: List<Seat>, 
     return allCards.minus(playedCards.toSet())
 }
 
-fun isTrumpSet(hand: Hand?): Boolean = hand?.trump != null
+fun isTrumpSet(hand: Hand?): Boolean = hand?.trump != Trump.NONE
 
 fun isAlreadyGewiesenSecond(tricks: List<Trick>, hand: Hand): Boolean {
     if (hand.trump == Trump.FREESTYLE) {
@@ -97,11 +97,9 @@ fun playerOwnsCard(player: Player, card: Card, state: GameState): Boolean {
 
 fun expectedState(allowed: List<State>, state: State): Boolean = allowed.contains(state)
 
+// activePlayer could _in theory_ be null if a game is not full and someone already plays a card
 fun playerHasActivePosition(player: Player, state: GameState): Boolean {
-    val activePlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks) ?: return false
-
-    // Could _in theory_ be null if a game is not full and someone already plays a card
-    return activePlayer.id == player.id
+    return activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)?.id == player.id
 }
 
 fun isLastCard(cards: List<Card>) = cards.size == 1
@@ -155,7 +153,7 @@ fun cardFollowsLead(card: Card, player: Player, state: GameState): Boolean {
         isLastCard(cards) -> true
         isFollowingLead(lead, card) -> true
         couldNotFollowLead(hand, cards, lead) -> true
-        card.suit == hand.trump?.toSuit() -> true
+        card.suit == hand.trump.toSuit() -> true
         else -> false
     }
 }
