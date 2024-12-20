@@ -16,16 +16,16 @@ import org.jooq.JSON
 @Suppress("UNCHECKED_CAST")
 data class Hand(
     var id: Int? = null,
-    var uuid: String? = null,
-    var createdAt: LocalDateTime? = null,
-    var updatedAt: LocalDateTime? = null,
-    var gameId: Int? = null,
+    var uuid: String,
+    var createdAt: LocalDateTime,
+    var updatedAt: LocalDateTime,
+    var gameId: Int,
     var trump: String? = null,
-    var gschobe: String? = null,
-    var north: JSON? = null,
-    var east: JSON? = null,
-    var south: JSON? = null,
-    var west: JSON? = null,
+    var gschobe: String,
+    var north: JSON,
+    var east: JSON,
+    var south: JSON,
+    var west: JSON,
     var northWeise: JSON? = null,
     var eastWeise: JSON? = null,
     var southWeise: JSON? = null,
@@ -48,29 +48,13 @@ data class Hand(
         }
         else if (this.id != o.id)
             return false
-        if (this.uuid == null) {
-            if (o.uuid != null)
-                return false
-        }
-        else if (this.uuid != o.uuid)
+        if (this.uuid != o.uuid)
             return false
-        if (this.createdAt == null) {
-            if (o.createdAt != null)
-                return false
-        }
-        else if (this.createdAt != o.createdAt)
+        if (this.createdAt != o.createdAt)
             return false
-        if (this.updatedAt == null) {
-            if (o.updatedAt != null)
-                return false
-        }
-        else if (this.updatedAt != o.updatedAt)
+        if (this.updatedAt != o.updatedAt)
             return false
-        if (this.gameId == null) {
-            if (o.gameId != null)
-                return false
-        }
-        else if (this.gameId != o.gameId)
+        if (this.gameId != o.gameId)
             return false
         if (this.trump == null) {
             if (o.trump != null)
@@ -78,35 +62,15 @@ data class Hand(
         }
         else if (this.trump != o.trump)
             return false
-        if (this.gschobe == null) {
-            if (o.gschobe != null)
-                return false
-        }
-        else if (this.gschobe != o.gschobe)
+        if (this.gschobe != o.gschobe)
             return false
-        if (this.north == null) {
-            if (o.north != null)
-                return false
-        }
-        else if (this.north != o.north)
+        if (this.north != o.north)
             return false
-        if (this.east == null) {
-            if (o.east != null)
-                return false
-        }
-        else if (this.east != o.east)
+        if (this.east != o.east)
             return false
-        if (this.south == null) {
-            if (o.south != null)
-                return false
-        }
-        else if (this.south != o.south)
+        if (this.south != o.south)
             return false
-        if (this.west == null) {
-            if (o.west != null)
-                return false
-        }
-        else if (this.west != o.west)
+        if (this.west != o.west)
             return false
         if (this.northWeise == null) {
             if (o.northWeise != null)
@@ -145,16 +109,16 @@ data class Hand(
         val prime = 31
         var result = 1
         result = prime * result + (if (this.id == null) 0 else this.id.hashCode())
-        result = prime * result + (if (this.uuid == null) 0 else this.uuid.hashCode())
-        result = prime * result + (if (this.createdAt == null) 0 else this.createdAt.hashCode())
-        result = prime * result + (if (this.updatedAt == null) 0 else this.updatedAt.hashCode())
-        result = prime * result + (if (this.gameId == null) 0 else this.gameId.hashCode())
+        result = prime * result + this.uuid.hashCode()
+        result = prime * result + this.createdAt.hashCode()
+        result = prime * result + this.updatedAt.hashCode()
+        result = prime * result + this.gameId.hashCode()
         result = prime * result + (if (this.trump == null) 0 else this.trump.hashCode())
-        result = prime * result + (if (this.gschobe == null) 0 else this.gschobe.hashCode())
-        result = prime * result + (if (this.north == null) 0 else this.north.hashCode())
-        result = prime * result + (if (this.east == null) 0 else this.east.hashCode())
-        result = prime * result + (if (this.south == null) 0 else this.south.hashCode())
-        result = prime * result + (if (this.west == null) 0 else this.west.hashCode())
+        result = prime * result + this.gschobe.hashCode()
+        result = prime * result + this.north.hashCode()
+        result = prime * result + this.east.hashCode()
+        result = prime * result + this.south.hashCode()
+        result = prime * result + this.west.hashCode()
         result = prime * result + (if (this.northWeise == null) 0 else this.northWeise.hashCode())
         result = prime * result + (if (this.eastWeise == null) 0 else this.eastWeise.hashCode())
         result = prime * result + (if (this.southWeise == null) 0 else this.southWeise.hashCode())

@@ -370,6 +370,8 @@
                             <pojosEqualsAndHashCode>true</pojosEqualsAndHashCode>
                             <javaTimeTypes>true</javaTimeTypes>
                             <fluentSetters>true</fluentSetters>
+                            <kotlinNotNullPojoAttributes>true</kotlinNotNullPojoAttributes>
+                            <kotlinNotNullRecordAttributes>true</kotlinNotNullRecordAttributes>
                         </generate>
                         <target>
                             <packageName>ch.yass.db</packageName>

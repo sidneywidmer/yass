@@ -14,12 +14,12 @@ import java.time.LocalDateTime
 @Suppress("UNCHECKED_CAST")
 data class Seat(
     var id: Int? = null,
-    var uuid: String? = null,
-    var createdAt: LocalDateTime? = null,
-    var updatedAt: LocalDateTime? = null,
-    var playerId: Int? = null,
-    var gameId: Int? = null,
-    var position: String? = null,
+    var uuid: String,
+    var createdAt: LocalDateTime,
+    var updatedAt: LocalDateTime,
+    var playerId: Int,
+    var gameId: Int,
+    var position: String,
     var rejoinedAt: LocalDateTime? = null,
     var playerPing: LocalDateTime? = null,
     var status: String? = null
@@ -40,41 +40,17 @@ data class Seat(
         }
         else if (this.id != o.id)
             return false
-        if (this.uuid == null) {
-            if (o.uuid != null)
-                return false
-        }
-        else if (this.uuid != o.uuid)
+        if (this.uuid != o.uuid)
             return false
-        if (this.createdAt == null) {
-            if (o.createdAt != null)
-                return false
-        }
-        else if (this.createdAt != o.createdAt)
+        if (this.createdAt != o.createdAt)
             return false
-        if (this.updatedAt == null) {
-            if (o.updatedAt != null)
-                return false
-        }
-        else if (this.updatedAt != o.updatedAt)
+        if (this.updatedAt != o.updatedAt)
             return false
-        if (this.playerId == null) {
-            if (o.playerId != null)
-                return false
-        }
-        else if (this.playerId != o.playerId)
+        if (this.playerId != o.playerId)
             return false
-        if (this.gameId == null) {
-            if (o.gameId != null)
-                return false
-        }
-        else if (this.gameId != o.gameId)
+        if (this.gameId != o.gameId)
             return false
-        if (this.position == null) {
-            if (o.position != null)
-                return false
-        }
-        else if (this.position != o.position)
+        if (this.position != o.position)
             return false
         if (this.rejoinedAt == null) {
             if (o.rejoinedAt != null)
@@ -101,12 +77,12 @@ data class Seat(
         val prime = 31
         var result = 1
         result = prime * result + (if (this.id == null) 0 else this.id.hashCode())
-        result = prime * result + (if (this.uuid == null) 0 else this.uuid.hashCode())
-        result = prime * result + (if (this.createdAt == null) 0 else this.createdAt.hashCode())
-        result = prime * result + (if (this.updatedAt == null) 0 else this.updatedAt.hashCode())
-        result = prime * result + (if (this.playerId == null) 0 else this.playerId.hashCode())
-        result = prime * result + (if (this.gameId == null) 0 else this.gameId.hashCode())
-        result = prime * result + (if (this.position == null) 0 else this.position.hashCode())
+        result = prime * result + this.uuid.hashCode()
+        result = prime * result + this.createdAt.hashCode()
+        result = prime * result + this.updatedAt.hashCode()
+        result = prime * result + this.playerId.hashCode()
+        result = prime * result + this.gameId.hashCode()
+        result = prime * result + this.position.hashCode()
         result = prime * result + (if (this.rejoinedAt == null) 0 else this.rejoinedAt.hashCode())
         result = prime * result + (if (this.playerPing == null) 0 else this.playerPing.hashCode())
         result = prime * result + (if (this.status == null) 0 else this.status.hashCode())

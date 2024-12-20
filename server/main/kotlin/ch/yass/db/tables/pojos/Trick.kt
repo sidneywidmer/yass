@@ -16,10 +16,10 @@ import org.jooq.JSON
 @Suppress("UNCHECKED_CAST")
 data class Trick(
     var id: Int? = null,
-    var uuid: String? = null,
-    var createdAt: LocalDateTime? = null,
-    var updatedAt: LocalDateTime? = null,
-    var handId: Int? = null,
+    var uuid: String,
+    var createdAt: LocalDateTime,
+    var updatedAt: LocalDateTime,
+    var handId: Int,
     var north: JSON? = null,
     var east: JSON? = null,
     var south: JSON? = null,
@@ -41,29 +41,13 @@ data class Trick(
         }
         else if (this.id != o.id)
             return false
-        if (this.uuid == null) {
-            if (o.uuid != null)
-                return false
-        }
-        else if (this.uuid != o.uuid)
+        if (this.uuid != o.uuid)
             return false
-        if (this.createdAt == null) {
-            if (o.createdAt != null)
-                return false
-        }
-        else if (this.createdAt != o.createdAt)
+        if (this.createdAt != o.createdAt)
             return false
-        if (this.updatedAt == null) {
-            if (o.updatedAt != null)
-                return false
-        }
-        else if (this.updatedAt != o.updatedAt)
+        if (this.updatedAt != o.updatedAt)
             return false
-        if (this.handId == null) {
-            if (o.handId != null)
-                return false
-        }
-        else if (this.handId != o.handId)
+        if (this.handId != o.handId)
             return false
         if (this.north == null) {
             if (o.north != null)
@@ -96,10 +80,10 @@ data class Trick(
         val prime = 31
         var result = 1
         result = prime * result + (if (this.id == null) 0 else this.id.hashCode())
-        result = prime * result + (if (this.uuid == null) 0 else this.uuid.hashCode())
-        result = prime * result + (if (this.createdAt == null) 0 else this.createdAt.hashCode())
-        result = prime * result + (if (this.updatedAt == null) 0 else this.updatedAt.hashCode())
-        result = prime * result + (if (this.handId == null) 0 else this.handId.hashCode())
+        result = prime * result + this.uuid.hashCode()
+        result = prime * result + this.createdAt.hashCode()
+        result = prime * result + this.updatedAt.hashCode()
+        result = prime * result + this.handId.hashCode()
         result = prime * result + (if (this.north == null) 0 else this.north.hashCode())
         result = prime * result + (if (this.east == null) 0 else this.east.hashCode())
         result = prime * result + (if (this.south == null) 0 else this.south.hashCode())

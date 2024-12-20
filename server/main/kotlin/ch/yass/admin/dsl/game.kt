@@ -37,7 +37,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
         settings = toDbJson(GameSettings(false, false, false, false, state.settings.wcType, state.settings.wcValue))
         store()
     }
-    val game = recover({ repo.getByUUID(gameRecord.uuid!!) }, { throw Exception("invalid uuid") })
+    val game = recover({ repo.getByUUID(gameRecord.uuid) }, { throw Exception("invalid uuid") })
 
     state.players.forEach { p ->
         val player = db.newRecord(PLAYER).apply {
@@ -53,7 +53,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
             uuid = UUID.randomUUID().toString()
             createdAt = LocalDateTime.now(ZoneOffset.UTC)
             updatedAt = LocalDateTime.now(ZoneOffset.UTC)
-            playerId = player.id
+            playerId = player.id!!
             gameId = game.id
             position = p.position.name
             rejoinedAt = null
@@ -76,10 +76,10 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
             gameId = game.id
             trump = h.trump.name
             gschobe = h.gschobe.name
-            north = toDbJson(interpretCards(h.north.cards))
-            east = toDbJson(interpretCards(h.east.cards))
-            south = toDbJson(interpretCards(h.south.cards))
-            west = toDbJson(interpretCards(h.west.cards))
+            north = toDbJson(interpretCards(h.north?.cards))
+            east = toDbJson(interpretCards(h.east?.cards))
+            south = toDbJson(interpretCards(h.south?.cards))
+            west = toDbJson(interpretCards(h.west?.cards))
             store()
         }
 
@@ -89,7 +89,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
                 uuid = UUID.randomUUID().toString()
                 createdAt = LocalDateTime.now(ZoneOffset.UTC)
                 updatedAt = LocalDateTime.now(ZoneOffset.UTC)
-                handId = hand.id
+                handId = hand.id!!
                 store()
             }
         }
@@ -99,7 +99,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
                 uuid = UUID.randomUUID().toString()
                 createdAt = LocalDateTime.now(ZoneOffset.UTC)
                 updatedAt = LocalDateTime.now(ZoneOffset.UTC)
-                handId = hand.id
+                handId = hand.id!!
                 north = toDbJson(interpretCard(t.north))
                 east = toDbJson(interpretCard(t.east))
                 south = toDbJson(interpretCard(t.south))

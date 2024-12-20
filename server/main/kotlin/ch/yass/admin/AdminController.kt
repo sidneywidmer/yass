@@ -57,7 +57,6 @@ class AdminController(
      */
     private fun playGame(ctx: Context) = either {
         playGameService.play(ctx.pathParam("code"))
-
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }
@@ -136,10 +135,10 @@ class AdminController(
         val hand = randomHand(null)
         successResponse(
             ctx, GenerateHandResponse(
-                north = hand[Position.NORTH]!!.joinToString(",") { cardToNotation(it) },
-                east = hand[Position.EAST]!!.joinToString(",") { cardToNotation(it) },
-                south = hand[Position.SOUTH]!!.joinToString(",") { cardToNotation(it) },
-                west = hand[Position.WEST]!!.joinToString(",") { cardToNotation(it) },
+                north = hand.getValue(Position.NORTH).joinToString(",") { cardToNotation(it) },
+                east = hand.getValue(Position.EAST).joinToString(",") { cardToNotation(it) },
+                south = hand.getValue(Position.SOUTH).joinToString(",") { cardToNotation(it) },
+                west = hand.getValue(Position.WEST).joinToString(",") { cardToNotation(it) },
             )
         )
     }

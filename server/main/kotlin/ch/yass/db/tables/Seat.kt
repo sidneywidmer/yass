@@ -86,7 +86,7 @@ open class Seat(
     /**
      * The column <code>public.seat.uuid</code>.
      */
-    val UUID: TableField<SeatRecord, String?> = createField(DSL.name("uuid"), SQLDataType.VARCHAR(37), this, "")
+    val UUID: TableField<SeatRecord, String?> = createField(DSL.name("uuid"), SQLDataType.VARCHAR(37).nullable(false), this, "")
 
     /**
      * The column <code>public.seat.created_at</code>.
@@ -101,12 +101,12 @@ open class Seat(
     /**
      * The column <code>public.seat.player_id</code>.
      */
-    val PLAYER_ID: TableField<SeatRecord, Int?> = createField(DSL.name("player_id"), SQLDataType.INTEGER, this, "")
+    val PLAYER_ID: TableField<SeatRecord, Int?> = createField(DSL.name("player_id"), SQLDataType.INTEGER.nullable(false), this, "")
 
     /**
      * The column <code>public.seat.game_id</code>.
      */
-    val GAME_ID: TableField<SeatRecord, Int?> = createField(DSL.name("game_id"), SQLDataType.INTEGER, this, "")
+    val GAME_ID: TableField<SeatRecord, Int?> = createField(DSL.name("game_id"), SQLDataType.INTEGER.nullable(false), this, "")
 
     /**
      * The column <code>public.seat.position</code>.

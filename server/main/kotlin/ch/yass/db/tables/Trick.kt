@@ -85,7 +85,7 @@ open class Trick(
     /**
      * The column <code>public.trick.uuid</code>.
      */
-    val UUID: TableField<TrickRecord, String?> = createField(DSL.name("uuid"), SQLDataType.VARCHAR(37), this, "")
+    val UUID: TableField<TrickRecord, String?> = createField(DSL.name("uuid"), SQLDataType.VARCHAR(37).nullable(false), this, "")
 
     /**
      * The column <code>public.trick.created_at</code>.
@@ -100,7 +100,7 @@ open class Trick(
     /**
      * The column <code>public.trick.hand_id</code>.
      */
-    val HAND_ID: TableField<TrickRecord, Int?> = createField(DSL.name("hand_id"), SQLDataType.INTEGER, this, "")
+    val HAND_ID: TableField<TrickRecord, Int?> = createField(DSL.name("hand_id"), SQLDataType.INTEGER.nullable(false), this, "")
 
     /**
      * The column <code>public.trick.north</code>.

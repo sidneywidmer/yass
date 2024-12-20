@@ -16,10 +16,10 @@ import org.jooq.JSON
 @Suppress("UNCHECKED_CAST")
 data class Game(
     var id: Int? = null,
-    var uuid: String? = null,
-    var createdAt: LocalDateTime? = null,
-    var updatedAt: LocalDateTime? = null,
-    var code: String? = null,
+    var uuid: String,
+    var createdAt: LocalDateTime,
+    var updatedAt: LocalDateTime,
+    var code: String,
     var settings: JSON? = null,
     var status: String? = null
 ): Serializable {
@@ -39,29 +39,13 @@ data class Game(
         }
         else if (this.id != o.id)
             return false
-        if (this.uuid == null) {
-            if (o.uuid != null)
-                return false
-        }
-        else if (this.uuid != o.uuid)
+        if (this.uuid != o.uuid)
             return false
-        if (this.createdAt == null) {
-            if (o.createdAt != null)
-                return false
-        }
-        else if (this.createdAt != o.createdAt)
+        if (this.createdAt != o.createdAt)
             return false
-        if (this.updatedAt == null) {
-            if (o.updatedAt != null)
-                return false
-        }
-        else if (this.updatedAt != o.updatedAt)
+        if (this.updatedAt != o.updatedAt)
             return false
-        if (this.code == null) {
-            if (o.code != null)
-                return false
-        }
-        else if (this.code != o.code)
+        if (this.code != o.code)
             return false
         if (this.settings == null) {
             if (o.settings != null)
@@ -82,10 +66,10 @@ data class Game(
         val prime = 31
         var result = 1
         result = prime * result + (if (this.id == null) 0 else this.id.hashCode())
-        result = prime * result + (if (this.uuid == null) 0 else this.uuid.hashCode())
-        result = prime * result + (if (this.createdAt == null) 0 else this.createdAt.hashCode())
-        result = prime * result + (if (this.updatedAt == null) 0 else this.updatedAt.hashCode())
-        result = prime * result + (if (this.code == null) 0 else this.code.hashCode())
+        result = prime * result + this.uuid.hashCode()
+        result = prime * result + this.createdAt.hashCode()
+        result = prime * result + this.updatedAt.hashCode()
+        result = prime * result + this.code.hashCode()
         result = prime * result + (if (this.settings == null) 0 else this.settings.hashCode())
         result = prime * result + (if (this.status == null) 0 else this.status.hashCode())
         return result

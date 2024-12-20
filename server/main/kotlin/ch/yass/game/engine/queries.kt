@@ -192,8 +192,11 @@ fun winningPositionOfTricks(hand: Hand, tricks: List<Trick>): Position =
  * See activePosition, this is just a helper to map a player to a position. We always have an active position
  * but not necessary a player already sitting there.
  */
-fun activePlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>, tricks: List<Trick>): Player? =
+fun activePlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>, tricks: List<Trick>): Player =
     playerAtPosition(activePosition(hands, seats, tricks), seats, players)
+
+fun maybeActivePlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>, tricks: List<Trick>): Player? =
+    maybePlayerAtPosition(activePosition(hands, seats, tricks), seats, players)
 
 context(Raise<GameAlreadyFull>)
 fun randomFreePosition(occupiedSeats: List<Seat>): Position {
@@ -323,7 +326,7 @@ fun withoutStoeck(weise: List<Weis>): List<Weis> = weise.filter { w -> w.type !=
 fun weisWinner(hand: Hand, tricks: List<Trick>): List<Position> {
     val points = weisPointsByPositionTotal(listOf(hand), tricks)
     return Team.entries
-        .associateWith { it.positions.sumOf { pos -> points[pos]!! } }
+        .associateWith { it.positions.sumOf { pos -> points.getValue(pos) } }
         .maxBy { it.value }
         .key.positions
 }

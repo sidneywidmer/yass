@@ -28,11 +28,11 @@ data class Hand(
         fun fromRecord(hand: HandRecord): Hand {
             return Hand(
                 hand.id!!,
-                UUID.fromString(hand.uuid)!!,
-                hand.createdAt!!,
-                hand.updatedAt!!,
+                UUID.fromString(hand.uuid),
+                hand.createdAt,
+                hand.updatedAt,
                 Position.entries.first { it.name == hand.startingPosition },
-                hand.gameId!!,
+                hand.gameId,
                 Trump.entries.first { it.name == hand.trump },
                 Gschobe.entries.first { it.name == hand.gschobe },
                 listFromDbJson<Card>(hand.north),

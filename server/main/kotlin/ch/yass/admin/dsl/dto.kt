@@ -13,10 +13,10 @@ data class GameSettingsDSL(val wcType: WinningConditionType, val wcValue: Int)
 data class HandDSL(
     val trump: Trump,
     val gschobe: Gschobe,
-    val north: HandPositionDSL,
-    val east: HandPositionDSL,
-    val south: HandPositionDSL,
-    val west: HandPositionDSL,
+    val north: HandPositionDSL?,
+    val east: HandPositionDSL?,
+    val south: HandPositionDSL?,
+    val west: HandPositionDSL?,
     val tricks: List<TrickDSL>
 ) {
     fun positions(): List<HandPositionDSL> = listOfNotNull(north, east, south, west)

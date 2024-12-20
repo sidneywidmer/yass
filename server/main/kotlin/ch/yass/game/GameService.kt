@@ -204,7 +204,7 @@ class GameService(
 
         weisWinner(hand, state.tricks).map { position ->
             val weise = hand.weiseOf(position).toMutableList()
-            val actions = withoutStoeck(remainingWeise[position]!!)
+            val actions = withoutStoeck(remainingWeise.getValue(position))
                 .map {
                     weise.add(it)
                     ShowWeis(position, it.toWeisWithPoints(hand.trump))
@@ -363,7 +363,7 @@ class GameService(
 
     context(Raise<GameError>)
     private fun trumpAsBot(state: GameState): GameState {
-        val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)!!
+        val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)
         if (!botPlayer.bot) {
             raise(PlayerIsNotBot(botPlayer, state))
         }
@@ -377,7 +377,7 @@ class GameService(
 
     context(Raise<GameError>)
     private fun playAsBot(state: GameState): GameState {
-        val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)!!
+        val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)
         if (!botPlayer.bot) {
             raise(PlayerIsNotBot(botPlayer, state))
         }
@@ -394,7 +394,7 @@ class GameService(
 
     context(Raise<GameError>)
     private fun schiebeAsBot(state: GameState): GameState {
-        val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)!!
+        val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)
         if (!botPlayer.bot) {
             raise(PlayerIsNotBot(botPlayer, state))
         }
@@ -409,7 +409,7 @@ class GameService(
 
     context(Raise<GameError>)
     private fun weisenAsBot(state: GameState): GameState {
-        val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)!!
+        val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)
 
         // TODO: Better decision
         val weis = chooseWeisForBot(botPlayer, state)

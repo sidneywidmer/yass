@@ -43,7 +43,7 @@ fun gameFinishedActions(state: GameState): List<Action> {
 
     // Calculate the sum of points for each pair
     val pointsSum = pairs.map { pair ->
-        val sum = points[pair.first]!!.total() + points[pair.second]!!.total()
+        val sum = points.getValue(pair.first).total() + points.getValue(pair.second).total()
         Pair(pair, sum)
     }
 

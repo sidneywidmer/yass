@@ -102,7 +102,7 @@ open class Hand(
     /**
      * The column <code>public.hand.game_id</code>.
      */
-    val GAME_ID: TableField<HandRecord, Int?> = createField(DSL.name("game_id"), SQLDataType.INTEGER, this, "")
+    val GAME_ID: TableField<HandRecord, Int?> = createField(DSL.name("game_id"), SQLDataType.INTEGER.nullable(false), this, "")
 
     /**
      * The column <code>public.hand.trump</code>.

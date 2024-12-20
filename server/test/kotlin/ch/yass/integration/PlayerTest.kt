@@ -150,15 +150,15 @@ class PlayerTest : Integration() {
 
     private fun checkPointsForHand2(state: GameState) {
         val points = pointsByPositionTotal(state.hands, state.tricks)
-        assertThat(points[Position.NORTH]!!.weisPoints, equalTo(40))
-        assertThat(points[Position.EAST]!!.weisPoints, equalTo(40))
-        assertThat(points[Position.SOUTH]!!.weisPoints, equalTo(140))
-        assertThat(points[Position.WEST]!!.weisPoints, equalTo(0))
+        assertThat(points.getValue(Position.NORTH).weisPoints, equalTo(40))
+        assertThat(points.getValue(Position.EAST).weisPoints, equalTo(40))
+        assertThat(points.getValue(Position.SOUTH).weisPoints, equalTo(140))
+        assertThat(points.getValue(Position.WEST).weisPoints, equalTo(0))
 
-        assertThat(points[Position.NORTH]!!.cardPoints, equalTo(179)) // Only change versus points in hand 1
-        assertThat(points[Position.EAST]!!.cardPoints, equalTo(26))
-        assertThat(points[Position.SOUTH]!!.cardPoints, equalTo(64))
-        assertThat(points[Position.WEST]!!.cardPoints, equalTo(102))
+        assertThat(points.getValue(Position.NORTH).cardPoints, equalTo(179)) // Only change versus points in hand 1
+        assertThat(points.getValue(Position.EAST).cardPoints, equalTo(26))
+        assertThat(points.getValue(Position.SOUTH).cardPoints, equalTo(64))
+        assertThat(points.getValue(Position.WEST).cardPoints, equalTo(102))
     }
 
     private fun playHand2Trick1(state: GameState): GameState {
@@ -200,15 +200,15 @@ class PlayerTest : Integration() {
 
     private fun checkPointsForHand1(state: GameState) {
         val points = pointsByPositionTotal(state.hands, state.tricks)
-        assertThat(points[Position.NORTH]!!.weisPoints, equalTo(40))
-        assertThat(points[Position.EAST]!!.weisPoints, equalTo(40))
-        assertThat(points[Position.SOUTH]!!.weisPoints, equalTo(140))
-        assertThat(points[Position.WEST]!!.weisPoints, equalTo(0))
+        assertThat(points.getValue(Position.NORTH).weisPoints, equalTo(40))
+        assertThat(points.getValue(Position.EAST).weisPoints, equalTo(40))
+        assertThat(points.getValue(Position.SOUTH).weisPoints, equalTo(140))
+        assertThat(points.getValue(Position.WEST).weisPoints, equalTo(0))
 
-        assertThat(points[Position.NORTH]!!.cardPoints, equalTo(122))
-        assertThat(points[Position.EAST]!!.cardPoints, equalTo(26))
-        assertThat(points[Position.SOUTH]!!.cardPoints, equalTo(64))
-        assertThat(points[Position.WEST]!!.cardPoints, equalTo(102))
+        assertThat(points.getValue(Position.NORTH).cardPoints, equalTo(122))
+        assertThat(points.getValue(Position.EAST).cardPoints, equalTo(26))
+        assertThat(points.getValue(Position.SOUTH).cardPoints, equalTo(64))
+        assertThat(points.getValue(Position.WEST).cardPoints, equalTo(102))
     }
 
     private fun playHand1Trick3To9(state: GameState): GameState {
@@ -278,14 +278,14 @@ class PlayerTest : Integration() {
 
     private fun checkPointsTrick2(state: GameState) {
         val points = pointsByPositionTotal(state.hands, state.tricks)
-        assertThat(points[Position.NORTH]!!.cardPoints, equalTo(0))
-        assertThat(points[Position.NORTH]!!.weisPoints, equalTo(40))
-        assertThat(points[Position.EAST]!!.cardPoints, equalTo(26))
-        assertThat(points[Position.EAST]!!.weisPoints, equalTo(40)) // +40 Stoeck
-        assertThat(points[Position.SOUTH]!!.cardPoints, equalTo(0))
-        assertThat(points[Position.SOUTH]!!.weisPoints, equalTo(140))
-        assertThat(points[Position.WEST]!!.cardPoints, equalTo(30)) // +30 (King plus Ace)
-        assertThat(points[Position.WEST]!!.weisPoints, equalTo(0))
+        assertThat(points.getValue(Position.NORTH).cardPoints, equalTo(0))
+        assertThat(points.getValue(Position.NORTH).weisPoints, equalTo(40))
+        assertThat(points.getValue(Position.EAST).cardPoints, equalTo(26))
+        assertThat(points.getValue(Position.EAST).weisPoints, equalTo(40)) // +40 Stoeck
+        assertThat(points.getValue(Position.SOUTH).cardPoints, equalTo(0))
+        assertThat(points.getValue(Position.SOUTH).weisPoints, equalTo(140))
+        assertThat(points.getValue(Position.WEST).cardPoints, equalTo(30)) // +30 (King plus Ace)
+        assertThat(points.getValue(Position.WEST).weisPoints, equalTo(0))
     }
 
     private fun playHand1Trick2(state: GameState): GameState {
@@ -325,14 +325,14 @@ class PlayerTest : Integration() {
     private fun checkPointsTrick1(state: GameState) {
         // All points are times 2 because trump is HEARTS
         val points = pointsByPositionTotal(state.hands, state.tricks)
-        assertThat(points[Position.NORTH]!!.cardPoints, equalTo(0))
-        assertThat(points[Position.NORTH]!!.weisPoints, equalTo(40)) // DREI_BLATT
-        assertThat(points[Position.EAST]!!.cardPoints, equalTo(26)) // 10 and Queen
-        assertThat(points[Position.EAST]!!.weisPoints, equalTo(0))
-        assertThat(points[Position.SOUTH]!!.cardPoints, equalTo(0))
-        assertThat(points[Position.SOUTH]!!.weisPoints, equalTo(140)) // DREI_BLATT and VIER_BLATT
-        assertThat(points[Position.WEST]!!.cardPoints, equalTo(0))
-        assertThat(points[Position.WEST]!!.weisPoints, equalTo(0))
+        assertThat(points.getValue(Position.NORTH).cardPoints, equalTo(0))
+        assertThat(points.getValue(Position.NORTH).weisPoints, equalTo(40)) // DREI_BLATT
+        assertThat(points.getValue(Position.EAST).cardPoints, equalTo(26)) // 10 and Queen
+        assertThat(points.getValue(Position.EAST).weisPoints, equalTo(0))
+        assertThat(points.getValue(Position.SOUTH).cardPoints, equalTo(0))
+        assertThat(points.getValue(Position.SOUTH).weisPoints, equalTo(140)) // DREI_BLATT and VIER_BLATT
+        assertThat(points.getValue(Position.WEST).cardPoints, equalTo(0))
+        assertThat(points.getValue(Position.WEST).weisPoints, equalTo(0))
     }
 
     private fun prepareHand2() {

@@ -99,7 +99,7 @@ fun expectedState(allowed: List<State>, state: State): Boolean = allowed.contain
 
 // activePlayer could _in theory_ be null if a game is not full and someone already plays a card
 fun playerHasActivePosition(player: Player, state: GameState): Boolean {
-    return activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)?.id == player.id
+    return maybeActivePlayer(state.hands, state.allPlayers, state.seats, state.tricks)?.id == player.id
 }
 
 fun isLastCard(cards: List<Card>) = cards.size == 1
@@ -125,7 +125,7 @@ fun isGameFinished(state: GameState): Boolean {
 
         WinningConditionType.POINTS -> {
             val points = pointsByPositionTotal(state.hands, state.tricks)
-            Team.entries.any { team -> team.positions.sumOf { points[it]!!.total() } >= settings.winningConditionValue }
+            Team.entries.any { team -> team.positions.sumOf { points.getValue(it).total() } >= settings.winningConditionValue }
         }
     }
 }

@@ -69,7 +69,7 @@ class HandBuilder(
         this.tricks = tricks
     }
 
-    fun build(): HandDSL = HandDSL(trump, gschobe, north!!, east!!, south!!, west!!, tricks)
+    fun build(): HandDSL = HandDSL(trump, gschobe, north, east, south, west, tricks)
 }
 
 class TricksBuilder(

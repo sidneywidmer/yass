@@ -14,10 +14,10 @@ import java.time.LocalDateTime
 @Suppress("UNCHECKED_CAST")
 data class Player(
     var id: Int? = null,
-    var uuid: String? = null,
-    var createdAt: LocalDateTime? = null,
-    var updatedAt: LocalDateTime? = null,
-    var name: String? = null,
+    var uuid: String,
+    var createdAt: LocalDateTime,
+    var updatedAt: LocalDateTime,
+    var name: String,
     var bot: Boolean? = null,
     var oryUuid: String? = null,
     var anonToken: String? = null
@@ -38,29 +38,13 @@ data class Player(
         }
         else if (this.id != o.id)
             return false
-        if (this.uuid == null) {
-            if (o.uuid != null)
-                return false
-        }
-        else if (this.uuid != o.uuid)
+        if (this.uuid != o.uuid)
             return false
-        if (this.createdAt == null) {
-            if (o.createdAt != null)
-                return false
-        }
-        else if (this.createdAt != o.createdAt)
+        if (this.createdAt != o.createdAt)
             return false
-        if (this.updatedAt == null) {
-            if (o.updatedAt != null)
-                return false
-        }
-        else if (this.updatedAt != o.updatedAt)
+        if (this.updatedAt != o.updatedAt)
             return false
-        if (this.name == null) {
-            if (o.name != null)
-                return false
-        }
-        else if (this.name != o.name)
+        if (this.name != o.name)
             return false
         if (this.bot == null) {
             if (o.bot != null)
@@ -87,10 +71,10 @@ data class Player(
         val prime = 31
         var result = 1
         result = prime * result + (if (this.id == null) 0 else this.id.hashCode())
-        result = prime * result + (if (this.uuid == null) 0 else this.uuid.hashCode())
-        result = prime * result + (if (this.createdAt == null) 0 else this.createdAt.hashCode())
-        result = prime * result + (if (this.updatedAt == null) 0 else this.updatedAt.hashCode())
-        result = prime * result + (if (this.name == null) 0 else this.name.hashCode())
+        result = prime * result + this.uuid.hashCode()
+        result = prime * result + this.createdAt.hashCode()
+        result = prime * result + this.updatedAt.hashCode()
+        result = prime * result + this.name.hashCode()
         result = prime * result + (if (this.bot == null) 0 else this.bot.hashCode())
         result = prime * result + (if (this.oryUuid == null) 0 else this.oryUuid.hashCode())
         result = prime * result + (if (this.anonToken == null) 0 else this.anonToken.hashCode())
