@@ -32,7 +32,7 @@ class HandsBuilder(private var hands: MutableList<HandDSL> = mutableListOf()) {
 }
 
 class HandBuilder(
-    private var trump: Trump? = null,
+    private var trump: Trump = Trump.NONE,
     private var gschobe: Gschobe = Gschobe.NOT_YET,
     private var north: HandPositionDSL? = null,
     private var east: HandPositionDSL? = null,
@@ -40,7 +40,7 @@ class HandBuilder(
     private var west: HandPositionDSL? = null,
     private var tricks: MutableList<TrickDSL> = mutableListOf(),
 ) {
-    fun trump(trump: Trump?) {
+    fun trump(trump: Trump) {
         this.trump = trump
     }
 
@@ -69,7 +69,7 @@ class HandBuilder(
         this.tricks = tricks
     }
 
-    fun build(): HandDSL = HandDSL(trump, gschobe, north!!, east!!, south!!, west!!, tricks)
+    fun build(): HandDSL = HandDSL(trump, gschobe, north, east, south, west, tricks)
 }
 
 class TricksBuilder(

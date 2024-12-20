@@ -68,14 +68,14 @@ fun maxBlattBySuit(cards: List<Card>): List<Card> {
 
         var counter: Int = rankValueAscending(card.rank) - 1
         while (setOfCards.contains(counter)) {
-            sequence.add(setOfCards[counter]!!)
+            sequence.add(setOfCards.getValue(counter))
             setOfCards.remove(counter)
             counter--
         }
 
         counter = rankValueAscending(card.rank) + 1
         while (setOfCards.contains(counter)) {
-            sequence.add(setOfCards[counter]!!)
+            sequence.add(setOfCards.getValue(counter))
             setOfCards.remove(counter)
             counter++
         }

@@ -43,7 +43,7 @@ fun gameFinishedActions(state: GameState): List<Action> {
 
     // Calculate the sum of points for each pair
     val pointsSum = pairs.map { pair ->
-        val sum = points[pair.first]!!.total() + points[pair.second]!!.total()
+        val sum = points.getValue(pair.first).total() + points.getValue(pair.second).total()
         Pair(pair, sum)
     }
 
@@ -118,7 +118,7 @@ fun gewiesenActions(state: GameState, weis: Weis, playedBy: Seat, seat: Seat): L
 
     // We don't need to show this weis to the player who just played it - they already know
     if (seat != playedBy) {
-        actions.add(ShowWeis(playedBy.position, weis.toWeisWithPoints(currentHand(state.hands).trump!!)))
+        actions.add(ShowWeis(playedBy.position, weis.toWeisWithPoints(currentHand(state.hands).trump)))
     }
 
     return actions
@@ -131,7 +131,7 @@ fun gewiesenActions(state: GameState, weis: Weis, playedBy: Seat, seat: Seat): L
 fun stoeckGewiesenActions(hand: Hand, weis: Weis, playedBy: Seat, state: GameState): List<Action> {
     val points = pointsByPositionTotal(state.hands, state.tricks)
     return listOf(
-        ShowWeis(playedBy.position, weis.toWeisWithPoints(hand.trump!!)),
+        ShowWeis(playedBy.position, weis.toWeisWithPoints(hand.trump)),
         UpdatePoints(points)
     )
 }

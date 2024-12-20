@@ -27,7 +27,7 @@ class PlayGameService(private val gameService: GameService) {
         val cards = cardsInHand(hand, player, state)
         val nextState = nextState(state)
         val active = activePosition(state.hands, state.seats, state.tricks)
-        val weise = hand.trump?.let { possibleWeiseWithPoints(hand.cardsOf(seat.position), hand.trump) }.orEmpty()
+        val weise = possibleWeiseWithPoints(hand.cardsOf(seat.position), hand.trump)
 
         return SeatState(seat.uuid, cards, seat.position, player, points, nextState, active, hand.trump, weise)
     }

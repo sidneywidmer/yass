@@ -20,10 +20,10 @@ data class Game(
         fun fromRecord(game: GameRecord): Game {
             return Game(
                 game.id!!,
-                UUID.fromString(game.uuid)!!,
-                game.createdAt!!,
-                game.updatedAt!!,
-                game.code!!,
+                UUID.fromString(game.uuid),
+                game.createdAt,
+                game.updatedAt,
+                game.code,
                 fromDbJson<GameSettings>(game.settings),
                 GameStatus.entries.first { it.name == game.status }
             )

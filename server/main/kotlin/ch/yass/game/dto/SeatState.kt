@@ -11,6 +11,6 @@ data class SeatState(
     val points: Points,
     val state: State,
     val activePosition: Position,
-    val trump: Trump?,
+    val trump: Trump,
     val weise: List<WeisWithPoints>,
 )

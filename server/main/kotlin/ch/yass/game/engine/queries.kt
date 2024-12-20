@@ -75,7 +75,7 @@ fun nextState(state: GameState): State {
     val position = activePosition(state.hands, state.seats, state.tricks)
     val player = playerAtPosition(position, state.seats, state.allPlayers)
     val tricks = tricksOfHand(state.tricks, hand)
-    val weise = hand.trump?.let { possibleWeise(hand.cardsOf(position), it) }.orEmpty()
+    val weise = possibleWeise(hand.cardsOf(position), hand.trump)
 
     // The order of these checks is VERY relevant
     return when {
@@ -186,13 +186,17 @@ fun winningPositionOfTrick(trick: Trick, lead: Position, trump: Trump): Position
  * the winner of the last trick in the tricks list.
  */
 fun winningPositionOfTricks(hand: Hand, tricks: List<Trick>): Position =
-    tricks.reversed().fold(hand.startingPosition) { lead, trick -> winningPositionOfTrick(trick, lead, hand.trump!!) }
+    tricks.reversed().fold(hand.startingPosition) { lead, trick -> winningPositionOfTrick(trick, lead, hand.trump) }
 
 /**
- * See activePosition, this is just a helper to map a player to a position.
+ * See activePosition, this is just a helper to map a player to a position. We always have an active position
+ * but not necessary a player already sitting there.
  */
-fun activePlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>, tricks: List<Trick>): Player? =
+fun activePlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>, tricks: List<Trick>): Player =
     playerAtPosition(activePosition(hands, seats, tricks), seats, players)
+
+fun maybeActivePlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>, tricks: List<Trick>): Player? =
+    maybePlayerAtPosition(activePosition(hands, seats, tricks), seats, players)
 
 context(Raise<GameAlreadyFull>)
 fun randomFreePosition(occupiedSeats: List<Seat>): Position {
@@ -216,7 +220,7 @@ fun playableCards(hand: Hand, cards: List<Card>): List<Card> =
             Trump.DIAMONDS,
             Trump.HEARTS,
             Trump.SPADES
-        ) -> cards.filterNot { it.suit != hand.trump?.toSuit() && it.rank == Rank.JACK }
+        ) -> cards.filterNot { it.suit != hand.trump.toSuit() && it.rank == Rank.JACK }
 
         else -> cards
     }
@@ -236,7 +240,7 @@ fun weisPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>): SplitPoin
         if (!validForWeis) return@fold accumulator
 
         val posToWeise = Position.entries.associateWithToEnum { pos ->
-            hand.weiseOf(pos).map { it.toWeisWithPoints(hand.trump!!) }
+            hand.weiseOf(pos).map { it.toWeisWithPoints(hand.trump) }
         }
 
         val posToPoints = posToWeise.mapValuesToEnum { it.value.sumOf { weis -> weis.points } }
@@ -287,7 +291,7 @@ fun cardPointsByPosition(hand: Hand, tricks: List<Trick>): SplitPoints {
     val positionToTricksMap = tricks.reversed().fold(
         PositionToTrickAccumulator(positionMap, hand.startingPosition)
     ) { accumulator, trick ->
-        val winner = winningPositionOfTrick(trick, accumulator.lead, hand.trump!!)
+        val winner = winningPositionOfTrick(trick, accumulator.lead, hand.trump)
         val wonTricks = accumulator.positions.getValue(winner) + trick
         PositionToTrickAccumulator(EnumMap(accumulator.positions).apply { put(winner, wonTricks) }, winner)
     }
@@ -295,7 +299,7 @@ fun cardPointsByPosition(hand: Hand, tricks: List<Trick>): SplitPoints {
     return positionToTricksMap.positions.mapValuesToEnum { (_, tricksOfPosition) ->
         tricksOfPosition.sumOf { trick ->
             // First means last played in this context, you get the bonus if the hand is complete
-            val bonus = multiplyByTrump(5, hand.trump!!)
+            val bonus = multiplyByTrump(5, hand.trump)
             val lastTrickBonus = if (trick.id == tricks.first().id && tricks.count() == 9) bonus else 0
             trick.cards().sumOf { card -> multiplyByTrump(cardPoints(card, hand.trump), hand.trump) } + lastTrickBonus
         }
@@ -322,7 +326,7 @@ fun withoutStoeck(weise: List<Weis>): List<Weis> = weise.filter { w -> w.type !=
 fun weisWinner(hand: Hand, tricks: List<Trick>): List<Position> {
     val points = weisPointsByPositionTotal(listOf(hand), tricks)
     return Team.entries
-        .associateWith { it.positions.sumOf { pos -> points[pos]!! } }
+        .associateWith { it.positions.sumOf { pos -> points.getValue(pos) } }
         .maxBy { it.value }
         .key.positions
 }
@@ -330,7 +334,7 @@ fun weisWinner(hand: Hand, tricks: List<Trick>): List<Position> {
 fun remainingWeise(hand: Hand): EnumMap<Position, List<Weis>> {
     val playedWeise = Position.entries.associateWithToEnum { withoutStoeck(hand.weiseOf(it)) }
     val possibleWeise = Position.entries
-        .associateWithToEnum { withoutStoeck(possibleWeise(hand.cardsOf(it), hand.trump!!)) }
+        .associateWithToEnum { withoutStoeck(possibleWeise(hand.cardsOf(it), hand.trump)) }
 
     return possibleWeise.mapValuesToEnum { (position, weise) ->
         weise.filterNot {

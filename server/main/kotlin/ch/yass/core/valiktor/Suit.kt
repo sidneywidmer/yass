@@ -1,7 +1,6 @@
 package ch.yass.core.valiktor
-
+import ch.yass.game.dto.Trump as TrumpEnum
 import ch.yass.game.dto.WinningConditionType
-import ch.yass.game.engine.playableTrumps
 import org.valiktor.Constraint
 import org.valiktor.Validator
 
@@ -14,7 +13,7 @@ fun <E> Validator<E>.Property<String?>.isSuit(): Validator<E>.Property<String?> 
 }
 
 fun <E> Validator<E>.Property<String?>.isTrump(): Validator<E>.Property<String?> = this.validate(Trump) {
-    it == null || playableTrumps().any { trump -> trump.name == it }
+    it == null || TrumpEnum.playable().any { trump -> trump.name == it }
 }
 
 fun <E> Validator<E>.Property<String?>.isWinningConditionType(): Validator<E>.Property<String?> =

@@ -11,7 +11,7 @@ fun toJson(value: Any?): String {
     return mapper.writeValueAsString(value)
 }
 
-fun toDbJson(value: Any?): JSON? = JSON.jsonOrNull(toJson(value))
+fun toDbJson(value: Any?): JSON = JSON.json(toJson(value))
 
 inline fun <reified T> listFromDbJson(json: JSON?): List<T> {
     val mapper = Yass.container.direct.instance<ObjectMapper>()

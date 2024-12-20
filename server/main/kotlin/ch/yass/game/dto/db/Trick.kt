@@ -5,7 +5,6 @@ import ch.yass.db.tables.records.TrickRecord
 import ch.yass.game.dto.Card
 import ch.yass.game.dto.CardOnTable
 import ch.yass.game.dto.Position
-import org.postgresql.core.Tuple
 import java.time.LocalDateTime
 import java.util.*
 
@@ -24,10 +23,10 @@ data class Trick(
         fun fromRecord(trick: TrickRecord): Trick {
             return Trick(
                 trick.id!!,
-                UUID.fromString(trick.uuid)!!,
-                trick.createdAt!!,
-                trick.updatedAt!!,
-                trick.handId!!,
+                UUID.fromString(trick.uuid),
+                trick.createdAt,
+                trick.updatedAt,
+                trick.handId,
                 fromDbJson(trick.north),
                 fromDbJson(trick.east),
                 fromDbJson(trick.south),

@@ -7,7 +7,7 @@ import ch.yass.game.dto.Trump
 import ch.yass.game.dto.db.Player
 
 data class Hand(
-    val trump: Trump?,
+    val trump: Trump,
     val gschobe: Gschobe,
     val startingPlayer: Player,
     val players: List<PlayerWithCards>,
