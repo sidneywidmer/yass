@@ -1,0 +1,21 @@
+{
+  "auth": {
+    "welcome": "Hallo!",
+    "guestPlay": "Als Gast spielen",
+    "continueWith": "oder",
+    "providers": {
+      "apple": "Mit Apple anmelden",
+      "google": "Mit Google anmelden"
+    },
+    "form": {
+      "email": "E-Mail",
+      "password": "Passwort",
+      "forgotPassword": "Passwort vergessen?",
+      "loginButton": "Anmelden"
+    },
+    "signup": {
+      "prompt": "Noch kein Konto?",
+      "link": "Registrieren"
+    }
+  }
+}
