@@ -1,0 +1,201 @@
+openapi: 3.0.0
+info:
+  title: Auth API
+  version: 1.0.0
+  description: API endpoints for authentication
+
+paths:
+  /auth/whoami:
+    get:
+      summary: Get current user information
+      operationId: whoami
+      tags:
+        - Auth
+      security:
+        - ory_session: [ ]
+        - anon_token: [ ]
+      responses:
+        '200':
+          description: Successfully retrieved user information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhoAmIResponse'
+        '401':
+          description: Unauthorized
+
+  /auth/connect:
+    post:
+      summary: WebSocket connection authentication
+      operationId: connect
+      tags:
+        - Internal
+      security:
+        - ory_session: [ ]
+        - anon_token: [ ]
+      responses:
+        '200':
+          description: Connection authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    properties:
+                      user:
+                        type: string
+                        format: uuid
+        '401':
+          description: Unauthorized
+
+  /auth/subscribe:
+    post:
+      summary: WebSocket channel subscription
+      operationId: subscribe
+      tags:
+        - Internal
+      security:
+        - ory_session: [ ]
+        - anon_token: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscribeRequest'
+      responses:
+        '200':
+          description: Subscription authorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+        '401':
+          description: Unauthorized
+
+  /auth/anon/signup:
+    post:
+      summary: Anonymous user signup
+      operationId: anonSignup
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnonSignupRequest'
+      responses:
+        '200':
+          description: Successfully created anonymous user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnonSignupResponse'
+        '422':
+          description: Validation error
+
+  /auth/anon/link:
+    post:
+      summary: Link anonymous account to Ory account
+      operationId: anonLink
+      tags:
+        - Auth
+      security:
+        - anon_token: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnonLinkRequest'
+      responses:
+        '200':
+          description: Successfully linked accounts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '401':
+          description: Unauthorized
+
+components:
+  securitySchemes:
+    ory_session:
+      type: apiKey
+      in: cookie
+      name: ory_kratos_session
+    anon_token:
+      type: apiKey
+      in: header
+      name: X-Anon-Token
+
+  schemas:
+    WhoAmIResponse:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: Unique identifier of the user
+        name:
+          type: string
+          description: Display name of the user
+      required:
+        - uuid
+        - name
+
+    SubscribeRequest:
+      type: object
+      properties:
+        channel:
+          type: string
+          pattern: "^seat:#[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          description: Channel identifier for WebSocket subscription
+      required:
+        - channel
+
+    AnonSignupRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 15
+          pattern: "^[a-zA-Z0-9]+$"
+          description: Username for anonymous account
+        anonToken:
+          type: string
+          minLength: 100
+          maxLength: 255
+          pattern: "^anonToken_.*$"
+          description: Token for anonymous authentication
+      required:
+        - name
+        - anonToken
+
+    AnonSignupResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Confirmed username for the anonymous account
+      required:
+        - name
+
+    AnonLinkRequest:
+      type: object
+      properties:
+        orySession:
+          type: string
+          description: Ory session token to link with anonymous account
+      required:
+        - orySession

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import Container from '@mui/material/Container';
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import Root from "../routes/Root.jsx";
 import Analyze from "../routes/Analyze.jsx";
