@@ -1,7 +1,61 @@
 {
+  "errors": {
+    "title": "Fehler",
+    "anonSignup": "Muss zwischen 3 und 15 Zeichen lang sein und darf nur Buchstaben und Zahlen enthalten",
+    "ory": {
+      "4000006": "E-Mail oder Passwort falsch",
+      "4000007": "Bitte verwende eine andere E-Mail",
+      "4000003": "Die Länge muss mindestens {{min_length}} sein, ist aber {{actual_length}}",
+      "4000004": "enthält ungültige Zeichen",
+      "4000017": "Die Länge darf maximal {{max_length}} sein, ist aber {{actual_length}}",
+      "4000032": "Die Länge muss mindestens {{min_length}} sein, ist aber {{actual_length}}",
+      "4000033": "Die Länge darf maximal {{max_length}} sein, ist aber {{actual_length}}",
+      "4000034": "Dieses Passwort wurde in Datenlecks gefunden und darf nicht mehr verwendet werden.",
+      "4010001": "Der Vorgang ist vor {expired_at_unix_since_minutes} Minuten abgelaufen, bitte versuchen Sie es erneut."
+    },
+    "network": {
+      "title": "Verbindungsfehler",
+      "description": "Yass Server konnte nicht erreicht werden"
+    },
+    "unauthorized": {
+      "title": "Nicht angemeldet",
+      "description": "Bitte melde dich an um fortzufahren",
+      "action": "Anmelden"
+    },
+    "forbidden": {
+      "title": "Zugriff verweigert",
+      "description": "Du hast keine Berechtigung für diese Aktion"
+    },
+    "validation": {
+      "title": "Ungültige Eingabe",
+      "description": "Bitte überprüfe deine Eingaben"
+    },
+    "server": {
+      "title": "Serverfehler",
+      "description": "Etwas ist schiefgelaufen. Bitte versuche es später erneut"
+    },
+    "unknown": {
+      "title": "Fehler",
+      "description": "Ein unerwarteter Fehler ist aufgetreten"
+    }
+  },
+  "main": {
+    "title": "Hallo",
+    "game": {
+      "codePlaceholder": "ABCDE",
+      "join": "Beitreten",
+      "create": "Spiel erstellen"
+    }
+  },
+  "logout": {
+    "prompt": {
+      "title": "Ausloggen",
+      "text": "Als Gast-User gehen alle deine Daten beim Ausloggen verloren. Bist du sicher, dass du fortfahren möchtest",
+      "cancel": "Abbrechen",
+      "confirm": "Ausloggen"
+    }
+  },
   "auth": {
-    "welcome": "Hallo!",
-    "guestPlay": "Als Gast spielen",
     "continueWith": "oder",
     "providers": {
       "apple": "Mit Apple anmelden",
@@ -11,11 +65,22 @@
       "email": "E-Mail",
       "password": "Passwort",
       "forgotPassword": "Passwort vergessen?",
-      "loginButton": "Anmelden"
+      "loginButton": "Anmelden",
+      "username": "Nickname"
+    },
+    "login": {
+      "guestPlay": "Als Gast spielen",
+      "title": "Hallo!",
+      "prompt": "Bereits registriert?",
+      "link": "Login"
     },
     "signup": {
+      "title": "Registrieren",
       "prompt": "Noch kein Konto?",
-      "link": "Registrieren"
+      "link": "Registrieren",
+      "guestProfile": "Gast-Profil",
+      "submit": "Los geht's",
+      "guestProfileInfo": "Das Gast-Profil ist nur auf diesem Gerät verfügbar,\n kann jedoch zu jedem Zeitpunkt in einen richtigen \nAccount umgewandelt werden."
     }
   }
 }

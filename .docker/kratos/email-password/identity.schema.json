@@ -30,7 +30,8 @@
           "type": "string",
           "title": "Player name",
           "minLength": 3,
-          "maxLength": 15
+          "maxLength": 15,
+          "pattern": "^[a-zA-Z0-9_-]+$"
         }
       },
       "required": [

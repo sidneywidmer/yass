@@ -24,10 +24,3 @@ export const useLangStore = create<LanguageState>()(
     }
   )
 );
-// export const useLangStore = create<LanguageState>((set) => ({
-//   language: 'de',
-//   setLanguage: (lang) => {
-//     i18n.changeLanguage(lang);
-//     set({language: lang});
-//   }
-// }));

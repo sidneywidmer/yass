@@ -1,17 +1,20 @@
+import {GalleryVerticalEnd} from "lucide-react";
+import {MainScreen} from "@/components/main-screen.tsx";
+
 export default function Root() {
   return (
     <>
-      <div className="min-h-screen bg-background">
-        <header className="border-b">
-          <div className="container flex h-16 items-center px-4">
-            <div className="flex-1">
-              <h1 className="text-lg font-bold">Your App</h1>
+      <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
+        <div className="flex w-full max-w-sm flex-col gap-6">
+          <a href="#" className="flex items-center gap-2 self-center font-medium">
+            <div
+              className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
+              <GalleryVerticalEnd className="size-4"/>
             </div>
-          </div>
-        </header>
-        <main className="container py-6 px-4">
-          <p>Hello</p>
-        </main>
+            Yass
+          </a>
+          <MainScreen/>
+        </div>
       </div>
     </>
   );

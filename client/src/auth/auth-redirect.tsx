@@ -1,6 +1,6 @@
 import {Navigate} from "react-router";
 import React from "react";
-import {useAuth} from "@/hooks/useAuth.tsx";
+import {useAuth} from "@/hooks/use-auth.tsx";
 
 interface AuthRedirectProps {
   children: React.ReactNode;
