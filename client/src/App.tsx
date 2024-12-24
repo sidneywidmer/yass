@@ -5,15 +5,21 @@ import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import {AuthGuard} from "@/auth/auth-guard.tsx";
 import {AuthRedirect} from "@/auth/auth-redirect.tsx";
 import '@/i18n';
+import {MainWrapper} from "@/components/main-wrapper.tsx";
+import Signup from "@/routes/signup.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <AuthGuard><Root/></AuthGuard>,
+    element: <AuthGuard><MainWrapper><Root/></MainWrapper></AuthGuard>,
   },
   {
     path: "/login",
-    element: <AuthRedirect><Login/></AuthRedirect>,
+    element: <AuthRedirect><MainWrapper><Login/></MainWrapper></AuthRedirect>,
+  },
+  {
+    path: "/signup",
+    element: <AuthRedirect><MainWrapper><Signup/></MainWrapper></AuthRedirect>,
   }
 ]);
 

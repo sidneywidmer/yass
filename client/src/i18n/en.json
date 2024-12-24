@@ -1,7 +1,60 @@
 {
+  "errors": {
+    "title": "Ooops",
+    "ory": {
+      "4000006": "E-Mail or password incorrect",
+      "4000007": "Please use a different E-Mail",
+      "4000003": "length must be >= {{min_length}}, but got {{actual_length}}",
+      "4000004": "contains invalid characters",
+      "4000017": "length must be <= {{max_length}}, but got {{actual_length}}",
+      "4000032": "length must be >= {{min_length}}, but got {{actual_length}}",
+      "4000033": "length must be <= {{max_length}}, but got {{actual_length}}",
+      "4000034": "The password has been found in data breaches and must no longer be used.",
+      "4010001": "The login flow expired {expired_at_unix_since_minutes} minutes ago, please try again."
+    },
+    "network": {
+      "title": "Network Error",
+      "description": "Could not reach Yass server"
+    },
+    "unauthorized": {
+      "title": "Unauthorized",
+      "description": "Please log in to continue",
+      "action": "Login"
+    },
+    "forbidden": {
+      "title": "Access Denied",
+      "description": "You don't have permission to perform this action"
+    },
+    "validation": {
+      "title": "Invalid Input",
+      "description": "Please check your input and try again"
+    },
+    "server": {
+      "title": "Server Error",
+      "description": "Something went wrong on our end. Please try again later"
+    },
+    "unknown": {
+      "title": "Error",
+      "description": "An unexpected error occurred"
+    }
+  },
+  "main": {
+    "title": "Hello",
+    "game": {
+      "codePlaceholder": "ABCDE",
+      "join": "Join",
+      "create": "Create game"
+    }
+  },
+  "logout": {
+    "prompt": {
+      "title": "Logout",
+      "text": "As guest user, all your data will be lost after logging out. Are you sure you want to continue?",
+      "cancel": "Cancel",
+      "confirm": "Logout"
+    }
+  },
   "auth": {
-    "welcome": "Welcome back",
-    "guestPlay": "Play as guest",
     "continueWith": "Or continue with",
     "providers": {
       "apple": "Login with Apple",
@@ -11,11 +64,22 @@
       "email": "Email",
       "password": "Password",
       "forgotPassword": "Forgot your password?",
-      "loginButton": "Login"
+      "loginButton": "Login",
+      "username": "Player name"
+    },
+    "login": {
+      "title": "Welcome back",
+      "guestPlay": "Play as guest",
+      "prompt": "Already signed up?",
+      "link": "Login"
     },
     "signup": {
       "prompt": "Don't have an account?",
-      "link": "Sign up"
+      "link": "Sign up",
+      "title": "Sign-up",
+      "guestProfile": "Guest-Profile",
+      "submit": "Let's play",
+      "guestProfileInfo": "The Guest-Profile ist only on this device available.\n Can be converted to a real account at any time."
     }
   }
 }

@@ -7,16 +7,18 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {useLangStore} from "@/store/language.ts";
 import {SupportedLanguage} from "@/types/language.ts";
+import {Button} from "@/components/ui/button.tsx";
 
 const LanguageSwitcher = () => {
-  const { setLanguage } = useLangStore();
+  const {setLanguage} = useLangStore();
 
   return (
     <div className="fixed top-4 right-4">
       <DropdownMenu>
-        <DropdownMenuTrigger
-          className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md border shadow-sm hover:bg-gray-50">
-          <Globe className="w-4 h-4"/>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="icon">
+            <Globe className="h-4 w-4"/>
+          </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem className="flex items-center gap-2" onSelect={() => setLanguage(SupportedLanguage.EN)}>

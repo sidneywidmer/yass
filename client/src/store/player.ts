@@ -1,22 +1,32 @@
 import {create} from 'zustand'
 
 interface PlayerState {
-  uuid?: string
+  oryUuid?: string
+  anonToken?: string
   name?: string
   isAuthenticated: boolean
-  setPlayer: (uuid: string, name: string) => void
-  wipe: () => void
+  isAnon: () => boolean
+  setOryPlayer: (uuid: string, name: string) => void
+  setAnonPlayer: (token: string, name: string) => void
+  logout: () => void
 }
 
-export const usePlayerStore = create<PlayerState>((set) => ({
+export const usePlayerStore = create<PlayerState>((set, get) => ({
   isAuthenticated: false,
-  setPlayer: (uuid, name) => set({
-    uuid,
+  isAnon: () => !!get().anonToken,
+  setAnonPlayer: (token, name) => set({
+    anonToken: token,
     name,
     isAuthenticated: true,
   }),
-  wipe: () => set({
-    uuid: undefined,
+  setOryPlayer: (oryUuid, name) => set({
+    oryUuid,
+    name,
+    isAuthenticated: true,
+  }),
+  logout: () => set({
+    oryUuid: undefined,
+    anonToken: undefined,
     name: undefined,
     isAuthenticated: false,
   })
