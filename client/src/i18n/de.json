@@ -39,6 +39,20 @@
       "description": "Ein unerwarteter Fehler ist aufgetreten"
     }
   },
+  "create": {
+    "title": "Spiel erstellen",
+    "description": "Erstelle ein neues Spiel mit verschiedenen Einstellungen",
+    "bots": "Bot-Spieler",
+    "winningCondition": "Spielende",
+    "points": "Punkte",
+    "hands": "Spiele",
+    "value": "Zielwert",
+    "submit": "Erstellen",
+    "botNorth": "Norden",
+    "botSouth": "Süden",
+    "botEast": "Osten",
+    "botWest": "Westen"
+  },
   "main": {
     "title": "Hallo",
     "game": {

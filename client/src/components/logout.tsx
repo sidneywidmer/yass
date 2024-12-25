@@ -15,7 +15,6 @@ import {
 import {useTranslation} from "react-i18next";
 import {useAnonTokenStore} from "@/store/anon-token.ts";
 import {ory} from "@/api/ory.ts";
-import {useLocation} from "react-router";
 import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 import {useNavigate} from "react-router-dom";
 

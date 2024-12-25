@@ -17,6 +17,8 @@ data class StringNoValidUUID(val string: String) : DomainError
 sealed interface ValidationError : DomainError
 data class JsonNotMappable(val targetClass: String?, val exception: Throwable?) : ValidationError
 data class ValiktorError(val violations: Set<ConstraintViolation>) : ValidationError
+data class GameSettingsMaxBots(val settings: GameSettings) : ValidationError
+data class GameSettingsInvalidValue(val settings: GameSettings) : ValidationError
 
 // Auth related Errors
 sealed interface AuthError : DomainError
@@ -41,8 +43,6 @@ data class InvalidState(val nextState: State, val state: GameState) : GameError
 data class TrumpInvalid(val trump: Trump) : GameError
 data class WeisInvalid(val weis: Weis) : GameError
 data class PlayerIsNotBot(val player: Player, val state: GameState) : GameError
-data class GameSettingsMaxBots(val settings: GameSettings) : GameError
-data class GameSettingsInvalidValue(val settings: GameSettings) : GameError
 
 // Db related Errors
 sealed interface DbError : DomainError

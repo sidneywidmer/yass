@@ -25,11 +25,161 @@ export type AnonSignupResponse = {
     name: string;
 };
 
+export type Card = {
+    suit?: Suit;
+    rank?: Rank;
+    skin?: string;
+};
+
+export type CardInHand = {
+    suit?: Suit;
+    rank?: Rank;
+    skin?: string;
+    state?: 'PLAYABLE' | 'UNPLAYABLE' | 'ALREADY_PLAYED';
+};
+
+export type state = 'PLAYABLE' | 'UNPLAYABLE' | 'ALREADY_PLAYED';
+
+export type CardOnTable = {
+    suit?: Suit;
+    rank?: Rank;
+    skin?: string;
+    position?: Position;
+};
+
+export type ChooseTrumpRequest = {
+    game: string;
+    trump: 'CLUBS' | 'SPADES' | 'HEARTS' | 'DIAMONDS' | 'UNEUFE' | 'OBEABE';
+};
+
+export type trump = 'CLUBS' | 'SPADES' | 'HEARTS' | 'DIAMONDS' | 'UNEUFE' | 'OBEABE';
+
+export type CreateCustomGameRequest = {
+    botNorth: boolean;
+    botEast: boolean;
+    botSouth: boolean;
+    botWest: boolean;
+    winningConditionType: 'HANDS' | 'POINTS';
+    winningConditionValue: number;
+};
+
+export type winningConditionType = 'HANDS' | 'POINTS';
+
+export type CreateCustomGameResponse = {
+    code?: string;
+};
+
+export type JoinGameRequest = {
+    code: string;
+};
+
+export type JoinGameResponse = {
+    gameUuid?: string;
+    code?: string;
+    seat?: SeatState;
+    cardsPlayed?: Array<CardOnTable>;
+    otherPlayers?: Array<PlayerAtTable>;
+};
+
+export type PingSeatRequest = {
+    seat: string;
+};
+
+export type PlayCardRequest = {
+    game: string;
+    card: PlayedCard;
+};
+
+export type PlayedCard = {
+    suit?: string;
+    rank?: string;
+    skin?: string;
+};
+
+export type Player = {
+    id?: number;
+    uuid?: string;
+    oryUuid?: string;
+    name?: string;
+    bot?: boolean;
+    anonToken?: string;
+    createdAt?: string;
+    updatedAt?: string;
+};
+
+export type PlayerAtTable = {
+    uuid?: string;
+    name?: string;
+    bot?: boolean;
+    position?: Position;
+    status?: 'CONNECTED' | 'DISCONNECTED' | 'BOT';
+};
+
+export type status = 'CONNECTED' | 'DISCONNECTED' | 'BOT';
+
+export type Position = 'NORTH' | 'EAST' | 'SOUTH' | 'WEST';
+
+export type Rank = 'SIX' | 'SEVEN' | 'EIGHT' | 'NINE' | 'TEN' | 'JACK' | 'QUEEN' | 'KING' | 'ACE' | 'HELLO';
+
+export type SchiebeRequest = {
+    game: string;
+    gschobe: 'YES' | 'NO';
+};
+
+export type gschobe = 'YES' | 'NO';
+
+export type SeatState = {
+    uuid?: string;
+    cards?: Array<CardInHand>;
+    position?: Position;
+    player?: Player;
+    points?: {
+        [key: string]: TotalPoints;
+    };
+    state?: State;
+    activePosition?: Position;
+    trump?: Trump;
+    weise?: Array<WeisWithPoints>;
+};
+
+export type State = 'WAITING_FOR_PLAYERS' | 'PLAY_CARD' | 'PLAY_CARD_BOT' | 'SCHIEBE' | 'SCHIEBE_BOT' | 'WEISEN_FIRST' | 'WEISEN_FIRST_BOT' | 'WEISEN_SECOND' | 'WEISEN_SECOND_BOT' | 'TRUMP' | 'TRUMP_BOT' | 'NEW_TRICK' | 'NEW_HAND' | 'FINISHED';
+
 export type SubscribeRequest = {
     /**
      * Channel identifier for WebSocket subscription
      */
     channel: string;
+};
+
+export type SuccessfulActionResponse = {
+    success?: boolean;
+};
+
+export type Suit = 'CLUBS' | 'DIAMONDS' | 'HEARTS' | 'SPADES' | 'WELCOME';
+
+export type TotalPoints = {
+    cardPoints?: number;
+    weisPoints?: number;
+};
+
+export type Trump = 'CLUBS' | 'DIAMONDS' | 'HEARTS' | 'SPADES' | 'OBEABE' | 'UNEUFE' | 'FREESTYLE';
+
+export type Weis = {
+    type?: WeisType;
+    cards?: Array<Card>;
+};
+
+export type WeisenRequest = {
+    game: string;
+    weis: Weis;
+};
+
+export type WeisType = 'DREI_BLATT' | 'VIER_BLATT' | 'FUENF_BLATT' | 'SECHS_BLATT' | 'SIEBEN_BLATT' | 'ACHT_BLATT' | 'NEUN_BLATT' | 'VIER_GLEICHE' | 'VIER_NELL' | 'VIER_BUUR' | 'STOECK';
+
+export type WeisWithPoints = {
+    type?: WeisType;
+    cards?: Array<Card>;
+    points?: number;
 };
 
 export type WhoAmIResponse = {
@@ -42,6 +192,62 @@ export type WhoAmIResponse = {
      */
     name: string;
 };
+
+export type PostGameCreateData = {
+    body: CreateCustomGameRequest;
+};
+
+export type PostGameCreateResponse = (CreateCustomGameResponse);
+
+export type PostGameCreateError = unknown;
+
+export type PostGameJoinData = {
+    body: JoinGameRequest;
+};
+
+export type PostGameJoinResponse = (JoinGameResponse);
+
+export type PostGameJoinError = unknown;
+
+export type PostGamePlayData = {
+    body: PlayCardRequest;
+};
+
+export type PostGamePlayResponse = (SuccessfulActionResponse);
+
+export type PostGamePlayError = unknown;
+
+export type PostGameTrumpData = {
+    body: ChooseTrumpRequest;
+};
+
+export type PostGameTrumpResponse = (SuccessfulActionResponse);
+
+export type PostGameTrumpError = unknown;
+
+export type PostGameWeisenData = {
+    body: WeisenRequest;
+};
+
+export type PostGameWeisenResponse = (SuccessfulActionResponse);
+
+export type PostGameWeisenError = unknown;
+
+export type PostGameSchiebeData = {
+    body: SchiebeRequest;
+};
+
+export type PostGameSchiebeResponse = (SuccessfulActionResponse);
+
+export type PostGameSchiebeError = unknown;
+
+export type PostGamePingData = {
+    body: PingSeatRequest;
+};
+
+export type PostGamePingResponse = (SuccessfulActionResponse);
+
+export type PostGamePingError = unknown;
 
 export type WhoamiResponse = (WhoAmIResponse);
 

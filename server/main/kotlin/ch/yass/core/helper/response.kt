@@ -21,6 +21,10 @@ fun errorResponse(ctx: Context, error: DomainError): Context {
 
     return when (error) {
         is ValiktorError -> ctx.status(422).json(groupValiktorViolations(error))
+        is ValidationError -> ctx.status(422).json(ErrorResponse("request validation failed", object {
+            val error = error.javaClass.name
+        }))
+
         is Unauthorized -> ctx.status(401)
             .json(ErrorResponse("ory authentication failed", error.exception.responseBody))
 

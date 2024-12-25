@@ -16,7 +16,7 @@ data class Seat(
     val uuid: UUID,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
-    val playerId: Int,
+    val playerId: Int?,  // is null if a bot is sitting here (also indicated by SeatStatus)
     val gameId: Int,
     val position: Position,
     val status: SeatStatus,

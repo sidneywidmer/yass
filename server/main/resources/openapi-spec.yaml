@@ -5,6 +5,124 @@ info:
   description: API endpoints for authentication
 
 paths:
+  /game/create:
+    post:
+      summary: Create a new game
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomGameRequest'
+      responses:
+        '200':
+          description: Game created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateCustomGameResponse'
+
+  /game/join:
+    post:
+      summary: Join an existing game
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JoinGameRequest'
+      responses:
+        '200':
+          description: Successfully joined game
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JoinGameResponse'
+
+  /game/play:
+    post:
+      summary: Play a card
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlayCardRequest'
+      responses:
+        '200':
+          description: Card played successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessfulActionResponse'
+
+  /game/trump:
+    post:
+      summary: Choose trump
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChooseTrumpRequest'
+      responses:
+        '200':
+          description: Trump chosen successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessfulActionResponse'
+
+  /game/weisen:
+    post:
+      summary: Declare weis
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WeisenRequest'
+      responses:
+        '200':
+          description: Weis declared successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessfulActionResponse'
+
+  /game/schiebe:
+    post:
+      summary: Schiebe action
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SchiebeRequest'
+      responses:
+        '200':
+          description: Schiebe action successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessfulActionResponse'
+
+  /game/ping:
+    post:
+      summary: Ping seat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PingSeatRequest'
+      responses:
+        '200':
+          description: Ping successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessfulActionResponse'
   /auth/whoami:
     get:
       summary: Get current user information
@@ -139,6 +257,299 @@ components:
       name: X-Anon-Token
 
   schemas:
+    CreateCustomGameRequest:
+      type: object
+      required:
+        - botNorth
+        - botEast
+        - botSouth
+        - botWest
+        - winningConditionType
+        - winningConditionValue
+      properties:
+        botNorth:
+          type: boolean
+        botEast:
+          type: boolean
+        botSouth:
+          type: boolean
+        botWest:
+          type: boolean
+        winningConditionType:
+          type: string
+          enum: [ HANDS, POINTS ]
+        winningConditionValue:
+          type: integer
+          minimum: 1
+          maximum: 10000
+
+    CreateCustomGameResponse:
+      type: object
+      properties:
+        code:
+          type: string
+
+    JoinGameRequest:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          pattern: "[A-Z\\d]{5}"
+
+    JoinGameResponse:
+      type: object
+      properties:
+        gameUuid:
+          type: string
+          format: uuid
+        code:
+          type: string
+        seat:
+          $ref: '#/components/schemas/SeatState'
+        cardsPlayed:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardOnTable'
+        otherPlayers:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlayerAtTable'
+
+    PlayCardRequest:
+      type: object
+      required:
+        - game
+        - card
+      properties:
+        game:
+          type: string
+          format: uuid
+        card:
+          $ref: '#/components/schemas/PlayedCard'
+
+    ChooseTrumpRequest:
+      type: object
+      required:
+        - game
+        - trump
+      properties:
+        game:
+          type: string
+          format: uuid
+        trump:
+          type: string
+          enum: [ CLUBS, SPADES, HEARTS, DIAMONDS, UNEUFE, OBEABE ]
+
+    WeisenRequest:
+      type: object
+      required:
+        - game
+        - weis
+      properties:
+        game:
+          type: string
+          format: uuid
+        weis:
+          $ref: '#/components/schemas/Weis'
+
+    SchiebeRequest:
+      type: object
+      required:
+        - game
+        - gschobe
+      properties:
+        game:
+          type: string
+          format: uuid
+        gschobe:
+          type: string
+          enum: [ YES, NO ]
+
+    PingSeatRequest:
+      type: object
+      required:
+        - seat
+      properties:
+        seat:
+          type: string
+          format: uuid
+
+    SuccessfulActionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: true
+
+    SeatState:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardInHand'
+        position:
+          $ref: '#/components/schemas/Position'
+        player:
+          $ref: '#/components/schemas/Player'
+        points:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/TotalPoints'
+        state:
+          $ref: '#/components/schemas/State'
+        activePosition:
+          $ref: '#/components/schemas/Position'
+        trump:
+          $ref: '#/components/schemas/Trump'
+        weise:
+          type: array
+          items:
+            $ref: '#/components/schemas/WeisWithPoints'
+
+    CardInHand:
+      type: object
+      properties:
+        suit:
+          $ref: '#/components/schemas/Suit'
+        rank:
+          $ref: '#/components/schemas/Rank'
+        skin:
+          type: string
+        state:
+          type: string
+          enum: [ PLAYABLE, UNPLAYABLE, ALREADY_PLAYED ]
+
+    CardOnTable:
+      type: object
+      properties:
+        suit:
+          $ref: '#/components/schemas/Suit'
+        rank:
+          $ref: '#/components/schemas/Rank'
+        skin:
+          type: string
+        position:
+          $ref: '#/components/schemas/Position'
+
+    PlayedCard:
+      type: object
+      properties:
+        suit:
+          type: string
+        rank:
+          type: string
+        skin:
+          type: string
+
+    Position:
+      type: string
+      enum: [ NORTH, EAST, SOUTH, WEST ]
+
+    Suit:
+      type: string
+      enum: [ CLUBS, DIAMONDS, HEARTS, SPADES, WELCOME ]
+
+    Rank:
+      type: string
+      enum: [ SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE, HELLO ]
+
+    Trump:
+      type: string
+      enum: [ CLUBS, DIAMONDS, HEARTS, SPADES, OBEABE, UNEUFE, FREESTYLE ]
+
+    State:
+      type: string
+      enum: [ WAITING_FOR_PLAYERS, PLAY_CARD, PLAY_CARD_BOT, SCHIEBE, SCHIEBE_BOT, WEISEN_FIRST, WEISEN_FIRST_BOT, WEISEN_SECOND, WEISEN_SECOND_BOT, TRUMP, TRUMP_BOT, NEW_TRICK, NEW_HAND, FINISHED ]
+
+    Weis:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WeisType'
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/Card'
+
+    WeisType:
+      type: string
+      enum: [ DREI_BLATT, VIER_BLATT, FUENF_BLATT, SECHS_BLATT, SIEBEN_BLATT, ACHT_BLATT, NEUN_BLATT, VIER_GLEICHE, VIER_NELL, VIER_BUUR, STOECK ]
+
+    WeisWithPoints:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/WeisType'
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/Card'
+        points:
+          type: integer
+
+    Card:
+      type: object
+      properties:
+        suit:
+          $ref: '#/components/schemas/Suit'
+        rank:
+          $ref: '#/components/schemas/Rank'
+        skin:
+          type: string
+
+    TotalPoints:
+      type: object
+      properties:
+        cardPoints:
+          type: integer
+        weisPoints:
+          type: integer
+
+    Player:
+      type: object
+      properties:
+        id:
+          type: integer
+        uuid:
+          type: string
+          format: uuid
+        oryUuid:
+          type: string
+          format: uuid
+        name:
+          type: string
+        bot:
+          type: boolean
+        anonToken:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PlayerAtTable:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        name:
+          type: string
+        bot:
+          type: boolean
+        position:
+          $ref: '#/components/schemas/Position'
+        status:
+          type: string
+          enum: [ CONNECTED, DISCONNECTED, BOT ]
     WhoAmIResponse:
       type: object
       properties:
