@@ -54,7 +54,7 @@ class GameService(
      * as configured in the settings. Then seat the player at a free position, deal everyone
      * some cards and start a fresh trick.
      */
-    context(Raise<GameError>)
+    context(Raise<DomainError>)
     fun create(request: CreateCustomGameRequest, player: Player): String {
         val settings = GameSettings.from(request)
 

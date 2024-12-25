@@ -46,6 +46,16 @@
       "create": "Create game"
     }
   },
+  "create": {
+    "title": "Create Game",
+    "description": "Create a new custom game with different settings",
+    "bots": "Bot Players",
+    "winningCondition": "Winning Condition",
+    "points": "Points",
+    "hands": "Hands",
+    "value": "Target Value",
+    "submit": "Create Game"
+  },
   "logout": {
     "prompt": {
       "title": "Logout",

@@ -2,10 +2,10 @@ import {Button} from "@/components/ui/button"
 import {Card, CardContent, CardHeader, CardTitle,} from "@/components/ui/card"
 import {Input} from "@/components/ui/input"
 import {useState} from "react";
-import {Plus} from "lucide-react";
 import {useTranslation} from "react-i18next";
 import {usePlayerStore} from "@/store/player.ts";
 import Logout from "@/components/logout.tsx";
+import {CreateGameOverlay} from "@/components/create-game-overlay.tsx";
 
 export function MainScreen() {
   const [gameCode, setGameCode] = useState("")
@@ -14,12 +14,12 @@ export function MainScreen() {
 
   const handleJoinGame = (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle join game
+    console.log(gameCode)
   }
 
   return (
     <>
-      <Logout />
+      <Logout/>
       <div className="container max-w-lg mx-auto p-4">
         <Card>
           <CardHeader className="text-center">
@@ -39,10 +39,7 @@ export function MainScreen() {
                   {t("main.game.join")}
                 </Button>
               </form>
-              <Button className="w-full" variant="outline">
-                <Plus className="mr-2 h-4 w-4"/>
-                {t("main.game.create")}
-              </Button>
+              <CreateGameOverlay/>
             </div>
           </CardContent>
         </Card>

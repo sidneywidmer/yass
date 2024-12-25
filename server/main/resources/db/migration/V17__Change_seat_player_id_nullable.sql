@@ -1,0 +1,2 @@
+ALTER TABLE seat
+    ALTER COLUMN player_id DROP NOT NULL;
