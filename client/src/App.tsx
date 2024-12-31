@@ -7,6 +7,7 @@ import {AuthRedirect} from "@/auth/auth-redirect.tsx";
 import '@/i18n';
 import {MainWrapper} from "@/components/main-wrapper.tsx";
 import Signup from "@/routes/signup.tsx";
+import Game from "@/routes/game.tsx";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
   {
     path: "/signup",
     element: <AuthRedirect><MainWrapper><Signup/></MainWrapper></AuthRedirect>,
+  },
+  {
+    path: "/game/:code",
+    element: <AuthGuard><MainWrapper><Game/></MainWrapper></AuthGuard>,
   }
 ]);
 

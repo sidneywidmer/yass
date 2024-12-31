@@ -10,6 +10,7 @@ import ch.yass.core.helper.toUUID
 import ch.yass.core.helper.validate
 import ch.yass.game.api.*
 import ch.yass.game.api.internal.GameState
+import ch.yass.game.dto.CardOnTable
 import ch.yass.game.dto.PlayerAtTable
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.SeatState

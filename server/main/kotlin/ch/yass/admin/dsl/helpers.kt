@@ -24,10 +24,10 @@ fun interpretCards(cards: String?): List<Card> {
     // Special for welcome hand
     if (cards == "welcome") {
         return listOf(
-            Card(Suit.WELCOME, Rank.HELLO, "french"),
-            Card(Suit.WELCOME, Rank.HELLO, "french"),
-            Card(Suit.WELCOME, Rank.HELLO, "french"),
-            Card(Suit.WELCOME, Rank.HELLO, "french")
+            Card(Suit.WELCOME, Rank.SIX, "french"),
+            Card(Suit.WELCOME, Rank.SEVEN, "french"),
+            Card(Suit.WELCOME, Rank.EIGHT, "french"),
+            Card(Suit.WELCOME, Rank.NINE, "french")
         )
     }
 

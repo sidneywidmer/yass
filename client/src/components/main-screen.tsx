@@ -4,22 +4,22 @@ import {Input} from "@/components/ui/input"
 import {useState} from "react";
 import {useTranslation} from "react-i18next";
 import {usePlayerStore} from "@/store/player.ts";
-import Logout from "@/components/logout.tsx";
 import {CreateGameOverlay} from "@/components/create-game-overlay.tsx";
+import {useNavigate} from "react-router-dom";
 
 export function MainScreen() {
   const [gameCode, setGameCode] = useState("")
   const {name} = usePlayerStore()
   const {t} = useTranslation()
+  const navigate = useNavigate()
 
   const handleJoinGame = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log(gameCode)
+    navigate(`/game/${gameCode}`)
   }
 
   return (
     <>
-      <Logout/>
       <div className="container max-w-lg mx-auto p-4">
         <Card>
           <CardHeader className="text-center">
