@@ -14,7 +14,6 @@ val rankMap = mapOf(
     Rank.QUEEN to "Q",
     Rank.KING to "K",
     Rank.ACE to "A",
-    Rank.HELLO to "H",
 )
 
 val suitMap = mapOf(

@@ -312,8 +312,17 @@ fun Weis.toWeisWithPoints(trump: Trump): WeisWithPoints =
 fun possibleWeiseWithPoints(cards: List<Card>, trump: Trump): List<WeisWithPoints> =
     possibleWeise(cards, trump).map { it.toWeisWithPoints(trump) }
 
-fun possibleWeise(cards: List<Card>, trump: Trump): List<Weis> =
-    blattWeise(cards) + gleicheWeise(cards) + stoeckWeis(cards, trump)
+/**
+ * If we have at least on weis (that is NOT stoeck) the player can also choose to skip and not weis at all.
+ */
+fun possibleWeise(cards: List<Card>, trump: Trump): List<Weis> {
+    val weise = blattWeise(cards) + gleicheWeise(cards) + stoeckWeis(cards, trump)
+    return if (weise.isNotEmpty() && !(weise.size == 1 && weise[0].type == WeisType.STOECK)) {
+        weise + listOf(Weis(WeisType.SKIP, emptyList()))
+    } else {
+        weise
+    }
+}
 
 /**
  * Can't have the same name since generics get erased at runtime.
@@ -337,8 +346,7 @@ fun remainingWeise(hand: Hand): EnumMap<Position, List<Weis>> {
         .associateWithToEnum { withoutStoeck(possibleWeise(hand.cardsOf(it), hand.trump)) }
 
     return possibleWeise.mapValuesToEnum { (position, weise) ->
-        weise.filterNot {
-            playedWeise.getValue(position).contains(it)
-        }
+        weise.filterNot { playedWeise.getValue(position).contains(it) }
+            .filterNot { it.type == WeisType.SKIP }
     }
 }

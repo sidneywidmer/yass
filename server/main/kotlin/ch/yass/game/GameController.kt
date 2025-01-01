@@ -2,6 +2,8 @@ package ch.yass.game
 
 import arrow.core.raise.either
 import arrow.core.raise.ensure
+import ch.yass.Yass
+import ch.yass.admin.dsl.interpretCards
 import ch.yass.core.contract.Controller
 import ch.yass.core.error.PlayerDoesNotOwnSeat
 import ch.yass.core.helper.errorResponse
@@ -21,6 +23,8 @@ import ch.yass.identity.helper.player
 import io.javalin.apibuilder.ApiBuilder.post
 import io.javalin.apibuilder.EndpointGroup
 import io.javalin.http.Context
+import org.kodein.di.direct
+import org.kodein.di.instance
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -61,6 +65,20 @@ class GameController(private val service: GameService, private val repo: GameRep
         val request = validate<CreateCustomGameRequest>(ctx.body())
         val player = player(ctx)
         val code = service.create(request, player)
+
+
+        // Has a DREI_BLATT for 20 Points (S9-SJ)
+        val cardsN = interpretCards("S9,S10,SJ,SA,DQ,D9,CK,CQ,H10")
+        // Will schiebe and has STOECK if west chooses HEARTS as trump (fingers crossed)
+        val cardsE = interpretCards("HQ,HK,H6,H7,DJ,DK,C6,C7,SQ")
+        // Has a VIER_BLATT for 50 Points (C8-CJ) and a DREI_BLATT for 20 Points (S6-S8)
+        val cardsS = interpretCards("C8,C9,C10,CJ,S6,S7,S8,CA,DA")
+        // Has a DREI_BLATT for 20 Points (D6-D9)
+        val cardsW = interpretCards("D6,D7,D8,D10,H8,H9,HJ,HA,SK")
+
+        // Manipulate our luck a little
+        val foresight: Foresight = Yass.container.direct.instance()
+        foresight.pushDeck(cardsN + cardsE + cardsS + cardsW)
 
         CreateCustomGameResponse(code)
     }.fold(

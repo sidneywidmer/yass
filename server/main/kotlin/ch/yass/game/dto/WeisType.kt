@@ -12,4 +12,5 @@ enum class WeisType {
     VIER_NELL,
     VIER_BUUR,
     STOECK,
+    SKIP, // Special Weis if the player doesn't want to weis (for whatever reason?)
 }

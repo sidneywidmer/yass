@@ -1,45 +1,90 @@
 import {create} from 'zustand'
-import {CardInHand, CardOnTable, JoinGameResponse} from "@/api/generated";
+import {
+  CardInHand,
+  CardOnTable,
+  JoinGameResponse,
+  Position,
+  State,
+  TotalPoints,
+  Trump,
+  WeisWithPoints
+} from "@/api/generated"
 
-interface GameState extends JoinGameResponse {
+type FlatGameState = Omit<JoinGameResponse, 'seat'> & {
   isConnected: boolean
-  setGameState: (state: JoinGameResponse) => void
-  reset: () => void,
-  removeCardFromHand: (card: CardInHand) => void,
-  playCard: (card: CardOnTable) => void,
-  setAllCardsUnplayable: () => void
+  uuid: string
+  cards: CardInHand[]
+  position?: Position
+  clearDirection?: Position
+  points: { [p: string]: TotalPoints }
+  state?: State
+  activePosition?: Position
+  trump?: Trump
+  weise: WeisWithPoints[]
+  otherWeise: { [position: string]: WeisWithPoints[] }
 }
 
-const initialState = {
+interface GameStateActions {
+  setGameState: (state: JoinGameResponse) => void
+  reset: () => void
+  removeCardFromHand: (card: CardInHand) => void
+  addCardsToHand: (cards: CardInHand[]) => void
+  playCard: (card: CardOnTable) => void
+  clearCards: (position: Position) => Promise<void>
+  addWeis: (position: string, weis: WeisWithPoints) => void
+  clearWeise: () => void
+}
+
+const initialState: FlatGameState = {
+  uuid: "",
   gameUuid: "",
   code: "",
-  seat: {},
+  cards: [],
+  points: {
+    NORTH: {cardPoints: 0, weisPoints: 0},
+    SOUTH: {cardPoints: 0, weisPoints: 0},
+    EAST: {cardPoints: 0, weisPoints: 0},
+    WEST: {cardPoints: 0, weisPoints: 0}
+  },
+  weise: [],
+  otherWeise: {},
   cardsPlayed: [],
   otherPlayers: [],
   isConnected: false
 }
 
-export const useGameStateStore = create<GameState>((set) => ({
+export const useGameStateStore = create<FlatGameState & GameStateActions>((set) => ({
   ...initialState,
-  setGameState: (state) => set({...state}),
+  setGameState: (response) => set({
+    ...response,
+    uuid: response.seat?.uuid ?? "",
+    cards: response.seat?.cards ?? [],
+    position: response.seat?.position,
+    points: response.seat?.points,
+    state: response.seat?.state,
+    activePosition: response.seat?.activePosition,
+    trump: response.seat?.trump,
+    weise: response.seat?.weise ?? []
+  }),
   reset: () => set(initialState),
   removeCardFromHand: (card) => set((state) => ({
-    seat: {
-      ...state.seat,
-      cards: state.seat!!.cards!!.filter(c => !(card.suit === c.suit && card.rank === c.rank)
-      )
-    }
+    cards: state.cards.filter(c => !(card.suit === c.suit && card.rank === c.rank))
   })),
-  setAllCardsUnplayable: () => set((state) => ({
-    seat: {
-      ...state.seat,
-      cards: state.seat!!.cards!!.filter((card) => card.state == "PLAYABLE").map(card => ({
-        ...card,
-        state: "UNPLAYABLE"
-      }))
-    }
-  })),
-  playCard: (card: CardOnTable) => set((state) => ({
+  playCard: (card) => set((state) => ({
     cardsPlayed: [...state.cardsPlayed!!, card]
   })),
+  addCardsToHand: (cards) => set({cards: cards}),
+  clearCards: async (position) => {
+    set({clearDirection: position})
+    // Wait for next render cycle, I have no idea if this is a good idea but for now it works #providurium :)
+    await new Promise(resolve => setTimeout(resolve, 0))
+    set({cardsPlayed: []})
+  },
+  addWeis: (position, weis) => set((state) => ({
+    otherWeise: {
+      ...state.otherWeise,
+      [position]: [...(state.otherWeise[position] || []), weis]
+    }
+  })),
+  clearWeise: () => set({otherWeise: {}})
 }))

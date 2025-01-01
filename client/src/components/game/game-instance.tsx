@@ -5,6 +5,11 @@ import {GameInfo} from "@/components/game/game-info.tsx";
 import {PlayerHand} from "@/components/game/player-hand.tsx";
 import {PlayedCards} from "@/components/game/played-cards.tsx";
 import {useEffect} from "react";
+import {WebSocketHandler} from "@/components/game/websocket-handler.tsx";
+import {PingHandler} from "@/components/game/ping-handler.tsx";
+import {ChooseTrump} from "@/components/game/choose-trump.tsx";
+import {Weisen} from "@/components/game/weisen.tsx";
+import {ShowWeise} from "@/components/game/show-weise.tsx";
 
 interface GameInstanceProps {
   tryCode: string
@@ -12,7 +17,7 @@ interface GameInstanceProps {
 
 export function GameInstance({tryCode}: GameInstanceProps) {
   const handleAxiosError = useAxiosErrorHandler()
-  const {setGameState, seat} = useGameStateStore()
+  const {setGameState} = useGameStateStore()
 
   useEffect(() => {
     api.joinGame({code: tryCode})
@@ -25,22 +30,16 @@ export function GameInstance({tryCode}: GameInstanceProps) {
       })
   }, [tryCode])
 
-  if (!seat?.uuid) {
-    return (
-      <p>Loading</p>
-    )
-  }
-
-  // render played cards, other players, my hand, points
   return (
     <div className="fixed inset-0 overflow-hidden">
       <GameInfo/>
       <PlayedCards/>
-      {/*<OpponentHand position="top"/>*/}
-      {/*<OpponentHand position="left"/>*/}
-      {/*<OpponentHand position="right"/>*/}
       <PlayerHand/>
-      {/*<WebSocketHandler/>*/}
+      <ChooseTrump/>
+      <Weisen/>
+      <ShowWeise />
+      <PingHandler/>
+      <WebSocketHandler/>
     </div>
   )
 }

@@ -15,5 +15,6 @@ fun weisPoints(type: WeisType): Int {
         WeisType.VIER_NELL -> 150
         WeisType.VIER_BUUR -> 200
         WeisType.STOECK -> 20
+        WeisType.SKIP -> 0
     }
 }

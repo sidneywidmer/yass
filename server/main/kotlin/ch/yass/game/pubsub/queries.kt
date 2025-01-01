@@ -30,10 +30,10 @@ fun newHandActions(state: GameState, seat: Seat): List<Action> {
 
     return listOf(
         UpdateActive(activePosition),
-        UpdateState(nextState),
-        UpdateHand(cards, true),
-        UpdatePoints(points),
         ClearPlayedCards(winningPos),
+        UpdateState(nextState),
+        UpdatePoints(points),
+        UpdateHand(cards, true),
     )
 }
 
@@ -74,9 +74,9 @@ fun newTrickActions(state: GameState, seat: Seat): List<Action> {
 
     return listOf(
         UpdateActive(activePosition),
+        ClearPlayedCards(winningPos!!),
         UpdateState(nextState),
         UpdateHand(cards, false),
-        ClearPlayedCards(winningPos!!)
     )
 }
 
@@ -116,8 +116,9 @@ fun gewiesenActions(state: GameState, weis: Weis, playedBy: Seat, seat: Seat): L
 
     val actions = listOf(UpdateActive(activePosition), UpdateState(nextState)).toMutableList()
 
-    // We don't need to show this weis to the player who just played it - they already know
-    if (seat != playedBy) {
+    // We don't need to show this weis to the player who just played it - they already know. Also, we don't need to
+    // show other players that they would have possible weise but chose to skip
+    if (seat != playedBy && weis.type != WeisType.SKIP) {
         actions.add(ShowWeis(playedBy.position, weis.toWeisWithPoints(currentHand(state.hands).trump)))
     }
 

@@ -103,6 +103,25 @@ class WeisenTest {
     }
 
     @Test
+    fun testSkipWeisOnlyIfOtherPresent() {
+        val cards = listOf(Card(Suit.CLUBS, Rank.EIGHT, ""))
+        val result = possibleWeise(cards, Trump.CLUBS)
+        assert(result.firstOrNull { it.type == WeisType.SKIP } === null)
+    }
+
+    @Test
+    fun testSkipWeis() {
+        val cards = listOf(
+            Card(Suit.CLUBS, Rank.NINE, ""),
+            Card(Suit.HEARTS, Rank.NINE, ""),
+            Card(Suit.SPADES, Rank.NINE, ""),
+            Card(Suit.DIAMONDS, Rank.NINE, ""),
+        )
+        val result = possibleWeise(cards, Trump.CLUBS)
+        assert(result.firstOrNull { it.type == WeisType.SKIP } !== null)
+    }
+
+    @Test
     fun testCrossWeis() {
         val cards = listOf(
             Card(Suit.CLUBS, Rank.EIGHT, ""),
