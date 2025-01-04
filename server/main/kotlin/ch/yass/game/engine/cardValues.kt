@@ -35,7 +35,6 @@ fun rankValueAscending(rank: Rank): Int = when (rank) {
     Rank.QUEEN -> 7
     Rank.KING -> 8
     Rank.ACE -> 9
-    else -> 0
 }
 
 fun rankValueDescending(rank: Rank): Int = when (rank) {
@@ -48,6 +47,5 @@ fun rankValueDescending(rank: Rank): Int = when (rank) {
     Rank.QUEEN -> 3
     Rank.KING -> 2
     Rank.ACE -> 1
-    else -> 0
 }
 

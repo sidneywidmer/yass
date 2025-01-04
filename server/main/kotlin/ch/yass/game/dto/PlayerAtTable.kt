@@ -1,8 +1,5 @@
 package ch.yass.game.dto
 
-import ch.yass.db.tables.references.PLAYER
-import ch.yass.db.tables.references.SEAT
-import org.jooq.Record
 import java.util.*
 
 data class PlayerAtTable(

@@ -44,7 +44,7 @@ class WelcomeHandTest : Integration() {
                     south(cards = "welcome")
                     west(cards = "welcome")
                     tricks {
-                        trick(north = "WH", east = "WH", south = "WH", west = null)
+                        trick(north = "W6", east = "W6", south = "W6", west = null)
                     }
                 }
             }
@@ -56,7 +56,7 @@ class WelcomeHandTest : Integration() {
         val state = getState()
 
         val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
-        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "HELLO", "french"))
+        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "SIX", "french"))
 
         fold(
             { service.play(request, player) },
@@ -85,7 +85,7 @@ class WelcomeHandTest : Integration() {
 
         // WEST plays the last missing card in this trick -> should result in a new hand
         val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
-        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "HELLO", "french"))
+        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "SIX", "french"))
 
         // TODO: don't launch in global scope, manage this somehow
         fold(
@@ -104,7 +104,7 @@ class WelcomeHandTest : Integration() {
         val unknonwId = "b562227b-cc63-48cc-919e-9a115bbf7c6e"
 
         val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
-        val request = PlayCardRequest(unknonwId, PlayedCard("WELCOME", "HELLO", "french"))
+        val request = PlayCardRequest(unknonwId, PlayedCard("WELCOME", "SIX", "french"))
 
         fold(
             { service.play(request, player) },

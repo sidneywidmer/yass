@@ -91,5 +91,11 @@
       "submit": "Let's play",
       "guestProfileInfo": "The Guest-Profile ist only on this device available.\n Can be converted to a real account at any time."
     }
+  },
+  "weisen": {
+    "title": "Weisen",
+    "description": "Choose cards for your weis",
+    "points": "Points",
+    "zeroWeis": "0 Points weisen"
   }
 }

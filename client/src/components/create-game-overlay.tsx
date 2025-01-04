@@ -11,6 +11,7 @@ import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler"
 import {CreateCustomGameRequest} from "@/api/generated";
 import {DialogDescription} from "@radix-ui/react-dialog";
 import {useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 type Position = 'North' | 'East' | 'South' | 'West'
 type BotKey = `bot${Position}`
@@ -19,6 +20,7 @@ export function CreateGameOverlay() {
   const {t} = useTranslation()
   const handleAxiosError = useAxiosErrorHandler()
   const [open, setOpen] = useState(false)
+  const navigate = useNavigate()
   const [settings, setSettings] = useState<CreateCustomGameRequest>({
     botNorth: true,
     botEast: true,
@@ -30,7 +32,10 @@ export function CreateGameOverlay() {
 
   const handleCreate = () => {
     api.createGame(settings)
-      .then(() => setOpen(false))
+      .then((response) => {
+        setOpen(false)
+        navigate(`/game/${response.data?.code}`)
+      })
       .catch(handleAxiosError)
   }
 

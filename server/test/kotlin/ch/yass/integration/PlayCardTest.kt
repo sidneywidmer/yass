@@ -41,7 +41,7 @@ class PlayCardTest : Integration() {
                     south(cards = "welcome")
                     west(cards = "welcome")
                     tricks {
-                        trick(north = "WH", east = "WH", south = "WH", west = "WH")
+                        trick(north = "W6", east = "W6", south = "W6", west = "W6")
                     }
                 }
                 hand {
