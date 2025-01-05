@@ -29,15 +29,12 @@ class AuthMiddleware(
             return
         }
 
-        val anonToken = ctx.headerMap()["X-Anon-Token"]
+        val anonToken = ctx.cookieMap()["anon_token"]
         val maybePlayer = either {
             if (anonToken != null) {
                 ensureNotNull(playerService.getByAnonToken(anonToken)) { InvalidAnonToken(anonToken) }
             } else {
-                val session = getSession(
-                    ctx.headerMap()["X-Session-Token"],
-                    ctx.cookieMap()["ory_kratos_session"]
-                )
+                val session = getSession(ctx.cookieMap()["ory_kratos_session"])
                 playerService.fromSession(session)
             }
         }
@@ -49,8 +46,8 @@ class AuthMiddleware(
     }
 
     context(Raise<Unauthorized>)
-    private fun getSession(session: String?, cookie: String?): Session =
+    private fun getSession(cookie: String?): Session =
         catch({
-            oryClient.frontend.toSession(session, cookie?.let { "ory_kratos_session=$cookie" }, null)
+            oryClient.frontend.toSession(null, cookie?.let { "ory_kratos_session=$cookie" }, null)
         }) { e: ApiException -> raise(Unauthorized(e)) }
 }

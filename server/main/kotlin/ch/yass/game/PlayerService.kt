@@ -5,6 +5,8 @@ import arrow.core.raise.ensure
 import ch.yass.core.error.CanNotLinkAnonAccount
 import ch.yass.core.error.OryIdentityWithoutName
 import ch.yass.core.error.StringNoValidUUID
+import ch.yass.core.helper.createToken
+import ch.yass.core.helper.hashToken
 import ch.yass.core.helper.toUUID
 import ch.yass.db.tables.references.PLAYER
 import ch.yass.game.api.internal.NewAnonPlayer
@@ -17,6 +19,8 @@ import com.google.gson.internal.LinkedTreeMap
 import org.jooq.DSLContext
 import sh.ory.model.Identity
 import sh.ory.model.Session
+import java.security.MessageDigest
+import java.security.SecureRandom
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
@@ -42,7 +46,7 @@ class PlayerService(private val db: DSLContext) {
 
     fun getByAnonToken(token: String): Player? {
         return db.selectFrom(PLAYER)
-            .where(PLAYER.ANON_TOKEN.eq(token))
+            .where(PLAYER.ANON_TOKEN.eq(hashToken(token)))
             .fetchOneInto(Player::class.java)
     }
 
@@ -85,7 +89,7 @@ class PlayerService(private val db: DSLContext) {
             oryUuid = null,
             name = player.name,
             bot = false,
-            anonToken = player.anonToken
+            anonToken = player.hashedToken
         )
     }
 
@@ -102,6 +106,14 @@ class PlayerService(private val db: DSLContext) {
             .where(PLAYER.UUID.eq(player.uuid.toString()))
             .returningResult(PLAYER)
             .fetchOneInto(Player::class.java)!!
+    }
+
+    fun resetAnonToken(player: Player) {
+        db.update(PLAYER)
+            .setNull(PLAYER.ANON_TOKEN)
+            .set(PLAYER.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
+            .where(PLAYER.UUID.eq(player.uuid.toString()))
+            .execute()
     }
 
     private fun createInternal(uuid: UUID, oryUuid: UUID?, name: String, bot: Boolean, anonToken: String?): Player {
