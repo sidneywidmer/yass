@@ -22,7 +22,7 @@ class CreateCustomGameTest : Integration() {
 
     @Test
     fun testNormalCustomGame() {
-        var player = playerService.create(NewAnonPlayer("Fooo", "TOKEN"))
+        var player = playerService.create(NewAnonPlayer("Fooo", "HASHED_TOKEN"))
         var request = CreateCustomGameRequest(false, true, true, true, "POINTS", 2500)
 
         val gameCode = recover({ gameService.create(request, player) }) { fail() }

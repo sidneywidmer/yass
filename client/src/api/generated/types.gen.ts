@@ -12,10 +12,6 @@ export type AnonSignupRequest = {
      * Username for anonymous account
      */
     name: string;
-    /**
-     * Token for anonymous authentication
-     */
-    anonToken: string;
 };
 
 export type AnonSignupResponse = {
@@ -191,6 +187,10 @@ export type WhoAmIResponse = {
      * Display name of the user
      */
     name: string;
+    /**
+     * Differentiate ory and anonymous users
+     */
+    isAnon: boolean;
 };
 
 export type PostGameCreateData = {
@@ -272,6 +272,14 @@ export type SubscribeResponse = ({
 });
 
 export type SubscribeError = (unknown);
+
+export type AnonLogoutResponse = ({
+    result?: {
+        [key: string]: unknown;
+    };
+});
+
+export type AnonLogoutError = unknown;
 
 export type AnonSignupData = {
     body: AnonSignupRequest;

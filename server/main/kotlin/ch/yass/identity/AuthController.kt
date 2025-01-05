@@ -6,7 +6,9 @@ import arrow.core.raise.ensure
 import arrow.core.raise.ensureNotNull
 import ch.yass.core.contract.Controller
 import ch.yass.core.error.*
+import ch.yass.core.helper.createToken
 import ch.yass.core.helper.errorResponse
+import ch.yass.core.helper.hashToken
 import ch.yass.core.helper.successResponse
 import ch.yass.core.helper.toUUID
 import ch.yass.core.helper.validate
@@ -22,6 +24,8 @@ import io.javalin.apibuilder.ApiBuilder.get
 import io.javalin.apibuilder.ApiBuilder.post
 import io.javalin.apibuilder.EndpointGroup
 import io.javalin.http.Context
+import io.javalin.http.Cookie
+import io.javalin.http.SameSite
 import sh.ory.ApiException
 import sh.ory.model.Session
 
@@ -37,6 +41,7 @@ class AuthController(
         post("/connect", ::connect)
         post("/subscribe", ::subscribe)
         post("/anon/signup", ::anonSignup, EndpointRole.PUBLIC)
+        get("/anon/logout", ::anonLogout)
         post("/anon/link", ::anonLink)
     }
 
@@ -66,13 +71,37 @@ class AuthController(
     private fun anonSignup(ctx: Context) {
         either {
             val request = validate<AnonSignupRequest>(ctx.body())
-            playerService.create(NewAnonPlayer(request.name, request.anonToken))
+            val token = createToken()
+            playerService.create(NewAnonPlayer(request.name, hashToken(token)))
 
+            ctx.cookie(
+                Cookie("anon_token", token).apply {
+                    isHttpOnly = true
+                    path = "/"
+                    sameSite = SameSite.LAX
+                    maxAge = 60 * 60 * 24 * 365 // 1 year
+                }
+            )
             AnonSignupResponse(request.name)
         }.fold(
             { errorResponse(ctx, it) },
             { successResponse(ctx, it) }
         )
+    }
+
+    private fun anonLogout(ctx: Context) {
+        playerService.resetAnonToken(player(ctx))
+        ctx.cookie(
+            Cookie("anon_token", "").apply {
+                isHttpOnly = true
+                path = "/"
+                sameSite = SameSite.LAX
+                maxAge = 0
+            }
+        )
+        successResponse(ctx, object {
+            val result = object {}
+        })
     }
 
     private fun whoami(ctx: Context) {

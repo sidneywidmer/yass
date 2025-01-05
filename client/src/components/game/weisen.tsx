@@ -9,6 +9,7 @@ import {Weis} from "@/api/generated";
 import {useTranslation} from "react-i18next";
 
 export function Weisen() {
+  const isMyPos = useGameStateStore((state) => state.activePosition === state.position)
   const {state, weise, gameUuid, otherWeise} = useGameStateStore()
   const [open, setOpen] = useState(true)
   const handleAxiosError = useAxiosErrorHandler()
@@ -16,7 +17,7 @@ export function Weisen() {
 
   // It's possible that we still display weis of other players - wait with opening
   // this overlay so we don't have two open == bad UX
-  if (state !== "WEISEN_FIRST" || Object.entries(otherWeise).length > 0) {
+  if (state !== "WEISEN_FIRST" || Object.entries(otherWeise).length > 0 || !isMyPos ) {
     return
   }
 

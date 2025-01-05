@@ -6,9 +6,10 @@ import java.util.*
 data class WhoAmIResponse(
     val uuid: UUID,
     val name: String,
+    val isAnon: Boolean
 ) {
     companion object {
-        fun from(player: Player): WhoAmIResponse = WhoAmIResponse(player.uuid, player.name)
+        fun from(player: Player): WhoAmIResponse = WhoAmIResponse(player.uuid, player.name, player.oryUuid == null)
     }
 }
 

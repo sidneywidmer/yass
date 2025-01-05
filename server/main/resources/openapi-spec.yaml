@@ -196,6 +196,26 @@ paths:
         '401':
           description: Unauthorized
 
+  /auth/anon/logout:
+    get:
+      tags:
+        - Auth
+      operationId: anonLogout
+      summary: Clear anonymous user token, effectively logging the user out
+      security:
+        - anon: [ ]
+      responses:
+        '200':
+          description: Successfully logged out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    additionalProperties: false
+
   /auth/anon/signup:
     post:
       summary: Anonymous user signup
@@ -560,9 +580,13 @@ components:
         name:
           type: string
           description: Display name of the user
+        isAnon:
+          type: boolean
+          description: Differentiate ory and anonymous users
       required:
         - uuid
         - name
+        - isAnon
 
     SubscribeRequest:
       type: object
@@ -583,12 +607,6 @@ components:
           maxLength: 15
           pattern: "^[a-zA-Z0-9]+$"
           description: Username for anonymous account
-        anonToken:
-          type: string
-          minLength: 100
-          maxLength: 255
-          pattern: "^anonToken_.*$"
-          description: Token for anonymous authentication
       required:
         - name
         - anonToken

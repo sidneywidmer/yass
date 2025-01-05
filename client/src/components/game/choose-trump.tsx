@@ -9,6 +9,7 @@ import {Trump} from "@/api/generated";
 export function ChooseTrump() {
   const handleAxiosError = useAxiosErrorHandler()
   const {state, gameUuid} = useGameStateStore()
+  const isMyPos = useGameStateStore((state) => state.activePosition === state.position)
 
   /**
    * We handle 3 cases  here:
@@ -30,7 +31,7 @@ export function ChooseTrump() {
     return action.catch(handleAxiosError)
   }
 
-  if (state !== "SCHIEBE" && state !== "TRUMP") {
+  if ((state !== "SCHIEBE" && state !== "TRUMP") || !isMyPos) {
     return
   }
 

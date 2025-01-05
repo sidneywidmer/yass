@@ -13,21 +13,20 @@ import {
   AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import {useTranslation} from "react-i18next";
-import {useAnonTokenStore} from "@/store/anon-token.ts";
 import {ory} from "@/api/ory.ts";
 import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 import {useNavigate} from "react-router-dom";
+import {api} from "@/api/client.ts";
 
 const Logout = () => {
   const {t} = useTranslation()
   const {isAnon, logout} = usePlayerStore()
   const [showAlert, setShowAlert] = useState(false)
-  const {clearToken} = useAnonTokenStore()
   const navigate = useNavigate()
   const handleError = useAxiosErrorHandler()
 
   const handleMaybeLogout = () => {
-    if (isAnon()) {
+    if (isAnon) {
       setShowAlert(true)
       return
     }
@@ -37,10 +36,13 @@ const Logout = () => {
   const handleRealLogout = () => {
     setShowAlert(false)
 
-    if (isAnon()) {
-      logout()
-      clearToken()
-      navigate('/login')
+    if (isAnon) {
+      api.anonLogout()
+        .catch(handleError)
+        .finally(() => {
+          logout()
+          navigate('/login')
+        })
       return
     }
 
@@ -57,7 +59,7 @@ const Logout = () => {
 
   return (
     <>
-      <div className="fixed top-4 right-16">
+      <div className="fixed top-4 right-16 z-10">
         <Button
           variant="outline"
           size="icon"
