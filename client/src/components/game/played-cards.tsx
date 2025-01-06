@@ -3,23 +3,10 @@ import {useGameStateStore} from "@/store/game-state"
 import {Card, CARD_HEIGHT, CARD_WIDTH} from "@/components/game/card.tsx";
 import {Position} from "@/api/generated";
 import {useMemo} from "react";
+import {getRelativePosition} from "@/lib/utils.ts";
 
 export function PlayedCards() {
   const {clearDirection, cardsPlayed, position} = useGameStateStore()
-
-  const POSITIONS: Position[] = ['NORTH', 'EAST', 'SOUTH', 'WEST']
-  const getRelativePosition = (absolutePosition: Position): Position => {
-    let southOffset = 2 - POSITIONS.indexOf(position!!)
-    let newPos = POSITIONS.indexOf(absolutePosition) + southOffset
-
-    if (newPos > 3) {
-      newPos = newPos % 4
-    } else if (newPos == -1) {
-      newPos = 3
-    }
-
-    return POSITIONS[newPos]
-  }
 
   // For every trick, choose a bit a different rotation to keep it visually interesting
   const cardRotations = useMemo(() => ({
@@ -64,7 +51,7 @@ export function PlayedCards() {
   }
 
   const handleExit = () => {
-    return getInitialPosition(getRelativePosition(clearDirection!!), true)
+    return getInitialPosition(getRelativePosition(position!!, clearDirection!!), true)
   }
 
   return (
@@ -76,9 +63,9 @@ export function PlayedCards() {
               layoutId={`cardlayout-${card.position}-${card.suit}-${card.rank}`}
               key={`cardtable-${card.position}-${card.suit}-${card.rank}`}
               className="absolute origin-center"
-              initial={getInitialPosition(getRelativePosition(card.position!!))}
+              initial={getInitialPosition(getRelativePosition(position!!, card.position!!))}
               animate={{
-                ...getPosition(getRelativePosition(card.position!!)),
+                ...getPosition(getRelativePosition(position!!, card.position!!)),
                 opacity: 1
               }}
               transition={{type: "tween", duration: 0.3}}

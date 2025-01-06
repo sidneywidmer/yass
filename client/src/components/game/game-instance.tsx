@@ -10,6 +10,7 @@ import {PingHandler} from "@/components/game/ping-handler.tsx";
 import {ChooseTrump} from "@/components/game/choose-trump.tsx";
 import {Weisen} from "@/components/game/weisen.tsx";
 import {ShowWeise} from "@/components/game/show-weise.tsx";
+import OtherPlayers from "@/components/game/other-players.tsx";
 
 interface GameInstanceProps {
   tryCode: string
@@ -34,10 +35,11 @@ export function GameInstance({tryCode}: GameInstanceProps) {
     <div className="fixed inset-0 overflow-hidden">
       <GameInfo/>
       <PlayedCards/>
+      <OtherPlayers/>
       <PlayerHand/>
       <ChooseTrump/>
       <Weisen/>
-      <ShowWeise />
+      <ShowWeise/>
       <PingHandler/>
       <WebSocketHandler/>
     </div>

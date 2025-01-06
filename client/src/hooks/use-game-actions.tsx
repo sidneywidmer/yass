@@ -51,6 +51,32 @@ const useGameActions = () => {
     },
     ShowWeis: {
       handle: (action) => addWeis(action.position, action.weis)
+    },
+    PlayerJoined: {
+      handle: (action) => useGameStateStore.setState((state) => {
+        const existingPlayerIndex = state.otherPlayers!!.findIndex(p => p.uuid === action.player.uuid)
+
+        if (existingPlayerIndex !== -1) {
+          return {
+            otherPlayers: state.otherPlayers!!.map((p, i) =>
+              i === existingPlayerIndex ? {...p, status: "CONNECTED"} : p
+            )
+          }
+        }
+
+        return {
+          otherPlayers: [...state.otherPlayers!!, action.player]
+        }
+      })
+    },
+    PlayerDisconnected: {
+      handle: (action) => useGameStateStore.setState((state) => ({
+        otherPlayers: state.otherPlayers!!.map(player =>
+          player.uuid === action.player.uuid
+            ? {...player, status: "DISCONNECTED"}
+            : player
+        )
+      }))
     }
   }
 
