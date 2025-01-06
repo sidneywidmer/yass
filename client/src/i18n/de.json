@@ -64,7 +64,7 @@
   "logout": {
     "prompt": {
       "title": "Ausloggen",
-      "text": "Als Gast-User gehen alle deine Daten beim Ausloggen verloren. Bist du sicher, dass du fortfahren möchtest",
+      "text": "Als Gast-User gehen alle deine Daten beim Ausloggen verloren. Bist du sicher, dass du fortfahren möchtest?",
       "cancel": "Abbrechen",
       "confirm": "Ausloggen"
     }
