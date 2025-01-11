@@ -102,7 +102,7 @@ class GameController(private val service: GameService, private val repo: GameRep
     private fun mapSeat(seat: Seat, state: GameState): SeatState {
         val player = playerAtPosition(seat.position, state.seats, state.allPlayers)
         val hand = currentHand(state.hands)
-        val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks)
+        val points = pointsByPositionTotal(state.hands, state.tricks)
         val cards = cardsInHand(hand, player, state)
         val nextState = nextState(state)
         val active = activePosition(state.hands, state.seats, state.tricks)

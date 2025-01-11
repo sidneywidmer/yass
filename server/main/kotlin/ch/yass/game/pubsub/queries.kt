@@ -31,8 +31,8 @@ fun newHandActions(state: GameState, seat: Seat): List<Action> {
     return listOf(
         UpdateActive(activePosition),
         ClearPlayedCards(winningPos),
-        UpdateState(nextState),
         UpdatePoints(points),
+        UpdateState(nextState),
         UpdateHand(cards, true),
     )
 }
@@ -71,10 +71,12 @@ fun newTrickActions(state: GameState, seat: Seat): List<Action> {
     val winningPos = winningPositionOfLastTrick(hand, tricks)
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.seats, state.tricks)
+    val points = pointsByPositionTotal(state.hands, state.tricks)
 
     return listOf(
         UpdateActive(activePosition),
         ClearPlayedCards(winningPos!!),
+        UpdatePoints(points),
         UpdateState(nextState),
         UpdateHand(cards, false),
     )
@@ -85,21 +87,20 @@ fun cardPlayedActions(state: GameState, card: Card, playedBy: Seat, seat: Seat):
     val cards = cardsInHand(currentHand(state.hands), player, state)
     val activePosition = activePosition(state.hands, state.seats, state.tricks)
     val nextState = nextState(state)
-    val points = pointsByPositionTotal(state.hands, state.tricks)
 
     return listOf(
         UpdateActive(activePosition),
         UpdateState(nextState),
         CardPlayed(CardOnTable(card.suit, card.rank, card.skin, playedBy.position)),
         UpdateHand(cards, false),
-        UpdatePoints(points)
     )
 }
 
 fun trumpChosenActions(state: GameState, trump: Trump, seat: Seat): List<Action> {
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.seats, state.tricks)
-    val cards = currentHand(state.hands).cardsOf(seat.position) // We don't care about CardInHand since the state is wurst
+    val cards =
+        currentHand(state.hands).cardsOf(seat.position) // We don't care about CardInHand since the state is wurst
     val weise = withoutStoeckPoints(possibleWeiseWithPoints(cards, trump))
 
     return listOf(
@@ -113,8 +114,13 @@ fun trumpChosenActions(state: GameState, trump: Trump, seat: Seat): List<Action>
 fun gewiesenActions(state: GameState, weis: Weis, playedBy: Seat, seat: Seat): List<Action> {
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.seats, state.tricks)
+    val points = pointsByPositionTotal(state.hands, state.tricks)
 
-    val actions = listOf(UpdateActive(activePosition), UpdateState(nextState)).toMutableList()
+    val actions = listOf(
+        UpdateActive(activePosition),
+        UpdateState(nextState),
+        UpdatePoints(points)
+    ).toMutableList()
 
     // We don't need to show this weis to the player who just played it - they already know. Also, we don't need to
     // show other players that they would have possible weise but chose to skip

@@ -46,7 +46,6 @@ fun rankPointsSuitTrump(rank: Rank): Int = when (rank) {
     Rank.QUEEN -> 3
     Rank.KING -> 4
     Rank.ACE -> 11
-    else -> 0
 }
 
 
@@ -60,7 +59,6 @@ fun cardPointsObeabeTrump(rank: Rank) = when (rank) {
     Rank.QUEEN -> 3
     Rank.KING -> 4
     Rank.ACE -> 11
-    else -> 0
 }
 
 fun cardPointsUneufeTrump(rank: Rank): Int = when (rank) {
@@ -73,5 +71,4 @@ fun cardPointsUneufeTrump(rank: Rank): Int = when (rank) {
     Rank.QUEEN -> 3
     Rank.KING -> 4
     Rank.ACE -> 0
-    else -> 0
 }

@@ -8,13 +8,12 @@ import {getRelativePosition} from "@/lib/utils.ts";
 export function PlayedCards() {
   const {clearDirection, cardsPlayed, position} = useGameStateStore()
 
-  // For every trick, choose a bit a different rotation to keep it visually interesting
   const cardRotations = useMemo(() => ({
     NORTH: 180 + (Math.random() * 10 - 5),
     EAST: -90 + (Math.random() * 10 - 5),
     SOUTH: (Math.random() * 10 - 5),
     WEST: 90 + (Math.random() * 10 - 5),
-  }), [clearDirection])
+  }), [])
 
   const getInitialPosition = (position: Position, exclRotate: boolean = false) => {
     const target = getPosition(position)
@@ -64,11 +63,33 @@ export function PlayedCards() {
               key={`cardtable-${card.position}-${card.suit}-${card.rank}`}
               className="absolute origin-center"
               initial={getInitialPosition(getRelativePosition(position!!, card.position!!))}
-              animate={{
-                ...getPosition(getRelativePosition(position!!, card.position!!)),
-                opacity: 1
-              }}
-              transition={{type: "tween", duration: 0.3}}
+              animate={
+                clearDirection && getRelativePosition(position!!, card.position!!) === clearDirection
+                  ? {
+                    ...getPosition(getRelativePosition(position!!, card.position!!)),
+                    opacity: 1,
+                    rotate: [
+                      cardRotations[getRelativePosition(position!!, card.position!!)],
+                      cardRotations[getRelativePosition(position!!, card.position!!)] - 15,
+                      cardRotations[getRelativePosition(position!!, card.position!!)] + 15,
+                      cardRotations[getRelativePosition(position!!, card.position!!)] - 10,
+                      cardRotations[getRelativePosition(position!!, card.position!!)] + 10,
+                      cardRotations[getRelativePosition(position!!, card.position!!)]
+                    ],
+                    zIndex: 100,
+                    transition: {rotate: {duration: 0.2, ease: "easeInOut"}}
+                  }
+                  : {
+                    ...getPosition(getRelativePosition(position!!, card.position!!)),
+                    opacity: 1,
+                    transition: {type: "tween", duration: 0.3}
+                  }
+              }
+              // animate={{
+              //   ...getPosition(getRelativePosition(position!!, card.position!!)),
+              //   opacity: 1
+              // }}
+              // transition={{type: "tween", duration: 0.3}}
               exit={clearDirection ? {...handleExit(), opacity: 0} : {}}
               style={{width: CARD_WIDTH, height: CARD_HEIGHT}}
             >
