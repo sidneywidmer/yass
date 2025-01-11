@@ -3,6 +3,7 @@ import {
   CardInHand,
   CardOnTable,
   JoinGameResponse,
+  PlayerAtTable,
   Position,
   State,
   TotalPoints,
@@ -33,6 +34,7 @@ interface GameStateActions {
   clearCards: (position: Position) => Promise<void>
   addWeis: (position: string, weis: WeisWithPoints) => void
   clearWeise: () => void
+  getPlayer: (position: Position) => PlayerAtTable | undefined
 }
 
 const initialState: FlatGameState = {
@@ -86,5 +88,9 @@ export const useGameStateStore = create<FlatGameState & GameStateActions>((set) 
       [position]: [...(state.otherWeise[position] || []), weis]
     }
   })),
-  clearWeise: () => set({otherWeise: {}})
+  clearWeise: () => set({otherWeise: {}}),
+  getPlayer: (position: Position) => {
+    const otherPlayers: Array<PlayerAtTable> = useGameStateStore.getState().otherPlayers!!
+    return otherPlayers.find(p => p.position === position)
+  }
 }))

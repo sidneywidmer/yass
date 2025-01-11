@@ -3,6 +3,7 @@ import {Dialog, DialogContent, DialogTitle} from '@/components/ui/dialog'
 import {useGameStateStore} from '@/store/game-state'
 import {Card} from '@/components/game/card'
 import {useTranslation} from "react-i18next";
+import {Position} from "@/api/generated";
 
 export function ShowWeise() {
   const [open, setOpen] = useState(false)
@@ -23,15 +24,16 @@ export function ShowWeise() {
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
-        <DialogTitle className="text-center">{t("weisen.title")}</DialogTitle>
+        <DialogTitle className="text-center">{t("weisen.title_alt")}</DialogTitle>
         <div className="space-y-6 max-h-[60vh] overflow-y-auto p-2">
           {Object.entries(otherWeise).map(([position, weise]) =>
             weise.map((weis, idx) => (
               <div key={`${position}-${idx}`} className="p-4 rounded-lg">
                 <div className="flex items-center gap-4 mb-2">
-                  <span className="font-medium">{position}</span>
+                  <span
+                    className="font-medium">{useGameStateStore.getState().getPlayer(position as Position)?.name}</span>
                   <div className="h-4 w-px bg-border"/>
-                  <span className="font-medium">{weis.type}</span>
+                  <span className="font-medium">{t(`weise.${weis.type}`)}</span>
                   <div className="h-4 w-px bg-border"/>
                   <span className="text-sm text-muted-foreground">{weis.points} {t("weisen.points")}</span>
                 </div>
