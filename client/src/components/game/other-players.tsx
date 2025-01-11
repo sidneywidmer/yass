@@ -18,9 +18,39 @@ const positionStylesInitial: Record<Position, { transform: string }> = {
   EAST: {transform: 'translate(calc(-50% + 330px), -50%)'},
   WEST: {transform: 'translate(calc(-50% - 330px), -50%)'}
 }
+const StatusIndicator = ({status, isActive}: { status: string, isActive?: boolean }) => {
+  return (
+    <div className="relative">
+      <motion.div
+        className={cn(
+          "absolute w-2 h-2 rounded-full",
+          status === "DISCONNECTED" && "bg-red-500/50",
+          status === "BOT" && "bg-blue-500/50",
+          status === "CONNECTED"  && "bg-green-500/50"
+        )}
+        animate={isActive ? {
+          scale: [0.8, 20, 0.8],
+          opacity: [0.7, 0, 0]
+        } : {opacity: 0}}
+        transition={isActive ? {
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeOut",
+          times: [0, 0.8, 1] // 3 Keyframes to avoid flickering when "downsizing" again
+        } : undefined}
+      />
+      <div className={cn(
+        "relative w-2 h-2 rounded-full",
+        status === "DISCONNECTED" && "bg-red-500",
+        status === "BOT" && "bg-blue-500",
+        status === "CONNECTED"  && "bg-green-500"
+      )}/>
+    </div>
+  )
+}
 
 export function OtherPlayers() {
-  const {otherPlayers, position} = useGameStateStore()
+  const {otherPlayers, position, activePosition} = useGameStateStore()
   return (
     <>
       <AnimatePresence mode="popLayout" initial={true}>
@@ -32,15 +62,13 @@ export function OtherPlayers() {
             initial={{opacity: 0}}
             animate={positionStyles[getRelativePosition(position!!, player.position!!)]}
           >
-            <Card
-              className={cn(
-                "h-10 p-3 flex flex-row items-center justify-center gap-2",
-                player.status === "DISCONNECTED" && "border-red-500",
-                (player.status === "CONNECTED" || player.status === "BOT") && "border-green-500"
-              )}
-            >
+            <Card className="h-10 p-3 flex flex-row items-center justify-center gap-2 overflow-hidden">
               {player.bot ? (<Bot className="h-4 w-4"/>) : (<User className="h-4 w-4"/>)}
               <span className="text-sm text-center">{player.name}</span>
+              <StatusIndicator
+                status={player.status!!}
+                isActive={player.position == activePosition && !player.bot}
+              />
             </Card>
           </motion.div>
         ))}
