@@ -94,8 +94,22 @@
   },
   "weisen": {
     "title": "Weisen",
+    "title_alt": "Gewiesen",
     "description": "Choose cards for your weis",
     "points": "Points",
     "zeroWeis": "0 Points weisen"
+  },
+  "weis": {
+    "DREI_BLATT": "3 of a suit",
+    "VIER_BLATT": "4 of a suit",
+    "FUENF_BLATT": "5 of a suit",
+    "SECHS_BLATT": "6 of a suit",
+    "SIEBEN_BLATT": "7 of a suit",
+    "ACHT_BLATT": "8 of a suit",
+    "NEUN_BLATT": "9 of a suit",
+    "VIER_GLEICHE": "4 of a kind",
+    "VIER_NELL": "4 nines",
+    "VIER_BUUR": "4 jacks",
+    "STOECK": "King-Queen pair"
   }
 }

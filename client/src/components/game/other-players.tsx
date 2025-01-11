@@ -33,10 +33,10 @@ const StatusIndicator = ({status, isActive}: { status: string, isActive?: boolea
           opacity: [0.7, 0, 0]
         } : {opacity: 0}}
         transition={isActive ? {
-          duration: 2,
+          duration: 3,
           repeat: Infinity,
           ease: "easeOut",
-          times: [0, 0.8, 1] // 3 Keyframes to avoid flickering when "downsizing" again
+          times: [0, 0.6, 1] // 3 Keyframes to avoid flickering when "downsizing" again
         } : undefined}
       />
       <div className={cn(

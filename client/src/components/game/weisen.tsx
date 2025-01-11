@@ -46,12 +46,12 @@ export function Weisen() {
               onClick={() => onWeisSelect(weis)}
             >
               <div className="flex items-center gap-4 mb-2">
-                <span className="font-medium">{weis.type}</span>
+                <span className="font-medium">{t(`weise.${weis.type}`)}</span>
                 <div className="h-4 w-px bg-border"/>
                 <span className="text-sm text-muted-foreground">{weis.points} {t("weisen.points")}</span>
               </div>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {weis.cards!!.map((card, i) => (
+              {weis.cards!!.map((card, i) => (
                   <Card key={i} card={card}/>
                 ))}
               </div>

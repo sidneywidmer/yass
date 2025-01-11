@@ -99,8 +99,22 @@
   },
   "weisen": {
     "title": "Weisen",
+    "title_alt": "Gewiesen",
     "description": "Karten zum weisen auswählen",
     "points": "Punkte",
     "zeroWeis": "0 Punkte weisen"
+ },
+  "weise": {
+    "DREI_BLATT": "3-Blatt",
+    "VIER_BLATT": "4-Blatt",
+    "FUENF_BLATT": "5-Blatt",
+    "SECHS_BLATT": "6-Blatt",
+    "SIEB-BLATT": "7-Blatt",
+    "ACHT_BLATT": "8-Blatt",
+    "NEUN_BLATT": "9-Blatt",
+    "VIER_GLEICHE": "4 Gleiche",
+    "VIER_NELL": "4 Nell",
+    "VIER_BUUR": "4 Buure",
+    "STOECK": "Stöck"
   }
 }
