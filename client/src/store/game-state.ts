@@ -79,8 +79,11 @@ export const useGameStateStore = create<FlatGameState & GameStateActions>((set) 
   clearCards: async (position) => {
     set({clearDirection: position})
     // Wait for next render cycle, I have no idea if this is a good idea but for now it works #providurium :)
-    await new Promise(resolve => setTimeout(resolve, 0))
+    await new Promise(resolve => setTimeout(resolve, 1200))
     set({cardsPlayed: []})
+    set({clearDirection: undefined})
+    // Give some time after cleaning the table until the next card comes flying out
+    await new Promise(resolve => setTimeout(resolve, 300))
   },
   addWeis: (position, weis) => set((state) => ({
     otherWeise: {

@@ -8,8 +8,7 @@ interface GameAction {
 }
 
 interface ActionHandler {
-  handle: (action: GameAction) => void
-  delay?: number
+  handle: (action: GameAction) => Promise<void>
 }
 
 const useGameActions = () => {
@@ -19,7 +18,7 @@ const useGameActions = () => {
 
   const actionHandlers: Record<string, ActionHandler> = {
     CardPlayed: {
-      handle: (action) => {
+      handle: async (action) => {
         if (position == action.card.position) {
           return
         }
@@ -27,33 +26,40 @@ const useGameActions = () => {
       }
     },
     UpdateHand: {
-      handle: (action) => {
+      handle: async (action) => {
         addCardsToHand(action.cards)
       }
     },
     ClearPlayedCards: {
-      handle: (action) => {
-        clearCards(action.position)
-      },
-      delay: 2000
+      handle: async (action) => {
+        // Allow enough time the players to register what card was played
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        await clearCards(action.position)
+      }
     },
     UpdateState: {
-      handle: (action) => useGameStateStore.setState({state: action.state}),
+      handle: async (action) => useGameStateStore.setState({state: action.state}),
     },
     UpdateTrump: {
-      handle: (action) => useGameStateStore.setState({trump: action.trump}),
+      handle: async (action) => useGameStateStore.setState({trump: action.trump}),
     },
     UpdateActive: {
-      handle: (action) => useGameStateStore.setState({activePosition: action.position}),
+      handle: async (action) => useGameStateStore.setState({activePosition: action.position}),
     },
     UpdatePossibleWeise: {
-      handle: (action) => useGameStateStore.setState({weise: action.weise}),
+      handle: async (action) => useGameStateStore.setState({weise: action.weise}),
+    },
+    UpdatePoints: {
+      handle: async (action) => {
+        console.log("points")
+        useGameStateStore.setState({points: action.points})
+      },
     },
     ShowWeis: {
-      handle: (action) => addWeis(action.position, action.weis)
+      handle: async (action) => addWeis(action.position, action.weis)
     },
     PlayerJoined: {
-      handle: (action) => useGameStateStore.setState((state) => {
+      handle: async (action) => useGameStateStore.setState((state) => {
         const existingPlayerIndex = state.otherPlayers!!.findIndex(p => p.uuid === action.player.uuid)
 
         if (existingPlayerIndex !== -1) {
@@ -70,7 +76,7 @@ const useGameActions = () => {
       })
     },
     PlayerDisconnected: {
-      handle: (action) => useGameStateStore.setState((state) => ({
+      handle: async (action) => useGameStateStore.setState((state) => ({
         otherPlayers: state.otherPlayers!!.map(player =>
           player.uuid === action.player.uuid
             ? {...player, status: "DISCONNECTED"}
@@ -88,14 +94,8 @@ const useGameActions = () => {
     const handler = actionHandlers[action.type]
 
     if (handler) {
-      if (handler.delay) {
-        console.log("handle action in " + handler.delay, action)
-        await new Promise(resolve => setTimeout(resolve, handler.delay))
-      } else {
-        console.log("handle action w/o delay", action)
-        await new Promise(resolve => setTimeout(resolve, 50))
-      }
-      handler.handle(action)
+      await new Promise(resolve => setTimeout(resolve, 50))
+      await handler.handle(action)
     } else {
       console.log("no handler for action found", action)
     }
