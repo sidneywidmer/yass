@@ -5,6 +5,22 @@ info:
   description: API endpoints for authentication
 
 paths:
+  /admin/analyze/game/{code}:
+    get:
+      summary: Analyze game state
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Game analysis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzeGameStateResponse'
   /game/create:
     post:
       summary: Create a new game
@@ -277,6 +293,103 @@ components:
       name: X-Anon-Token
 
   schemas:
+    AnalyzeGameStateResponse:
+      type: object
+      required:
+        - hands
+        - points
+        - gameUuid
+      properties:
+        hands:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnalyzeHand'
+        points:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/TotalPoints'
+        gameUuid:
+          type: string
+          format: uuid
+
+    AnalyzeHand:
+      type: object
+      required:
+        - trump
+        - gschobe
+        - startingPlayer
+        - players
+        - tricks
+        - points
+      properties:
+        trump:
+          $ref: '#/components/schemas/Trump'
+        gschobe:
+          type: string
+          enum: [ NOT_YET, NO, YES ]
+        startingPlayer:
+          $ref: '#/components/schemas/Player'
+        players:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlayerWithCards'
+        tricks:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrickWithCards'
+        points:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/TotalPoints'
+
+    PlayerWithCards:
+      type: object
+      required:
+        - uuid
+        - name
+        - cards
+        - position
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        name:
+          type: string
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/Card'
+        position:
+          $ref: '#/components/schemas/Position'
+
+    TrickWithCards:
+      type: object
+      required:
+        - cards
+      properties:
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlayedCardWithPlayer'
+        leadPlayer:
+          $ref: '#/components/schemas/Player'
+        leadSuit:
+          $ref: '#/components/schemas/Suit'
+        winnerPlayer:
+          $ref: '#/components/schemas/Player'
+        points:
+          $ref: '#/components/schemas/TotalPoints'
+
+    PlayedCardWithPlayer:
+      type: object
+      required:
+        - player
+      properties:
+        player:
+          $ref: '#/components/schemas/Player'
+        card:
+          $ref: '#/components/schemas/Card'
+
     CreateCustomGameRequest:
       type: object
       required:

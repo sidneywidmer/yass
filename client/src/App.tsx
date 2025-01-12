@@ -8,6 +8,7 @@ import '@/i18n';
 import {MainWrapper} from "@/components/main-wrapper.tsx";
 import Signup from "@/routes/signup.tsx";
 import Game from "@/routes/game.tsx";
+import Analyze from "@/routes/analyze.tsx";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
   {
     path: "/game/:code",
     element: <AuthGuard><MainWrapper><Game/></MainWrapper></AuthGuard>,
+  },
+  {
+    path: "/game/:code/analyze",
+    element: <AuthGuard><MainWrapper><Analyze/></MainWrapper></AuthGuard>,
   }
 ]);
 

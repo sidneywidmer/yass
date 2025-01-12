@@ -50,8 +50,9 @@ class AnalyzeGameService(private val gameService: GameService) {
         val cards = positionsOrderedWithStart(leadPosition).map {
             PlayedCardWithPlayer(playerAtPosition(it, state.seats, state.allPlayers), trick.cardOf(it))
         }
+        val points = pointsByPositionTotal(listOf(hand), listOf(trick))
 
-        return TrickWithCards(cards, leadPlayer, leadCard?.suit, winningPlayer)
+        return TrickWithCards(cards, leadPlayer, leadCard?.suit, winningPlayer, points)
     }
 
     private fun mapPlayer(player: Player, hand: Hand, state: GameState): PlayerWithCards {

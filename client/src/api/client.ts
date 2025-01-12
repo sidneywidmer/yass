@@ -47,5 +47,12 @@ export const api = {
   chooseTrump: (data: ChooseTrumpRequest) => generatedApi.postGameTrump({client: customClient, body: data}),
   weisen: (data: WeisenRequest) => generatedApi.postGameWeisen({client: customClient, body: data}),
   schiebe: (data: SchiebeRequest) => generatedApi.postGameSchiebe({client: customClient, body: data}),
-  pingSeat: (data: PingSeatRequest) => generatedApi.postGamePing({client: customClient, body: data})
+  pingSeat: (data: PingSeatRequest) => generatedApi.postGamePing({client: customClient, body: data}),
+
+  // Admin
+  analyzeGame: (code: string) => generatedApi.getAdminAnalyzeGameByCode({
+    client: customClient,
+    path: {code: code},  // For URL parameters
+    params: {}  // For query parameters (empty in this case)
+  }),
 };
