@@ -65,6 +65,13 @@ export type CreateCustomGameResponse = {
     code?: string;
 };
 
+export type GameFinished = {
+    winners?: Array<Player>;
+    losers?: Array<Player>;
+    winnerPoints?: number;
+    loserPoints?: number;
+};
+
 export type JoinGameRequest = {
     code: string;
 };
@@ -75,6 +82,7 @@ export type JoinGameResponse = {
     seat?: SeatState;
     cardsPlayed?: Array<CardOnTable>;
     otherPlayers?: Array<PlayerAtTable>;
+    finished?: (GameFinished) | null;
 };
 
 export type PingSeatRequest = {

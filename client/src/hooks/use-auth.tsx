@@ -19,7 +19,7 @@ export function useAuth() {
         .then(response => {
           if (response.data) {
             if (response.data.isAnon) {
-              setAnonPlayer(response.data.name)
+              setAnonPlayer(response.data.uuid, response.data.name)
             } else {
               setOryPlayer(response.data.uuid, response.data.name)
             }

@@ -3,6 +3,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import {X} from "lucide-react"
 
 import {cn} from "@/lib/utils"
+import ReactConfetti from "react-confetti";
 
 const Dialog = DialogPrimitive.Root
 
@@ -14,16 +15,20 @@ const DialogClose = DialogPrimitive.Close
 
 const DialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
->(({className, ...props}, ref) => (
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay> & {
+  confetti?: boolean
+}
+>(({className, confetti, ...props}, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "fixed inset-0 z-50 bg-black/30  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
     {...props}
-  />
+  >
+    {confetti && <ReactConfetti recycle={true} numberOfPieces={180} gravity={0.007} friction={1}/>}
+  </DialogPrimitive.Overlay>
 ))
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
@@ -31,10 +36,11 @@ const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
   disableClose?: boolean
+  confetti?: boolean
 }
->(({className, children, disableClose, ...props}, ref) => (
+>(({className, children, disableClose, confetti, ...props}, ref) => (
   <DialogPortal>
-    <DialogOverlay/>
+    <DialogOverlay confetti={confetti}/>
     <DialogPrimitive.Content
       ref={ref}
       className={cn(

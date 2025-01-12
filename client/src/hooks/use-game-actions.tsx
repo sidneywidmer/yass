@@ -49,9 +49,18 @@ const useGameActions = () => {
     UpdatePossibleWeise: {
       handle: async (action) => useGameStateStore.setState({weise: action.weise}),
     },
+    GameFinished: {
+      handle: async (action) => useGameStateStore.setState({
+        finished: {
+          winners: action.winners,
+          losers: action.losers,
+          winnerPoints: action.winnerPoints,
+          loserPoints: action.loserPoints
+        }
+      }),
+    },
     UpdatePoints: {
       handle: async (action) => {
-        console.log("points")
         useGameStateStore.setState({points: action.points})
       },
     },

@@ -35,7 +35,7 @@ export function PlayerHand() {
       rotate: currentAngle * 0.8,
       scale: isPlayable ? 1.1 : 1,
       filter: isPlayable ? "brightness(1)" : "brightness(0.95)",
-      transition: {duration: 0.2}
+      transition: {duration: 0.12}
     }
   }
 

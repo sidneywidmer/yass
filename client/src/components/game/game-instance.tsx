@@ -11,6 +11,7 @@ import {ChooseTrump} from "@/components/game/choose-trump.tsx";
 import {Weisen} from "@/components/game/weisen.tsx";
 import {ShowWeise} from "@/components/game/show-weise.tsx";
 import OtherPlayers from "@/components/game/other-players.tsx";
+import {GameFinished} from "@/components/game/game-finished.tsx";
 
 interface GameInstanceProps {
   tryCode: string
@@ -40,6 +41,7 @@ export function GameInstance({tryCode}: GameInstanceProps) {
       <ChooseTrump/>
       <Weisen/>
       <ShowWeise/>
+      <GameFinished/>
       <PingHandler/>
       <WebSocketHandler/>
     </div>

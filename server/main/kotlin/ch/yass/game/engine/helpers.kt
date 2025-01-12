@@ -37,3 +37,10 @@ fun randomHand(forcedDeck: List<Card>?): EnumMap<Position, List<Card>> {
 }
 
 fun sort(cards: List<Card>): List<Card> = cards.sortedWith(compareBy<Card> { it.suit }.thenBy { it.rank })
+
+fun botName(position: Position): String = when (position) {
+    Position.NORTH -> "Unit-N0R7H"
+    Position.EAST -> "Bot-3000"
+    Position.SOUTH -> "CyberS1X"
+    Position.WEST -> "RoboW-X"
+}
