@@ -14,6 +14,7 @@ import ch.yass.game.dto.*
 import ch.yass.game.dto.db.*
 import ch.yass.game.dto.db.Game
 import ch.yass.game.engine.botId
+import ch.yass.game.engine.botName
 import ch.yass.game.engine.randomFreePosition
 import org.jooq.DSLContext
 import org.jooq.Records.mapping
@@ -70,7 +71,7 @@ class GameRepository(private val db: DSLContext) {
                     id = botId(it.position),
                     uuid = UUID.randomUUID(),
                     oryUuid = null,
-                    name = "Bot", // TODO: When bot takeASeat, persist some data like name on the seat table
+                    name = botName(it.position),
                     bot = true,
                     anonToken = null,
                     createdAt = LocalDateTime.now(),

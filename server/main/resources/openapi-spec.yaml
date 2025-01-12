@@ -336,6 +336,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PlayerAtTable'
+        finished:
+          $ref: '#/components/schemas/GameFinished'
+          nullable: true
 
     PlayCardRequest:
       type: object
@@ -555,6 +558,21 @@ components:
           type: string
           format: date-time
 
+    GameFinished:
+      type: object
+      properties:
+        winners:
+          type: array
+          items:
+            $ref: '#/components/schemas/Player'
+        losers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Player'
+        winnerPoints:
+          type: integer
+        loserPoints:
+          type: integer
     PlayerAtTable:
       type: object
       properties:

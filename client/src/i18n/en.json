@@ -111,5 +111,14 @@
     "VIER_NELL": "4 nines",
     "VIER_BUUR": "4 jacks",
     "STOECK": "King-Queen pair"
+  },
+  "finished": {
+    "titleWinner": "WINNER!",
+    "titleLooser": "Oh no, you lost :(",
+    "points": "Points",
+    "winners": "Winners",
+    "losers": "Losers",
+    "analyze": "Analyze",
+    "back": "Back"
   }
 }

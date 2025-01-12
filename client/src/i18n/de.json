@@ -103,7 +103,7 @@
     "description": "Karten zum weisen auswählen",
     "points": "Punkte",
     "zeroWeis": "0 Punkte weisen"
- },
+  },
   "weise": {
     "DREI_BLATT": "3-Blatt",
     "VIER_BLATT": "4-Blatt",
@@ -116,5 +116,14 @@
     "VIER_NELL": "4 Nell",
     "VIER_BUUR": "4 Buure",
     "STOECK": "Stöck"
+  },
+  "finished": {
+    "titleWinner": "GEWONNEN!",
+    "titleLooser": "Oh je, verloren :(",
+    "points": "Punkte",
+    "winners": "Gewinner",
+    "losers": "Verlierer",
+    "analyze": "Analyse",
+    "back": "Zurück"
   }
 }

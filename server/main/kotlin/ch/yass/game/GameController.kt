@@ -17,8 +17,11 @@ import ch.yass.game.dto.PlayerAtTable
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.SeatState
 import ch.yass.game.dto.SeatStatus
+import ch.yass.game.dto.State
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
+import ch.yass.game.pubsub.GameFinished
+import ch.yass.game.pubsub.gameFinishedActions
 import ch.yass.identity.helper.player
 import io.javalin.apibuilder.ApiBuilder.post
 import io.javalin.apibuilder.EndpointGroup
@@ -93,7 +96,12 @@ class GameController(private val service: GameService, private val repo: GameRep
                 )
             }
 
-        JoinGameResponse(state.game.uuid, state.game.code, seat, playedCards, otherPlayers)
+        val finish = state.takeIf { nextState(it) == State.FINISHED }
+            ?.let { gameFinishedActions(it) }
+            ?.filterIsInstance<GameFinished>()
+            ?.firstOrNull()
+
+        JoinGameResponse(state.game.uuid, state.game.code, seat, playedCards, otherPlayers, finish)
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }
