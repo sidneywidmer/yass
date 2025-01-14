@@ -366,6 +366,9 @@ components:
       type: object
       required:
         - cards
+        - leadPlayer
+        - leadSuit
+        - points
       properties:
         cards:
           type: array
@@ -378,7 +381,7 @@ components:
         winnerPlayer:
           $ref: '#/components/schemas/Player'
         points:
-          $ref: '#/components/schemas/TotalPoints'
+          type: integer
 
     PlayedCardWithPlayer:
       type: object

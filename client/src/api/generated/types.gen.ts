@@ -201,10 +201,10 @@ export type TotalPoints = {
 
 export type TrickWithCards = {
     cards: Array<PlayedCardWithPlayer>;
-    leadPlayer?: Player;
-    leadSuit?: Suit;
+    leadPlayer: Player;
+    leadSuit: Suit;
     winnerPlayer?: Player;
-    points?: TotalPoints;
+    points: number;
 };
 
 export type Trump = 'CLUBS' | 'DIAMONDS' | 'HEARTS' | 'SPADES' | 'OBEABE' | 'UNEUFE' | 'FREESTYLE';

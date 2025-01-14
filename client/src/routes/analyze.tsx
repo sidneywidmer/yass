@@ -7,7 +7,7 @@ import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 import {useParams} from "react-router";
 import {Card as PlayingCard, CARD_HEIGHT, CARD_WIDTH} from "@/components/game/card"
 import {cn} from "@/lib/utils.ts";
-import {AnalyzeHand, Player} from "@/api/generated";
+import {AnalyzeHand, PlayedCardWithPlayer, Player, TrickWithCards} from "@/api/generated";
 
 export default function Analyze() {
   const [analysis, setAnalysis] = useState<any>(null)
@@ -34,30 +34,16 @@ export default function Analyze() {
     return hand.players.find(p => p.uuid === player.uuid)?.position
   }
 
-  const getTrickWinnerPoints = (trick: any, hand: any) => {
-    if (!trick.winnerPlayer) return 0;
-
-    const position = getPlayerPosition(trick.winnerPlayer, hand);
-
-    const points = trick.points;
-    if (position === 'NORTH' || position === 'SOUTH') {
-      return points.NORTH.cardPoints + points.SOUTH.cardPoints
-    } else {
-      return points.EAST.cardPoints + points.WEST.cardPoints
-    }
-  };
-
-  const getRunningTotals = (tricks: any[], currentIndex: number, hand) => {
+  const getRunningTotals = (tricks: TrickWithCards[], currentIndex: number, hand: AnalyzeHand) => {
     return tricks.slice(0, currentIndex + 1).reduce((totals, trick) => {
       if (!trick.winnerPlayer) return totals;
 
       const position = getPlayerPosition(trick.winnerPlayer, hand);
-      const trickPoints = getTrickWinnerPoints(trick, hand);
 
       if (position === 'NORTH' || position === 'SOUTH') {
-        return {...totals, northSouth: totals.northSouth + trickPoints};
+        return {...totals, northSouth: totals.northSouth + trick.points};
       } else {
-        return {...totals, eastWest: totals.eastWest + trickPoints};
+        return {...totals, eastWest: totals.eastWest + trick.points};
       }
     }, {northSouth: 0, eastWest: 0});
   };
@@ -100,11 +86,11 @@ export default function Analyze() {
                 </AccordionTrigger>
                 <AccordionContent>
                   <Card className="p-4">
-                    {hand.tricks.map((trick: any, trickIndex: number) => (
+                    {hand.tricks.map((trick: TrickWithCards, trickIndex: number) => (
                       <div key={trickIndex} className="mb-4 last:mb-0">
                         <div className="grid grid-cols-6 gap-1 p-4">
                           <div className="font-medium mb-2">Trick {trickIndex + 1}</div>
-                          {trick.cards.map((play: any) => (
+                          {trick.cards.map((play: PlayedCardWithPlayer) => (
                             <div key={play.player.uuid} className="space-y-2">
                               <div className="text-sm text-muted-foreground text-left">
                                 {play.player.name}
@@ -134,7 +120,7 @@ export default function Analyze() {
                                 "font-medium",
                                 getTeamColor(getPlayerPosition(trick.winnerPlayer, hand)!!)
                               )}>
-                               +{getTrickWinnerPoints(trick, hand)}
+                               +{trick.points}
                               </span>
                               <span className="border-l pl-4">
                                 {getRunningTotals(hand.tricks, trickIndex, hand).northSouth} - {getRunningTotals(hand.tricks, trickIndex, hand).eastWest}

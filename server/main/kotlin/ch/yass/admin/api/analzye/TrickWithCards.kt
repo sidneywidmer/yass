@@ -9,5 +9,5 @@ data class TrickWithCards(
     val leadPlayer: Player?,
     val leadSuit: Suit?,
     val winnerPlayer: Player?,
-    val points: Points
+    val points: Int
 )

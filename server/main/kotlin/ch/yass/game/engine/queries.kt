@@ -14,7 +14,6 @@ import ch.yass.game.dto.db.Player
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.dto.db.Trick
 import java.util.EnumMap
-import kotlin.collections.contains
 
 fun currentTrick(tricks: List<Trick>): Trick = tricks.first()
 
@@ -226,10 +225,10 @@ fun playableCards(hand: Hand, cards: List<Card>): List<Card> =
     }
 
 fun pointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>): Points {
-    val weis = weisPointsByPositionTotal(hands, tricks)
-    val card = cardPointsByPositionTotal(hands, tricks)
+    val weisPoints = weisPointsByPositionTotal(hands, tricks)
+    val cardPoints = handTricksWithPoints(hands, tricks).sumPointsByPosition()
 
-    return Position.entries.associateWithToEnum { TotalPoints(card.getValue(it), weis.getValue(it)) }
+    return Position.entries.associateWithToEnum { TotalPoints(cardPoints.getValue(it), weisPoints.getValue(it)) }
 }
 
 fun weisPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>): SplitPoints {
@@ -272,37 +271,24 @@ fun weisPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>): SplitPoin
     }
 }
 
-fun cardPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>): SplitPoints {
-    val initial = Position.entries.associateWithToEnum { 0 }
-
-    return hands.fold(initial) { accumulator, hand ->
-        val tricksOfHand = completeTricksOfHand(tricks, hand)
-        val pointsNew = cardPointsByPosition(hand, tricksOfHand)
-        accumulator.mapValuesToEnum { (position, points) -> points + pointsNew.getValue(position) }
+fun handTricksWithPoints(hands: List<Hand>, tricks: List<Trick>): List<HandWithTricks> =
+    hands.map { hand ->
+        val tricksWithPoints = hand.tricksWithPoints(completeTricksOfHand(tricks, hand))
+        HandWithTricks(hand, tricksWithPoints)
     }
-}
 
 /**
- * Splits all tricks to a map with key POSITION and value a list of tricks that position won. The given
- * tricks are ordered descending where index 0 is the newest trick, so we reverse the list.
+ * For given tricks (that all should belong to given hand) we calculate the points, lead and winner.
  */
-fun cardPointsByPosition(hand: Hand, tricks: List<Trick>): SplitPoints {
-    val positionMap = Position.entries.associateWithToEnum { emptyList<Trick>() }
-    val positionToTricksMap = tricks.reversed().fold(
-        PositionToTrickAccumulator(positionMap, hand.startingPosition)
-    ) { accumulator, trick ->
-        val winner = winningPositionOfTrick(trick, accumulator.lead, hand.trump)
-        val wonTricks = accumulator.positions.getValue(winner) + trick
-        PositionToTrickAccumulator(EnumMap(accumulator.positions).apply { put(winner, wonTricks) }, winner)
-    }
-
-    return positionToTricksMap.positions.mapValuesToEnum { (_, tricksOfPosition) ->
-        tricksOfPosition.sumOf { trick ->
-            // First means last played in this context, you get the bonus if the hand is complete
-            val bonus = multiplyByTrump(5, hand.trump)
-            val lastTrickBonus = if (trick.id == tricks.first().id && tricks.count() == 9) bonus else 0
-            trick.cards().sumOf { card -> multiplyByTrump(cardPoints(card, hand.trump), hand.trump) } + lastTrickBonus
-        }
+fun Hand.tricksWithPoints(tricks: List<Trick>): List<TrickWithPoints> {
+    var currentLead = startingPosition
+    return tricks.reversed().map { trick ->
+        val winner = winningPositionOfTrick(trick, currentLead, trump)
+        val cardPoints = trick.cards().sumOf { card -> multiplyByTrump(cardPoints(card, trump), trump) }
+        val isLastTrick = trick.id == tricks.first().id && tricks.count() == 9
+        val lastTrickBonus = if (isLastTrick) multiplyByTrump(5, trump) else 0
+        val totalPoints = cardPoints + lastTrickBonus
+        TrickWithPoints(currentLead, winner, totalPoints, trick).also { currentLead = winner }
     }
 }
 
