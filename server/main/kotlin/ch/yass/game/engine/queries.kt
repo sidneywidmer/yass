@@ -247,6 +247,7 @@ fun weisPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>): SplitPoin
             team.positions.sumOf { posToPoints.getValue(it) }
         }
 
+        // Reset to 0 for the team with fewer points
         when {
             teamToPoints.getValue(Team.NS) < teamToPoints.getValue(Team.EW) -> {
                 Team.NS.positions.forEach { posToPoints[it] = 0 }
@@ -262,6 +263,7 @@ fun weisPointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>): SplitPoin
             }
         }
 
+        // Stoeck count always
         posToWeise.entries
             .flatMap { (pos, weise) -> weise.map { pos to it } }
             .firstOrNull { it.second.type == WeisType.STOECK }
@@ -336,3 +338,15 @@ fun remainingWeise(hand: Hand): EnumMap<Position, List<Weis>> {
             .filterNot { it.type == WeisType.SKIP }
     }
 }
+
+fun getTeamPoints(points: Points, team: Team): Int = team.positions.sumOf { points[it]!!.total() }
+
+fun getWinningTeam(points: Points): TeamWithPoints =
+    Team.entries
+        .map { TeamWithPoints(it, getTeamPoints(points, it)) }
+        .maxBy { it.points }
+
+fun getLosingTeam(points: Points): TeamWithPoints =
+    Team.entries
+        .map { TeamWithPoints(it, getTeamPoints(points, it)) }
+        .minBy { it.points }

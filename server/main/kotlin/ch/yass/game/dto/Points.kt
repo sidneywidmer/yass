@@ -14,6 +14,8 @@ typealias SplitPoints = EnumMap<Position, Int> // Either points by Cards or by W
 data class HandWithTricks(val hand: Hand, val tricks: List<TrickWithPoints>)
 data class TrickWithPoints(val lead: Position, val winner: Position, val points: Int, val trick: Trick)
 
+data class TeamWithPoints(val team: Team, val points: Int)
+
 fun List<HandWithTricks>.sumPointsByPosition(): SplitPoints =
     Position.entries.associateWithToEnum { position ->
         sumOf { hand -> hand.tricks.sumOf { trick -> if (trick.winner == position) trick.points else 0 } }

@@ -120,5 +120,29 @@
     "losers": "Losers",
     "analyze": "Analyze",
     "back": "Back"
+  },
+  "analysis": {
+    "title": "Analysis",
+    "code": "Code",
+    "back": "Back",
+    "hand": "Hand",
+    "trump": "Trump",
+    "tricks": "Tricks",
+    "winner": "Won",
+    "loser": "Lost",
+    "startingPlayer": "Starting Player",
+    "teams": {
+      "northSouth": "North/South",
+      "eastWest": "East/West"
+    }
+  },
+  "trumps": {
+    "CLUBS": "Clubs",
+    "SPADES": "Spades",
+    "HEARTS": "Hearts",
+    "DIAMONDS": "Diamonds",
+    "OBEABE": "Top down",
+    "UNEUFE": "Bottom up",
+    "FREESTYLE": "Freestyle"
   }
 }

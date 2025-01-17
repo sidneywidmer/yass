@@ -125,5 +125,29 @@
     "losers": "Verlierer",
     "analyze": "Analyse",
     "back": "Zurück"
+  },
+  "analysis": {
+    "title": "Analysis",
+    "code": "Code",
+    "back": "Zurück",
+    "hand": "Hand",
+    "trump": "Trumpf",
+    "tricks": "Stiche",
+    "startingPlayer": "Startspieler",
+    "winner": "Gewonnen",
+    "loser": "Verloren",
+    "teams": {
+      "northSouth": "Nord/Süd",
+      "eastWest": "Ost/West"
+    }
+  },
+  "trumps": {
+    "CLUBS": "Schilten",
+    "SPADES": "Schaufeln",
+    "HEARTS": "Herz",
+    "DIAMONDS": "Ecken",
+    "OBEABE": "Obenabe",
+    "UNEUFE": "Undenufe",
+    "FREESTYLE": "Freestyle"
   }
 }

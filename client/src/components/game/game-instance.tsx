@@ -33,17 +33,19 @@ export function GameInstance({tryCode}: GameInstanceProps) {
   }, [tryCode])
 
   return (
-    <div className="fixed inset-0 overflow-hidden">
-      <GameInfo/>
-      <PlayedCards/>
-      <OtherPlayers/>
-      <PlayerHand/>
-      <ChooseTrump/>
-      <Weisen/>
-      <ShowWeise/>
-      <GameFinished/>
-      <PingHandler/>
-      <WebSocketHandler/>
+    <div className="flex min-h-svh bg-muted">
+      <div className="fixed inset-0 overflow-hidden">
+        <GameInfo/>
+        <PlayedCards/>
+        <OtherPlayers/>
+        <PlayerHand/>
+        <ChooseTrump/>
+        <Weisen/>
+        <ShowWeise/>
+        <GameFinished/>
+        <PingHandler/>
+        <WebSocketHandler/>
+      </div>
     </div>
   )
 }

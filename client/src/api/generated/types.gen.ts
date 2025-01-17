@@ -6,6 +6,12 @@ export type AnalyzeGameStateResponse = {
         [key: string]: TotalPoints;
     };
     gameUuid: string;
+    winners: {
+        [key: string]: TeamWithPoints;
+    };
+    losers: {
+        [key: string]: TeamWithPoints;
+    };
 };
 
 export type AnalyzeHand = {
@@ -17,6 +23,7 @@ export type AnalyzeHand = {
     points: {
         [key: string]: TotalPoints;
     };
+    weise?: Array<PlayerWithWeise>;
 };
 
 export type gschobe = 'NOT_YET' | 'NO' | 'YES';
@@ -154,6 +161,11 @@ export type PlayerWithCards = {
     position: Position;
 };
 
+export type PlayerWithWeise = {
+    player: Player;
+    weise: Array<WeisWithPoints>;
+};
+
 export type Position = 'NORTH' | 'EAST' | 'SOUTH' | 'WEST';
 
 export type Rank = 'SIX' | 'SEVEN' | 'EIGHT' | 'NINE' | 'TEN' | 'JACK' | 'QUEEN' | 'KING' | 'ACE' | 'HELLO';
@@ -194,6 +206,13 @@ export type SuccessfulActionResponse = {
 
 export type Suit = 'CLUBS' | 'DIAMONDS' | 'HEARTS' | 'SPADES' | 'WELCOME';
 
+export type TeamWithPoints = {
+    team?: 'NS' | 'EW';
+    points?: number;
+};
+
+export type team = 'NS' | 'EW';
+
 export type TotalPoints = {
     cardPoints?: number;
     weisPoints?: number;
@@ -222,9 +241,9 @@ export type WeisenRequest = {
 export type WeisType = 'DREI_BLATT' | 'VIER_BLATT' | 'FUENF_BLATT' | 'SECHS_BLATT' | 'SIEBEN_BLATT' | 'ACHT_BLATT' | 'NEUN_BLATT' | 'VIER_GLEICHE' | 'VIER_NELL' | 'VIER_BUUR' | 'STOECK' | 'SKIP';
 
 export type WeisWithPoints = {
-    type?: WeisType;
-    cards?: Array<Card>;
-    points?: number;
+    type: WeisType;
+    cards: Array<Card>;
+    points: number;
 };
 
 export type WhoAmIResponse = {

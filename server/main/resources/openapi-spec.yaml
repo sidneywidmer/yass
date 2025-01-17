@@ -299,6 +299,8 @@ components:
         - hands
         - points
         - gameUuid
+        - winners
+        - losers
       properties:
         hands:
           type: array
@@ -311,6 +313,14 @@ components:
         gameUuid:
           type: string
           format: uuid
+        winners:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/TeamWithPoints'
+        losers:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/TeamWithPoints'
 
     AnalyzeHand:
       type: object
@@ -341,6 +351,10 @@ components:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/TotalPoints'
+        weise:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlayerWithWeise'
 
     PlayerWithCards:
       type: object
@@ -620,8 +634,25 @@ components:
       type: string
       enum: [ DREI_BLATT, VIER_BLATT, FUENF_BLATT, SECHS_BLATT, SIEBEN_BLATT, ACHT_BLATT, NEUN_BLATT, VIER_GLEICHE, VIER_NELL, VIER_BUUR, STOECK, SKIP ]
 
+    PlayerWithWeise:
+      type: object
+      required:
+        - player
+        - weise
+      properties:
+        player:
+          $ref: '#/components/schemas/Player'
+        weise:
+          type: array
+          items:
+            $ref: '#/components/schemas/WeisWithPoints'
+
     WeisWithPoints:
       type: object
+      required:
+        - type
+        - cards
+        - points
       properties:
         type:
           $ref: '#/components/schemas/WeisType'
@@ -649,6 +680,16 @@ components:
           type: integer
         weisPoints:
           type: integer
+
+    TeamWithPoints:
+      type: object
+      properties:
+        team:
+          type: string
+          enum: [ NS, EW ]
+        points:
+          type: integer
+          minimum: 0
 
     Player:
       type: object
