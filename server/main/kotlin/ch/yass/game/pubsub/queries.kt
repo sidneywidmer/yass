@@ -39,26 +39,16 @@ fun newHandActions(state: GameState, seat: Seat): List<Action> {
 
 fun gameFinishedActions(state: GameState): List<Action> {
     val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks)
-    val pairs = listOf(Pair(Position.NORTH, Position.SOUTH), Pair(Position.EAST, Position.WEST))
-
-    // Calculate the sum of points for each pair
-    val pointsSum = pairs.map { pair ->
-        val sum = points.getValue(pair.first).total() + points.getValue(pair.second).total()
-        Pair(pair, sum)
-    }
-
-    // Find the winners and losers
-    val (maxPair, minPair) = pointsSum.maxBy { it.second } to pointsSum.minBy { it.second }
-    val (winnerPositions, loserPositions) = maxPair.first.toList() to minPair.first.toList()
-    val (maxPoints, minPoints) = maxPair.second to minPair.second
+    val winners = getWinningTeam(points)
+    val losers = getLosingTeam(points)
 
     return listOf(
         UpdatePoints(points),
         GameFinished(
-            winnerPositions.map { position -> playerAtPosition(position, state.seats, state.allPlayers) },
-            loserPositions.map { position -> playerAtPosition(position, state.seats, state.allPlayers) },
-            maxPoints,
-            minPoints
+            winners.team.positions.map { playerAtPosition(it, state.seats, state.allPlayers) },
+            losers.team.positions.map { playerAtPosition(it, state.seats, state.allPlayers) },
+            winners.points,
+            losers.points
         )
     )
 }

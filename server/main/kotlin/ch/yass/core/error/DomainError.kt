@@ -33,6 +33,7 @@ data class CanNotLinkAnonAccount(val player: Player, val orySession: String) : A
 sealed interface GameError : DomainError
 data object GameAlreadyFull : GameError
 data class GameNotFound(val uuid: String) : GameError
+data class GameNotFinished(val uuid: String) : GameError
 data class SeatNotFound(val uuid: String) : GameError
 data class PlayerNotInGame(val player: Player, val state: GameState) : GameError
 data class PlayerDoesNotOwnSeat(val player: Player, val seatUuid: String, val state: GameState) : GameError

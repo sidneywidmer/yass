@@ -2,8 +2,6 @@ package ch.yass.game
 
 import arrow.core.raise.either
 import arrow.core.raise.ensure
-import ch.yass.Yass
-import ch.yass.admin.dsl.interpretCards
 import ch.yass.core.contract.Controller
 import ch.yass.core.error.PlayerDoesNotOwnSeat
 import ch.yass.core.helper.errorResponse
@@ -12,12 +10,7 @@ import ch.yass.core.helper.toUUID
 import ch.yass.core.helper.validate
 import ch.yass.game.api.*
 import ch.yass.game.api.internal.GameState
-import ch.yass.game.dto.CardOnTable
-import ch.yass.game.dto.PlayerAtTable
-import ch.yass.game.dto.Position
-import ch.yass.game.dto.SeatState
-import ch.yass.game.dto.SeatStatus
-import ch.yass.game.dto.State
+import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
 import ch.yass.game.pubsub.GameFinished
@@ -26,8 +19,6 @@ import ch.yass.identity.helper.player
 import io.javalin.apibuilder.ApiBuilder.post
 import io.javalin.apibuilder.EndpointGroup
 import io.javalin.http.Context
-import org.kodein.di.direct
-import org.kodein.di.instance
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -83,8 +74,7 @@ class GameController(private val service: GameService, private val repo: GameRep
         val seat = mapSeat(playerSeat(player, state.seats), state)
         val playedCards = currentTrick(state.tricks).cardsByPosition()
         val otherPlayers = Position.entries
-            .map { pos -> maybePlayerAtPosition(pos, state.seats, state.allPlayers) }
-            .filterNotNull()
+            .mapNotNull { pos -> maybePlayerAtPosition(pos, state.seats, state.allPlayers) }
             .map { p -> Pair(p, playerSeat(p, state.seats)) }
             .map { pair ->
                 PlayerAtTable(
