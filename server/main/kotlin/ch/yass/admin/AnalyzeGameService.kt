@@ -1,15 +1,19 @@
 package ch.yass.admin
 
 import arrow.core.raise.Raise
+import arrow.core.raise.ensure
 import ch.yass.admin.api.AnalyzeGameStateResponse
 import ch.yass.admin.api.analzye.PlayedCardWithPlayer
 import ch.yass.admin.api.analzye.PlayerWithCards
 import ch.yass.admin.api.analzye.PlayerWithWeise
 import ch.yass.admin.api.analzye.TrickWithCards
+import ch.yass.core.error.GameNotFinished
 import ch.yass.core.error.GameWithCodeNotFound
+import ch.yass.core.error.PlayerNotInGame
 import ch.yass.core.helper.associateWithToEnum
 import ch.yass.game.GameService
 import ch.yass.game.api.internal.GameState
+import ch.yass.game.dto.GameStatus
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.TotalPoints
 import ch.yass.game.dto.db.Hand
@@ -23,9 +27,13 @@ import ch.yass.admin.api.analzye.Hand as AnalyzeHand
  */
 class AnalyzeGameService(private val gameService: GameService) {
 
-    context(Raise<GameWithCodeNotFound>)
-    fun analyze(code: String): AnalyzeGameStateResponse {
+    context(Raise<GameWithCodeNotFound>, Raise<PlayerNotInGame>, Raise<GameNotFinished>)
+    fun analyze(code: String, player: Player): AnalyzeGameStateResponse {
         val state = gameService.getStateByCode(code)
+
+        ensure<PlayerNotInGame>(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
+        ensure<GameNotFinished>(state.game.status == GameStatus.FINISHED) { GameNotFinished(state.game.uuid.toString()) }
+
         val hands = state.hands.reversed().stream().map { mapHand(it, state) }.toList()
         val points = pointsByPositionTotal(state.hands, state.tricks)
         val winners = getWinningTeam(points)

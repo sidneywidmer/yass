@@ -25,7 +25,10 @@ export default function Analyze() {
   useEffect(() => {
     api.analyzeGame(code!!)
       .then(response => setAnalysis(response.data))
-      .catch(handleAxiosError)
+      .catch(error => {
+        navigate("/")
+        handleAxiosError(error)
+      })
   }, [code])
 
   const getTeamColor = (position: string) => {

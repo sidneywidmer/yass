@@ -22,6 +22,7 @@ import ch.yass.game.engine.playerAtPosition
 import ch.yass.game.engine.playerInGame
 import ch.yass.game.engine.randomHand
 import ch.yass.identity.EndpointRole
+import ch.yass.identity.helper.player
 import io.javalin.apibuilder.ApiBuilder.get
 import io.javalin.apibuilder.EndpointGroup
 import io.javalin.http.Context
@@ -45,14 +46,7 @@ class AdminController(
     }
 
     private fun analyzeGame(ctx: Context) = either {
-        // TODO: Make sure not everyone can analyze all games...
-//        val game = repo.getByUUID(request.game)
-//        val state = repo.getState(game)
-//        val playedCard = Card.from(request.card)
-//        val nextState = nextState(state)
-//
-//        ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
-        analyzeGameService.analyze(ctx.pathParam("code"))
+        analyzeGameService.analyze(ctx.pathParam("code"), player(ctx))
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }
