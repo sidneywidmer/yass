@@ -38,7 +38,7 @@ fun newHandActions(state: GameState, seat: Seat): List<Action> {
 }
 
 fun gameFinishedActions(state: GameState): List<Action> {
-    val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks)
+    val points = pointsByPositionTotal(state.hands, state.tricks)
     val winners = getWinningTeam(points)
     val losers = getLosingTeam(points)
 
