@@ -43,6 +43,7 @@ export type AnonSignupRequest = {
 };
 
 export type AnonSignupResponse = {
+    uuid: string;
     /**
      * Confirmed username for the anonymous account
      */

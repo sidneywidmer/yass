@@ -40,7 +40,7 @@ class Bootstrap(private val config: ConfigSettings, private val logbook: Logbook
             }
             javalinConfig.bundledPlugins.enableCors { cors ->
                 cors.addRule {
-                    it.allowHost("http://127.0.0.1:5173")
+                    it.allowHost(config.getString("server.cors"))
                     it.allowCredentials = true
                 }
             }
@@ -73,8 +73,9 @@ class Bootstrap(private val config: ConfigSettings, private val logbook: Logbook
         val flyway = Flyway.configure()
             .loggers("slf4j")
             .dataSource(config.getString("db.url"), config.getString("db.username"), config.getString("db.password"))
-            .locations("filesystem:server/main/resources/db/migration")
+            .locations("classpath:db/migration")
             .baselineOnMigrate(true)
+            .validateMigrationNaming(true)
             .load()
 
         if (config.getBoolean("db.migrate")) {
