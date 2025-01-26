@@ -20,6 +20,7 @@ import ch.yass.game.engine.playerInGame
 import ch.yass.game.engine.playerOwnsSeat
 import ch.yass.identity.api.*
 import ch.yass.identity.helper.player
+import com.typesafe.config.Config
 import io.javalin.apibuilder.ApiBuilder.get
 import io.javalin.apibuilder.ApiBuilder.post
 import io.javalin.apibuilder.EndpointGroup
@@ -32,7 +33,8 @@ import sh.ory.model.Session
 class AuthController(
     private val gameRepo: GameRepository,
     private val playerService: PlayerService,
-    private val oryClient: OryClient
+    private val oryClient: OryClient,
+    private val config: Config,
 ) : Controller {
     override val path = "/auth"
 
@@ -72,17 +74,19 @@ class AuthController(
         either {
             val request = validate<AnonSignupRequest>(ctx.body())
             val token = createToken()
-            playerService.create(NewAnonPlayer(request.name, hashToken(token)))
+            val player = playerService.create(NewAnonPlayer(request.name, hashToken(token)))
 
             ctx.cookie(
                 Cookie("anon_token", token).apply {
                     isHttpOnly = true
                     path = "/"
-                    sameSite = SameSite.LAX
+                    sameSite = SameSite.NONE
+                    secure = config.getBoolean("server.cookieSecure")
+                    domain = config.getString("server.cookieDomain")
                     maxAge = 60 * 60 * 24 * 365 // 1 year
                 }
             )
-            AnonSignupResponse(request.name)
+            AnonSignupResponse(player.uuid, player.name)
         }.fold(
             { errorResponse(ctx, it) },
             { successResponse(ctx, it) }

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build --mode production",
     "lint": "eslint .",
     "preview": "vite preview",
     "generate-client": "openapi-ts -i ../server/main/resources/openapi-spec.yaml -o ./src/api/generated -c @hey-api/client-axios"

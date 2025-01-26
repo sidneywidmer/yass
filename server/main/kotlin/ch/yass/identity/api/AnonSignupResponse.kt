@@ -1,3 +1,5 @@
 package ch.yass.identity.api
 
-data class AnonSignupResponse(val name: String)
+import java.util.UUID
+
+data class AnonSignupResponse(val uuid: UUID, val name: String)

@@ -789,11 +789,15 @@ components:
     AnonSignupResponse:
       type: object
       properties:
+        uuid:
+          type: string
+          format: uuid
         name:
           type: string
           description: Confirmed username for the anonymous account
       required:
         - name
+        - uuid
 
     AnonLinkRequest:
       type: object
