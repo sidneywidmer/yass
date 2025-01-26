@@ -2,7 +2,7 @@ package ch.yass.game.pubsub
 
 import ch.yass.core.pubsub.Action
 import ch.yass.game.dto.*
-import ch.yass.game.dto.db.Player
+import ch.yass.game.dto.Player
 
 data class CardPlayed(val card: CardOnTable) : Action
 data class ClearPlayedCards(val position: Position) : Action

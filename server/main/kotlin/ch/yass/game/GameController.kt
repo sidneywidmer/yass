@@ -106,7 +106,7 @@ class GameController(private val service: GameService, private val repo: GameRep
         val active = activePosition(state.hands, state.seats, state.tricks)
         val weise = possibleWeiseWithPoints(hand.cardsOf(seat.position), hand.trump)
 
-        return SeatState(seat.uuid, cards, seat.position, player, points, nextState, active, hand.trump, weise)
+        return SeatState(seat.uuid, cards, seat.position, Player.from(player), points, nextState, active, hand.trump, weise)
     }
 
     private fun play(ctx: Context) = either {

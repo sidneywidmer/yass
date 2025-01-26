@@ -40,7 +40,6 @@ class CountingPointsTest : Integration() {
     @Test
     fun testTrump() {
         val state = getStateSpades()
-        val hand = state.hands.first()
 
         // TODO: Refactor, we want way more tests and a way to create an "in memory" state for functional tests with our dsl
         val points = handTricksWithPoints(state.hands, state.tricks).sumPointsByPosition()

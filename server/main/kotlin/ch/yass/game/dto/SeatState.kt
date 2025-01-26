@@ -1,6 +1,5 @@
 package ch.yass.game.dto
 
-import ch.yass.game.dto.db.Player
 import java.util.*
 
 data class SeatState(

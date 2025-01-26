@@ -10,7 +10,7 @@ import ch.yass.core.helper.mapValuesToEnum
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Hand
-import ch.yass.game.dto.db.Player
+import ch.yass.game.dto.db.InternalPlayer
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.dto.db.Trick
 import java.util.EnumMap
@@ -27,7 +27,7 @@ fun lastHand(hands: List<Hand>): Hand = hands[1]
 fun completedHands(hands: List<Hand>, tricks: List<Trick>): List<Hand> =
     hands.filter { hand -> tricksOfHand(tricks, hand).filter { trick -> trick.cards().size == 4 }.size == 9 }
 
-fun playerSeat(player: Player, seats: List<Seat>): Seat =
+fun playerSeat(player: InternalPlayer, seats: List<Seat>): Seat =
     seats.first { it.playerId == player.id }
 
 fun positionSeat(position: Position, seats: List<Seat>): Seat =
@@ -41,13 +41,13 @@ fun completeTricksOfHand(tricks: List<Trick>, hand: Hand): List<Trick> =
 /**
  * Can return null because maybe the game is not full yet.
  */
-fun maybePlayerAtPosition(position: Position, seats: List<Seat>, players: List<Player>): Player? =
+fun maybePlayerAtPosition(position: Position, seats: List<Seat>, players: List<InternalPlayer>): InternalPlayer? =
     seats.firstOrNull { it.position == position }.let { players.firstOrNull { player -> player.id == it?.playerId } }
 
-fun playerAtPosition(position: Position, seats: List<Seat>, players: List<Player>): Player =
+fun playerAtPosition(position: Position, seats: List<Seat>, players: List<InternalPlayer>): InternalPlayer =
     seats.first { it.position == position }.let { players.first { player -> player.id == it.playerId } }
 
-fun cardsInHand(hand: Hand, player: Player, state: GameState): List<CardInHand> {
+fun cardsInHand(hand: Hand, player: InternalPlayer, state: GameState): List<CardInHand> {
     val seat = playerSeat(player, state.seats)
 
     return hand.cardsOf(seat.position).map {
@@ -106,7 +106,7 @@ fun nextHandStartingPosition(hands: List<Hand>, seats: List<Seat>): Position {
     return positionsOrderedWithStart(seat.position)[1]
 }
 
-fun nextHandStartingPlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>): Player =
+fun nextHandStartingPlayer(hands: List<Hand>, players: List<InternalPlayer>, seats: List<Seat>): InternalPlayer =
     playerAtPosition(nextHandStartingPosition(hands, seats), seats, players)
 
 /**
@@ -191,10 +191,10 @@ fun winningPositionOfTricks(hand: Hand, tricks: List<Trick>): Position =
  * See activePosition, this is just a helper to map a player to a position. We always have an active position
  * but not necessary a player already sitting there.
  */
-fun activePlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>, tricks: List<Trick>): Player =
+fun activePlayer(hands: List<Hand>, players: List<InternalPlayer>, seats: List<Seat>, tricks: List<Trick>): InternalPlayer =
     playerAtPosition(activePosition(hands, seats, tricks), seats, players)
 
-fun maybeActivePlayer(hands: List<Hand>, players: List<Player>, seats: List<Seat>, tricks: List<Trick>): Player? =
+fun maybeActivePlayer(hands: List<Hand>, players: List<InternalPlayer>, seats: List<Seat>, tricks: List<Trick>): InternalPlayer? =
     maybePlayerAtPosition(activePosition(hands, seats, tricks), seats, players)
 
 context(Raise<GameAlreadyFull>)

@@ -2,9 +2,9 @@ package ch.yass.identity.helper
 
 import ch.yass.core.contract.CtxAttributes
 import ch.yass.core.helper.config
-import ch.yass.game.dto.db.Player
+import ch.yass.game.dto.db.InternalPlayer
 import io.javalin.http.Context
 
-fun player(ctx: Context): Player = ctx.attribute<Player>(CtxAttributes.PLAYER.name)!!
+fun player(ctx: Context): InternalPlayer = ctx.attribute<InternalPlayer>(CtxAttributes.PLAYER.name)!!
 
-fun isAdmin(player: Player): Boolean = config().getStringList("admins").contains(player.uuid.toString())
+fun isAdmin(player: InternalPlayer): Boolean = config().getStringList("admins").contains(player.uuid.toString())

@@ -14,7 +14,7 @@ import ch.yass.game.api.internal.NewHand
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Game
 import ch.yass.game.dto.db.Hand
-import ch.yass.game.dto.db.Player
+import ch.yass.game.dto.db.InternalPlayer
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
 import ch.yass.game.pubsub.*
@@ -55,7 +55,7 @@ class GameService(
      * some cards and start a fresh trick.
      */
     context(Raise<DomainError>)
-    fun create(request: CreateCustomGameRequest, player: Player): String {
+    fun create(request: CreateCustomGameRequest, player: InternalPlayer): String {
         val settings = GameSettings.from(request)
 
         val validWcValue = when (settings.winningConditionType) {
@@ -85,7 +85,7 @@ class GameService(
     }
 
     context(Raise<GameError>, Raise<DbError>)
-    fun join(request: JoinGameRequest, player: Player): GameState {
+    fun join(request: JoinGameRequest, player: InternalPlayer): GameState {
         val game = repo.getByCode(request.code)
         val joinedAtSeat = repo.takeASeat(game, player)
         val state = repo.getState(game)
@@ -105,7 +105,7 @@ class GameService(
     }
 
     context(Raise<GameError>)
-    fun play(request: PlayCardRequest, player: Player): GameState {
+    fun play(request: PlayCardRequest, player: InternalPlayer): GameState {
         val game = repo.getByUUID(request.game)
         val state = repo.getState(game)
         val playedCard = Card.from(request.card)
@@ -142,7 +142,7 @@ class GameService(
     }
 
     context(Raise<GameError>)
-    fun trump(request: ChooseTrumpRequest, player: Player): GameState {
+    fun trump(request: ChooseTrumpRequest, player: InternalPlayer): GameState {
         val game = repo.getByUUID(request.game)
         val state = repo.getState(game)
         val chosenTrump = Trump.valueOf(request.trump)
@@ -164,7 +164,7 @@ class GameService(
     }
 
     context(Raise<GameError>)
-    fun weisen(request: WeisenRequest, player: Player): GameState {
+    fun weisen(request: WeisenRequest, player: InternalPlayer): GameState {
         val game = repo.getByUUID(request.game)
         val state = repo.getState(game)
         val nextState = nextState(state)
@@ -221,7 +221,7 @@ class GameService(
     }
 
     context(Raise<GameError>)
-    fun schiebe(request: SchiebeRequest, player: Player): GameState {
+    fun schiebe(request: SchiebeRequest, player: InternalPlayer): GameState {
         val game = repo.getByUUID(request.game)
         val state = repo.getState(game)
         val nextState = nextState(state)

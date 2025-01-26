@@ -5,7 +5,6 @@ import arrow.core.raise.ensure
 import ch.yass.core.error.CanNotLinkAnonAccount
 import ch.yass.core.error.OryIdentityWithoutName
 import ch.yass.core.error.StringNoValidUUID
-import ch.yass.core.helper.createToken
 import ch.yass.core.helper.hashToken
 import ch.yass.core.helper.toUUID
 import ch.yass.db.tables.references.PLAYER
@@ -13,14 +12,12 @@ import ch.yass.game.api.internal.NewAnonPlayer
 import ch.yass.game.api.internal.NewOryPlayer
 import ch.yass.game.api.internal.UpdatePlayer
 import ch.yass.game.dto.Position
-import ch.yass.game.dto.db.Player
+import ch.yass.game.dto.db.InternalPlayer
 import ch.yass.game.engine.botId
 import com.google.gson.internal.LinkedTreeMap
 import org.jooq.DSLContext
 import sh.ory.model.Identity
 import sh.ory.model.Session
-import java.security.MessageDigest
-import java.security.SecureRandom
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
@@ -32,7 +29,7 @@ class PlayerService(private val db: DSLContext) {
      * via ory self-service - update it in our DB.
      */
     context(Raise<StringNoValidUUID>, Raise<OryIdentityWithoutName>)
-    fun fromSession(session: Session): Player {
+    fun fromSession(session: Session): InternalPlayer {
         val oryUuid = session.identity!!.id.toUUID()
         val name = getNameFromIdentity(session.identity!!)
         var player = getOrCreateByOry(oryUuid, NewOryPlayer(oryUuid, name))
@@ -44,19 +41,19 @@ class PlayerService(private val db: DSLContext) {
         return player
     }
 
-    fun getByAnonToken(token: String): Player? {
+    fun getByAnonToken(token: String): InternalPlayer? {
         return db.selectFrom(PLAYER)
             .where(PLAYER.ANON_TOKEN.eq(hashToken(token)))
-            .fetchOneInto(Player::class.java)
+            .fetchOneInto(InternalPlayer::class.java)
     }
 
-    fun getByOryUuid(oryUuid: UUID): Player? {
+    fun getByOryUuid(oryUuid: UUID): InternalPlayer? {
         return db.selectFrom(PLAYER)
             .where(PLAYER.ORY_UUID.eq(oryUuid.toString()))
-            .fetchOneInto(Player::class.java)
+            .fetchOneInto(InternalPlayer::class.java)
     }
 
-    fun create(player: NewOryPlayer): Player {
+    fun create(player: NewOryPlayer): InternalPlayer {
         return createInternal(
             uuid = UUID.randomUUID(),
             oryUuid = player.oryUuid,
@@ -70,8 +67,8 @@ class PlayerService(private val db: DSLContext) {
      * Special handling for bots: we don't create an actual entry in the db and just map the id to the
      * position. When loading the game state again in GameRepository.getState we again fake the player object.
      */
-    fun create(name: String, position: Position): Player {
-        return Player(
+    fun create(name: String, position: Position): InternalPlayer {
+        return InternalPlayer(
             id = botId(position),
             uuid = UUID.randomUUID(),
             oryUuid = null,
@@ -83,7 +80,7 @@ class PlayerService(private val db: DSLContext) {
         )
     }
 
-    fun create(player: NewAnonPlayer): Player {
+    fun create(player: NewAnonPlayer): InternalPlayer {
         return createInternal(
             uuid = UUID.randomUUID(),
             oryUuid = null,
@@ -94,7 +91,7 @@ class PlayerService(private val db: DSLContext) {
     }
 
     context(Raise<CanNotLinkAnonAccount>)
-    fun linkAnonAccount(player: Player, oryUuid: UUID, orySession: String): Player {
+    fun linkAnonAccount(player: InternalPlayer, oryUuid: UUID, orySession: String): InternalPlayer {
         // Just make sure no funky stuff is going on and we don't have an existing player with this ory uuid already set
         val existingOryUuids = db.fetchCount(PLAYER, PLAYER.ORY_UUID.eq(oryUuid.toString()))
         ensure(existingOryUuids == 0) { CanNotLinkAnonAccount(player, orySession) }
@@ -105,10 +102,10 @@ class PlayerService(private val db: DSLContext) {
             .set(PLAYER.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
             .where(PLAYER.UUID.eq(player.uuid.toString()))
             .returningResult(PLAYER)
-            .fetchOneInto(Player::class.java)!!
+            .fetchOneInto(InternalPlayer::class.java)!!
     }
 
-    fun resetAnonToken(player: Player) {
+    fun resetAnonToken(player: InternalPlayer) {
         db.update(PLAYER)
             .setNull(PLAYER.ANON_TOKEN)
             .set(PLAYER.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
@@ -116,7 +113,7 @@ class PlayerService(private val db: DSLContext) {
             .execute()
     }
 
-    private fun createInternal(uuid: UUID, oryUuid: UUID?, name: String, bot: Boolean, anonToken: String?): Player {
+    private fun createInternal(uuid: UUID, oryUuid: UUID?, name: String, bot: Boolean, anonToken: String?): InternalPlayer {
         return db.insertInto(
             PLAYER,
             PLAYER.UUID,
@@ -137,19 +134,19 @@ class PlayerService(private val db: DSLContext) {
                 LocalDateTime.now(ZoneOffset.UTC),
             )
             .returningResult(PLAYER)
-            .fetchOneInto(Player::class.java)!!
+            .fetchOneInto(InternalPlayer::class.java)!!
     }
 
-    private fun update(uuid: UUID, updatePlayer: UpdatePlayer): Player {
+    private fun update(uuid: UUID, updatePlayer: UpdatePlayer): InternalPlayer {
         return db.update(PLAYER)
             .set(PLAYER.NAME, updatePlayer.name)
             .set(PLAYER.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
             .where(PLAYER.UUID.eq(uuid.toString()))
             .returningResult(PLAYER)
-            .fetchOneInto(Player::class.java)!!
+            .fetchOneInto(InternalPlayer::class.java)!!
     }
 
-    private fun getOrCreateByOry(oryUuid: UUID, newOryPlayer: NewOryPlayer): Player =
+    private fun getOrCreateByOry(oryUuid: UUID, newOryPlayer: NewOryPlayer): InternalPlayer =
         getByOryUuid(oryUuid) ?: create(newOryPlayer)
 
     context(Raise<OryIdentityWithoutName>)

@@ -3,6 +3,7 @@ package ch.yass.core
 import ch.yass.Yass
 import ch.yass.core.helper.config
 import ch.yass.core.pubsub.PubSub
+import ch.yass.game.dto.db.InternalPlayer
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -99,6 +100,9 @@ object Core {
             disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             dateFormat = StdDateFormat().withColonInTimeZone(true)
+
+            // Make sure to never serialize
+            configOverride(InternalPlayer::class.java).setIsIgnoredType(true)
         }
 
         return mapper
