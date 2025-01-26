@@ -4,7 +4,8 @@ import ch.yass.core.pubsub.Action
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Hand
-import ch.yass.game.dto.db.Player
+import ch.yass.game.dto.Player
+import ch.yass.game.dto.db.InternalPlayer
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
 
@@ -45,8 +46,8 @@ fun gameFinishedActions(state: GameState): List<Action> {
     return listOf(
         UpdatePoints(points),
         GameFinished(
-            winners.team.positions.map { playerAtPosition(it, state.seats, state.allPlayers) },
-            losers.team.positions.map { playerAtPosition(it, state.seats, state.allPlayers) },
+            winners.team.positions.map { Player.from(playerAtPosition(it, state.seats, state.allPlayers)) },
+            losers.team.positions.map { Player.from(playerAtPosition(it, state.seats, state.allPlayers)) },
             winners.points,
             losers.points
         )
@@ -143,7 +144,7 @@ fun geschobenActions(state: GameState): List<Action> {
     )
 }
 
-fun playerJoinedActions(state: GameState, newPlayer: Player, joinedAtSeat: Seat): List<Action> {
+fun playerJoinedActions(state: GameState, newPlayer: InternalPlayer, joinedAtSeat: Seat): List<Action> {
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.seats, state.tricks)
 
@@ -162,7 +163,7 @@ fun playerJoinedActions(state: GameState, newPlayer: Player, joinedAtSeat: Seat)
     )
 }
 
-fun playerDisconnectedActions(dcSeat: Seat, dcPlayer: Player): List<Action> {
+fun playerDisconnectedActions(dcSeat: Seat, dcPlayer: InternalPlayer): List<Action> {
     return listOf(
         PlayerDisconnected(
             PlayerAtTable(

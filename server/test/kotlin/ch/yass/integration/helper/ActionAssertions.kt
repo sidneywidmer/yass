@@ -2,7 +2,7 @@ package ch.yass.integration.helper
 
 import ch.yass.core.pubsub.Action
 import ch.yass.game.dto.*
-import ch.yass.game.dto.db.Player
+import ch.yass.game.dto.db.InternalPlayer
 import ch.yass.game.pubsub.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -43,7 +43,7 @@ class ActionAssertions(private val actions: List<Action>) {
         assertTrue(actions.any { it is UpdateTrump && it.trump == trump })
     }
 
-    fun hasWinner(player: Player) {
-        assertTrue(actions.any { it is GameFinished && it.winners.contains(player) })
+    fun hasWinner(player: InternalPlayer) {
+        assertTrue(actions.any { it is GameFinished && it.winners.contains(Player.from(player)) })
     }
 }

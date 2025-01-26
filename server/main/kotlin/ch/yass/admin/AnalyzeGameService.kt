@@ -14,10 +14,11 @@ import ch.yass.core.helper.associateWithToEnum
 import ch.yass.game.GameService
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.GameStatus
+import ch.yass.game.dto.Player
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.TotalPoints
 import ch.yass.game.dto.db.Hand
-import ch.yass.game.dto.db.Player
+import ch.yass.game.dto.db.InternalPlayer
 import ch.yass.game.dto.sumPointsByPosition
 import ch.yass.game.engine.*
 import ch.yass.admin.api.analzye.Hand as AnalyzeHand
@@ -28,13 +29,13 @@ import ch.yass.admin.api.analzye.Hand as AnalyzeHand
 class AnalyzeGameService(private val gameService: GameService) {
 
     context(Raise<GameWithCodeNotFound>, Raise<PlayerNotInGame>, Raise<GameNotFinished>)
-    fun analyze(code: String, player: Player): AnalyzeGameStateResponse {
+    fun analyze(code: String, player: InternalPlayer): AnalyzeGameStateResponse {
         val state = gameService.getStateByCode(code)
 
         ensure<PlayerNotInGame>(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
         ensure<GameNotFinished>(state.game.status == GameStatus.FINISHED) { GameNotFinished(state.game.uuid.toString()) }
 
-        val hands = state.hands.reversed().stream().map { mapHand(it, state) }.toList()
+        val hands = state.hands.reversed().map { mapHand(it, state) }
         val points = pointsByPositionTotal(state.hands, state.tricks)
         val winners = getWinningTeam(points)
         val losers = getLosingTeam(points)
@@ -42,7 +43,7 @@ class AnalyzeGameService(private val gameService: GameService) {
         return AnalyzeGameStateResponse(hands, points, state.game.uuid, winners, losers)
     }
 
-    private fun mapHand(hand: Hand, state: GameState): ch.yass.admin.api.analzye.Hand {
+    private fun mapHand(hand: Hand, state: GameState): AnalyzeHand {
         val startingPlayer = playerAtPosition(hand.startingPosition, state.seats, state.allPlayers)
         val players = state.allPlayers.map { mapPlayer(it, hand, state) }.toList()
         var details = handTricksWithPoints(listOf(hand), state.tricks)
@@ -51,7 +52,7 @@ class AnalyzeGameService(private val gameService: GameService) {
         val weise = Position.entries
             .map {
                 PlayerWithWeise(
-                    playerAtPosition(it, state.seats, state.allPlayers),
+                    Player.from(playerAtPosition(it, state.seats, state.allPlayers)),
                     hand.weiseOf(it).map { w -> w.toWeisWithPoints(hand.trump) }
                 )
             }
@@ -63,21 +64,29 @@ class AnalyzeGameService(private val gameService: GameService) {
             val winnerPlayer = playerAtPosition(trickDetail.winner, state.seats, state.allPlayers)
             val leadPlayer = playerAtPosition(trickDetail.lead, state.seats, state.allPlayers)
             val cards = positionsOrderedWithStart(trickDetail.lead).map {
-                PlayedCardWithPlayer(playerAtPosition(it, state.seats, state.allPlayers), trickDetail.trick.cardOf(it))
+                PlayedCardWithPlayer(Player.from(playerAtPosition(it, state.seats, state.allPlayers)), trickDetail.trick.cardOf(it))
             }
             TrickWithCards(
                 cards,
-                leadPlayer,
+                Player.from(leadPlayer),
                 trickDetail.trick.cardOf(trickDetail.lead)?.suit,
-                winnerPlayer,
+                Player.from(winnerPlayer),
                 trickDetail.points
             )
         }
 
-        return AnalyzeHand(hand.trump, hand.gschobe, startingPlayer, players, tricks.reversed(), points, weise)
+        return AnalyzeHand(
+            hand.trump,
+            hand.gschobe,
+            Player.from(startingPlayer),
+            players,
+            tricks.reversed(),
+            points,
+            weise
+        )
     }
 
-    private fun mapPlayer(player: Player, hand: Hand, state: GameState): PlayerWithCards {
+    private fun mapPlayer(player: InternalPlayer, hand: Hand, state: GameState): PlayerWithCards {
         val seat = state.seats.first { it.playerId == player.id }
         val cards = hand.cardsOf(seat.position)
         return PlayerWithCards(player.uuid, player.name, cards, seat.position)

@@ -39,7 +39,7 @@ class GameRepository(private val db: DSLContext) {
     }
 
     context(Raise<GameAlreadyFull>)
-    fun takeASeat(game: Game, player: Player, position: Position? = null): Seat {
+    fun takeASeat(game: Game, player: InternalPlayer, position: Position? = null): Seat {
         val seats = getSeats(game)
         val maybeAlreadySeated = seats.firstOrNull { it.playerId == player.id }
         return maybeAlreadySeated?.let { rejoinSeat(it) }
@@ -67,7 +67,7 @@ class GameRepository(private val db: DSLContext) {
         val bots = seats
             .filter { it.status == SeatStatus.BOT }
             .map {
-                Player(
+                InternalPlayer(
                     id = botId(it.position),
                     uuid = UUID.randomUUID(),
                     oryUuid = null,
@@ -231,10 +231,10 @@ class GameRepository(private val db: DSLContext) {
             .fetchOneInto(Seat::class.java)!!
     }
 
-    private fun getPlayers(seats: List<Seat>): List<Player> =
+    private fun getPlayers(seats: List<Seat>): List<InternalPlayer> =
         db.selectFrom(PLAYER)
             .where(PLAYER.ID.`in`(seats.map { it.playerId }))
-            .fetchInto(Player::class.java)
+            .fetchInto(InternalPlayer::class.java)
 
     private fun getSeats(game: Game): List<Seat> =
         db.selectFrom(SEAT)

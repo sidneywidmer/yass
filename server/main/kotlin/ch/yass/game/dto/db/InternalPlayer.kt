@@ -3,7 +3,10 @@ package ch.yass.game.dto.db
 import java.time.LocalDateTime
 import java.util.*
 
-data class Player(
+/**
+ * It's essential that this dto never gets leaked since it possibly contains an anonToken
+ */
+data class InternalPlayer(
     val id: Int,
     val uuid: UUID,
     val oryUuid: UUID?, // Is null for anonymous user

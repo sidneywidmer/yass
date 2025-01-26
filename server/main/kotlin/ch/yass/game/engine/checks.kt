@@ -8,7 +8,7 @@ import ch.yass.core.error.PlayerDoesNotOwnCard
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Hand
-import ch.yass.game.dto.db.Player
+import ch.yass.game.dto.db.InternalPlayer
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.dto.db.Trick
 
@@ -16,7 +16,7 @@ import ch.yass.game.dto.db.Trick
  * Take all cards the given player was dealt in the current hand and subtract all the
  * cards he already played in the tricks of this hand.
  */
-fun unplayedCardsOfPlayer(player: Player, hands: List<Hand>, seats: List<Seat>, tricks: List<Trick>): List<Card> {
+fun unplayedCardsOfPlayer(player: InternalPlayer, hands: List<Hand>, seats: List<Seat>, tricks: List<Trick>): List<Card> {
     val hand = currentHand(hands)
     val seat = playerSeat(player, seats)
 
@@ -81,15 +81,15 @@ fun isStoeckGewiesen(hand: Hand, weise: List<Weis>, position: Position, tricks: 
 
 fun isAlreadyGschobe(hand: Hand?): Boolean = hand?.gschobe != Gschobe.NOT_YET
 
-fun playerInGame(player: Player, seats: List<Seat>): Boolean = seats.any { it.playerId == player.id }
+fun playerInGame(player: InternalPlayer, seats: List<Seat>): Boolean = seats.any { it.playerId == player.id }
 
-fun playerOwnsSeat(player: Player, seatUuid: String, seats: List<Seat>): Boolean =
+fun playerOwnsSeat(player: InternalPlayer, seatUuid: String, seats: List<Seat>): Boolean =
     seats.firstOrNull { it.playerId == player.id }?.uuid.toString() == seatUuid
 
 /**
  * Check if the current player was ever dealt and has not yet played the given card.
  */
-fun playerOwnsCard(player: Player, card: Card, state: GameState): Boolean {
+fun playerOwnsCard(player: InternalPlayer, card: Card, state: GameState): Boolean {
     val unplayedCards = unplayedCardsOfPlayer(player, state.hands, state.seats, state.tricks)
 
     return unplayedCards.any { it == card }
@@ -98,7 +98,7 @@ fun playerOwnsCard(player: Player, card: Card, state: GameState): Boolean {
 fun expectedState(allowed: List<State>, state: State): Boolean = allowed.contains(state)
 
 // activePlayer could _in theory_ be null if a game is not full and someone already plays a card
-fun playerHasActivePosition(player: Player, state: GameState): Boolean =
+fun playerHasActivePosition(player: InternalPlayer, state: GameState): Boolean =
     maybeActivePlayer(state.hands, state.allPlayers, state.seats, state.tricks)?.id == player.id
 
 fun isLastCard(cards: List<Card>) = cards.size == 1
@@ -134,14 +134,14 @@ fun isGameFinished(state: GameState): Boolean {
 }
 
 context(Raise<GameError>)
-fun cardIsPlayable(card: Card, player: Player, state: GameState): Boolean {
+fun cardIsPlayable(card: Card, player: InternalPlayer, state: GameState): Boolean {
     ensure(playerOwnsCard(player, card, state)) { PlayerDoesNotOwnCard(player, card, state) }
     ensure(cardFollowsLead(card, player, state)) { CardNotPlayable(card, player, state) }
 
     return true
 }
 
-fun cardFollowsLead(card: Card, player: Player, state: GameState): Boolean {
+fun cardFollowsLead(card: Card, player: InternalPlayer, state: GameState): Boolean {
     val trick = currentTrick(state.tricks)
     val hand = currentHand(state.hands)
     val tricks = tricksOfHand(state.tricks, hand)

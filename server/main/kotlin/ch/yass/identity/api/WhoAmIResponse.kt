@@ -1,6 +1,6 @@
 package ch.yass.identity.api
 
-import ch.yass.game.dto.db.Player
+import ch.yass.game.dto.db.InternalPlayer
 import java.util.*
 
 data class WhoAmIResponse(
@@ -9,7 +9,7 @@ data class WhoAmIResponse(
     val isAnon: Boolean
 ) {
     companion object {
-        fun from(player: Player): WhoAmIResponse = WhoAmIResponse(player.uuid, player.name, player.oryUuid == null)
+        fun from(player: InternalPlayer): WhoAmIResponse = WhoAmIResponse(player.uuid, player.name, player.oryUuid == null)
     }
 }
 

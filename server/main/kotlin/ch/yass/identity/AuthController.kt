@@ -15,7 +15,7 @@ import ch.yass.core.helper.validate
 import ch.yass.game.GameRepository
 import ch.yass.game.PlayerService
 import ch.yass.game.api.internal.NewAnonPlayer
-import ch.yass.game.dto.db.Player
+import ch.yass.game.dto.db.InternalPlayer
 import ch.yass.game.engine.playerInGame
 import ch.yass.game.engine.playerOwnsSeat
 import ch.yass.identity.api.*
@@ -150,7 +150,7 @@ class AuthController(
     }
 
     context(Raise<CanNotLinkAnonAccount>)
-    private fun getSession(player: Player, orySession: String): Session =
+    private fun getSession(player: InternalPlayer, orySession: String): Session =
         arrow.core.raise.catch({
             oryClient.frontend.toSession(orySession, null, null)
         }) { _: ApiException -> raise(CanNotLinkAnonAccount(player, orySession)) }
