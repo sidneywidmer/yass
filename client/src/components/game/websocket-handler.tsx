@@ -1,14 +1,29 @@
 import {useEffect} from 'react'
-import {Centrifuge} from 'centrifuge'
+import {Centrifuge, TransportName} from 'centrifuge'
 import {useGameStateStore} from '@/store/game-state'
 import useGameActions from "@/hooks/use-game-actions.tsx";
-
+class CustomEventSource extends EventSource {
+  constructor(url: string, _?: EventSourceInit) {
+    super(url, {
+      withCredentials: true,
+    });
+  }
+}
 
 export function WebSocketHandler() {
   const {gameUuid, uuid} = useGameStateStore()
   const {addActions} = useGameActions()
-
-  const centrifuge = new Centrifuge(import.meta.env.VITE_CENTRIFUGO_API_URL + '/connection/websocket', {});
+  const transports = [
+    {
+      transport: 'sse' as TransportName,
+      endpoint: import.meta.env.VITE_CENTRIFUGO_API_URL_SSE + '/connection/sse',
+    }
+  ];
+  const centrifuge = new Centrifuge(transports, {
+    debug: true,
+    eventsource: CustomEventSource,
+    emulationEndpoint: import.meta.env.VITE_CENTRIFUGO_API_URL_SSE + '/emulation',
+  });
 
   useEffect(() => {
     if (!gameUuid) return

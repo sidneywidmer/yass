@@ -72,7 +72,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     container_name: centrifugo
-    image: centrifugo/centrifugo:v5.2
+    image: centrifugo/centrifugo:v6.0
     volumes:
       - ./.docker/centrifugo/config.json:/centrifugo/config.json
     command: centrifugo -c config.json

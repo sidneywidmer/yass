@@ -81,7 +81,7 @@ class AuthController(
                     isHttpOnly = true
                     path = "/"
                     sameSite = SameSite.NONE
-                    secure = config.getBoolean("server.cookieSecure")
+                    secure = true
                     domain = config.getString("server.cookieDomain")
                     maxAge = 60 * 60 * 24 * 365 // 1 year
                 }
@@ -99,8 +99,10 @@ class AuthController(
             Cookie("anon_token", "").apply {
                 isHttpOnly = true
                 path = "/"
-                sameSite = SameSite.LAX
-                maxAge = 0
+                sameSite = SameSite.NONE
+                secure = true
+                domain = config.getString("server.cookieDomain")
+                maxAge = 0 // Delete cookie by setting maxAge to 0
             }
         )
         successResponse(ctx, object {

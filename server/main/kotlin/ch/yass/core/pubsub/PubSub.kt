@@ -3,11 +3,8 @@ package ch.yass.core.pubsub
 import ch.yass.core.CentrifugoClient
 import ch.yass.core.helper.config
 import com.fasterxml.jackson.databind.ObjectMapper
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
 
