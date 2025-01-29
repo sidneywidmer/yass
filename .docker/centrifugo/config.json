@@ -1,26 +1,58 @@
 {
-  "log_level": "debug",
-  "token_hmac_secret_key": "my_secret",
-  "api_key": "my_api_key",
-  "admin_password": "password",
-  "admin_secret": "secret",
-  "admin": true,
-  "allowed_origins": [
-    "http://127.0.0.1:5173"
-  ],
-  "proxy_connect_endpoint": "http://host.docker.internal:8080/auth/connect",
-  "proxy_subscribe_endpoint": "http://host.docker.internal:8080/auth/subscribe",
-  "proxy_subscribe_timeout": "5s",
-  "proxy_connect_timeout": "5s",
-  "proxy_http_headers": [
-    "Cookie",
-    "X-Session-Token",
-    "X-Anon-Token"
-  ],
-  "namespaces": [
-    {
-      "name": "seat",
-      "proxy_subscribe": true
+  "client": {
+    "token": {
+      "hmac_secret_key": "my_secret"
+    },
+    "allowed_origins": [
+      "http://127.0.0.1:5173"
+    ],
+    "proxy": {
+      "connect": {
+        "endpoint": "http://host.docker.internal:8080/auth/connect",
+        "timeout": "5s",
+        "enabled": true,
+        "http": {},
+        "http_headers": [
+          "Cookie"
+        ],
+        "grpc": {}
+      }
     }
-  ]
+  },
+  "admin": {
+    "enabled": true,
+    "password": "FooBar",
+    "secret": "BarBaz"
+  },
+  "log": {
+    "level": "info"
+  },
+  "channel": {
+    "proxy": {
+      "subscribe": {
+        "timeout": "5s",
+        "endpoint": "http://host.docker.internal:8080/auth/subscribe",
+        "http": {},
+        "http_headers": [
+          "Cookie"
+        ],
+        "grpc": {}
+      }
+    },
+    "namespaces": [
+      {
+        "name": "seat",
+        "subscribe_proxy_enabled": true
+      }
+    ]
+  },
+  "http_api": {
+    "insecure": true
+  },
+  "websocket": {
+    "disabled": true
+  },
+  "sse": {
+    "enabled": true
+  }
 }
