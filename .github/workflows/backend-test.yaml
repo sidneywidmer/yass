@@ -27,6 +27,9 @@ jobs:
         run: mvn verify
         env:
           ENVIRONMENT: test
+          CENTRIFUGO_API_KEY: test
+          SERVER_CORS: http://127.0.0.1:5173
+          COOKIE_DOMAIN: 127.0.0.1
 
       - name: Install DeepSource CLI
         run: curl https://deepsource.io/cli | sh

@@ -55,7 +55,7 @@ class GameRepository(private val db: DSLContext) {
      */
     fun getState(game: Game): GameState {
         // Not a lot of changes on the game normally, BUT it could be finished so we need to re-fetch
-        var refreshedGame = refresh(game)
+        val refreshedGame = refresh(game)
 
         // Fake an id if this seat belongs to a bot
         val seats = getSeats(refreshedGame)
