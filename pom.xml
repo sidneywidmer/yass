@@ -27,7 +27,7 @@
         <dependency>
             <groupId>io.javalin</groupId>
             <artifactId>javalin</artifactId>
-            <version>6.4.0</version>
+            <version>6.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.kodein.di</groupId>
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>sh.ory</groupId>
             <artifactId>ory-client</artifactId>
-            <version>1.6.2</version>
+            <version>1.20.11</version>
         </dependency>
         <dependency>
             <groupId>io.arrow-kt</groupId>
@@ -147,7 +147,7 @@
         <dependency>
             <groupId>org.wiremock</groupId>
             <artifactId>wiremock</artifactId>
-            <version>3.9.1</version>
+            <version>3.13.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -160,7 +160,7 @@
         <dependency>
             <groupId>net.minidev</groupId>
             <artifactId>json-smart</artifactId>
-            <version>2.2.1</version>
+            <version>2.5.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -183,7 +183,7 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
-            <version>1.20.1</version>
+            <version>1.21.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -201,12 +201,12 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.4.14</version>
+            <version>1.5.18</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-            <version>1.4.12</version>
+            <version>1.5.18</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.janino</groupId>

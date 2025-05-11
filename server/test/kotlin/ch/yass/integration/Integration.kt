@@ -13,7 +13,6 @@ import org.kodein.di.instance
 
 open class Integration {
     protected val container = Yass.container
-    protected val db = PostgresContainer.instance
     protected val centrifugo = CentrifugoServer.instance
 
     companion object {
