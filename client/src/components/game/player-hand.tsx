@@ -7,7 +7,11 @@ import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 import {api} from "@/api/client.ts";
 
 export function PlayerHand() {
-  const {gameUuid, cards, position, removeCardFromHand, playCard} = useGameStateStore()
+  const gameUuid = useGameStateStore(state => state.gameUuid)
+  const cards = useGameStateStore(state => state.cards)
+  const position = useGameStateStore(state => state.position)
+  const removeCardFromHand = useGameStateStore(state => state.removeCardFromHand)
+  const playCard = useGameStateStore(state => state.playCard)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const handleAxiosError = useAxiosErrorHandler()
   const isMyPos = useGameStateStore((state) => state.activePosition === state.position)

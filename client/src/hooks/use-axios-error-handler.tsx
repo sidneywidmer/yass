@@ -1,12 +1,13 @@
 import {AxiosError} from 'axios'
 import {useTranslation} from 'react-i18next'
 import {useErrorStore} from "@/store/error.ts";
+import {useCallback} from "react";
 
 export const useAxiosErrorHandler = () => {
   const {t} = useTranslation()
   const {addError} = useErrorStore()
 
-  return (error: AxiosError) => {
+  return useCallback((error: AxiosError) => {
     if (!error.response) {
       addError({
         title: t('errors.network.title'),
@@ -46,5 +47,5 @@ export const useAxiosErrorHandler = () => {
           description: t('errors.unknown.description')
         })
     }
-  }
+  }, [t, addError]);
 }

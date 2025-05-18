@@ -10,7 +10,8 @@ import {TFunction} from "i18next";
 export const useOry = () => {
   const navigate = useNavigate()
   const handleError = useAxiosErrorHandler()
-  const {setOryPlayer, logout} = usePlayerStore()
+  const setOryPlayer = usePlayerStore(state => state.setOryPlayer)
+  const logout = usePlayerStore(state => state.logout)
   const [loginError, setLoginError] = useState<ErrorMessage | null>(null)
   const [signupError, setSignupError] = useState<ErrorMessage | null>(null)
   const {t}: { t: TFunction } = useTranslation()

@@ -41,7 +41,7 @@ const trumpIcons: Record<Trump, TrumpIconConfig> = {
 }
 
 export function CurrentTrump() {
-  const {trump} = useGameStateStore()
+  const trump = useGameStateStore(state => state.trump)
   const [key, setKey] = useState(0)
 
   useEffect(() => {

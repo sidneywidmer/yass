@@ -4,7 +4,7 @@ import {useGameStateStore} from '@/store/game-state'
 import {useAxiosErrorHandler} from '@/hooks/use-axios-error-handler'
 
 export function PingHandler() {
-  const {uuid} = useGameStateStore()
+  const uuid = useGameStateStore(state => state.uuid)
   const intervalRef = useRef<NodeJS.Timeout>()
   const handleError = useAxiosErrorHandler()
 

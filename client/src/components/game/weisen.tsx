@@ -10,14 +10,17 @@ import {useTranslation} from "react-i18next";
 
 export function Weisen() {
   const isMyPos = useGameStateStore((state) => state.activePosition === state.position)
-  const {state, weise, gameUuid, otherWeise} = useGameStateStore()
+  const state = useGameStateStore(state => state.state)
+  const weise = useGameStateStore(state => state.weise)
+  const gameUuid = useGameStateStore(state => state.gameUuid)
+  const otherWeise = useGameStateStore(state => state.otherWeise)
   const [open, setOpen] = useState(true)
   const handleAxiosError = useAxiosErrorHandler()
   const {t} = useTranslation()
 
   // It's possible that we still display weis of other players - wait with opening
   // this overlay so we don't have two open == bad UX
-  if (state !== "WEISEN_FIRST" || Object.entries(otherWeise).length > 0 || !isMyPos ) {
+  if (state !== "WEISEN_FIRST" || Object.entries(otherWeise).length > 0 || !isMyPos) {
     return
   }
 
@@ -51,7 +54,7 @@ export function Weisen() {
                 <span className="text-sm text-muted-foreground">{weis.points} {t("weisen.points")}</span>
               </div>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-              {weis.cards!!.map((card, i) => (
+                {weis.cards!!.map((card, i) => (
                   <Card key={i} card={card}/>
                 ))}
               </div>

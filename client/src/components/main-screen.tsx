@@ -9,7 +9,7 @@ import {useNavigate} from "react-router-dom";
 
 export function MainScreen() {
   const [gameCode, setGameCode] = useState("")
-  const {name} = usePlayerStore()
+  const name = usePlayerStore(state => state.name)
   const {t} = useTranslation()
   const navigate = useNavigate()
 

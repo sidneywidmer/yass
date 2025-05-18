@@ -34,7 +34,8 @@ interface PointsProps {
 }
 
 const Points = ({team}: PointsProps) => {
-  const {points, position} = useGameStateStore()
+  const points = useGameStateStore(state => state.points)
+  const position = useGameStateStore(state => state.position)
   const previousTotalRef = useRef(0)
   const totals = calculateTeamTotals(points)
   const currentTotal = totals[team].total
