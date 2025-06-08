@@ -39,7 +39,7 @@ fun errorResponse(ctx: Context, error: DomainError): Context {
         else -> {
             logger().error("DomainError `${error.javaClass.name}` encountered: $error")
             ctx.status(500).json(ErrorResponse("something went wrong", object {
-                val domainError = error.javaClass.name
+                val domainError = error.toString()
             }))
         }
     }

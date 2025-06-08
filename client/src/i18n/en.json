@@ -16,6 +16,11 @@
       "4000034": "The password has been found in data breaches and must no longer be used.",
       "4010001": "The login flow expired {expired_at_unix_since_minutes} minutes ago, please try again."
     },
+
+    "gameFull": {
+      "title": "Game full",
+      "description": "The game is already full"
+    },
     "network": {
       "title": "Network Error",
       "description": "Could not reach Yass server"
@@ -97,11 +102,11 @@
     }
   },
   "weisen": {
-    "title": "Weisen",
+    "title": "Select Weis",
     "title_alt": "Gewiesen",
     "description": "Choose cards for your weis",
     "points": "Points",
-    "zeroWeis": "0 Points weisen"
+    "zeroWeis": "Do not weis any points"
   },
   "weis": {
     "DREI_BLATT": "3 of a suit",

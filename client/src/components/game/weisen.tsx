@@ -45,7 +45,7 @@ export function Weisen() {
           {weise && weise.filter(weis => weis.type !== 'SKIP').map((weis, idx) => (
             <div
               key={idx}
-              className="p-4 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+              className="p-4 rounded-lg hover:bg-muted transition-colors cursor-pointer bg-emerald-100"
               onClick={() => onWeisSelect(weis)}
             >
               <div className="flex items-center gap-4 mb-2">
