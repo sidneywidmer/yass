@@ -1,10 +1,24 @@
 import {Card as C} from "@/api/generated";
 import {cn} from "@/lib/utils.ts";
 
-// TODO: Refactor, copy pasted
-export const CARD_ASPECT_RATIO = 261.11 / 355.19
-export const CARD_HEIGHT = 130
-export const CARD_WIDTH = Math.ceil(CARD_HEIGHT * CARD_ASPECT_RATIO)
+export const CARD_ASPECT_RATIO = 355.19 / 261.11
+export const CARD_WIDTH = getResponsiveValue(74, 96)
+export const CARD_HEIGHT = Math.ceil(CARD_WIDTH * CARD_ASPECT_RATIO)
+
+function getResponsiveValue(minValue: number, maxValue: number) {
+  const currentWidth = window.innerWidth;
+  const min = 375
+  const max = 600
+  if (currentWidth <= min) {
+    return minValue;
+  }
+  if (currentWidth >= max) {
+    return maxValue;
+  }
+
+  const slope = (maxValue - minValue) / (max - min);
+  return  minValue + slope * (currentWidth - min);
+}
 
 interface CardProps {
   card: C
