@@ -17,7 +17,12 @@ export function PlayedCards() {
     WEST: 90 + (Math.random() * 10 - 5),
   }), [])
 
-  const getInitialPosition = (position: Position, exclRotate: boolean = false) => {
+  const getInitialPosition = (position: Position, exclRotate: boolean = false, exclWe = false) => {
+    // "We" are always sitting south, no special initial position needs to be calculated
+    if (position == "SOUTH" && !exclWe) {
+      return undefined
+    }
+
     const target = getPosition(position)
     const transforms = {
       NORTH: {x: target.x, y: target.y - 200, rotate: woop(180), opacity: 0},
@@ -52,7 +57,7 @@ export function PlayedCards() {
   }
 
   const handleExit = () => {
-    return getInitialPosition(getRelativePosition(position!!, clearDirection!!), true)
+    return getInitialPosition(getRelativePosition(position!!, clearDirection!!), true, true)
   }
 
   return (

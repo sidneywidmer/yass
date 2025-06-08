@@ -1,22 +1,25 @@
 import {Bot, User} from "lucide-react"
-import {cn, getRelativePosition} from "@/lib/utils"
+import {cn, getRelativePosition, getResponsiveValue} from "@/lib/utils"
 import {Position} from "@/api/generated"
 import {useGameStateStore} from "@/store/game-state"
 import {Card} from "@/components/ui/card.tsx";
 import {AnimatePresence, motion} from "framer-motion"
 
+const VERTICAL = getResponsiveValue(200, 250)
+const HORIZONTAL = getResponsiveValue(160, 230)
+
 const positionStyles: Record<Position, { transform: string, opacity: number }> = {
-  NORTH: {transform: 'translate(-50%, calc(-50% - 200px))', opacity: 1},
-  SOUTH: {transform: 'translate(-50%, calc(-50% + 200px))', opacity: 1},
-  EAST: {transform: 'translate(calc(-50% + 300px), -50%)', opacity: 1},
-  WEST: {transform: 'translate(calc(-50% - 300px), -50%)', opacity: 1}
+  NORTH: {transform: 'translate(-50%, calc(-50% - ' + VERTICAL + 'px))', opacity: 1},
+  SOUTH: {transform: 'translate(-50%, calc(-50% + ' + VERTICAL + 'px))', opacity: 1},
+  EAST: {transform: 'translate(calc(-50% + ' + HORIZONTAL + 'px), -50%) rotate(-90deg)', opacity: 1},
+  WEST: {transform: 'translate(calc(-50% - ' + HORIZONTAL + 'px), -50%) rotate(-90deg)', opacity: 1}
 }
 
 const positionStylesInitial: Record<Position, { transform: string }> = {
-  NORTH: {transform: 'translate(-50%, calc(-50% - 230px))'},
-  SOUTH: {transform: 'translate(-50%, calc(-50% + 230px))'},
-  EAST: {transform: 'translate(calc(-50% + 330px), -50%)'},
-  WEST: {transform: 'translate(calc(-50% - 330px), -50%)'}
+  NORTH: {transform: 'translate(-50%, calc(-50% - ' + VERTICAL + 'px))'},
+  SOUTH: {transform: 'translate(-50%, calc(-50% + ' + VERTICAL + 'px))'},
+  EAST: {transform: 'translate(calc(-50% + ' + HORIZONTAL + 'px), -50%) rotate(-90deg)'},
+  WEST: {transform: 'translate(calc(-50% - ' + HORIZONTAL + 'px), -50%) rotate(-90deg)'}
 }
 const StatusIndicator = ({status, isActive}: { status: string, isActive?: boolean }) => {
   return (
