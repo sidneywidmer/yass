@@ -67,7 +67,7 @@ export function PlayedCards() {
               className="absolute origin-center"
               initial={getInitialPosition(getRelativePosition(position!!, card.position!!))}
               animate={
-                clearDirection && getRelativePosition(position!!, card.position!!) === clearDirection
+                clearDirection && card.position!! === clearDirection
                   ? {
                     ...getPosition(getRelativePosition(position!!, card.position!!)),
                     opacity: 1,
