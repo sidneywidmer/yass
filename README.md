@@ -24,3 +24,12 @@ of errors we currently have.
 
 Config file is under resources/application.conf. The environment variables need to be provided otherwise the application
 won't start (direnv is a good solution for this `direnv`)
+
+## Deployment
+
+KISS: 
+1. ./mvnw clean package -DskipTests
+2. npm run build
+3. rsync -avz --delete dist/ root@{server}:/var/www/frontend/
+4. rsync -avz --delete target/server-1.0.0-SNAPSHOT.jar root@{server}:/opt/yass/yass.jar
+5. ssh to server and `service yass restart`
