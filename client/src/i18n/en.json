@@ -134,10 +134,10 @@
     "tricks": "Tricks",
     "winner": "Won",
     "loser": "Lost",
-    "startingPlayer": "Starting Player",
+    "startingPlayer": "First",
     "teams": {
-      "northSouth": "North/South",
-      "eastWest": "East/West"
+      "northSouth": "N/S",
+      "eastWest": "E/W"
     }
   },
   "trumps": {

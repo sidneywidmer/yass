@@ -137,12 +137,12 @@
     "hand": "Hand",
     "trump": "Trumpf",
     "tricks": "Stiche",
-    "startingPlayer": "Startspieler",
+    "startingPlayer": "Start",
     "winner": "Gewonnen",
     "loser": "Verloren",
     "teams": {
-      "northSouth": "Nord/Süd",
-      "eastWest": "Ost/West"
+      "northSouth": "N/S",
+      "eastWest": "O/W"
     }
   },
   "trumps": {
