@@ -1,4 +1,8 @@
 {
+  "settings": {
+    "title": "Einstellungen",
+    "language": "Sprache"
+  },
   "errors": {
     "title": "Fehler",
     "anonSignup": "Muss zwischen 3 und 15 Zeichen lang sein und darf nur Buchstaben und Zahlen enthalten",
