@@ -116,11 +116,11 @@ export default function Analyze() {
                   <AccordionTrigger className="hover:no-underline">
                     <div className="flex items-center justify-between w-full">
                       <div className="flex items-center gap-4">
-                        <Hand className="w-4 h-4"/>
-                        <span>{t('analysis.hand')} {index + 1} - {t('analysis.trump')}: {t(`trumps.${hand.trump}`)}</span>
-                        <span className="text-muted-foreground text-sm">
-                      {t('analysis.startingPlayer')}: {hand.startingPlayer.name}
-                    </span>
+                        <Hand className="hidden sm:block w-4 h-4"/>
+                        <span>{index + 1} - {t(`trumps.${hand.trump}`)}</span>
+                        <span className="text-muted-foreground text-sm truncate">
+                          {t('analysis.startingPlayer')}: {hand.startingPlayer.name}
+                        </span>
                       </div>
                       <div className="flex items-center gap-6 text-sm">
                         <div className={getTeamColor("NORTH")}>{t('analysis.teams.northSouth')}: <span
@@ -152,13 +152,13 @@ export default function Analyze() {
                     <h4 className="text-sm font-medium mb-4">{t("analysis.tricks")}</h4>
                     {hand.tricks.reverse().map((trick: TrickWithCards, trickIndex: number) => (
                       <div key={trickIndex} className="mb-4 last:mb-0">
-                        <div className="grid grid-cols-6 gap-1 p-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-6 gap-1 sm:gap-6 p-4 place-items-center sm:place-items-start">
                           <div className="font-medium mb-2 text-center content-center">
                             <Badge variant="outline">#{trickIndex + 1}</Badge>
                           </div>
                           {trick.cards.map((play: PlayedCardWithPlayer) => (
                             <div key={play.player.uuid} className="space-y-2">
-                              <div className="text-sm text-muted-foreground text-left">
+                              <div className="text-sm text-muted-foreground text-left truncate">
                                 {play.player.name}
                               </div>
                               <div className="relative" style={{
