@@ -35,17 +35,17 @@ export function PlayedCards() {
 
   const getPosition = (position: Position) => {
     const transforms = {
-      NORTH: {x: -CARD_WIDTH / 2, y: -CARD_HEIGHT, rotate: cardRotations.NORTH},
-      EAST: {x: 40, y: -CARD_HEIGHT / 2, rotate: cardRotations.EAST},
-      SOUTH: {x: -CARD_WIDTH / 2, y: 0, rotate: cardRotations.SOUTH},
-      WEST: {x: -140, y: -CARD_WIDTH / 2, rotate: cardRotations.WEST},
+      NORTH: {x: 0, y: -CARD_HEIGHT / 2, rotate: cardRotations.NORTH},
+      EAST: {x: CARD_HEIGHT / 2, y: 0, rotate: cardRotations.EAST},
+      SOUTH: {x: 0, y: CARD_HEIGHT / 2, rotate: cardRotations.SOUTH},
+      WEST: {x: -CARD_HEIGHT / 2, y: 0, rotate: cardRotations.WEST},
     }
     return transforms[position]
   }
 
   // Give a rare chance to do a full 360
   const woop = (rotation: number): number => {
-    if (Math.random() < 0.01) {
+    if (Math.random() < 0.05) {
       return rotation + (rotation >= 0 ? 360 : -360)
     }
     return rotation
@@ -57,7 +57,8 @@ export function PlayedCards() {
 
   return (
     <div className="fixed inset-0 pointer-events-none">
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" key={"table"}>
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" key={"table"}
+           style={{width: CARD_WIDTH, height: CARD_HEIGHT}}>
         <AnimatePresence initial={true}>
           {cardsPlayed!!.map((card) => (
             <motion.div
@@ -79,12 +80,12 @@ export function PlayedCards() {
                       cardRotations[getRelativePosition(position!!, card.position!!)]
                     ],
                     zIndex: 100,
-                    transition: {duration: 0.2, ease: "easeInOut"}
+                    transition: {duration: 0.2, ease: "easeOut"}
                   }
                   : {
                     ...getPosition(getRelativePosition(position!!, card.position!!)),
                     opacity: 1,
-                    transition: {duration: 0.2, type: "tween"}
+                    transition: {duration: 0.2, ease: "easeOut"}
                   }
               }
               exit={clearDirection ? {...handleExit(), opacity: 0} : {}}

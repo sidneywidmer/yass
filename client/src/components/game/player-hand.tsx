@@ -35,18 +35,17 @@ export function PlayerHand() {
   const getHoverAnimation = (card: CardInHand, y: number, currentAngle: number) => {
     const isPlayable = cardPlayable(card)
     return {
-      y: y - Math.cos(currentAngle * Math.PI / 180) * (isPlayable ? 60 : 20),
-      rotate: currentAngle * 0.8,
-      scale: isPlayable ? 1.1 : 1,
+      y: y - Math.cos(currentAngle * Math.PI / 180) * (isPlayable ? CARD_HEIGHT / 2.5 : CARD_HEIGHT / 4),
+      scale: isPlayable ? 1.05 : 1,
       filter: isPlayable ? "brightness(1)" : "brightness(0.95)",
-      transition: {duration: 0.12}
+      transition: {duration: 0.1}
     }
   }
 
   const getInitialStyle = (card: CardInHand, y: number, currentAngle: number) => {
     const isPlayable = cardPlayable(card)
     return {
-      y: y - (isPlayable ? 40 : 0),
+      y: y - (isPlayable ? CARD_HEIGHT / 6 : 0),
       rotate: currentAngle,
       scale: isPlayable ? 1.02 : 1,
       filter: isPlayable ? "brightness(1)" : "brightness(0.95)"
@@ -56,7 +55,7 @@ export function PlayerHand() {
   const calculateOffset = (index: number, totalItems: number): number => {
     const middle = (totalItems - 1) / 2
     const distance = Math.abs(index - middle)
-    return (totalItems / 2 - distance) * 8 * -1
+    return (totalItems / 2 - distance) * 7 * -1
   }
 
   if (!cards) return null
