@@ -20,7 +20,6 @@ export const getRelativePosition = (playerPosition: Position, absolutePosition: 
   return POSITIONS[newPos]
 }
 
-
 export const getResponsiveValue = (minValue: number, maxValue: number) => {
   const currentWidth = window.innerWidth;
   const min = 375
@@ -34,5 +33,34 @@ export const getResponsiveValue = (minValue: number, maxValue: number) => {
 
   const slope = (maxValue - minValue) / (max - min);
   return minValue + slope * (currentWidth - min);
+}
+
+export const preloadAssets = () => {
+  const suits = ['CLUBS', 'DIAMONDS', 'HEARTS', 'SPADES'];
+  const ranks = ['ACE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'TEN', 'JACK', 'QUEEN', 'KING'];
+  const jokers = ['JOKER-1', 'JOKER-2', 'JOKER-3', 'JOKER-4'];
+  const path = '/cards/french/';
+
+  const promises: any[] = [];
+
+  // Build the list of URLs first
+  const imageUrls = [
+    ...suits.flatMap(suit => ranks.map(rank => `${path}${suit}-${rank}.svg`)),
+    ...jokers.map(joker => `${path}${joker}.svg`)
+  ];
+
+  console.log(`Preloading ${imageUrls.length} images...`);
+
+  imageUrls.forEach(url => {
+    const promise = new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error(`Failed to load image: ${url}`));
+      img.src = url;
+    });
+    promises.push(promise);
+  });
+
+  return Promise.all(promises);
 }
 

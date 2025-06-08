@@ -9,6 +9,8 @@ import {MainWrapper} from "@/components/main-wrapper.tsx";
 import Signup from "@/routes/signup.tsx";
 import Game from "@/routes/game.tsx";
 import Analyze from "@/routes/analyze.tsx";
+import { useEffect } from 'react';
+import {preloadAssets} from "@/lib/utils.ts";
 
 const router = createBrowserRouter([
   {
@@ -35,6 +37,9 @@ const router = createBrowserRouter([
 
 
 export default function App() {
+  useEffect(() => {
+    preloadAssets();
+  }, []);
   return (
     <RouterProvider router={router}/>
   );

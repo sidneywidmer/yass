@@ -12,6 +12,9 @@ import {Weisen} from "@/components/game/weisen.tsx";
 import {ShowWeise} from "@/components/game/show-weise.tsx";
 import OtherPlayers from "@/components/game/other-players.tsx";
 import {GameFinished} from "@/components/game/game-finished.tsx";
+import {useErrorStore} from "@/store/error.ts";
+import {useTranslation} from "react-i18next";
+import {useNavigate} from "react-router-dom";
 
 interface GameInstanceProps {
   tryCode: string
@@ -20,6 +23,9 @@ interface GameInstanceProps {
 export function GameInstance({tryCode}: GameInstanceProps) {
   const setGameState = useGameStateStore(state => state.setGameState);
   const handleAxiosError = useAxiosErrorHandler()
+  const {t} = useTranslation()
+  const {addError} = useErrorStore()
+  const navigate = useNavigate()
 
   useEffect(() => {
     api.joinGame({code: tryCode})
@@ -27,8 +33,14 @@ export function GameInstance({tryCode}: GameInstanceProps) {
         setGameState(response.data!!)
       })
       .catch(error => {
-        // Redirect back to home
-        handleAxiosError(error)
+        if (error.response.data.payload.domainError == "GameAlreadyFull") {
+          navigate('/')
+          return addError({
+            title: t('errors.gameFull.title'),
+            description: t('errors.gameFull.description')
+          })
+        }
+        return handleAxiosError(error)
       })
   }, [tryCode])
 

@@ -17,6 +17,10 @@
       "4000034": "Dieses Passwort wurde in Datenlecks gefunden und darf nicht mehr verwendet werden.",
       "4010001": "Der Vorgang ist vor {expired_at_unix_since_minutes} Minuten abgelaufen, bitte versuchen Sie es erneut."
     },
+    "gameFull": {
+      "title": "Spiel voll",
+      "description": "Das Spiel ist leider schon voll"
+    },
     "network": {
       "title": "Verbindungsfehler",
       "description": "Yass Server konnte nicht erreicht werden"
@@ -102,11 +106,11 @@
     }
   },
   "weisen": {
-    "title": "Weisen",
+    "title": "Weis selektieren",
     "title_alt": "Gewiesen",
     "description": "Karten zum weisen auswählen",
     "points": "Punkte",
-    "zeroWeis": "0 Punkte weisen"
+    "zeroWeis": "auf Weis verzichten"
   },
   "weise": {
     "DREI_BLATT": "3-Blatt",
