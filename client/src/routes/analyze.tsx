@@ -20,7 +20,7 @@ export default function Analyze() {
   const {code} = useParams()
   const navigate = useNavigate()
   const {t} = useTranslation()
-  const {uuid} = usePlayerStore()
+  const uuid = usePlayerStore(state => state.uuid)
 
   useEffect(() => {
     api.analyzeGame(code!!)

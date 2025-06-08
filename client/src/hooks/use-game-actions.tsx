@@ -14,7 +14,11 @@ interface ActionHandler {
 const useGameActions = () => {
   const [actionQueue, setActionQueue] = useState<GameAction[]>([])
   const processingRef = useRef(false)
-  const {playCard, addCardsToHand, position, clearCards, addWeis} = useGameStateStore()
+  const playCard = useGameStateStore(state => state.playCard)
+  const addCardsToHand = useGameStateStore(state => state.addCardsToHand)
+  const position = useGameStateStore(state => state.position)
+  const clearCards = useGameStateStore(state => state.clearCards)
+  const addWeis = useGameStateStore(state => state.addWeis)
 
   const actionHandlers: Record<string, ActionHandler> = {
     CardPlayed: {

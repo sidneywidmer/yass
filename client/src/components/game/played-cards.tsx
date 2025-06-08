@@ -6,7 +6,9 @@ import {useMemo} from "react";
 import {getRelativePosition} from "@/lib/utils.ts";
 
 export function PlayedCards() {
-  const {clearDirection, cardsPlayed, position} = useGameStateStore()
+  const clearDirection = useGameStateStore(state => state.clearDirection);
+  const cardsPlayed = useGameStateStore(state => state.cardsPlayed);
+  const position = useGameStateStore(state => state.position);
 
   const cardRotations = useMemo(() => ({
     NORTH: 180 + (Math.random() * 10 - 5),
@@ -43,7 +45,7 @@ export function PlayedCards() {
 
   // Give a rare chance to do a full 360
   const woop = (rotation: number): number => {
-    if (Math.random() < 0.1) {
+    if (Math.random() < 0.01) {
       return rotation + (rotation >= 0 ? 360 : -360)
     }
     return rotation
@@ -77,21 +79,16 @@ export function PlayedCards() {
                       cardRotations[getRelativePosition(position!!, card.position!!)]
                     ],
                     zIndex: 100,
-                    transition: {rotate: {duration: 0.2, ease: "easeInOut"}}
+                    transition: {duration: 0.2, ease: "easeInOut"}
                   }
                   : {
                     ...getPosition(getRelativePosition(position!!, card.position!!)),
                     opacity: 1,
-                    transition: {type: "tween", duration: 0.3}
+                    transition: {duration: 0.2, type: "tween"}
                   }
               }
-              // animate={{
-              //   ...getPosition(getRelativePosition(position!!, card.position!!)),
-              //   opacity: 1
-              // }}
-              // transition={{type: "tween", duration: 0.3}}
               exit={clearDirection ? {...handleExit(), opacity: 0} : {}}
-              style={{width: CARD_WIDTH, height: CARD_HEIGHT}}
+              style={{width: CARD_WIDTH, height: CARD_HEIGHT, willChange: "transform"}}
             >
               <Card card={card}/>
             </motion.div>

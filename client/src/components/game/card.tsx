@@ -4,7 +4,7 @@ import {cn} from "@/lib/utils.ts";
 // TODO: Refactor, copy pasted
 export const CARD_ASPECT_RATIO = 261.11 / 355.19
 export const CARD_HEIGHT = 130
-export const CARD_WIDTH = CARD_HEIGHT * CARD_ASPECT_RATIO
+export const CARD_WIDTH = Math.ceil(CARD_HEIGHT * CARD_ASPECT_RATIO)
 
 interface CardProps {
   card: C

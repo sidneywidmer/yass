@@ -26,7 +26,7 @@ const StatusIndicator = ({status, isActive}: { status: string, isActive?: boolea
           "absolute w-2 h-2 rounded-full",
           status === "DISCONNECTED" && "bg-red-500/50",
           status === "BOT" && "bg-blue-500/50",
-          status === "CONNECTED"  && "bg-green-500/50"
+          status === "CONNECTED" && "bg-green-500/50"
         )}
         animate={isActive ? {
           scale: [0.8, 20, 0.8],
@@ -43,14 +43,16 @@ const StatusIndicator = ({status, isActive}: { status: string, isActive?: boolea
         "relative w-2 h-2 rounded-full",
         status === "DISCONNECTED" && "bg-red-500",
         status === "BOT" && "bg-blue-500",
-        status === "CONNECTED"  && "bg-green-500"
+        status === "CONNECTED" && "bg-green-500"
       )}/>
     </div>
   )
 }
 
 export function OtherPlayers() {
-  const {otherPlayers, position, activePosition} = useGameStateStore()
+  const otherPlayers = useGameStateStore(state => state.otherPlayers)
+  const position = useGameStateStore(state => state.position)
+  const activePosition = useGameStateStore(state => state.activePosition)
   return (
     <>
       <AnimatePresence mode="popLayout" initial={true}>

@@ -52,3 +52,4 @@ client/*.translation
 client/.mono/
 client/data_*/
 client/mono_crash.*.json
+.aider*

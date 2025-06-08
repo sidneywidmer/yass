@@ -7,7 +7,8 @@ import {Position} from "@/api/generated";
 
 export function ShowWeise() {
   const [open, setOpen] = useState(false)
-  const {otherWeise, clearWeise} = useGameStateStore()
+  const otherWeise = useGameStateStore(state => state.otherWeise)
+  const clearWeise = useGameStateStore(state => state.clearWeise)
   const {t} = useTranslation()
 
   useEffect(() => {

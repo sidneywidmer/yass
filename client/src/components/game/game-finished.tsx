@@ -8,8 +8,11 @@ import {useTranslation} from "react-i18next";
 import {useNavigate} from "react-router-dom";
 
 export function GameFinished() {
-  const {state, finished, code} = useGameStateStore()
-  const {uuid} = usePlayerStore()
+  const state = useGameStateStore(state => state.state)
+  const finished = useGameStateStore(state => state.finished)
+  const code = useGameStateStore(state => state.code)
+
+  const uuid = usePlayerStore(state => state.uuid)
   const [open, setOpen] = useState(false)
   const {t} = useTranslation()
   const navigate = useNavigate()

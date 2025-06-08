@@ -18,8 +18,8 @@ interface GameInstanceProps {
 }
 
 export function GameInstance({tryCode}: GameInstanceProps) {
+  const setGameState = useGameStateStore(state => state.setGameState);
   const handleAxiosError = useAxiosErrorHandler()
-  const {setGameState} = useGameStateStore()
 
   useEffect(() => {
     api.joinGame({code: tryCode})

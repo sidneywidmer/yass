@@ -4,7 +4,10 @@ import {useEffect, useState} from "react";
 import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 
 export function useAuth() {
-  const {isAuthenticated, setOryPlayer, setAnonPlayer, logout} = usePlayerStore()
+  const isAuthenticated = usePlayerStore(state => state.isAuthenticated)
+  const setOryPlayer = usePlayerStore(state => state.setOryPlayer)
+  const setAnonPlayer = usePlayerStore(state => state.setAnonPlayer)
+  const logout = usePlayerStore(state => state.logout)
   const handleAxiosError = useAxiosErrorHandler()
   const [initialized, setInitialized] = useState(false)
 

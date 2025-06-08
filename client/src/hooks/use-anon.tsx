@@ -10,7 +10,7 @@ import {api} from "@/api/client.ts";
 export const useAnon = () => {
   const navigate = useNavigate()
   const handleError = useAxiosErrorHandler()
-  const {setAnonPlayer} = usePlayerStore()
+  const setAnonPlayer = usePlayerStore(state => state.setAnonPlayer)
   const [anonSignupError, setAnonSignupError] = useState<ErrorMessage | null>(null)
   const {t}: { t: TFunction } = useTranslation()
 

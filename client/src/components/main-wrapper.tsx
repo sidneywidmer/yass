@@ -9,7 +9,7 @@ interface WrapperProps {
 }
 
 export function MainWrapper({children}: WrapperProps) {
-  const {isAuthenticated} = usePlayerStore()
+  const isAuthenticated = usePlayerStore(state => state.isAuthenticated)
   return (
     <>
       <Toaster richColors theme="light" duration={10000} closeButton={true}/>

@@ -20,7 +20,8 @@ import {api} from "@/api/client.ts";
 
 const Logout = () => {
   const {t} = useTranslation()
-  const {isAnon, logout} = usePlayerStore()
+  const isAnon = usePlayerStore(state => state.isAnon)
+  const logout = usePlayerStore(state => state.logout)
   const [showAlert, setShowAlert] = useState(false)
   const navigate = useNavigate()
   const handleError = useAxiosErrorHandler()

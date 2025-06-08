@@ -2,6 +2,7 @@ import {useEffect} from 'react'
 import {Centrifuge, TransportName} from 'centrifuge'
 import {useGameStateStore} from '@/store/game-state'
 import useGameActions from "@/hooks/use-game-actions.tsx";
+
 class CustomEventSource extends EventSource {
   constructor(url: string, _?: EventSourceInit) {
     super(url, {
@@ -11,7 +12,8 @@ class CustomEventSource extends EventSource {
 }
 
 export function WebSocketHandler() {
-  const {gameUuid, uuid} = useGameStateStore()
+  const gameUuid = useGameStateStore(state => state.gameUuid)
+  const uuid = useGameStateStore(state => state.uuid)
   const {addActions} = useGameActions()
   const transports = [
     {

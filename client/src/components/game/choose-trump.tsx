@@ -8,7 +8,8 @@ import {Trump} from "@/api/generated";
 
 export function ChooseTrump() {
   const handleAxiosError = useAxiosErrorHandler()
-  const {state, gameUuid} = useGameStateStore()
+  const state = useGameStateStore(state => state.state)
+  const gameUuid = useGameStateStore(state => state.gameUuid)
   const isMyPos = useGameStateStore((state) => state.activePosition === state.position)
 
   /**
