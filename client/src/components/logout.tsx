@@ -60,13 +60,13 @@ const Logout = () => {
 
   return (
     <>
-      <div className="fixed top-4 right-16 z-10">
+      <div className="">
         <Button
           variant="outline"
           size="icon"
           onClick={handleMaybeLogout}
         >
-          <LogOut className="h-4 w-4"/>
+          <LogOut/>
         </Button>
       </div>
       <AlertDialog open={showAlert} onOpenChange={setShowAlert}>

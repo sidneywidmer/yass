@@ -5,7 +5,6 @@ import {ory} from "@/api/ory.ts";
 import {ErrorMessage, getOryErrorMessage} from "@/api/helpers.ts";
 import {useState} from "react";
 import {useTranslation} from "react-i18next";
-import {TFunction} from "i18next";
 
 export const useOry = () => {
   const navigate = useNavigate()
@@ -14,7 +13,7 @@ export const useOry = () => {
   const logout = usePlayerStore(state => state.logout)
   const [loginError, setLoginError] = useState<ErrorMessage | null>(null)
   const [signupError, setSignupError] = useState<ErrorMessage | null>(null)
-  const {t}: { t: TFunction } = useTranslation()
+  const {t} = useTranslation();
 
   const getCsrfToken = (flow: any): string => {
     let csrfNode = flow.ui.nodes.find(
