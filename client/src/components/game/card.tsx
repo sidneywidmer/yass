@@ -22,6 +22,7 @@ export function Card({card, className, imgClassName}: CardProps) {
         src={`/cards/french/${card.suit!!}-${card.rank!!}.svg`}
         alt={`${card.suit!!} ${card.rank!!}`}
         className={cn("w-full h-full", imgClassName)}
+        draggable={false}
       />
     </div>
   )

@@ -35,6 +35,10 @@ export const getResponsiveValue = (minValue: number, maxValue: number) => {
   return minValue + slope * (currentWidth - min);
 }
 
+export const isTouchDevice = () => {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+}
+
 export const preloadAssets = () => {
   const suits = ['CLUBS', 'DIAMONDS', 'HEARTS', 'SPADES'];
   const ranks = ['ACE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'TEN', 'JACK', 'QUEEN', 'KING'];
