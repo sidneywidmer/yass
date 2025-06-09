@@ -1,6 +1,6 @@
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog"
 import {Button} from "@/components/ui/button"
-import {Plus, AlertCircle} from "lucide-react"
+import {Plus, AlertCircle, Loader2} from "lucide-react"
 import {useTranslation} from "react-i18next"
 import {Label} from "@/components/ui/label"
 import {Switch} from "@/components/ui/switch"
@@ -8,6 +8,7 @@ import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group"
 import {Input} from "@/components/ui/input"
 import {api} from "@/api/client"
 import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler"
+import {useAsyncAction} from "@/hooks/use-async-action"
 import {CreateCustomGameRequest} from "@/api/generated";
 import {DialogDescription} from "@radix-ui/react-dialog";
 import {useState} from "react";
@@ -23,6 +24,10 @@ export function CreateGameOverlay() {
   const [open, setOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
+  
+  const {execute: executeCreateGame, isLoading, hasError, reset} = useAsyncAction(async (settings: CreateCustomGameRequest) => {
+    return api.createGame(settings)
+  })
   const [settings, setSettings] = useState<CreateCustomGameRequest>({
     botNorth: true,
     botEast: true,
@@ -32,24 +37,24 @@ export function CreateGameOverlay() {
     winningConditionValue: 2500
   })
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     setError(null)
-    api.createGame(settings)
-      .then((response) => {
-        setOpen(false)
-        navigate(`/game/${response.data?.code}`)
-      })
-      .catch(error => {
-        if (error.response?.status === 422) {
-          switch (error.response?.data?.payload?.error) {
-            case "GameSettingsMaxBots":
-              return setError(t('errors.gameSettings.maxBots'))
-            case "GameSettingsInvalidValue":
-              return setError(t('errors.gameSettings.invalidValue'))
-          }
+    reset()
+    try {
+      const response = await executeCreateGame(settings)
+      setOpen(false)
+      navigate(`/game/${response.data?.code}`)
+    } catch (error: any) {
+      if (error.response?.status === 422) {
+        switch (error.response?.data?.payload?.error) {
+          case "GameSettingsMaxBots":
+            return setError(t('errors.gameSettings.maxBots'))
+          case "GameSettingsInvalidValue":
+            return setError(t('errors.gameSettings.invalidValue'))
         }
-        return handleAxiosError(error)
-      })
+      }
+      handleAxiosError(error)
+    }
   }
 
   const positions: Position[] = ['North', 'East', 'South', 'West']
@@ -144,7 +149,14 @@ export function CreateGameOverlay() {
             />
           </div>
         </div>
-        <Button onClick={handleCreate}>{t("create.submit")}</Button>
+        <Button 
+          onClick={handleCreate} 
+          disabled={isLoading}
+          variant={hasError ? "destructive" : "default"}
+        >
+          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {t("create.submit")}
+        </Button>
       </DialogContent>
     </Dialog>
   )

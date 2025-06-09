@@ -8,11 +8,12 @@ import {useOry} from '@/hooks/use-ory.tsx'
 import {useTranslation} from 'react-i18next'
 import {useLocation} from "react-router";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip.tsx";
-import {AlertCircle, HelpCircle} from "lucide-react";
+import {AlertCircle, HelpCircle, Loader2} from "lucide-react";
 import {Link} from "react-router-dom";
 import {cn} from "@/lib/utils.ts";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
 import {useAnon} from "@/hooks/use-anon.tsx";
+import {useAsyncAction} from "@/hooks/use-async-action";
 
 export function SignupForm() {
   const location = useLocation()
@@ -20,16 +21,23 @@ export function SignupForm() {
   const {t} = useTranslation()
   const {signup, signupError} = useOry()
   const {anonSignup, anonSignupError} = useAnon()
+  
+  const {execute: executeSignup, isLoading, hasError, reset} = useAsyncAction(async (data: {username: string, email?: string, password?: string}) => {
+    if (isGuest) {
+      return anonSignup(data.username)
+    }
+    return signup({
+      username: data.username,
+      email: data.email!,
+      password: data.password!
+    })
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const formData = new FormData(e.target as HTMLFormElement)
-    if (isGuest) {
-      anonSignup(formData.get('username') as string)
-      return
-    }
-
-    await signup({
+    reset()
+    await executeSignup({
       username: formData.get('username') as string,
       email: formData.get('email') as string,
       password: formData.get('password') as string
@@ -124,7 +132,13 @@ export function SignupForm() {
               </>
             )}
 
-            <Button type="submit" className="w-full">
+            <Button 
+              type="submit" 
+              className="w-full"
+              disabled={isLoading}
+              variant={hasError ? "destructive" : "default"}
+            >
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {t('auth.signup.submit')}
             </Button>
 

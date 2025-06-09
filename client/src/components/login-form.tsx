@@ -5,7 +5,8 @@ import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import {useTranslation} from "react-i18next";
 import {useOry} from "@/hooks/use-ory.tsx";
-import {AlertCircle} from "lucide-react";
+import {useAsyncAction} from "@/hooks/use-async-action";
+import {AlertCircle, Loader2} from "lucide-react";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
 import {Link, useNavigate} from "react-router-dom";
 
@@ -13,11 +14,16 @@ export function LoginForm() {
   const {t} = useTranslation();
   const {login, loginError} = useOry()
   const navigate = useNavigate()
+  
+  const {execute: executeLogin, isLoading, hasError, reset} = useAsyncAction(async (credentials: {email: string, password: string}) => {
+    return login(credentials)
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const formData = new FormData(e.target as HTMLFormElement)
-    await login({
+    reset()
+    await executeLogin({
       email: formData.get('email') as string,
       password: formData.get('password') as string
     })
@@ -85,7 +91,13 @@ export function LoginForm() {
                            className={cn(loginError && loginError.field == "password" && "ring-2 ring-destructive")}
                            required/>
                   </div>
-                  <Button type="submit" className="w-full">
+                  <Button 
+                    type="submit" 
+                    className="w-full"
+                    disabled={isLoading}
+                    variant={hasError ? "destructive" : "default"}
+                  >
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     {t("auth.form.loginButton")}
                   </Button>
                 </div>
