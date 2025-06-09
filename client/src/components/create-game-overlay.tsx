@@ -1,6 +1,6 @@
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog"
 import {Button} from "@/components/ui/button"
-import {Plus} from "lucide-react"
+import {Plus, AlertCircle} from "lucide-react"
 import {useTranslation} from "react-i18next"
 import {Label} from "@/components/ui/label"
 import {Switch} from "@/components/ui/switch"
@@ -12,6 +12,7 @@ import {CreateCustomGameRequest} from "@/api/generated";
 import {DialogDescription} from "@radix-ui/react-dialog";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 
 type Position = 'North' | 'East' | 'South' | 'West'
 type BotKey = `bot${Position}`
@@ -20,6 +21,7 @@ export function CreateGameOverlay() {
   const {t} = useTranslation()
   const handleAxiosError = useAxiosErrorHandler()
   const [open, setOpen] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
   const [settings, setSettings] = useState<CreateCustomGameRequest>({
     botNorth: true,
@@ -31,12 +33,23 @@ export function CreateGameOverlay() {
   })
 
   const handleCreate = () => {
+    setError(null)
     api.createGame(settings)
       .then((response) => {
         setOpen(false)
         navigate(`/game/${response.data?.code}`)
       })
-      .catch(handleAxiosError)
+      .catch(error => {
+        if (error.response?.status === 422) {
+          switch (error.response?.data?.payload?.error) {
+            case "GameSettingsMaxBots":
+              return setError(t('errors.gameSettings.maxBots'))
+            case "GameSettingsInvalidValue":
+              return setError(t('errors.gameSettings.invalidValue'))
+          }
+        }
+        return handleAxiosError(error)
+      })
   }
 
   const positions: Position[] = ['North', 'East', 'South', 'West']
@@ -60,6 +73,15 @@ export function CreateGameOverlay() {
           <DialogDescription>{t("create.description")}</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4"/>
+              <AlertTitle>{t("errors.title")}</AlertTitle>
+              <AlertDescription>
+                {error}
+              </AlertDescription>
+            </Alert>
+          )}
           <div className="grid gap-2">
             <Label>{t("create.bots")}</Label>
             <div className="grid grid-cols-2 gap-4">

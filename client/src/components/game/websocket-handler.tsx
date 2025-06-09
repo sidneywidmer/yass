@@ -32,18 +32,7 @@ export function WebSocketHandler() {
 
     const connectToWs = async () => {
       try {
-        centrifuge.on('connected', function (ctx) {
-          console.log("connected ", ctx);
-        });
-        centrifuge.on('disconnected', function (ctx) {
-          console.log("disconnected ", ctx);
-        });
-
         const sub = centrifuge.newSubscription(`seat:#${uuid}`)
-        sub.on('subscribed', function (ctx) {
-          console.log('subscribed ', ctx);
-        });
-
         sub.on('publication', (ctx) => {
           addActions(ctx.data)
         })

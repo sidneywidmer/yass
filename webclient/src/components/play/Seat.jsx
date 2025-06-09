@@ -101,7 +101,6 @@ const Seat = ({seat, gameUuid, cardsPlayed, setCardsPlayed}) => {
         centrifuge.connect();
 
         centrifuge.on('connected', function (ctx) {
-            console.log("connected ", ctx);
             setIsConnected(true);
         });
         centrifuge.on('disconnected', function (ctx) {
@@ -110,15 +109,11 @@ const Seat = ({seat, gameUuid, cardsPlayed, setCardsPlayed}) => {
 
 
         const sub = centrifuge.newSubscription('seat:#' + seat.uuid, data);
-        sub.on('subscribed', function (ctx) {
-            console.log('subscribed ', ctx);
-        });
         sub.subscribe();
 
 
         sub.on('publication', function (ctx) {
             setActions(previous => [ctx, ...previous]);
-
         });
 
         return () => {
@@ -146,9 +141,6 @@ const Seat = ({seat, gameUuid, cardsPlayed, setCardsPlayed}) => {
         actions.shift().data.forEach((action) => {
             const executeFunction = actionMap[action.type];
             if (executeFunction) {
-                if (setCardsPlayed !== undefined) {
-                    console.log(seat.uuid, action.type)
-                }
                 executeFunction(action);
             }
         });

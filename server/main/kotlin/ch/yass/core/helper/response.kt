@@ -22,7 +22,7 @@ fun errorResponse(ctx: Context, error: DomainError): Context {
     return when (error) {
         is ValiktorError -> ctx.status(422).json(groupValiktorViolations(error))
         is ValidationError -> ctx.status(422).json(ErrorResponse("request validation failed", object {
-            val error = error.javaClass.name
+            val error = error.javaClass.simpleName
         }))
 
         is Unauthorized -> ctx.status(401)
@@ -39,7 +39,7 @@ fun errorResponse(ctx: Context, error: DomainError): Context {
         else -> {
             logger().error("DomainError `${error.javaClass.name}` encountered: $error")
             ctx.status(500).json(ErrorResponse("something went wrong", object {
-                val domainError = error.toString()
+                val domainError = error.javaClass.simpleName
             }))
         }
     }
