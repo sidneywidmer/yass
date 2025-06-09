@@ -39,8 +39,12 @@ export function LoginForm() {
             <form onSubmit={handleSubmit}>
               <div className="grid gap-6">
                 <div className="flex flex-col gap-4">
-                  <Button variant="outline" className="w-full"
-                          onClick={() => navigate('/signup', {state: {isGuest: true}})}>
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => navigate('/signup', {state: {isGuest: true}})}
+                  >
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
                          strokeLinejoin="round" className="lucide lucide-user">
