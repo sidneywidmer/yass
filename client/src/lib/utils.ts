@@ -38,7 +38,7 @@ export const getResponsiveValue = (minValue: number, maxValue: number) => {
 export const preloadAssets = () => {
   const suits = ['CLUBS', 'DIAMONDS', 'HEARTS', 'SPADES'];
   const ranks = ['ACE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'TEN', 'JACK', 'QUEEN', 'KING'];
-  const jokers = ['JOKER-1', 'JOKER-2', 'JOKER-3', 'JOKER-4'];
+  const jokers = ['JOKER-2', 'JOKER-3'];
   const path = '/cards/french/';
 
   const promises: any[] = [];

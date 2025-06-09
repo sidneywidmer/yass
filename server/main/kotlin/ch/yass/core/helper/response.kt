@@ -1,9 +1,13 @@
 package ch.yass.core.helper
 
 import ch.yass.core.error.*
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.javalin.http.Context
 import org.valiktor.i18n.mapToMessage
 import java.util.*
+import arrow.core.Either
+import arrow.core.getOrElse
 
 data class ErrorResponse(val message: String = "", val payload: Any? = null)
 data class CentrifugoErrorResponse(val code: Int, val message: String)
@@ -25,8 +29,11 @@ fun errorResponse(ctx: Context, error: DomainError): Context {
             val error = error.javaClass.simpleName
         }))
 
-        is Unauthorized -> ctx.status(401)
-            .json(ErrorResponse("ory authentication failed", error.exception.responseBody))
+        is Unauthorized -> {
+            val payload = Either.catch { jacksonObjectMapper().readValue<Any>(error.exception.responseBody) }
+                .getOrElse { error.exception.responseBody }
+            ctx.status(401).json(ErrorResponse("ory authentication failed", payload))
+        }
 
         is InvalidAnonToken -> ctx.status(401)
             .json(ErrorResponse("anon authentication failed"))
