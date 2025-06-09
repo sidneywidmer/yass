@@ -21,6 +21,14 @@
       "title": "Game full",
       "description": "The game is already full"
     },
+    "gameNotFound": {
+      "title": "Game not found",
+      "description": "The game you are trying to join does not exist"
+    },
+    "gameSettings": {
+      "maxBots": "Too many bot players selected. At least one human player is required.",
+      "invalidValue": "Invalid value for the selected winning condition"
+    },
     "network": {
       "title": "Network Error",
       "description": "Could not reach Yass server"

@@ -21,6 +21,14 @@
       "title": "Spiel voll",
       "description": "Das Spiel ist leider schon voll"
     },
+    "gameNotFound": {
+      "title": "Spiel nicht gefunden",
+      "description": "Das Spiel, dem du beitreten möchtest, existiert nicht"
+    },
+    "gameSettings": {
+      "maxBots": "Zu viele Bot-Spieler ausgewählt. Mindestens ein menschlicher Spieler ist erforderlich.",
+      "invalidValue": "Ungültiger Wert für die ausgewählte Gewinnbedingung"
+    },
     "network": {
       "title": "Verbindungsfehler",
       "description": "Yass Server konnte nicht erreicht werden"
