@@ -22,7 +22,7 @@ export function WebSocketHandler() {
     }
   ];
   const centrifuge = new Centrifuge(transports, {
-    debug: true,
+    debug: false,
     eventsource: CustomEventSource,
     emulationEndpoint: import.meta.env.VITE_CENTRIFUGO_API_URL_SSE + '/emulation',
   });
