@@ -59,6 +59,17 @@ export function CreateGameOverlay() {
     setSettings(s => ({...s, [key]: checked}))
   }
 
+  const validateAndClampValue = (value?: number, conditionType?: 'POINTS' | 'HANDS') => {
+    const type = conditionType || settings.winningConditionType
+    const min = type === 'POINTS' ? 100 : 1
+    const max = type === 'POINTS' ? 9000 : 99
+    const clampedValue = Math.max(min, Math.min(max, value || min))
+    setSettings(s => ({
+      ...s,
+      winningConditionValue: clampedValue
+    }))
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -102,8 +113,11 @@ export function CreateGameOverlay() {
             <Label>{t("create.winningCondition")}</Label>
             <RadioGroup
               value={settings.winningConditionType}
-              onValueChange={(value) =>
-                setSettings(s => ({...s, winningConditionType: value as 'POINTS' | 'HANDS'}))}
+              onValueChange={(value) => {
+                const newType = value as 'POINTS' | 'HANDS'
+                setSettings(s => ({...s, winningConditionType: newType}))
+                validateAndClampValue(settings.winningConditionValue, newType)
+              }}
               className="flex gap-4"
             >
               <div className="flex items-center space-x-2">
@@ -126,16 +140,7 @@ export function CreateGameOverlay() {
                 ...s,
                 winningConditionValue: parseInt(e.target.value) || 0
               }))}
-              onBlur={(e) => {
-                const value = parseInt(e.target.value)
-                const min = settings.winningConditionType === 'POINTS' ? 100 : 1
-                const max = settings.winningConditionType === 'POINTS' ? 9000 : 99
-                const clampedValue = Math.max(min, Math.min(max, value || min))
-                setSettings(s => ({
-                  ...s,
-                  winningConditionValue: clampedValue
-                }))
-              }}
+              onBlur={(e) => validateAndClampValue(parseInt(e.target.value))}
             />
           </div>
         </div>
