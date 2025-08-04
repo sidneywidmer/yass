@@ -38,10 +38,15 @@ export function PlayerHand() {
       const controls = getCardControlsByIndex(i)
       const y = calculateOffset(i, totalCards)
       const currentAngle = startRotation + cardRotation * i
-
-      if (i === selectedIndex && isTouch) {
-        // Start hover animation
-        controls.start(getHoverAnimation(card, y, currentAngle))
+      if (i === selectedIndex) {
+        // Start hover animation on main card
+        controls.start(getHoverAnimation(card))
+      } else if (selectedIndex !== null && isTouch && (i === selectedIndex - 1 && selectedIndex > 0)) {
+        // Adjacent cards get reduced hover effect
+        controls.start(getAdjacentHoverAnimationLeft(card))
+      } else if (selectedIndex !== null && isTouch && (i === selectedIndex + 1 && selectedIndex < totalCards - 1)) {
+        // Adjacent cards get reduced hover effect
+        controls.start(getAdjacentHoverAnimationRight(card))
       } else {
         // Return to initial state
         controls.start(getInitialStyle(card, y, currentAngle, i))
@@ -80,7 +85,10 @@ export function PlayerHand() {
   const cardTapped = (card: CardInHand, index: number) => {
     // Second tap - play the card
     if (hoveredIndexRef.current === index) {
-      if (cardPlayable(card)) playCardAction(card)
+      if (cardPlayable(card)) {
+        playCardAction(card)
+      }
+
       // Reset all animations
       hoveredIndexRef.current = null
       triggerCardHover(null, filteredCards)
@@ -92,23 +100,48 @@ export function PlayerHand() {
     triggerCardHover(index, filteredCards)
   }
 
-  const getHoverAnimation = (card: CardInHand, y: number, currentAngle: number) => {
+  const getHoverAnimation = (card: CardInHand) => {
+    const isPlayable = cardPlayable(card)
+    const base = -80 - ((CARD_HEIGHT - 100) / 30) * 20
+    const additional = -10 - ((CARD_HEIGHT - 100) / 30) * 10
+    return {
+      y: base + additional,
+      scale: 1.25,
+      filter: isPlayable ? "brightness(1)" : "brightness(0.95)",
+      rotate: 0,
+      transition: {duration: isTouch ? 0.07 : 0.15}
+    }
+  }
+
+  const getAdjacentHoverAnimationLeft = (card: CardInHand) => {
+    const isPlayable = cardPlayable(card)
+
+    return {
+      y: -80 - ((CARD_HEIGHT - 100) / 30) * 20,
+      scale: 1.1,
+      filter: isPlayable ? "brightness(1)" : "brightness(0.95)",
+      rotate: -15,
+      transition: {duration: isTouch ? 0.09 : 0.15}
+    }
+  }
+
+  const getAdjacentHoverAnimationRight = (card: CardInHand) => {
     const isPlayable = cardPlayable(card)
     return {
-      y: y - Math.cos(currentAngle * Math.PI / 180) * (isPlayable ? CARD_HEIGHT / 2.5 : CARD_HEIGHT / 4),
-      scale: isPlayable ? 1.05 : 1,
+      y: -80 - ((CARD_HEIGHT - 100) / 30) * 20,
+      scale: 1.1,
       filter: isPlayable ? "brightness(1)" : "brightness(0.95)",
-      zIndex: 100,
-      transition: {duration: isTouch ? 0.05 : 0.1}
+      rotate: 15,
+      transition: {duration: isTouch ? 0.09 : 0.15}
     }
   }
 
   const getInitialStyle = (card: CardInHand, y: number, currentAngle: number, cardIndex: number = 0) => {
     const isPlayable = cardPlayable(card)
     return {
-      y: y - (isPlayable ? CARD_HEIGHT / 6 : 0),
+      y: y,
       rotate: currentAngle,
-      scale: isPlayable ? 1.02 : 1,
+      scale: 1,
       filter: isPlayable ? "brightness(1)" : "brightness(0.95)",
       zIndex: cardIndex
     }
@@ -117,17 +150,15 @@ export function PlayerHand() {
   const calculateOffset = (index: number, totalItems: number): number => {
     const middle = (totalItems - 1) / 2
     const distance = Math.abs(index - middle)
-    return (totalItems / 2 - distance) * 7 * -1
+    return (distance / middle * 10) - (CARD_HEIGHT / 3)
   }
 
-  // Debounced drag handler to improve performance
-  const handleDrag = (info: any) => {
-    const element = document.elementFromPoint(info.point.x, info.point.y)
+  const handleDrag = (action: any) => {
+    const element = document.elementFromPoint(action.clientX, action.clientY)
     const cardElement = element?.closest('[data-card-index]')
     if (cardElement) {
       const newIndex = parseInt(cardElement.getAttribute('data-card-index') || '0')
       if (newIndex !== hoveredIndexRef.current) {
-        console.log("set index to " + newIndex)
         hoveredIndexRef.current = newIndex
         triggerCardHover(newIndex, filteredCards)
       }
@@ -148,7 +179,9 @@ export function PlayerHand() {
         drag={isTouch}
         dragConstraints={{left: 0, right: 0, top: 0, bottom: 0}}
         dragElastic={0}
-        onDrag={(_, info) => handleDrag(info)}
+        onDrag={(mouse) => handleDrag(mouse)}
+        onMouseMove={(mouse) => !isTouch && handleDrag(mouse)}
+        onMouseLeave={() => !isTouch && triggerCardHover(null, filteredCards)}
       >
         <AnimatePresence mode="popLayout" initial={true}>
           {filteredCards.map((card, i) => {
@@ -168,7 +201,6 @@ export function PlayerHand() {
                 }}
                 initial={getInitialStyle(card, y, currentAngle, i)}
                 animate={getCardControlsByIndex(i)}
-                whileHover={getHoverAnimation(card, y, currentAngle)}
                 onClick={() => cardClicked(card, i)}
               >
                 <Card card={{suit: card.suit!!, rank: card.rank!!}}/>
