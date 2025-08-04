@@ -1,7 +1,7 @@
 import {useGameStateStore} from "@/store/game-state.ts";
 import {CardInHand} from "@/api/generated";
 import {AnimatePresence, motion} from "framer-motion"
-import {useState} from "react";
+import React, {useState, useMemo} from "react";
 import {Card, CARD_HEIGHT, CARD_WIDTH} from "@/components/game/card.tsx";
 import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 import {api} from "@/api/client.ts";
@@ -17,10 +17,10 @@ export function PlayerHand() {
   const [isDragging, setIsDragging] = useState(false)
   const [touchStartTime, setTouchStartTime] = useState<number | null>(null)
   const [hasMoved, setHasMoved] = useState(false)
-  const handleAxiosError = useAxiosErrorHandler()
+  // const handleAxiosError = useAxiosErrorHandler()
   const isMyPos = useGameStateStore((state) => state.activePosition === state.position)
   const isPlayCardState = useGameStateStore((state) => state.state === "PLAY_CARD")
-  const isTouch = isTouchDevice()
+  const isTouch = useMemo(() => isTouchDevice(), [])
 
   const cardPlayable = (card: CardInHand) => {
     return card.state == "PLAYABLE" && isMyPos && isPlayCardState
@@ -28,19 +28,19 @@ export function PlayerHand() {
 
   const playCardAction = (card: CardInHand) => {
     api.playCard({game: gameUuid!!, card: {suit: card.suit, rank: card.rank, skin: "french"}})
-      .catch(handleAxiosError)
+       // .catch(handleAxiosError)
 
     setHoveredIndex(null)
     playCard({suit: card.suit, rank: card.rank, position: position})
     removeCardFromHand(card)
   }
 
-  const cardClicked = (card: CardInHand, index: number) => {
+  const cardClicked = (card: CardInHand) => {
     if (isTouch || !cardPlayable(card)) return
     playCardAction(card)
   }
 
-  const handleTouchStart = (index: number) => {
+  const handleTouchStart = () => {
     setTouchStartTime(Date.now())
     setHasMoved(false)
     setIsDragging(true)
@@ -105,6 +105,14 @@ export function PlayerHand() {
     return (totalItems / 2 - distance) * 7 * -1
   }
 
+  const touchEventHandlers = {
+    onTouchStart: handleTouchStart,
+    onTouchMove: handleTouchMove,
+  }
+
+  const setHoveredIndexToI = (i: number) => () => setHoveredIndex(i)
+  const clearHoveredIndex = () => setHoveredIndex(null)
+
   if (!cards) return null
 
   const totalCards = cards?.filter((card) => card.state != "ALREADY_PLAYED").length!!
@@ -120,13 +128,12 @@ export function PlayerHand() {
             const currentAngle = startRotation + cardRotation * i
 
             const eventHandlers = isTouch ? {
-              onTouchStart: () => handleTouchStart(i),
-              onTouchMove: handleTouchMove,
+              ...touchEventHandlers,
               onTouchEnd: () => handleTouchEnd(card, i),
             } : {
-              onClick: () => cardClicked(card, i),
-              onHoverStart: () => setHoveredIndex(i),
-              onHoverEnd: () => setHoveredIndex(null),
+              onClick: () => cardClicked(card),
+              onHoverStart: setHoveredIndexToI(i),
+              onHoverEnd: clearHoveredIndex,
             }
 
             return (

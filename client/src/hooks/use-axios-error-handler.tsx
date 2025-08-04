@@ -2,7 +2,6 @@ import {AxiosError} from 'axios'
 import {useTranslation} from 'react-i18next'
 import {useErrorStore} from "@/store/error.ts";
 import {useCallback} from "react";
-
 export const useAxiosErrorHandler = () => {
   const {t} = useTranslation()
   const {addError} = useErrorStore()
@@ -47,5 +46,5 @@ export const useAxiosErrorHandler = () => {
           description: t('errors.unknown.description')
         })
     }
-  }, [t, addError]);
+  }, [addError]);
 }
