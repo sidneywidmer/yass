@@ -1,7 +1,7 @@
 import {useGameStateStore} from "@/store/game-state.ts";
 import {CardInHand} from "@/api/generated";
-import {AnimatePresence, motion} from "framer-motion"
-import React, {useState, useMemo} from "react";
+import {AnimatePresence, motion, useAnimation} from "framer-motion"
+import {useMemo, useRef} from "react";
 import {Card, CARD_HEIGHT, CARD_WIDTH} from "@/components/game/card.tsx";
 import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 import {api} from "@/api/client.ts";
@@ -13,11 +13,42 @@ export function PlayerHand() {
   const position = useGameStateStore(state => state.position)
   const removeCardFromHand = useGameStateStore(state => state.removeCardFromHand)
   const playCard = useGameStateStore(state => state.playCard)
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
-  const [isDragging, setIsDragging] = useState(false)
-  const [touchStartTime, setTouchStartTime] = useState<number | null>(null)
-  const [hasMoved, setHasMoved] = useState(false)
-  // const handleAxiosError = useAxiosErrorHandler()
+  const hoveredIndexRef = useRef<number | null>(null)
+
+  // Create a fixed number of animation controls (max possible cards in hand which is 9)
+  const cardControls = [
+    useAnimation(), useAnimation(), useAnimation(),
+    useAnimation(), useAnimation(), useAnimation(),
+    useAnimation(), useAnimation(), useAnimation()
+  ]
+
+  const filteredCards = useMemo(() => cards?.filter(card => card.state !== "ALREADY_PLAYED") || [], [cards])
+
+  const getCardControlsByIndex = (index: number) => {
+    return cardControls[index]
+  }
+
+  // Trigger hover animation on specific card
+  const triggerCardHover = (selectedIndex: number | null, allCards: CardInHand[]) => {
+    const totalCards = allCards.length
+    const cardRotation = 3
+    const startRotation = -(cardRotation / 2) - (cardRotation * ((totalCards / 2) - 1))
+
+    allCards.forEach((card, i) => {
+      const controls = getCardControlsByIndex(i)
+      const y = calculateOffset(i, totalCards)
+      const currentAngle = startRotation + cardRotation * i
+
+      if (i === selectedIndex && isTouch) {
+        // Start hover animation
+        controls.start(getHoverAnimation(card, y, currentAngle))
+      } else {
+        // Return to initial state
+        controls.start(getInitialStyle(card, y, currentAngle, i))
+      }
+    })
+  }
+  const handleAxiosError = useAxiosErrorHandler()
   const isMyPos = useGameStateStore((state) => state.activePosition === state.position)
   const isPlayCardState = useGameStateStore((state) => state.state === "PLAY_CARD")
   const isTouch = useMemo(() => isTouchDevice(), [])
@@ -28,55 +59,37 @@ export function PlayerHand() {
 
   const playCardAction = (card: CardInHand) => {
     api.playCard({game: gameUuid!!, card: {suit: card.suit, rank: card.rank, skin: "french"}})
-       // .catch(handleAxiosError)
+      .catch(handleAxiosError)
 
-    setHoveredIndex(null)
+    hoveredIndexRef.current = null
+    triggerCardHover(null, filteredCards)
     playCard({suit: card.suit, rank: card.rank, position: position})
     removeCardFromHand(card)
   }
 
-  const cardClicked = (card: CardInHand) => {
-    if (isTouch || !cardPlayable(card)) return
+  const cardClicked = (card: CardInHand, index: number) => {
+    // No idea why the click event fires more reliably than the typ but here are
+    if (isTouch) {
+      return cardTapped(card, index)
+    }
+
+    if (!cardPlayable(card)) return
     playCardAction(card)
   }
 
-  const handleTouchStart = () => {
-    setTouchStartTime(Date.now())
-    setHasMoved(false)
-    setIsDragging(true)
-  }
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return
-    setHasMoved(true)
-    e.preventDefault()
-    
-    const touch = e.touches[0]
-    const element = document.elementFromPoint(touch.clientX, touch.clientY)
-    const cardElement = element?.closest('[data-card-index]')
-    
-    if (cardElement) {
-      const newIndex = parseInt(cardElement.getAttribute('data-card-index') || '0')
-      if (newIndex !== hoveredIndex) {
-        setHoveredIndex(newIndex)
-      }
+  const cardTapped = (card: CardInHand, index: number) => {
+    // Second tap - play the card
+    if (hoveredIndexRef.current === index) {
+      if (cardPlayable(card)) playCardAction(card)
+      // Reset all animations
+      hoveredIndexRef.current = null
+      triggerCardHover(null, filteredCards)
+      return
     }
-  }
 
-  const handleTouchEnd = (card: CardInHand, index: number) => {
-    setIsDragging(false)
-    if (!cardPlayable(card)) return
-    
-    const touchDuration = touchStartTime ? Date.now() - touchStartTime : 0
-    const isQuickTap = touchDuration < 300 && !hasMoved
-
-    if (isQuickTap) {
-      if (hoveredIndex === index) {
-        playCardAction(card)
-      } else {
-        setHoveredIndex(index)
-      }
-    }
+    // First tap - select the card
+    hoveredIndexRef.current = index
+    triggerCardHover(index, filteredCards)
   }
 
   const getHoverAnimation = (card: CardInHand, y: number, currentAngle: number) => {
@@ -85,17 +98,19 @@ export function PlayerHand() {
       y: y - Math.cos(currentAngle * Math.PI / 180) * (isPlayable ? CARD_HEIGHT / 2.5 : CARD_HEIGHT / 4),
       scale: isPlayable ? 1.05 : 1,
       filter: isPlayable ? "brightness(1)" : "brightness(0.95)",
+      zIndex: 100,
       transition: {duration: isTouch ? 0.05 : 0.1}
     }
   }
 
-  const getInitialStyle = (card: CardInHand, y: number, currentAngle: number) => {
+  const getInitialStyle = (card: CardInHand, y: number, currentAngle: number, cardIndex: number = 0) => {
     const isPlayable = cardPlayable(card)
     return {
       y: y - (isPlayable ? CARD_HEIGHT / 6 : 0),
       rotate: currentAngle,
       scale: isPlayable ? 1.02 : 1,
-      filter: isPlayable ? "brightness(1)" : "brightness(0.95)"
+      filter: isPlayable ? "brightness(1)" : "brightness(0.95)",
+      zIndex: cardIndex
     }
   }
 
@@ -105,65 +120,63 @@ export function PlayerHand() {
     return (totalItems / 2 - distance) * 7 * -1
   }
 
-  const touchEventHandlers = {
-    onTouchStart: handleTouchStart,
-    onTouchMove: handleTouchMove,
+  // Debounced drag handler to improve performance
+  const handleDrag = (info: any) => {
+    const element = document.elementFromPoint(info.point.x, info.point.y)
+    const cardElement = element?.closest('[data-card-index]')
+    if (cardElement) {
+      const newIndex = parseInt(cardElement.getAttribute('data-card-index') || '0')
+      if (newIndex !== hoveredIndexRef.current) {
+        console.log("set index to " + newIndex)
+        hoveredIndexRef.current = newIndex
+        triggerCardHover(newIndex, filteredCards)
+      }
+    }
   }
-
-  const setHoveredIndexToI = (i: number) => () => setHoveredIndex(i)
-  const clearHoveredIndex = () => setHoveredIndex(null)
 
   if (!cards) return null
 
-  const totalCards = cards?.filter((card) => card.state != "ALREADY_PLAYED").length!!
+  const totalCards = filteredCards.length
   const cardRotation = 3
   const startRotation = -(cardRotation / 2) - (cardRotation * ((totalCards / 2) - 1))
 
   return (
     <div className="fixed -bottom-[60px] w-full flex justify-center">
-      <div className="flex -space-x-10" key={totalCards}>
+      <motion.div
+        className="flex -space-x-10"
+        key={totalCards}
+        drag={isTouch}
+        dragConstraints={{left: 0, right: 0, top: 0, bottom: 0}}
+        dragElastic={0}
+        onDrag={(_, info) => handleDrag(info)}
+      >
         <AnimatePresence mode="popLayout" initial={true}>
-          {cards.filter(card => card.state != "ALREADY_PLAYED").map((card, i) => {
+          {filteredCards.map((card, i) => {
             const y = calculateOffset(i, totalCards)
             const currentAngle = startRotation + cardRotation * i
-
-            const eventHandlers = isTouch ? {
-              ...touchEventHandlers,
-              onTouchEnd: () => handleTouchEnd(card, i),
-            } : {
-              onClick: () => cardClicked(card),
-              onHoverStart: setHoveredIndexToI(i),
-              onHoverEnd: clearHoveredIndex,
-            }
 
             return (
               <motion.div
                 layoutId={`cardlayout-${position}-${card.suit}-${card.rank}`}
                 key={`cardhand-${card.suit}-${card.rank}`}
                 data-card-index={i}
-                {...eventHandlers}
                 className={`transition-shadow ${cardPlayable(card) ? 'hover:shadow-xl' : ''}`}
                 style={{
-                  cursor: cardPlayable(card) ? 'pointer' : 'not-allowed',
+                  cursor: 'pointer',
                   width: CARD_WIDTH,
                   height: CARD_HEIGHT,
-                  zIndex: hoveredIndex === i ? 100 : i,
-                  touchAction: isTouch ? 'none' : 'auto',
                 }}
-                initial={getInitialStyle(card, y, currentAngle)}
-                animate={
-                  hoveredIndex === i
-                    ? getHoverAnimation(card, y, currentAngle)
-                    : getInitialStyle(card, y, currentAngle)
-                }
-                whileHover={!isTouch ? getHoverAnimation(card, y, currentAngle) : undefined}
+                initial={getInitialStyle(card, y, currentAngle, i)}
+                animate={getCardControlsByIndex(i)}
+                whileHover={getHoverAnimation(card, y, currentAngle)}
+                onClick={() => cardClicked(card, i)}
               >
                 <Card card={{suit: card.suit!!, rank: card.rank!!}}/>
               </motion.div>
             )
           })}
         </AnimatePresence>
-      </div>
+      </motion.div>
     </div>
   )
 }
