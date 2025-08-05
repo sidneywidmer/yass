@@ -18,11 +18,7 @@ import ch.yass.game.dto.db.InternalPlayer
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
 import ch.yass.game.pubsub.*
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.util.*
 import kotlinx.coroutines.channels.Channel as EventChannel
 
@@ -195,7 +191,10 @@ class GameService(
 
     /**
      * After every player played the first card in the trick and showed their weise, the team who has wisen
-     * the most can weis the rest of their potentially not yet shown weise.
+     * the most can weis the rest of their potentially not yet shown weise. This can lead to behaviour where
+     * a player sees their own - not made - weis. E.g. a player has two possible weise and they show the first
+     * one, then after the first trick is over this method automatically publishes ShowWeis actions for all
+     * valid but not shown weise of the team with the most weis points. A bit a strange rule...
      */
     context(Raise<GameError>)
     private fun weisenSecond(state: GameState) {
