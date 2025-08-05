@@ -4,6 +4,7 @@ import {useGameStateStore} from '@/store/game-state'
 import {Card} from '@/components/game/card'
 import {useTranslation} from "react-i18next";
 import {Position} from "@/api/generated";
+import {DialogDescription} from "@radix-ui/react-dialog";
 
 export function ShowWeise() {
   const [open, setOpen] = useState(false)
@@ -26,6 +27,7 @@ export function ShowWeise() {
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
         <DialogTitle className="text-center">{t("weisen.title_alt")}</DialogTitle>
+        <DialogDescription></DialogDescription>
         <div className="space-y-6 max-h-[60vh] overflow-y-auto p-2">
           {Object.entries(otherWeise).map(([position, weise]) =>
             weise.map((weis, idx) => (
