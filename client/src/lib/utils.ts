@@ -36,7 +36,9 @@ export const getResponsiveValue = (minValue: number, maxValue: number) => {
 }
 
 export const isTouchDevice = () => {
-  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  // lol wat, https://stackoverflow.com/questions/55833326/wrong-maxtouchpoints-and-ontouchstart-in-document-in-chrome-mobile-emulati
+  let maxTouchPoints = navigator.maxTouchPoints & 0xFF;
+  return 'ontouchstart' in window || maxTouchPoints > 0;
 }
 
 export const preloadAssets = () => {
