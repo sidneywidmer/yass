@@ -5,7 +5,8 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/compo
 import {ArrowLeft, Frown, Hand, Trophy} from "lucide-react"
 import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 import {useParams} from "react-router";
-import {Card as PlayingCard, CARD_HEIGHT, CARD_WIDTH} from "@/components/game/card"
+import {Card as PlayingCard} from "@/components/game/card"
+import {useCardDimensions} from "@/hooks/use-card-dimensions.ts"
 import {cn} from "@/lib/utils.ts";
 import {AnalyzeHand, PlayedCardWithPlayer, Player, PlayerWithCards, TrickWithCards} from "@/api/generated";
 import {Button} from "@/components/ui/button.tsx";
@@ -13,6 +14,7 @@ import {useNavigate} from "react-router-dom";
 import {Badge} from "@/components/ui/badge.tsx";
 import {useTranslation} from "react-i18next";
 import {usePlayerStore} from "@/store/player.ts";
+import {useSettingsStore} from "@/store/settings.ts";
 
 export default function Analyze() {
   const [analysis, setAnalysis] = useState<any>(null)
@@ -20,6 +22,8 @@ export default function Analyze() {
   const {code} = useParams()
   const navigate = useNavigate()
   const {t} = useTranslation()
+  const {cardDeck} = useSettingsStore();
+  const {CARD_WIDTH, CARD_HEIGHT} = useCardDimensions()
   const uuid = usePlayerStore(state => state.uuid)
 
   useEffect(() => {
@@ -117,7 +121,7 @@ export default function Analyze() {
                     <div className="flex items-center justify-between w-full">
                       <div className="flex items-center gap-4">
                         <Hand className="hidden sm:block w-4 h-4"/>
-                        <span>{index + 1} - {t(`trumps.${hand.trump}`)}</span>
+                        <span>{index + 1} - {t(`trumps.${cardDeck}.${hand.trump}`)}</span>
                         <span className="text-muted-foreground text-sm truncate">
                           {t('analysis.startingPlayer')}: {hand.startingPlayer.name}
                         </span>
@@ -150,9 +154,10 @@ export default function Analyze() {
                     </div>
 
                     <h4 className="text-sm font-medium mb-4">{t("analysis.tricks")}</h4>
-                    {hand.tricks.reverse().map((trick: TrickWithCards, trickIndex: number) => (
+                    {hand.tricks.toReversed().map((trick: TrickWithCards, trickIndex: number) => (
                       <div key={trickIndex} className="mb-4 last:mb-0">
-                        <div className="grid grid-cols-1 sm:grid-cols-6 gap-1 sm:gap-6 p-4 place-items-center sm:place-items-start">
+                        <div
+                          className="grid grid-cols-1 sm:grid-cols-6 gap-1 sm:gap-6 p-4 place-items-center sm:place-items-start">
                           <div className="font-medium mb-2 text-center content-center">
                             <Badge variant="outline">#{trickIndex + 1}</Badge>
                           </div>

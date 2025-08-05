@@ -1,16 +1,19 @@
 import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 import {useGameStateStore} from "@/store/game-state.ts";
 import {Dialog, DialogContent, DialogDescription, DialogTitle} from "@/components/ui/dialog.tsx";
-import {ArrowDown, ArrowUp, Club, Diamond, Forward, Heart, Spade} from "lucide-react";
+import {Forward} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {api} from "@/api/client.ts";
 import {Trump} from "@/api/generated";
+import {TrumpIcon} from "@/components/game/trump-icon";
+import {useTranslation} from "react-i18next";
 
 export function ChooseTrump() {
   const handleAxiosError = useAxiosErrorHandler()
   const state = useGameStateStore(state => state.state)
   const gameUuid = useGameStateStore(state => state.gameUuid)
   const isMyPos = useGameStateStore((state) => state.activePosition === state.position)
+  const {t} = useTranslation()
 
   /**
    * We handle 3 cases  here:
@@ -39,37 +42,37 @@ export function ChooseTrump() {
   return (
     <Dialog open={true} modal>
       <DialogContent disableClose={true} className="sm:max-w-md" onPointerDownOutside={e => e.preventDefault()}>
-        <DialogTitle className="text-center">Trumpf wählen</DialogTitle>
-        <DialogDescription className="sr-only">Choose a trump</DialogDescription>
+        <DialogTitle className="text-center">{t("chooseTrump.title")}</DialogTitle>
+        <DialogDescription className="sr-only">{t("chooseTrump.description")}</DialogDescription>
         <div className="flex flex-col gap-4 items-center pt-4">
           <div className="flex gap-4">
-            <Button variant="outline" size="icon" onClick={() => selectTrump("HEARTS")}>
-              <Heart className="w-4 h-4 text-red-500"/>
+            <Button variant="outline" className="w-11 h-11" size="icon" onClick={() => selectTrump("HEARTS")}>
+              <TrumpIcon trump="HEARTS" className="w-6 h-6"/>
             </Button>
-            <Button variant="outline" size="icon" onClick={() => selectTrump("SPADES")}>
-              <Spade className="w-4 h-4"/>
+            <Button variant="outline" className="w-11 h-11" size="icon" onClick={() => selectTrump("SPADES")}>
+              <TrumpIcon trump="SPADES" className="w-6 h-6"/>
             </Button>
-            <Button variant="outline" size="icon" onClick={() => selectTrump("CLUBS")}>
-              <Club className="w-4 h-4"/>
+            <Button variant="outline" className="w-11 h-11" size="icon" onClick={() => selectTrump("CLUBS")}>
+              <TrumpIcon trump="CLUBS" className="w-6 h-6"/>
             </Button>
-            <Button variant="outline" size="icon" onClick={() => selectTrump("DIAMONDS")}>
-              <Diamond className="w-4 h-4 text-red-500"/>
+            <Button variant="outline" className="w-11 h-11" size="icon" onClick={() => selectTrump("DIAMONDS")}>
+              <TrumpIcon trump="DIAMONDS" className="w-6 h-6"/>
             </Button>
           </div>
 
           <div className="flex gap-4">
-            <Button variant="outline" size="icon" onClick={() => selectTrump("UNEUFE")}>
-              <ArrowUp className="w-4 h-4"/>
+            <Button variant="outline" className="w-11 h-11" size="icon" onClick={() => selectTrump("UNEUFE")}>
+              <TrumpIcon trump="UNEUFE" className="w-6 h-6"/>
             </Button>
-            <Button variant="outline" size="icon" onClick={() => selectTrump("OBEABE")}>
-              <ArrowDown className="w-4 h-4"/>
+            <Button variant="outline" className="w-11 h-11" size="icon" onClick={() => selectTrump("OBEABE")}>
+              <TrumpIcon trump="OBEABE" className="w-6 h-6"/>
             </Button>
           </div>
 
           {state == "SCHIEBE" &&
               <div>
-                  <Button variant="outline" size="icon" onClick={() => selectTrump("SCHIEBE")}>
-                      <Forward className="w-4 h-4"/>
+                  <Button variant="outline" className="w-11 h-11" onClick={() => selectTrump("SCHIEBE")}>
+                      <Forward className="w-6 h-6"/>
                   </Button>
               </div>
           }

@@ -1,8 +1,9 @@
 import {useGameStateStore} from "@/store/game-state.ts";
 import {CardInHand} from "@/api/generated";
 import {AnimatePresence, motion, useAnimation} from "framer-motion"
-import {useMemo, useRef, useEffect} from "react";
-import {Card, CARD_HEIGHT, CARD_WIDTH} from "@/components/game/card.tsx";
+import {useEffect, useMemo, useRef} from "react";
+import {Card} from "@/components/game/card.tsx";
+import {useCardDimensions} from "@/hooks/use-card-dimensions.ts";
 import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 import {api} from "@/api/client.ts";
 import {isTouchDevice} from "@/lib/utils.ts";
@@ -22,8 +23,8 @@ type CardAnimationConfig = {
   isTouch: boolean
 }
 
-// Animation constants
-const ANIMATION_CONFIG = {
+// Animation constants factory
+const getAnimationConfig = (CARD_HEIGHT: number) => ({
   CARD_ROTATION: 3, // how rotated each card is
   HOVER_SCALE: 1.25, // also for touch
   ADJACENT_SCALE: 1.1, // touch only, cards left and right of current are a little smaller
@@ -40,12 +41,12 @@ const ANIMATION_CONFIG = {
     PLAYABLE: "brightness(1)",
     DISABLED: "brightness(0.95)"
   },
-  HOVER_BASE_Y: -80 - ((CARD_HEIGHT - 100) / 30) * 20, // hover state based on CARD_HEIGHT, lol try and error
+  HOVER_BASE_Y: -70 - ((CARD_HEIGHT - 100) / 30) * 20, // hover state based on CARD_HEIGHT, lol try and error
   HOVER_ADDITIONAL_Y: -10 - ((CARD_HEIGHT - 100) / 30) * 10 // extra lift for main hover
-} as const
+} as const)
 
 // Animation overrides for specific card states
-const ANIMATION_OVERRIDES = {
+const getAnimationOverrides = (ANIMATION_CONFIG: ReturnType<typeof getAnimationConfig>) => ({
   hover: (isTouch: boolean) => ({
     y: ANIMATION_CONFIG.HOVER_BASE_Y + ANIMATION_CONFIG.HOVER_ADDITIONAL_Y,
     scale: ANIMATION_CONFIG.HOVER_SCALE,
@@ -73,9 +74,12 @@ const ANIMATION_OVERRIDES = {
       ease: ANIMATION_CONFIG.EASING
     }
   })
-} as const
+}) as const
 
 export function PlayerHand() {
+  const {CARD_WIDTH, CARD_HEIGHT} = useCardDimensions();
+  const ANIMATION_CONFIG = getAnimationConfig(CARD_HEIGHT);
+  const ANIMATION_OVERRIDES = getAnimationOverrides(ANIMATION_CONFIG);
   const gameUuid = useGameStateStore(state => state.gameUuid)
   const cards = useGameStateStore(state => state.cards)
   const position = useGameStateStore(state => state.position)
@@ -205,10 +209,14 @@ export function PlayerHand() {
   }
 
 
+  /**
+   * Calculate y offset of the card in the hand, this gives us the card "arch".
+   */
   const calculateOffset = (index: number, totalItems: number): number => {
     const middle = (totalItems - 1) / 2
     const distance = Math.abs(index - middle)
-    return (distance / middle * 10) - (CARD_HEIGHT / 3)
+
+    return Math.round((distance * 2 / middle * 10) - (CARD_HEIGHT / 3))
   }
 
   const handleDrag = (action: any) => {
@@ -256,6 +264,10 @@ export function PlayerHand() {
                   cursor: 'pointer',
                   width: CARD_WIDTH,
                   height: CARD_HEIGHT,
+                }}
+                layout
+                transition={{
+                  layout: {duration: 0.3, ease: [0.4, 0, 0.2, 1]}
                 }}
                 initial={initialAnimation}
                 animate={getCardControlsByIndex(i)}
