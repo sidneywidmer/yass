@@ -3,54 +3,75 @@ import {Centrifuge, TransportName} from 'centrifuge'
 import {useGameStateStore} from '@/store/game-state'
 import useGameActions from "@/hooks/use-game-actions.tsx";
 
-class CustomEventSource extends EventSource {
-  constructor(url: string, _?: EventSourceInit) {
-    super(url, {
-      withCredentials: true,
-    });
-  }
-}
-
 export function WebSocketHandler() {
   const gameUuid = useGameStateStore(state => state.gameUuid)
   const uuid = useGameStateStore(state => state.uuid)
   const {addActions} = useGameActions()
-  const transports = [
-    {
-      transport: 'sse' as TransportName,
-      endpoint: import.meta.env.VITE_CENTRIFUGO_API_URL_SSE + '/connection/sse',
-    }
-  ];
-  const centrifuge = new Centrifuge(transports, {
-    debug: false,
-    eventsource: CustomEventSource,
-    emulationEndpoint: import.meta.env.VITE_CENTRIFUGO_API_URL_SSE + '/emulation',
-  });
 
   useEffect(() => {
     if (!gameUuid) return
 
+    class CustomEventSource extends EventSource {
+      constructor(url: string, _?: EventSourceInit) {
+        super(url, {
+          withCredentials: true,
+        });
+      }
+    }
+
+    const transports = [
+      {
+        transport: 'sse' as TransportName,
+        endpoint: import.meta.env.VITE_CENTRIFUGO_API_URL_SSE + '/connection/sse',
+      }
+    ];
+    
+    const centrifuge = new Centrifuge(transports, {
+      debug: false,
+      eventsource: CustomEventSource,
+      emulationEndpoint: import.meta.env.VITE_CENTRIFUGO_API_URL_SSE + '/emulation',
+    });
+
     const connectToWs = async () => {
       try {
+        console.log("Connecting to Centrifugo...")
+        centrifuge.connect()
+
         const sub = centrifuge.newSubscription(`seat:#${uuid}`)
         sub.on('publication', (ctx) => {
           addActions(ctx.data)
         })
 
         sub.subscribe()
-        centrifuge.connect()
+        console.log("Connected and subscribed to seat:#" + uuid)
 
         return () => {
+          console.log("Cleaning up connection...")
           sub.unsubscribe()
           centrifuge.disconnect()
         }
       } catch (error) {
-        console.log(error)
+        console.error("WebSocket connection error:", error)
+        return () => {
+          centrifuge.disconnect()
+        }
       }
     }
 
-    connectToWs()
-  }, [gameUuid])
+    let cleanup: (() => void) | undefined
+
+    connectToWs().then(cleanupFn => {
+      cleanup = cleanupFn
+    }).catch(error => {
+      console.error("Failed to connect to WebSocket:", error)
+    })
+
+    return () => {
+      if (cleanup) {
+        cleanup()
+      }
+    }
+  }, [gameUuid, uuid, addActions])
 
   return null
 }
