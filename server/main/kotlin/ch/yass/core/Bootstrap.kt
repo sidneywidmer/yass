@@ -45,7 +45,7 @@ class Bootstrap(private val config: ConfigSettings, private val logbook: Logbook
                 }
             }
             javalinConfig.jetty.modifyServletContextHandler { handler ->
-                handler.addFilter(FilterHolder(LogbookFilter(logbook)), "/*", EnumSet.of(DispatcherType.REQUEST) )
+                handler.addFilter(FilterHolder(LogbookFilter(logbook)), "/*", EnumSet.of(DispatcherType.REQUEST))
             }
         }
 
@@ -63,8 +63,12 @@ class Bootstrap(private val config: ConfigSettings, private val logbook: Logbook
         // We want a clean shutdown
         Runtime.getRuntime().addShutdownHook(Thread { app.stop() })
 
-        app.exception(DomainException::class.java) { exception, ctx -> domainExceptionHandler(ctx, exception) }
-        app.exception(Exception::class.java) { exception, ctx -> globalExceptionHandler(exception, ctx) }
+        app.exception(DomainException::class.java) { exception: DomainException, ctx ->
+            domainExceptionHandler(ctx, exception)
+        }
+        app.exception(Exception::class.java) { exception: Exception, ctx ->
+            globalExceptionHandler(exception, ctx)
+        }
 
         app.start("0.0.0.0", config.getInt("server.port"))
     }

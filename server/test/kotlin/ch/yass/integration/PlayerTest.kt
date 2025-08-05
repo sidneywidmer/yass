@@ -8,22 +8,9 @@ import ch.yass.core.error.InvalidState
 import ch.yass.core.error.PlayerIsLocked
 import ch.yass.game.Foresight
 import ch.yass.game.GameService
-import ch.yass.game.api.ChooseTrumpRequest
-import ch.yass.game.api.PlayCardRequest
-import ch.yass.game.api.PlayedCard
-import ch.yass.game.api.SchiebeRequest
-import ch.yass.game.api.WeisenRequest
+import ch.yass.game.api.*
 import ch.yass.game.api.internal.GameState
-import ch.yass.game.dto.GameStatus
-import ch.yass.game.dto.Gschobe
-import ch.yass.game.dto.Position
-import ch.yass.game.dto.Rank
-import ch.yass.game.dto.State
-import ch.yass.game.dto.Suit
-import ch.yass.game.dto.Trump
-import ch.yass.game.dto.Weis
-import ch.yass.game.dto.WeisType
-import ch.yass.game.dto.WinningConditionType
+import ch.yass.game.dto.*
 import ch.yass.game.engine.playerAtPosition
 import ch.yass.game.engine.pointsByPositionTotal
 import ch.yass.game.engine.positionSeat
@@ -107,7 +94,7 @@ class PlayerTest : Integration() {
     }
 
     private fun checkCentrifugoHand2(state: GameState) {
-        var northSeat = positionSeat(Position.NORTH, state.seats)
+        val northSeat = positionSeat(Position.NORTH, state.seats)
         val north = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
         val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)
 
@@ -122,7 +109,7 @@ class PlayerTest : Integration() {
     private fun checkCentrifugoWelcomeHand(state: GameState) {
         // There is so many of those events sent and we're not testing all of them yet but focus on the
         // most important ones.
-        var north = positionSeat(Position.NORTH, state.seats)
+        val north = positionSeat(Position.NORTH, state.seats)
         cth.assertActions(north.uuid, cth.parseActions(centrifugo.allServeEvents)).apply {
             hasCount(CardPlayed::class, 4) // Every player played a welcome hand
             hasCount(ClearPlayedCards::class, 1)
@@ -134,7 +121,7 @@ class PlayerTest : Integration() {
     }
 
     private fun checkCentrifugoTrick1(state: GameState) {
-        var north = positionSeat(Position.NORTH, state.seats)
+        val north = positionSeat(Position.NORTH, state.seats)
         cth.assertActions(north.uuid, cth.parseActions(centrifugo.allServeEvents)).apply {
             hasTrump(Trump.HEARTS)
             hasCount(UpdatePossibleWeise::class, 1)
@@ -188,7 +175,7 @@ class PlayerTest : Integration() {
             service.play(request, north)
         }) { fail() }
 
-        var updatedState = recover({
+        val updatedState = recover({
             val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("SPADES", "SEVEN", "french"))
             service.play(request, east)
         }) { fail() }
@@ -295,7 +282,7 @@ class PlayerTest : Integration() {
         val west = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
 
         // East one the last trick so they go again first and again start with HEARTS which is also Stoeck
-        var stateAfterStoeck = recover({
+        val stateAfterStoeck = recover({
             val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "KING", "french"))
             service.play(request, east)
         }) { fail() }
@@ -371,7 +358,7 @@ class PlayerTest : Integration() {
         }) { assertTrue(it is InvalidState && it.nextState == State.SCHIEBE) }
 
         // The correct player (east) now declares: yes, schiebe please (it's now WEST's turn to declare trump)
-        var stateAfterSchiebe = recover({
+        val stateAfterSchiebe = recover({
             val request = SchiebeRequest(state.game.uuid.toString(), "YES")
             service.schiebe(request, east)
         }) { fail() }
@@ -379,7 +366,7 @@ class PlayerTest : Integration() {
         assertThat(stateAfterSchiebe.hands[0].trump, equalTo(Trump.NONE))
         assertThat(stateAfterSchiebe.hands[0].gschobe, equalTo(Gschobe.YES))
 
-        var stateAfterTrump = recover({
+        val stateAfterTrump = recover({
             val request = ChooseTrumpRequest(stateAfterSchiebe.game.uuid.toString(), "HEARTS")
             service.trump(request, west)
         }) { fail() }
@@ -399,7 +386,7 @@ class PlayerTest : Integration() {
         }) { assertTrue(it is InvalidState && it.nextState == State.WEISEN_FIRST) }
 
         // Okay then, let's weis our VIER_BLATT for 50 Points (C9-CJ) first
-        var stateAfterWeis = recover({
+        val stateAfterWeis = recover({
             val weis = Weis(WeisType.VIER_BLATT, interpretCards("C8,C9,C10,CJ"))
             val request = WeisenRequest(state.game.uuid.toString(), weis)
             service.weisen(request, south)
@@ -436,7 +423,7 @@ class PlayerTest : Integration() {
         }) { fail() }
 
         // ...and plays H10 because they must follow suit
-        var stateAfterAllCards = recover({
+        val stateAfterAllCards = recover({
             val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "TEN", "french"))
             service.play(request, north)
         }) { fail() }
@@ -482,7 +469,7 @@ class PlayerTest : Integration() {
         }) { fail() }
 
         // WEST
-        var newState = recover({
+        val newState = recover({
             val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "SIX", "french"))
             service.play(request, west)
         }) { fail() }
