@@ -1,11 +1,79 @@
 import {useGameStateStore} from "@/store/game-state.ts";
 import {CardInHand} from "@/api/generated";
 import {AnimatePresence, motion, useAnimation} from "framer-motion"
-import {useMemo, useRef} from "react";
+import {useMemo, useRef, useEffect} from "react";
 import {Card, CARD_HEIGHT, CARD_WIDTH} from "@/components/game/card.tsx";
 import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 import {api} from "@/api/client.ts";
 import {isTouchDevice} from "@/lib/utils.ts";
+
+type AnimationType = 'initial' | 'hover' | 'adjacentLeft' | 'adjacentRight'
+
+type CardPosition = {
+  offset: number // this gives us our nice little arch
+  angle: number
+  index: number
+}
+
+type CardAnimationConfig = {
+  card: CardInHand
+  animationType: AnimationType
+  position: CardPosition
+  isTouch: boolean
+}
+
+// Animation constants
+const ANIMATION_CONFIG = {
+  CARD_ROTATION: 3, // how rotated each card is
+  HOVER_SCALE: 1.25, // also for touch
+  ADJACENT_SCALE: 1.1, // touch only, cards left and right of current are a little smaller
+  DURATIONS: { // how fast the easy in/out happens
+    HOVER_TOUCH: 0.05,
+    HOVER_DESKTOP: 0.08,
+    ADJACENT_TOUCH: 0.06,
+    ADJACENT_DESKTOP: 0.08,
+    INITIAL: 0.08
+  },
+  EASING: [0.4, 0, 0.2, 1] as const, // feels "snappy", better than bouncy default of framer
+  ADJACENT_ROTATION: 15, // touch only
+  BRIGHTNESS: { // depending on state we want to "mute" unplayable cards
+    PLAYABLE: "brightness(1)",
+    DISABLED: "brightness(0.95)"
+  },
+  HOVER_BASE_Y: -80 - ((CARD_HEIGHT - 100) / 30) * 20, // hover state based on CARD_HEIGHT, lol try and error
+  HOVER_ADDITIONAL_Y: -10 - ((CARD_HEIGHT - 100) / 30) * 10 // extra lift for main hover
+} as const
+
+// Animation overrides for specific card states
+const ANIMATION_OVERRIDES = {
+  hover: (isTouch: boolean) => ({
+    y: ANIMATION_CONFIG.HOVER_BASE_Y + ANIMATION_CONFIG.HOVER_ADDITIONAL_Y,
+    scale: ANIMATION_CONFIG.HOVER_SCALE,
+    rotate: 0,
+    transition: {
+      duration: isTouch ? ANIMATION_CONFIG.DURATIONS.HOVER_TOUCH : ANIMATION_CONFIG.DURATIONS.HOVER_DESKTOP,
+      ease: ANIMATION_CONFIG.EASING
+    }
+  }),
+  adjacentLeft: (isTouch: boolean) => ({
+    y: ANIMATION_CONFIG.HOVER_BASE_Y,
+    scale: ANIMATION_CONFIG.ADJACENT_SCALE,
+    rotate: -ANIMATION_CONFIG.ADJACENT_ROTATION,
+    transition: {
+      duration: isTouch ? ANIMATION_CONFIG.DURATIONS.ADJACENT_TOUCH : ANIMATION_CONFIG.DURATIONS.ADJACENT_DESKTOP,
+      ease: ANIMATION_CONFIG.EASING
+    }
+  }),
+  adjacentRight: (isTouch: boolean) => ({
+    y: ANIMATION_CONFIG.HOVER_BASE_Y,
+    scale: ANIMATION_CONFIG.ADJACENT_SCALE,
+    rotate: ANIMATION_CONFIG.ADJACENT_ROTATION,
+    transition: {
+      duration: isTouch ? ANIMATION_CONFIG.DURATIONS.ADJACENT_TOUCH : ANIMATION_CONFIG.DURATIONS.ADJACENT_DESKTOP,
+      ease: ANIMATION_CONFIG.EASING
+    }
+  })
+} as const
 
 export function PlayerHand() {
   const gameUuid = useGameStateStore(state => state.gameUuid)
@@ -13,54 +81,90 @@ export function PlayerHand() {
   const position = useGameStateStore(state => state.position)
   const removeCardFromHand = useGameStateStore(state => state.removeCardFromHand)
   const playCard = useGameStateStore(state => state.playCard)
+  const isMyPos = useGameStateStore((state) => state.activePosition === state.position)
+  const isPlayCardState = useGameStateStore((state) => state.state === "PLAY_CARD")
+
+  const handleAxiosError = useAxiosErrorHandler()
+  const isTouch = useMemo(() => isTouchDevice(), [])
+  const filteredCards = useMemo(() => cards?.filter(card => card.state !== "ALREADY_PLAYED") || [], [cards])
+  const totalCards = filteredCards.length
+
   const hoveredIndexRef = useRef<number | null>(null)
 
-  // Create a fixed number of animation controls (max possible cards in hand which is 9)
+  if (!cards) return null
+
+  const startRotation = useMemo(() => {
+    return -(ANIMATION_CONFIG.CARD_ROTATION / 2) - (ANIMATION_CONFIG.CARD_ROTATION * ((totalCards / 2) - 1))
+  }, [totalCards])
+
+  // Create a fixed number of animation controls (max possible cards in hand which is 9). Each card, when being created -
+  // gets one of those assigned. Like this we hava a reference to the cards animation handler and can manually invoke
+  // it wherever we want.
   const cardControls = [
     useAnimation(), useAnimation(), useAnimation(),
     useAnimation(), useAnimation(), useAnimation(),
     useAnimation(), useAnimation(), useAnimation()
   ]
 
-  const filteredCards = useMemo(() => cards?.filter(card => card.state !== "ALREADY_PLAYED") || [], [cards])
-
   const getCardControlsByIndex = (index: number) => {
     return cardControls[index]
   }
 
-  // Trigger hover animation on specific card
-  const triggerCardHover = (selectedIndex: number | null, allCards: CardInHand[]) => {
-    const totalCards = allCards.length
-    const cardRotation = 3
-    const startRotation = -(cardRotation / 2) - (cardRotation * ((totalCards / 2) - 1))
+  const triggerCardHover = (index: number | null, allCards: CardInHand[]) => {
+    if (index == null) {
+      hoveredIndexRef.current = null
+    }
 
-    allCards.forEach((card, i) => {
-      const controls = getCardControlsByIndex(i)
-      const y = calculateOffset(i, totalCards)
-      const currentAngle = startRotation + cardRotation * i
-      if (i === selectedIndex) {
-        // Start hover animation on main card
-        controls.start(getHoverAnimation(card))
-      } else if (selectedIndex !== null && isTouch && (i === selectedIndex - 1 && selectedIndex > 0)) {
-        // Adjacent cards get reduced hover effect
-        controls.start(getAdjacentHoverAnimationLeft(card))
-      } else if (selectedIndex !== null && isTouch && (i === selectedIndex + 1 && selectedIndex < totalCards - 1)) {
-        // Adjacent cards get reduced hover effect
-        controls.start(getAdjacentHoverAnimationRight(card))
-      } else {
-        // Return to initial state
-        controls.start(getInitialStyle(card, y, currentAngle, i))
-      }
+    allCards.forEach((card: CardInHand, i: number) => {
+      const offset = calculateOffset(i, allCards.length)
+      const currentAngle = startRotation + ANIMATION_CONFIG.CARD_ROTATION * i
+
+      const animationType = getCardAnimationType(i, index, allCards.length)
+      const position: CardPosition = {offset, angle: currentAngle, index: i}
+
+      const animation = createCardAnimation({card, animationType, position, isTouch})
+
+      getCardControlsByIndex(i).start(animation)
     })
   }
-  const handleAxiosError = useAxiosErrorHandler()
-  const isMyPos = useGameStateStore((state) => state.activePosition === state.position)
-  const isPlayCardState = useGameStateStore((state) => state.state === "PLAY_CARD")
-  const isTouch = useMemo(() => isTouchDevice(), [])
 
   const cardPlayable = (card: CardInHand) => {
     return card.state == "PLAYABLE" && isMyPos && isPlayCardState
   }
+
+  const createCardAnimation = ({card, animationType, position, isTouch}: CardAnimationConfig) => {
+    const baseAnimation = {
+      y: position.offset,
+      rotate: position.angle,
+      scale: 1,
+      filter: cardPlayable(card) ? ANIMATION_CONFIG.BRIGHTNESS.PLAYABLE : ANIMATION_CONFIG.BRIGHTNESS.DISABLED,
+      zIndex: position.index,
+      transition: {duration: ANIMATION_CONFIG.DURATIONS.INITIAL, ease: ANIMATION_CONFIG.EASING}
+    }
+
+    const override = ANIMATION_OVERRIDES[animationType as keyof typeof ANIMATION_OVERRIDES]?.(isTouch)
+    return override ? {...baseAnimation, ...override} : baseAnimation
+  }
+
+  const getCardAnimationType = (cardIndex: number, selectedIndex: number | null, totalCards: number): AnimationType => {
+    if (selectedIndex === null) return 'initial'
+    if (cardIndex === selectedIndex) return 'hover'
+    if (isTouch && cardIndex === selectedIndex - 1 && selectedIndex > 0) return 'adjacentLeft'
+    if (isTouch && cardIndex === selectedIndex + 1 && selectedIndex < totalCards - 1) return 'adjacentRight'
+    return 'initial'
+  }
+
+  // Update all card animations when playable state changes
+  useEffect(() => {
+    if (!isMyPos || !isPlayCardState) {
+      return
+    }
+
+    filteredCards.forEach((card, i) => {
+      const filter = cardPlayable(card) ? ANIMATION_CONFIG.BRIGHTNESS.PLAYABLE : ANIMATION_CONFIG.BRIGHTNESS.DISABLED
+      getCardControlsByIndex(i).start({filter: filter})
+    })
+  }, [cards, isMyPos, isPlayCardState])
 
   const playCardAction = (card: CardInHand) => {
     api.playCard({game: gameUuid!!, card: {suit: card.suit, rank: card.rank, skin: "french"}})
@@ -100,52 +204,6 @@ export function PlayerHand() {
     triggerCardHover(index, filteredCards)
   }
 
-  const getHoverAnimation = (card: CardInHand) => {
-    const isPlayable = cardPlayable(card)
-    const base = -80 - ((CARD_HEIGHT - 100) / 30) * 20
-    const additional = -10 - ((CARD_HEIGHT - 100) / 30) * 10
-    return {
-      y: base + additional,
-      scale: 1.25,
-      filter: isPlayable ? "brightness(1)" : "brightness(0.95)",
-      rotate: 0,
-      transition: {duration: isTouch ? 0.07 : 0.15}
-    }
-  }
-
-  const getAdjacentHoverAnimationLeft = (card: CardInHand) => {
-    const isPlayable = cardPlayable(card)
-
-    return {
-      y: -80 - ((CARD_HEIGHT - 100) / 30) * 20,
-      scale: 1.1,
-      filter: isPlayable ? "brightness(1)" : "brightness(0.95)",
-      rotate: -15,
-      transition: {duration: isTouch ? 0.09 : 0.15}
-    }
-  }
-
-  const getAdjacentHoverAnimationRight = (card: CardInHand) => {
-    const isPlayable = cardPlayable(card)
-    return {
-      y: -80 - ((CARD_HEIGHT - 100) / 30) * 20,
-      scale: 1.1,
-      filter: isPlayable ? "brightness(1)" : "brightness(0.95)",
-      rotate: 15,
-      transition: {duration: isTouch ? 0.09 : 0.15}
-    }
-  }
-
-  const getInitialStyle = (card: CardInHand, y: number, currentAngle: number, cardIndex: number = 0) => {
-    const isPlayable = cardPlayable(card)
-    return {
-      y: y,
-      rotate: currentAngle,
-      scale: 1,
-      filter: isPlayable ? "brightness(1)" : "brightness(0.95)",
-      zIndex: cardIndex
-    }
-  }
 
   const calculateOffset = (index: number, totalItems: number): number => {
     const middle = (totalItems - 1) / 2
@@ -165,12 +223,6 @@ export function PlayerHand() {
     }
   }
 
-  if (!cards) return null
-
-  const totalCards = filteredCards.length
-  const cardRotation = 3
-  const startRotation = -(cardRotation / 2) - (cardRotation * ((totalCards / 2) - 1))
-
   return (
     <div className="fixed -bottom-[60px] w-full flex justify-center">
       <motion.div
@@ -185,8 +237,14 @@ export function PlayerHand() {
       >
         <AnimatePresence mode="popLayout" initial={true}>
           {filteredCards.map((card, i) => {
-            const y = calculateOffset(i, totalCards)
-            const currentAngle = startRotation + cardRotation * i
+            const offset = calculateOffset(i, totalCards)
+            const currentAngle = startRotation + ANIMATION_CONFIG.CARD_ROTATION * i
+            const initialAnimation = createCardAnimation({
+              card,
+              animationType: 'initial',
+              position: {offset, angle: currentAngle, index: i},
+              isTouch
+            })
 
             return (
               <motion.div
@@ -199,7 +257,7 @@ export function PlayerHand() {
                   width: CARD_WIDTH,
                   height: CARD_HEIGHT,
                 }}
-                initial={getInitialStyle(card, y, currentAngle, i)}
+                initial={initialAnimation}
                 animate={getCardControlsByIndex(i)}
                 onClick={() => cardClicked(card, i)}
               >
