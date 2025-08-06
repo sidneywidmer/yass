@@ -1,7 +1,10 @@
 {
   "settings": {
     "title": "Einstellungen",
-    "language": "Sprache"
+    "language": "Sprache",
+    "deck": "Kartenset",
+    "deckSwiss": "Deutschschweiz",
+    "deckFrench": "Französisch"
   },
   "errors": {
     "title": "Fehler",
@@ -158,12 +161,27 @@
     }
   },
   "trumps": {
-    "CLUBS": "Schilten",
-    "SPADES": "Schaufeln",
-    "HEARTS": "Herz",
-    "DIAMONDS": "Ecken",
-    "OBEABE": "Obenabe",
-    "UNEUFE": "Undenufe",
-    "FREESTYLE": "Freestyle"
+    "french": {
+      "CLUBS": "Kreuz",
+      "SPADES": "Schaufel",
+      "HEARTS": "Herz",
+      "DIAMONDS": "Ecke",
+      "OBEABE": "Obenabe",
+      "UNEUFE": "Undenufe",
+      "FREESTYLE": "Freestyle"
+    },
+    "swiss": {
+      "CLUBS": "Schellen",
+      "SPADES": "Schilten",
+      "HEARTS": "Rosen",
+      "DIAMONDS": "Eicheln",
+      "OBEABE": "Obenabe",
+      "UNEUFE": "Undenufe",
+      "FREESTYLE": "Freestyle"
+    }
+  },
+  "chooseTrump": {
+    "title": "Trump wählen",
+    "description": "Trump wählen"
   }
 }

@@ -1,44 +1,7 @@
 import {motion} from "framer-motion"
-import {useState, useEffect} from "react"
+import {useEffect, useState} from "react"
 import {useGameStateStore} from "@/store/game-state"
-import {Heart, Spade, Diamond, Club, ArrowUp, ArrowDown, LucideIcon, Smile} from "lucide-react"
-import {Trump} from "@/api/generated";
-
-type TrumpIconConfig = {
-  icon: LucideIcon
-  className: string
-}
-
-const trumpIcons: Record<Trump, TrumpIconConfig> = {
-  FREESTYLE: {
-    icon: Smile,
-    className: ""
-  },
-  HEARTS: {
-    icon: Heart,
-    className: "text-red-500 fill-red-500"
-  },
-  SPADES: {
-    icon: Spade,
-    className: "fill-foreground"
-  },
-  DIAMONDS: {
-    icon: Diamond,
-    className: "text-red-500 fill-red-500"
-  },
-  CLUBS: {
-    icon: Club,
-    className: "fill-foreground"
-  },
-  OBEABE: {
-    icon: ArrowDown,
-    className: "fill-foreground"
-  },
-  UNEUFE: {
-    icon: ArrowUp,
-    className: "fill-foreground"
-  }
-}
+import {TrumpIcon} from "@/components/game/trump-icon"
 
 export function CurrentTrump() {
   const trump = useGameStateStore(state => state.trump)
@@ -48,9 +11,7 @@ export function CurrentTrump() {
     setKey(prev => prev + 1)
   }, [trump])
 
-  if (!trump || !trumpIcons[trump]) return null
-
-  const {icon: IconComponent, className} = trumpIcons[trump]
+  if (!trump) return null
 
   return (
     <motion.div
@@ -64,7 +25,7 @@ export function CurrentTrump() {
       }}
       className="w-10 h-10 flex items-center justify-center bg-white"
     >
-      <IconComponent className={`w-6 h-6 ${className}`}/>
+      <TrumpIcon trump={trump} className={"w-6 h-6"} />
     </motion.div>
   )
 }

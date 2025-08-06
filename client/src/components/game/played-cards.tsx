@@ -1,6 +1,7 @@
 import {AnimatePresence, motion} from "framer-motion"
 import {useGameStateStore} from "@/store/game-state"
-import {Card, CARD_HEIGHT, CARD_WIDTH} from "@/components/game/card.tsx";
+import {Card} from "@/components/game/card.tsx";
+import {useCardDimensions} from "@/hooks/use-card-dimensions.ts";
 import {Position} from "@/api/generated";
 import {useMemo} from "react";
 import {getRelativePosition} from "@/lib/utils.ts";
@@ -9,6 +10,7 @@ export function PlayedCards() {
   const clearDirection = useGameStateStore(state => state.clearDirection);
   const cardsPlayed = useGameStateStore(state => state.cardsPlayed);
   const position = useGameStateStore(state => state.position);
+  const {CARD_WIDTH, CARD_HEIGHT} = useCardDimensions();
 
   const cardRotations = useMemo(() => ({
     NORTH: 180 + (Math.random() * 10 - 5),
@@ -71,6 +73,10 @@ export function PlayedCards() {
               key={`cardtable-${card.position}-${card.suit}-${card.rank}`}
               className="absolute origin-center"
               initial={getInitialPosition(getRelativePosition(position!!, card.position!!))}
+              layout
+              transition={{
+                layout: {duration: 0.2, ease: [0.4, 0, 0.2, 1]}
+              }}
               animate={
                 clearDirection && card.position!! === clearDirection
                   ? {

@@ -1,7 +1,10 @@
 {
   "settings": {
     "title": "Settings",
-    "language": "Language"
+    "language": "Language",
+    "deck": "Cardstyle",
+    "deckSwiss": "Swissgerman",
+    "deckFrench": "French"
   },
   "errors": {
     "title": "Ooops",
@@ -154,12 +157,27 @@
     }
   },
   "trumps": {
-    "CLUBS": "Clubs",
-    "SPADES": "Spades",
-    "HEARTS": "Hearts",
-    "DIAMONDS": "Diamonds",
-    "OBEABE": "Top down",
-    "UNEUFE": "Bottom up",
-    "FREESTYLE": "Freestyle"
+    "french": {
+      "CLUBS": "Clubs",
+      "SPADES": "Spades",
+      "HEARTS": "Hearts",
+      "DIAMONDS": "Diamonds",
+      "OBEABE": "Obenabe",
+      "UNEUFE": "Undenufe",
+      "FREESTYLE": "Freestyle"
+    },
+    "swiss": {
+      "CLUBS": "Bells",
+      "SPADES": "Shields",
+      "HEARTS": "Roses",
+      "DIAMONDS": "Acorns",
+      "OBEABE": "Obenabe",
+      "UNEUFE": "Undenufe",
+      "FREESTYLE": "Freestyle"
+    }
+  },
+  "chooseTrump": {
+    "title": "Choose trump",
+    "description": "Choose trump"
   }
 }
