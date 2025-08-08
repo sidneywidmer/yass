@@ -39,7 +39,7 @@ const getAnimationConfig = (CARD_HEIGHT: number) => ({
   ADJACENT_ROTATION: 15, // touch only
   BRIGHTNESS: { // depending on state we want to "mute" unplayable cards
     PLAYABLE: "brightness(1)",
-    DISABLED: "brightness(0.95)"
+    DISABLED: "brightness(0.75)"
   },
   HOVER_BASE_Y: -70 - ((CARD_HEIGHT - 100) / 30) * 20, // hover state based on CARD_HEIGHT, lol try and error
   HOVER_ADDITIONAL_Y: -10 - ((CARD_HEIGHT - 100) / 30) * 10 // extra lift for main hover
