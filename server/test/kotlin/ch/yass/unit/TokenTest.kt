@@ -10,8 +10,8 @@ class TokenTest {
 
     @Test
     fun testCreateHashAndVerifyToken() {
-        var token = createToken()
-        var hash = hashToken(token)
+        val token = createToken()
+        val hash = hashToken(token)
 
         assertTrue(verifyToken(token, hash))
     }

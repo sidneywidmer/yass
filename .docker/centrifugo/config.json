@@ -50,9 +50,6 @@
     "insecure": true
   },
   "websocket": {
-    "disabled": true
-  },
-  "sse": {
     "enabled": true
   }
 }
