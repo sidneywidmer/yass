@@ -16,7 +16,12 @@ import ch.yass.game.dto.db.Trick
  * Take all cards the given player was dealt in the current hand and subtract all the
  * cards he already played in the tricks of this hand.
  */
-fun unplayedCardsOfPlayer(player: InternalPlayer, hands: List<Hand>, seats: List<Seat>, tricks: List<Trick>): List<Card> {
+fun unplayedCardsOfPlayer(
+    player: InternalPlayer,
+    hands: List<Hand>,
+    seats: List<Seat>,
+    tricks: List<Trick>
+): List<Card> {
     val hand = currentHand(hands)
     val seat = playerSeat(player, seats)
 
@@ -105,8 +110,15 @@ fun isLastCard(cards: List<Card>) = cards.size == 1
 
 fun isFollowingLead(lead: Card?, card: Card) = lead?.suit == card.suit
 
-fun couldNotFollowLead(hand: Hand, cards: List<Card>, lead: Card?): Boolean =
-    !playableCards(hand, cards).any { it.suit == lead?.suit }
+/**
+ * If we have any card with the lead suit than yes, we can follow the lead. BUT
+ * if we only have one card that can follow suit and that card is the jack then
+ * no we don't have to.
+ */
+fun couldFollowLead(hand: Hand, cards: List<Card>, lead: Card?): Boolean {
+    val cardsWithLeadSuit = playableCards(hand, cards).filter { it.suit == lead?.suit }
+    return cardsWithLeadSuit.isNotEmpty() && cardsWithLeadSuit.singleOrNull()?.rank != Rank.JACK
+}
 
 fun isWelcomeHandFinished(trick: Trick, hands: List<Hand>): Boolean = trick.cards().size == 4 && hands.size == 1
 
@@ -155,7 +167,7 @@ fun cardFollowsLead(card: Card, player: InternalPlayer, state: GameState): Boole
         leadPosition == seat.position -> true  // the player is leading, so let him play
         isLastCard(cards) -> true
         isFollowingLead(lead, card) -> true
-        couldNotFollowLead(hand, cards, lead) -> true
+        !couldFollowLead(hand, cards, lead) -> true
         card.suit == hand.trump.toSuit() -> true
         else -> false
     }
