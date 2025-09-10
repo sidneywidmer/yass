@@ -46,7 +46,7 @@ class AnalyzeGameService(private val gameService: GameService) {
     private fun mapHand(hand: Hand, state: GameState): AnalyzeHand {
         val startingPlayer = playerAtPosition(hand.startingPosition, state.seats, state.allPlayers)
         val players = state.allPlayers.map { mapPlayer(it, hand, state) }.toList()
-        var details = handTricksWithPoints(listOf(hand), state.tricks)
+        val details = handTricksWithPoints(listOf(hand), state.tricks)
 
         val weisPoints = weisPointsByPositionTotal(listOf(hand), state.tricks)
         val weise = Position.entries

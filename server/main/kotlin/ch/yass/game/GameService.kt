@@ -11,6 +11,10 @@ import ch.yass.core.pubsub.PubSub
 import ch.yass.game.api.*
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.api.internal.NewHand
+import ch.yass.game.bot.chooseCardForBot
+import ch.yass.game.bot.chooseGschobeForBot
+import ch.yass.game.bot.chooseTrumpForBot
+import ch.yass.game.bot.chooseWeisForBot
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Game
 import ch.yass.game.dto.db.Hand
@@ -367,9 +371,8 @@ class GameService(
             raise(PlayerIsNotBot(botPlayer, state))
         }
 
-        // TODO: Get a good trump to choose
-        val trump = chooseTrumpForBot(botPlayer, state)
-        val request = ChooseTrumpRequest(state.game.uuid.toString(), trump.name)
+        val candidate = chooseTrumpForBot(botPlayer, state)
+        val request = ChooseTrumpRequest(state.game.uuid.toString(), candidate!!.trump.name)
 
         return trump(request, botPlayer)
     }
@@ -398,7 +401,6 @@ class GameService(
             raise(PlayerIsNotBot(botPlayer, state))
         }
 
-        // TODO: Better decision
         val gschobe = chooseGschobeForBot(botPlayer, state)
         val request = SchiebeRequest(state.game.uuid.toString(), gschobe.name)
 

@@ -11,26 +11,14 @@ export function WebSocketHandler() {
   useEffect(() => {
     if (!gameUuid) return
 
-    class CustomEventSource extends EventSource {
-      constructor(url: string, _?: EventSourceInit) {
-        super(url, {
-          withCredentials: true,
-        });
-      }
-    }
-
     const transports = [
       {
-        transport: 'sse' as TransportName,
-        endpoint: import.meta.env.VITE_CENTRIFUGO_API_URL_SSE + '/connection/sse',
-      }
+        transport: 'websocket' as TransportName,
+        endpoint: import.meta.env.VITE_CENTRIFUGO_API_URL_WS + '/connection/websocket',
+      },
     ];
-    
-    const centrifuge = new Centrifuge(transports, {
-      debug: false,
-      eventsource: CustomEventSource,
-      emulationEndpoint: import.meta.env.VITE_CENTRIFUGO_API_URL_SSE + '/emulation',
-    });
+
+    const centrifuge = new Centrifuge(transports, {});
 
     const connectToWs = async () => {
       try {

@@ -44,3 +44,12 @@ fun botName(position: Position): String = when (position) {
     Position.SOUTH -> "CyberS1X"
     Position.WEST -> "RoboW-X"
 }
+
+fun botId(position: Position): Int {
+    return when (position) {
+        Position.NORTH -> -1
+        Position.EAST -> -2
+        Position.SOUTH -> -3
+        Position.WEST -> -4
+    }
+}

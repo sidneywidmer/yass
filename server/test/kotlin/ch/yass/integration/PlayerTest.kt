@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test
 import org.kodein.di.direct
 import org.kodein.di.instance
 
-data class PlayCard(val position: Position, val card: String)
+private data class PlayCard(val position: Position, val card: String)
 
 class PlayerTest : Integration() {
     private val service: GameService = container.direct.instance()
