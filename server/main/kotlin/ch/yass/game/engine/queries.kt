@@ -191,10 +191,20 @@ fun winningPositionOfTricks(hand: Hand, tricks: List<Trick>): Position =
  * See activePosition, this is just a helper to map a player to a position. We always have an active position
  * but not necessary a player already sitting there.
  */
-fun activePlayer(hands: List<Hand>, players: List<InternalPlayer>, seats: List<Seat>, tricks: List<Trick>): InternalPlayer =
+fun activePlayer(
+    hands: List<Hand>,
+    players: List<InternalPlayer>,
+    seats: List<Seat>,
+    tricks: List<Trick>
+): InternalPlayer =
     playerAtPosition(activePosition(hands, seats, tricks), seats, players)
 
-fun maybeActivePlayer(hands: List<Hand>, players: List<InternalPlayer>, seats: List<Seat>, tricks: List<Trick>): InternalPlayer? =
+fun maybeActivePlayer(
+    hands: List<Hand>,
+    players: List<InternalPlayer>,
+    seats: List<Seat>,
+    tricks: List<Trick>
+): InternalPlayer? =
     maybePlayerAtPosition(activePosition(hands, seats, tricks), seats, players)
 
 context(Raise<GameAlreadyFull>)
@@ -209,18 +219,11 @@ fun startingPlayersSeatOfHand(hand: Hand, seats: List<Seat>): Seat =
     seats.first { it.position == hand.startingPosition }
 
 /**
- * If it's a "suit" trump, all cards must follow suit except the Trump Jack a.k.a Buur.
- * TODO: How to handle undertrump?
+ * If it's a "suit" trump, all cards must follow suit.
  */
 fun playableCards(hand: Hand, cards: List<Card>): List<Card> =
     when (hand.trump) {
-        in listOf(
-            Trump.CLUBS,
-            Trump.DIAMONDS,
-            Trump.HEARTS,
-            Trump.SPADES
-        ) -> cards.filterNot { it.suit != hand.trump.toSuit() && it.rank == Rank.JACK }
-
+        in Trump.suits() -> cards.filter { it.suit == hand.trump.toSuit() }
         else -> cards
     }
 

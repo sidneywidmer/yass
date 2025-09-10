@@ -19,6 +19,7 @@ enum class Trump {
 
     companion object {
         fun playable() = listOf(CLUBS, SPADES, HEARTS, DIAMONDS, UNEUFE, OBEABE)
+        fun suits() = listOf(CLUBS, SPADES, HEARTS, DIAMONDS)
     }
 
     fun equalsSuit(suit: Suit): Boolean = this.toString() == suit.toString()
