@@ -1,20 +1,17 @@
 package ch.yass.game.bot
 
 import ch.yass.game.api.internal.GameState
-import ch.yass.game.dto.*
+import ch.yass.game.dto.Gschobe
+import ch.yass.game.dto.Trump
+import ch.yass.game.dto.Weis
 import ch.yass.game.dto.db.InternalPlayer
-import ch.yass.game.engine.cardsInHand
 import ch.yass.game.engine.currentHand
 import ch.yass.game.engine.playerSeat
 import ch.yass.game.engine.possibleWeiseWithPoints
 import ch.yass.game.engine.withoutStoeckPoints
 
-fun chooseCardForBot(botPlayer: InternalPlayer, state: GameState): Card {
-    val hand = currentHand(state.hands)
-    val cards = cardsInHand(hand, botPlayer, state)
-    val match = cards.shuffled().first { it.state == CardInHandState.PLAYABLE }
-
-    return Card(match.suit, match.rank, match.skin)
+fun chooseCardForBot(botPlayer: InternalPlayer, state: GameState): PlayCandidate {
+    return getPlayCandidate(botPlayer, state)
 }
 
 fun chooseTrumpForBot(botPlayer: InternalPlayer, state: GameState): TrumpCandidate {
@@ -36,7 +33,7 @@ fun chooseGschobeForBot(botPlayer: InternalPlayer, state: GameState): Gschobe {
         isLowRisk && candidate.reason.weight >= 2 -> Gschobe.NO
         isMediumRisk && candidate.reason.weight >= 6 -> Gschobe.NO
         isHighRisk && candidate.reason.weight >= 8 -> Gschobe.NO
-        candidate.reason == Fallback -> Gschobe.YES
+        candidate.reason == TrumpFallback -> Gschobe.YES
         else -> Gschobe.YES
     }
 }

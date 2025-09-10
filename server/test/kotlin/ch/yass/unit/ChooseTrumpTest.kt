@@ -63,7 +63,7 @@ class ChooseTrumpTest {
     @Test
     fun testFallback() {
         val candidate = getTrumpCandidate(interpretCards("S8,S7,H8,H7,D8,D7,C8,C7,C6"))
-        assertTrue { candidate.reason is Fallback }
+        assertTrue { candidate.reason is TrumpFallback }
     }
 
     @Test

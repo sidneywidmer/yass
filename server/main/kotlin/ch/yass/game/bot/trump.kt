@@ -97,7 +97,7 @@ object NineWithFourTrumps : TrumpReason {
 }
 
 // In case no other TrumpReason matches, you'll get this one
-object Fallback : TrumpReason {
+object TrumpFallback : TrumpReason {
     override val weight = 0
     override fun check(cards: List<Card>, trump: Trump) = true
 }
@@ -146,7 +146,7 @@ val trumpReasons = listOf(
     NineWithFourTrumps,
     FiveTrumpsWithAce,
     NineJackStrongSides,
-    Fallback,
+    TrumpFallback,
     StrongUneufe,
     StrongObenabe,
 )
