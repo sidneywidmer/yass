@@ -126,5 +126,5 @@ fun inMemoryGame(lambda: GameStateBuilder.() -> Unit): GameState {
         }
     }
 
-    return GameState(game, allPlayers, seats, hands, tricks, inMemory = true)
+    return GameState(game, allPlayers, seats, hands.reversed(), tricks.reversed(), inMemory = true)
 }

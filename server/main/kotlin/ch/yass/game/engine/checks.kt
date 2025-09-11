@@ -112,12 +112,15 @@ fun isFollowingLead(lead: Card?, card: Card) = lead?.suit == card.suit
 
 /**
  * If we have any card with the lead suit than yes, we can follow the lead. BUT
- * if we only have one card that can follow suit and that card is the jack then
- * no we don't have to.
+ * if we only have one card that can follow suit and that suit is trump and that
+ * card is the jack then no we don't have to.
  */
-fun couldFollowLead(hand: Hand, cards: List<Card>, lead: Card?): Boolean {
-    val cardsWithLeadSuit = playableCards(hand, cards).filter { it.suit == lead?.suit }
-    return cardsWithLeadSuit.isNotEmpty() && cardsWithLeadSuit.singleOrNull()?.rank != Rank.JACK
+fun couldFollowLead(cards: List<Card>, lead: Card?, trump: Trump): Boolean {
+    val cardsOfLeadSuit = cards.filter { it.suit == lead?.suit }
+    if (lead?.suit == trump.toSuit() && cardsOfLeadSuit.size == 1) {
+        return cardsOfLeadSuit.first().rank != Rank.JACK
+    }
+    return cardsOfLeadSuit.isNotEmpty()
 }
 
 fun isWelcomeHandFinished(trick: Trick, hands: List<Hand>): Boolean = trick.cards().size == 4 && hands.size == 1
@@ -167,7 +170,7 @@ fun cardFollowsLead(card: Card, player: InternalPlayer, state: GameState): Boole
         leadPosition == seat.position -> true  // the player is leading, so let him play
         isLastCard(cards) -> true
         isFollowingLead(lead, card) -> true
-        !couldFollowLead(hand, cards, lead) -> true
+        !couldFollowLead(cards, lead, hand.trump) -> true
         card.suit == hand.trump.toSuit() -> true
         else -> false
     }
