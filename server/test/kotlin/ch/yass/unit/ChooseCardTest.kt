@@ -1,6 +1,7 @@
 package ch.yass.unit
 
 import ch.yass.admin.dsl.game
+import ch.yass.admin.dsl.inMemoryGame
 import ch.yass.game.dto.Gschobe
 import ch.yass.game.dto.Trump
 import org.junit.jupiter.api.Test
@@ -8,10 +9,7 @@ import org.junit.jupiter.api.Test
 class ChooseCardTest {
     @Test
     fun testCanWinTrick() {
-        hier gehts weiter -> ich will ein inmemory state!
-        // no players = create default nonbot players
-        // no FREESTYLE trump -> create one automatically
-        val state = game {
+        val state = inMemoryGame {
             hands {
                 hand {
                     trump(Trump.SPADES)
@@ -24,5 +22,8 @@ class ChooseCardTest {
                 }
             }
         }
+
+//        getPlayCandidate()
+        val bar = "baz"
     }
 }
