@@ -15,12 +15,6 @@ import org.junit.jupiter.api.Test
 class CountingPointsTest : Integration() {
     private fun getStateSpades(): GameState {
         return game {
-            players {
-                north(name = "ueli", bot = true)
-                east(name = "doris", bot = true)
-                south(name = "christoph", bot = true)
-                west(name = "daniela", bot = true)
-            }
             hands {
                 hand {
                     trump(Trump.SPADES)
@@ -41,7 +35,6 @@ class CountingPointsTest : Integration() {
     fun testTrump() {
         val state = getStateSpades()
 
-        // TODO: Refactor, we want way more tests and a way to create an "in memory" state for functional tests with our dsl
         val points = handTricksWithPoints(state.hands, state.tricks).sumPointsByPosition()
         assertEquals(45, points[Position.NORTH])
     }

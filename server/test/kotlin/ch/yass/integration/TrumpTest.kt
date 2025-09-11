@@ -22,26 +22,10 @@ import org.kodein.di.instance
 class TrumpTest : Integration() {
     private val service: GameService = Yass.container.direct.instance()
 
-    private fun getState(): GameState {
-        return game {
-            players {
-                north(name = "ueli", bot = false)
-                east(name = "doris", bot = false)
-                south(name = "christoph", bot = false)
-                west(name = "daniela", bot = false)
-            }
+    @Test
+    fun testPlayerCanPlayUneufeTrump() {
+        val state = game {
             hands {
-                hand {
-                    trump(Trump.FREESTYLE)
-                    gschobe(Gschobe.NO)
-                    north(cards = "welcome", start = true)
-                    east(cards = "welcome")
-                    south(cards = "welcome")
-                    west(cards = "welcome")
-                    tricks {
-                        trick(north = "W6", east = "W6", south = "W6", west = "W6")
-                    }
-                }
                 hand {
                     trump(Trump.NONE)
                     gschobe(Gschobe.NO)
@@ -55,11 +39,6 @@ class TrumpTest : Integration() {
                 }
             }
         }
-    }
-
-    @Test
-    fun testPlayerCanPlayUneufeTrump() {
-        val state = getState()
 
         val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
         val request = ChooseTrumpRequest(state.game.uuid.toString(), "UNEUFE")
@@ -71,12 +50,6 @@ class TrumpTest : Integration() {
     @Test
     fun testCorrectPlayerWinsUneufeTrump() {
         val state = game {
-            players {
-                north(name = "ueli", bot = false)
-                east(name = "doris", bot = false)
-                south(name = "christoph", bot = false)
-                west(name = "daniela", bot = false)
-            }
             hands {
                 hand {
                     trump(Trump.UNEUFE)

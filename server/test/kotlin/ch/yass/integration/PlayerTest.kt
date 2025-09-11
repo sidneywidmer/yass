@@ -43,12 +43,6 @@ class PlayerTest : Integration() {
                 wcValue(400) // We'll be achieved in the first trick of the second hand
                 wcType(WinningConditionType.POINTS)
             }
-            players {
-                north(name = "ueli", bot = false)
-                east(name = "doris", bot = false)
-                south(name = "christoph", bot = false)
-                west(name = "daniela", bot = false)
-            }
             hands {
                 hand {
                     trump(Trump.FREESTYLE)

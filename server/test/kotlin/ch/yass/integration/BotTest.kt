@@ -47,17 +47,6 @@ class BotTest : Integration() {
             }
             hands {
                 hand {
-                    trump(Trump.FREESTYLE)
-                    gschobe(Gschobe.NO)
-                    north(cards = "welcome", start = true)
-                    east(cards = "welcome")
-                    south(cards = "welcome")
-                    west(cards = "welcome")
-                    tricks {
-                        trick(north = "W6", east = "W6", south = "W6", west = "W6")
-                    }
-                }
-                hand {
                     trump(Trump.SPADES)
                     gschobe(Gschobe.NO)
                     north(cards = "C9,D7,D10,DQ,H6,HQ,HK,S9,SJ", start = true)
