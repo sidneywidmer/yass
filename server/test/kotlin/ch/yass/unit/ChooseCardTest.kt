@@ -1,6 +1,5 @@
 package ch.yass.unit
 
-import ch.yass.admin.dsl.game
 import ch.yass.admin.dsl.inMemoryGame
 import ch.yass.admin.dsl.interpretCard
 import ch.yass.game.bot.getPlayCandidate
@@ -34,7 +33,7 @@ class ChooseCardTest {
         // CQ is correct. Not C6 (not winning trick) and not S6 or S10 (both _could_ win because they're trump
         // but we should not waste trumps if not necessary). Also not CK, just take the lowest card.
         val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
-        val candidate = getPlayCandidate(player ,state)
+        val candidate = getPlayCandidate(player, state)
         assertTrue(candidate.card == interpretCard("CQ"))
     }
 
@@ -57,7 +56,7 @@ class ChooseCardTest {
         }
 
         val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
-        val candidate = getPlayCandidate(player ,state)
+        val candidate = getPlayCandidate(player, state)
         assertTrue(candidate.card == interpretCard("SJ"))
     }
 
@@ -80,7 +79,7 @@ class ChooseCardTest {
         }
 
         val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
-        val candidate = getPlayCandidate(player ,state)
+        val candidate = getPlayCandidate(player, state)
         assertTrue(candidate.card == interpretCard("H6"))
     }
 
@@ -103,7 +102,33 @@ class ChooseCardTest {
         }
 
         val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
-        val candidate = getPlayCandidate(player ,state)
+        val candidate = getPlayCandidate(player, state)
+        assertTrue(candidate.card == interpretCard("HK"))
+    }
+
+    @Test
+    fun testOutOfSuit() {
+        val state = inMemoryGame {
+            hands {
+                hand {
+                    trump(Trump.HEARTS)
+                    gschobe(Gschobe.NO)
+                    north(cards = "C9,CJ,D7,D10,DQ,H6,H7,H10,HQ", start = true)
+                    east(cards = "C7,CA,D8,D9,DA,H8,H9,HJ,HA")
+                    south(cards = "C8,C10,CQ,CK,D6,HK,S7,S8,S9") // 1 diamond
+                    west(cards = "C6,DJ,DK,S6,S10,SJ,SQ,SK,SA") // no hearts, 1 club
+                    tricks {
+                        trick(north = "H6", east = "HA", south = "HK", west = "C6") // west signals: no hearts
+                        trick(north = "C9", east = "CA", south = "C8", west = "S6") // west signals: no clubs
+                        trick(north = "DQ", east = "DA", south = "D6", west = "DK") // south plays last diamond
+                        trick(north = "DQ", east = "D9", south = "S7", west = "DJ") // south signals: no diamond
+                    }
+                }
+            }
+        }
+
+        val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
+        val candidate = getPlayCandidate(player, state)
         assertTrue(candidate.card == interpretCard("HK"))
     }
 }

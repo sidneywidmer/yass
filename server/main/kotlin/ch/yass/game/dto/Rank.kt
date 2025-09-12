@@ -1,6 +1,6 @@
 package ch.yass.game.dto
 
-// Good to know: minBy works because Enums implement Comparable and each item has on ordinal prop
+// Good to know: don't use minBy/maxBy over these and always the cardValue function
 enum class Rank {
     SIX,
     SEVEN,

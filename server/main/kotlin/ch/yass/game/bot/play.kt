@@ -6,9 +6,12 @@ import ch.yass.game.dto.CardInHand
 import ch.yass.game.dto.CardInHandState
 import ch.yass.game.dto.Gschobe
 import ch.yass.game.dto.Position
+import ch.yass.game.dto.Suit
+import ch.yass.game.dto.Team
 import ch.yass.game.dto.Trump
 import ch.yass.game.dto.db.Hand
 import ch.yass.game.dto.db.InternalPlayer
+import ch.yass.game.dto.db.Seat
 import ch.yass.game.dto.db.Trick
 import ch.yass.game.engine.*
 
@@ -19,6 +22,7 @@ import ch.yass.game.engine.*
 
 
 data class PlayCandidate(val card: Card, val reasons: List<PlayReason>)
+data class OutOfSuit(val position: Position, val suits: Set<Suit>)
 
 data class PlayParams(
     val hand: Hand,
@@ -26,11 +30,12 @@ data class PlayParams(
     val playable: List<CardInHand>,
     val lead: Position,
     val state: GameState,
-    val notGschobeOpeningLead: Boolean // First card in the first trick of an ungschobe hand
+    val notGschobeOpeningLead: Boolean, // First card in the first trick of an ungschobe hand
+    val outOfSuit: List<OutOfSuit>,
+    val bock: List<Card>,
+    val remainingTrumps: List<Card>
 //    val points: Int,
 //    val partnerWinning: Boolean,
-//    val bock: List<Card>,
-//    val remainingTrumps: List<Card>,
 )
 
 sealed interface PlayReason {
@@ -71,7 +76,7 @@ object CanWinTrickWithLowest : PlayReason {
  * Check if we can win the trick without using a trump. Only relevant for last card.
  */
 object CanWinTrickWithNoTrump : PlayReason {
-    override val weight = 5
+    override val weight = 4
     override fun check(card: Card, params: PlayParams, candidates: List<PlayCandidate>): Boolean {
         // If we can't win the trick with given card return
         if (!candidates.reasonsOf(card).contains(CanWinTrick)) return false
@@ -106,7 +111,9 @@ object LeadWithHighestTrump : PlayReason {
     override fun check(card: Card, params: PlayParams, candidates: List<PlayCandidate>): Boolean {
         if (!params.notGschobeOpeningLead) return false
         if (!Trump.suits().contains(params.hand.trump)) return false
-        val highest = params.playable.filter { it.suit == params.hand.trump.toSuit() }.maxBy { it.rank }
+        val highest = params.playable
+            .filter { it.suit == params.hand.trump.toSuit() }
+            .maxBy { cardValue(Card.from(it), params.hand.trump) }
         return card == Card.from(highest)
     }
 }
@@ -120,12 +127,32 @@ object LeadWithHighestTrumpObeabeUneufe : PlayReason {
         if (!params.notGschobeOpeningLead) return false
         if (!setOf(Trump.OBEABE, Trump.UNEUFE).contains(params.hand.trump)) return false
 
-        val best = when (params.hand.trump) {
-            Trump.UNEUFE -> params.playable.minBy { it.rank }
-            else -> params.playable.maxBy { it.rank }
-        }
+        val best = params.playable.maxBy { cardValue(Card.from(it), params.hand.trump) }
 
         return card == Card.from(best)
+    }
+}
+
+/**
+ * When not in the opening trick of the hand, if we detected that all players after us can't beat
+ * given card we can play it.
+ */
+object PlayBock : PlayReason {
+    override val weight = 10
+    override fun check(card: Card, params: PlayParams, candidates: List<PlayCandidate>): Boolean {
+        if (tricksOfHand(params.state.tricks, params.hand).size == 1) return false
+        return params.bock.contains(card) && params.remainingTrumps.isEmpty()
+    }
+}
+
+object Schmiere : PlayReason {
+    override val weight = 10
+    override fun check(card: Card, params: PlayParams, candidates: List<PlayCandidate>): Boolean {
+        if (tricksOfHand(params.state.tricks, params.hand).size == 1) return false
+        if (cardValue(card, params.hand.trump) < 8) return false
+
+        return false
+//        return partnerGuaranteedWin
     }
 }
 
@@ -144,6 +171,8 @@ val playReasons = listOf(
     CanWinTrick,
     CanWinTrickWithNoTrump,
     CanWinTrickWithLowest,
+    PlayBock,
+    Schmiere
 //    PlayFallback,
 )
 
@@ -154,7 +183,11 @@ fun getPlayCandidate(player: InternalPlayer, state: GameState): PlayCandidate {
     val playable = cards.filter { it.state == CardInHandState.PLAYABLE }
     val lead = currentLeadPositionOfHand(hand, tricksOfHand(state.tricks, hand), state.seats)
     val notGschobeOpeningLead = notGschobeOpeningLead(trick, tricksOfHand(state.tricks, hand), hand)
-    val params = PlayParams(hand, trick, playable, lead, state, notGschobeOpeningLead)
+    val outOfSuit = outOfSuit(hand, tricksOfHand(state.tricks, hand), state.seats)
+    val bock = bock(tricksOfHand(state.tricks, hand), hand.trump)
+    val remainingTrumps = remainingTrumps(tricksOfHand(state.tricks, hand), hand.trump)
+    val isPartnerWinning = isPartnerWinning()
+    val params = PlayParams(hand, trick, playable, lead, state, notGschobeOpeningLead, outOfSuit, bock, remainingTrumps)
 
     val initialCandidates = playable.map { card -> PlayCandidate(card = Card.from(card), reasons = emptyList()) }
     val candidates = playReasons.fold(initialCandidates) { candidates, reason ->
@@ -168,6 +201,54 @@ fun getPlayCandidate(player: InternalPlayer, state: GameState): PlayCandidate {
     }
 
     return candidates.maxBy { candidate -> candidate.reasons.sumOf { it.weight } }
+}
+
+private fun isPartnerWinning(position: Position, trick: Trick, lead: Position): Boolean {
+    val partner = Team.getPartner(position)
+    val partnerCard = trick.cardOf(partner) ?: return false
+    hier gehts weiter
+    // the partners card is currently winning, it's bock and no more trumps
+    TODO("Not yet implemented")
+}
+
+private fun remainingTrumps(tricks: List<Trick>, trump: Trump): List<Card> {
+    val all = deck()
+        .map { Card(it.second, it.first, "french") }
+        .filter { trump.equalsSuit(it.suit) }
+    val played = tricks.flatMap { it.cards() }.filter { trump.equalsSuit(it.suit) }
+
+    return all.minus(played.toSet())
+}
+
+/**
+ * Get bock cards from all suits (including trump)
+ */
+private fun bock(tricks: List<Trick>, trump: Trump): List<Card> {
+    val all = deck().map { Card(it.second, it.first, "french") }
+    val played = tricks.flatMap { it.cards() }
+
+    return all.minus(played.toSet())
+        .groupBy { it.suit }
+        .map { (_, cards) -> cards.maxBy { cardValue(it, trump) } }
+}
+
+/**
+ * By looking at all past tricks we figure out who could not follow suit for sure. If they played
+ * a trump instead of following suit we can't really be sure.
+ */
+private fun outOfSuit(hand: Hand, tricks: List<Trick>, seats: List<Seat>): List<OutOfSuit> {
+    return hand.tricksWithPoints(tricks.filter { it.cards().size == 4 })
+        .flatMap { trickWithPoints ->
+            val leadSuit = trickWithPoints.trick.cardOf(trickWithPoints.lead)!!.suit
+            trickWithPoints.trick.cardsByPosition()
+                .filter { it.suit != leadSuit }
+                .filter { !hand.trump.equalsSuit(it.suit) }
+                .map { it.position }
+                .map { OutOfSuit(it, setOf(leadSuit)) }
+        }
+        .groupBy { it.position }
+        .mapValues { (_, outOfSuits) -> outOfSuits.flatMap { it.suits }.toSet() }
+        .map { OutOfSuit(it.key, it.value) }
 }
 
 private fun notGschobeOpeningLead(trick: Trick, tricks: List<Trick>, hand: Hand): Boolean {
