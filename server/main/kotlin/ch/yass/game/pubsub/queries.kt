@@ -20,14 +20,18 @@ import ch.yass.game.engine.*
 
 fun newHandActions(state: GameState, seat: Seat): List<Action> {
     val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks)
-    val lastHand = lastHand(state.hands)
+    val lastHand = lastHand(state.hands) // in the game state the new hand is already created
     val player = playerAtPosition(seat.position, state.seats, state.allPlayers)
     val cards = cardsInHand(currentHand(state.hands), player, state)
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.seats, state.tricks)
 
-    // If no winner found it's probably the welcome hand, and we just move the cards to SOUTH as default
-    val winningPos = winningPositionOfLastTrick(lastHand, tricksOfHand(state.tricks, lastHand)) ?: Position.SOUTH
+    // For the welcome hand we don't need to look too hard, just move cards north it doesn't matter
+    val winningPos = if (lastHand.trump == Trump.FREESTYLE) {
+        Position.NORTH
+    } else {
+        winningPositionOfTricks(lastHand, tricksOfHand(state.tricks, lastHand))
+    }
 
     return listOf(
         UpdateActive(activePosition),
