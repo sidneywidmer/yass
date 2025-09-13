@@ -19,6 +19,15 @@ fun positionsOrderedWithStart(position: Position): List<Position> {
     }
 }
 
+/**
+ * Given the lead and the currently active position, who still needs to play a card?
+ */
+fun upcomingPositions(lead: Position, current: Position): List<Position> {
+    val orderedPositions = positionsOrderedWithStart(lead)
+    val currentIndex = orderedPositions.indexOf(current)
+    return orderedPositions.drop(currentIndex + 1)
+}
+
 fun deck(): List<Pair<Rank, Suit>> = cartesianProduct(Rank.regular(), Suit.regular()).shuffled()
 
 /**

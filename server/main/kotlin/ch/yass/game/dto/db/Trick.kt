@@ -51,4 +51,13 @@ data class Trick(
             .mapNotNull { cardOf(it)?.let { card -> Pair(card, it) } }
             .map { p -> CardOnTable(p.first.suit, p.first.rank, p.first.skin, p.second) }
     }
+
+    fun withCard(position: Position, card: Card): Trick {
+        return when (position) {
+            Position.NORTH -> this.copy(north = card)
+            Position.EAST -> this.copy(east = card)
+            Position.SOUTH -> this.copy(south = card)
+            Position.WEST -> this.copy(west = card)
+        }
+    }
 }
