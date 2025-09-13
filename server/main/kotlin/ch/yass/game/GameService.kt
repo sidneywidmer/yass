@@ -384,8 +384,7 @@ class GameService(
             raise(PlayerIsNotBot(botPlayer, state))
         }
 
-        // TODO: Get a good card to play
-        val card = chooseCardForBot(botPlayer, state)
+        val card = chooseCardForBot(botPlayer, state).card
         val request = PlayCardRequest(
             state.game.uuid.toString(),
             PlayedCard(card.suit.toString(), card.rank.toString(), card.skin)

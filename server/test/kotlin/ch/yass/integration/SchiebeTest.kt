@@ -27,24 +27,7 @@ class SchiebeTest : Integration() {
 
     private fun getState(): GameState {
         return game {
-            players {
-                north(name = "ueli", bot = false)
-                east(name = "doris", bot = false)
-                south(name = "christoph", bot = false)
-                west(name = "daniela", bot = false)
-            }
             hands {
-                hand {
-                    trump(Trump.FREESTYLE)
-                    gschobe(Gschobe.NO)
-                    north(cards = "welcome", start = true)
-                    east(cards = "welcome")
-                    south(cards = "welcome")
-                    west(cards = "welcome")
-                    tricks {
-                        trick(north = "W6", east = "W6", south = "W6", west = "W6")
-                    }
-                }
                 hand {
                     trump(Trump.NONE)
                     gschobe(Gschobe.NOT_YET)

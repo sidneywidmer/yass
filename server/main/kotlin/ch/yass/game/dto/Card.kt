@@ -15,5 +15,9 @@ data class Card(
                 card.skin,
             )
         }
+
+        fun from(card: CardInHand): Card {
+            return Card(card.suit, card.rank, card.skin)
+        }
     }
 }

@@ -2,6 +2,7 @@ package ch.yass.game.engine
 
 import arrow.core.raise.Raise
 import arrow.core.raise.fold
+import ch.yass.admin.dsl.interpretCard
 import ch.yass.core.error.GameAlreadyFull
 import ch.yass.core.error.GameError
 import ch.yass.core.error.PlayerDoesNotOwnCard
@@ -218,14 +219,6 @@ fun randomFreePosition(occupiedSeats: List<Seat>): Position {
 fun startingPlayersSeatOfHand(hand: Hand, seats: List<Seat>): Seat =
     seats.first { it.position == hand.startingPosition }
 
-/**
- * If it's a "suit" trump, all cards must follow suit.
- */
-fun playableCards(hand: Hand, cards: List<Card>): List<Card> =
-    when (hand.trump) {
-        in Trump.suits() -> cards.filter { it.suit == hand.trump.toSuit() }
-        else -> cards
-    }
 
 fun pointsByPositionTotal(hands: List<Hand>, tricks: List<Trick>): Points {
     val weisPoints = weisPointsByPositionTotal(hands, tricks)

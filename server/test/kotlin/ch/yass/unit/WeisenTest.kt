@@ -19,19 +19,7 @@ class WeisenTest {
     @Test
     fun testBlattWeise() {
         // 4 blatt clubs, 3 blatt hearts, yes I know this "hand" has too many cards :)
-        val cards = listOf(
-            Card(Suit.CLUBS, Rank.SIX, ""),
-            Card(Suit.CLUBS, Rank.KING, ""),
-            Card(Suit.CLUBS, Rank.QUEEN, ""),
-            Card(Suit.CLUBS, Rank.SEVEN, ""),
-            Card(Suit.CLUBS, Rank.EIGHT, ""),
-            Card(Suit.CLUBS, Rank.JACK, ""),
-            Card(Suit.CLUBS, Rank.ACE, ""),
-            Card(Suit.HEARTS, Rank.NINE, ""),
-            Card(Suit.HEARTS, Rank.TEN, ""),
-            Card(Suit.HEARTS, Rank.JACK, ""),
-            Card(Suit.DIAMONDS, Rank.NINE, ""),
-        )
+        val cards = interpretCards("C6,CK,CQ,C7,C8,CJ,CA,H9,H10,HJ,D9")
 
         val result = blattWeise(cards)
         val vierBlatt = result.firstOrNull { it.type == WeisType.VIER_BLATT }
@@ -45,19 +33,7 @@ class WeisenTest {
 
     @Test
     fun testWeisPoints() {
-        val cards = listOf(
-            Card(Suit.CLUBS, Rank.SIX, ""),
-            Card(Suit.CLUBS, Rank.KING, ""),
-            Card(Suit.CLUBS, Rank.QUEEN, ""),
-            Card(Suit.CLUBS, Rank.SEVEN, ""),
-            Card(Suit.CLUBS, Rank.EIGHT, ""),
-            Card(Suit.CLUBS, Rank.JACK, ""),
-            Card(Suit.CLUBS, Rank.ACE, ""),
-            Card(Suit.HEARTS, Rank.NINE, ""),
-            Card(Suit.HEARTS, Rank.TEN, ""),
-            Card(Suit.HEARTS, Rank.JACK, ""),
-            Card(Suit.DIAMONDS, Rank.NINE, ""),
-        )
+        val cards = interpretCards("C6,CK,CQ,C7,C8,CJ,CA,H9,H10,HJ,D9")
 
         val result = possibleWeiseWithPoints(cards, Trump.CLUBS)
         assert(result.sumOf { it.points } == 90)
@@ -65,12 +41,7 @@ class WeisenTest {
 
     @Test
     fun testGleicheWeise() {
-        val cards = listOf(
-            Card(Suit.CLUBS, Rank.SIX, ""),
-            Card(Suit.HEARTS, Rank.SIX, ""),
-            Card(Suit.SPADES, Rank.SIX, ""),
-            Card(Suit.DIAMONDS, Rank.SIX, ""),
-        )
+        val cards = interpretCards("C6,H6,S6,D6")
 
         val result = gleicheWeise(cards)
         assert(result.firstOrNull { it.type == WeisType.VIER_GLEICHE } !== null)
@@ -78,12 +49,7 @@ class WeisenTest {
 
     @Test
     fun testGleicheWeiseBuur() {
-        val cards = listOf(
-            Card(Suit.CLUBS, Rank.JACK, ""),
-            Card(Suit.HEARTS, Rank.JACK, ""),
-            Card(Suit.SPADES, Rank.JACK, ""),
-            Card(Suit.DIAMONDS, Rank.JACK, ""),
-        )
+        val cards = interpretCards("CJ,HJ,SJ,DJ")
 
         val result = gleicheWeise(cards)
         assert(result.firstOrNull { it.type == WeisType.VIER_BUUR } !== null)
@@ -91,12 +57,7 @@ class WeisenTest {
 
     @Test
     fun testGleicheWeiseNell() {
-        val cards = listOf(
-            Card(Suit.CLUBS, Rank.NINE, ""),
-            Card(Suit.HEARTS, Rank.NINE, ""),
-            Card(Suit.SPADES, Rank.NINE, ""),
-            Card(Suit.DIAMONDS, Rank.NINE, ""),
-        )
+        val cards = interpretCards("C9,H9,S9,D9")
 
         val result = gleicheWeise(cards)
         assert(result.firstOrNull { it.type == WeisType.VIER_NELL } !== null)
@@ -104,35 +65,21 @@ class WeisenTest {
 
     @Test
     fun testSkipWeisOnlyIfOtherPresent() {
-        val cards = listOf(Card(Suit.CLUBS, Rank.EIGHT, ""))
+        val cards = interpretCards("C8")
         val result = possibleWeise(cards, Trump.CLUBS)
         assert(result.firstOrNull { it.type == WeisType.SKIP } === null)
     }
 
     @Test
     fun testSkipWeis() {
-        val cards = listOf(
-            Card(Suit.CLUBS, Rank.NINE, ""),
-            Card(Suit.HEARTS, Rank.NINE, ""),
-            Card(Suit.SPADES, Rank.NINE, ""),
-            Card(Suit.DIAMONDS, Rank.NINE, ""),
-        )
+        val cards = interpretCards("C9,H9,S9,D9")
         val result = possibleWeise(cards, Trump.CLUBS)
         assert(result.firstOrNull { it.type == WeisType.SKIP } !== null)
     }
 
     @Test
     fun testCrossWeis() {
-        val cards = listOf(
-            Card(Suit.CLUBS, Rank.EIGHT, ""),
-            Card(Suit.CLUBS, Rank.NINE, ""),
-            Card(Suit.CLUBS, Rank.TEN, ""),
-            Card(Suit.HEARTS, Rank.NINE, ""),
-            Card(Suit.SPADES, Rank.NINE, ""),
-            Card(Suit.DIAMONDS, Rank.NINE, ""),
-            Card(Suit.CLUBS, Rank.QUEEN, ""),
-            Card(Suit.CLUBS, Rank.KING, ""),
-        )
+        val cards = interpretCards("C8,C9,C10,H9,S9,D9,CQ,CK")
 
         val result = possibleWeise(cards, Trump.CLUBS)
         assert(result.firstOrNull { it.type == WeisType.VIER_NELL } !== null)
@@ -142,6 +89,7 @@ class WeisenTest {
 
     @Test
     fun testisAlreadyGewiesenSecond() {
+        // TODO: Update with inMemoryGame once it supports weise
         val trick = Trick(
             1,
             UUID.randomUUID(),

@@ -29,12 +29,6 @@ class WelcomeHandTest : Integration() {
      */
     private fun getState(): GameState {
         return game {
-            players {
-                north(name = "ueli", bot = false)
-                east(name = "doris", bot = false)
-                south(name = "christoph", bot = false)
-                west(name = "daniela", bot = false)
-            }
             hands {
                 hand {
                     trump(Trump.FREESTYLE)

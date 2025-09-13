@@ -21,29 +21,12 @@ class PlayCardTest : Integration() {
     private val service: GameService = Yass.container.direct.instance()
 
     /**
-     * 4 Players in the game and the welcome hand is already played. Clubs is trump and in the first
+     * 4 Players in the game and the welcome hand is already played. Spades is trump and in the first
      * trick a lot of trumps already went. Now in the second trick its WEST's turn.
      */
     private fun getState(): GameState {
         return game {
-            players {
-                north(name = "ueli", bot = false)
-                east(name = "doris", bot = false)
-                south(name = "christoph", bot = false)
-                west(name = "daniela", bot = false)
-            }
             hands {
-                hand {
-                    trump(Trump.FREESTYLE)
-                    gschobe(Gschobe.NO)
-                    north(cards = "welcome", start = true)
-                    east(cards = "welcome")
-                    south(cards = "welcome")
-                    west(cards = "welcome")
-                    tricks {
-                        trick(north = "W6", east = "W6", south = "W6", west = "W6")
-                    }
-                }
                 hand {
                     trump(Trump.SPADES)
                     gschobe(Gschobe.NO)

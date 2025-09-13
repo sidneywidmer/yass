@@ -8,4 +8,5 @@ data class GameState(
     val seats: List<Seat>,
     val hands: List<Hand>,
     val tricks: List<Trick>,
+    val inMemory: Boolean = false
 )

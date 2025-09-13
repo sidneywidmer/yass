@@ -17,7 +17,7 @@ import java.util.*
 
 
 /**
- * Quick and dirty, convert ad GameStateDSL to a correct GameState
+ * Quick and dirty, convert a GameStateDSL to a correct GameState
  * by persisting everything in the DB.
  */
 fun game(lambda: GameStateBuilder.() -> Unit): GameState {
