@@ -1,18 +1,9 @@
 package ch.yass.game.bot
 
-import ch.yass.core.helper.logger
 import ch.yass.game.api.internal.GameState
-import ch.yass.game.dto.Card
-import ch.yass.game.dto.CardInHandState
-import ch.yass.game.dto.Gschobe
-import ch.yass.game.dto.Position
-import ch.yass.game.dto.Rank
-import ch.yass.game.dto.Suit
-import ch.yass.game.dto.Team
-import ch.yass.game.dto.Trump
+import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Hand
 import ch.yass.game.dto.db.InternalPlayer
-import ch.yass.game.dto.db.Seat
 import ch.yass.game.dto.db.Trick
 import ch.yass.game.engine.*
 
@@ -20,7 +11,6 @@ import ch.yass.game.engine.*
 // https://www.swisslos.ch/de/jass/informationen/tipps-vom-jass-onkel/schieber-jass.html
 // https://s1403f1212affd0cf.jimcontent.com/download/version/1653654748/module/8968421285/name/Tipps%20Schieber1910.pdf
 // https://www.earthli.com/jass/manual.php?page=strategies
-
 
 data class PlayCandidate(val card: Card, val reasons: List<PlayReason>)
 data class OutOfSuit(val position: Position, val suits: Set<Suit>)
@@ -97,7 +87,7 @@ object CanWinTrickWithLastCard : PlayReason {
         val simulatedTrick = params.trick.withCard(params.position, card)
         val winner = winningPositionOfTrick(simulatedTrick, params.lead, params.hand.trump)
 
-        return params.trick.cardOf(winner) == card
+        return simulatedTrick.cardOf(winner) == card
     }
 }
 
@@ -122,9 +112,8 @@ object CanWinTrickWithNonBock : PlayReason {
     }
 }
 
-
 /**
- * Ignoring trumps, if play this card the opponents can not farben.
+ * Ignoring trumps, if play this card the opponents can not farben (but still may have trumps).
  */
 object CanWinTrickPotentiallyWithNonBock : PlayReason {
     override val weight = 4
@@ -177,12 +166,17 @@ object LeadWithHighestTrumpObeabeUneufe : PlayReason {
 }
 
 /**
- * If we have a bock for now just play it unless it's a trump and our opponents are out of trumps.
+ * If we have a bock for now just play it unless it's a trump and our opponents are out of trumps or
+ * we have anything better.
  */
 object PlayBock : PlayReason {
     override val weight = 5
     override fun check(card: Card, params: PlayParams, candidates: List<PlayCandidate>): Boolean {
-        // if card is trump and the opponent is out of trump we don't have to
+        // Don't boost this card with bock weight if not necessary
+        val betterChoices = setOf(CanWinTrickWithLastCard, CanWinTrickWithNonBock)
+        if (candidates.reasonsOf(card).any { it in betterChoices }) return false
+
+        // If card is trump and the opponent is out of trump we don't have to
         val isTrump = params.hand.trump.equalsSuit(card.suit)
         val opponentsOutOfTrumpSuit = params.outOfSuit
             .filter { Team.getOpponents(params.position).contains(it.position) }
@@ -203,14 +197,72 @@ object PlayBock : PlayReason {
     }
 }
 
+/**
+ * If we're leading or cant farbe (and have not identified anything better to play) signal a strong
+ * suit with a low card from that suit. Strong suit meaning we have near bock aka a card 1 bellow
+ * current bock in that suit.
+ */
+object SignalStrongSuitNearBock : PlayReason {
+    override val weight = 5
+    override fun check(card: Card, params: PlayParams, candidates: List<PlayCandidate>): Boolean {
+        if (candidates.reasonsOf(card).isNotEmpty()) return false
+        if (cardPoints(card, params.hand.trump) >= 1) return false // only use braettli for that
+
+        val leadCard = params.trick.cardOf(params.lead)
+        val canFarbe = params.playable.any { it.suit == leadCard?.suit }
+        if (params.trick.cards().isNotEmpty() || !canFarbe) return false
+
+        // Find cards that are soon bock, with just one card higher than them currently being bock.
+        // If we find some of them play a low card from that suit
+        val bockOfSuit = params.bock.firstOrNull { it.suit == card.suit }
+        if (bockOfSuit == null) return false
+
+        val allOfSuit = allOfSuit(card.suit).map { Card(it.second, it.first, "french") }
+        val allRemainingOfSuit = sortByPoints(allOfSuit, params.hand.trump).dropWhile { it != bockOfSuit }
+        val nearBock = allRemainingOfSuit[1] // second card in that list is our near bock
+
+        // Unlucky, we don't have this near bock
+        if (!params.playable.contains(nearBock)) return false
+
+        // If this card is the nearBock, definitely don't play it
+        if (card == nearBock) return false
+
+        // If this card is the lowest in this suit, play it
+        return card == sortByPoints(params.playable.filter { it.suit == card.suit }, params.hand.trump).last()
+    }
+}
+
+/**
+ * Play something small if partner is winning anyway. Check `Schmiere` which takes precedence.
+ */
+object PartnerIsWinning : PlayReason {
+    override val weight = 5
+    override fun check(card: Card, params: PlayParams, candidates: List<PlayCandidate>): Boolean {
+        if (tricksOfHand(params.state.tricks, params.hand).size <= 1) return false
+        if (cardPoints(card, params.hand.trump) > 1) return false
+
+        return params.isPartnerWinning
+    }
+}
+
 object Schmiere : PlayReason {
     override val weight = 10
     override fun check(card: Card, params: PlayParams, candidates: List<PlayCandidate>): Boolean {
-        if (tricksOfHand(params.state.tricks, params.hand).size == 1) return false
+        if (tricksOfHand(params.state.tricks, params.hand).size <= 1) return false
         if (cardPoints(card, params.hand.trump) < 8) return false
         if (card.rank == Rank.ACE) return false
 
         return params.isPartnerWinning
+    }
+}
+
+object JustPlayLow : PlayReason {
+    override val weight = 2
+    override fun check(card: Card, params: PlayParams, candidates: List<PlayCandidate>): Boolean {
+        if (candidates.reasonsOf(card).isNotEmpty()) return false
+        val lowestPlayable = sortByPoints(params.playable, params.hand.trump)
+
+        return lowestPlayable.last() == card
     }
 }
 
@@ -226,7 +278,10 @@ val playReasons = listOf(
     CanWinTrickPotentiallyWithNonBock,
     CanWinTrickWithNonBock,
     PlayBock,
-    Schmiere
+    Schmiere,
+    PartnerIsWinning,
+    SignalStrongSuitNearBock,
+    JustPlayLow
 )
 
 fun getPlayCandidate(player: InternalPlayer, state: GameState): PlayCandidate {
@@ -239,7 +294,7 @@ fun getPlayCandidate(player: InternalPlayer, state: GameState): PlayCandidate {
 
     // Some "Facts" about the current state of the game
     val notGschobeOpeningLead = notGschobeOpeningLead(trick, tricksOfHand(state.tricks, hand), hand)
-    val outOfSuit = outOfSuit(hand, tricksOfHand(state.tricks, hand), state.seats)
+    val outOfSuit = outOfSuit(hand, tricksOfHand(state.tricks, hand))
     val bock = remainingBocks(tricksOfHand(state.tricks, hand), hand.trump)
     val remainingTrumps = remainingTrumps(tricksOfHand(state.tricks, hand), hand.trump)
     val isPartnerWinning = isPartnerWinning(position, trick, lead, hand.trump, playable, bock, remainingTrumps)
@@ -270,11 +325,11 @@ fun getPlayCandidate(player: InternalPlayer, state: GameState): PlayCandidate {
 
     // if no good card to play -> play a low value one
     val final = candidates.maxBy { candidate -> candidate.reasons.sumOf { it.weight } }
-    logger().info(
-        "{} played {} because: {}",
-        position.name,
-        final.card,
-        final.reasons.joinToString { it.javaClass.simpleName })
+//    logger().info(
+//        "{} played {} because: {}",
+//        position.name,
+//        final.card,
+//        final.reasons.joinToString { it.javaClass.simpleName })
 
     return final
 }
@@ -326,7 +381,7 @@ private fun remainingBocks(tricks: List<Trick>, trump: Trump): List<Card> {
  * By looking at all past tricks we figure out who could not follow suit for sure. If they played
  * a trump instead of following suit we can't really be sure.
  */
-private fun outOfSuit(hand: Hand, tricks: List<Trick>, seats: List<Seat>): List<OutOfSuit> {
+private fun outOfSuit(hand: Hand, tricks: List<Trick>): List<OutOfSuit> {
     return hand.tricksWithPoints(tricks.filter { it.cards().size == 4 })
         .flatMap { trickWithPoints ->
             val leadSuit = trickWithPoints.trick.cardOf(trickWithPoints.lead)!!.suit

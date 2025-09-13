@@ -10,9 +10,7 @@ import ch.yass.game.engine.playerSeat
 import ch.yass.game.engine.possibleWeiseWithPoints
 import ch.yass.game.engine.withoutStoeckPoints
 
-fun chooseCardForBot(botPlayer: InternalPlayer, state: GameState): PlayCandidate {
-    return getPlayCandidate(botPlayer, state)
-}
+fun chooseCardForBot(botPlayer: InternalPlayer, state: GameState): PlayCandidate = getPlayCandidate(botPlayer, state)
 
 fun chooseTrumpForBot(botPlayer: InternalPlayer, state: GameState): TrumpCandidate {
     val hand = currentHand(state.hands)

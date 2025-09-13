@@ -30,6 +30,8 @@ fun upcomingPositions(lead: Position, current: Position): List<Position> {
 
 fun deck(): List<Pair<Rank, Suit>> = cartesianProduct(Rank.regular(), Suit.regular()).shuffled()
 
+fun allOfSuit(suit: Suit): List<Pair<Rank, Suit>> = cartesianProduct(Rank.regular(), listOf(suit))
+
 /**
  * nextDeck allows us to inject a not so random deck in case we need it to replicate
  * errors or for testing.
@@ -46,6 +48,11 @@ fun randomHand(forcedDeck: List<Card>?): EnumMap<Position, List<Card>> {
 }
 
 fun sort(cards: List<Card>): List<Card> = cards.sortedWith(compareBy<Card> { it.suit }.thenBy { it.rank })
+
+/**
+* Sort by how high cards, the highest card is at index 0
+*/
+fun sortByPoints(cards: List<Card>, trump: Trump): List<Card> = cards.sortedWith(compareBy { cardValue(it, trump) }).reversed()
 
 fun botName(position: Position): String = when (position) {
     Position.NORTH -> "Unit-N0R7H"
