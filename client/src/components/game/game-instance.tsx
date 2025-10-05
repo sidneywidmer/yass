@@ -6,6 +6,7 @@ import {PlayerHand} from "@/components/game/player-hand.tsx";
 import {PlayedCards} from "@/components/game/played-cards.tsx";
 import {useEffect} from "react";
 import {WebSocketHandler} from "@/components/game/websocket-handler.tsx";
+
 import {PingHandler} from "@/components/game/ping-handler.tsx";
 import {ChooseTrump} from "@/components/game/choose-trump.tsx";
 import {Weisen} from "@/components/game/weisen.tsx";
@@ -57,7 +58,6 @@ export function GameInstance({tryCode}: GameInstanceProps) {
         <GameInfo/>
         <PlayedCards/>
         <OtherPlayers/>
-        <PlayerHand/>
         <ChooseTrump/>
         <Weisen/>
         <ShowWeise/>
@@ -65,6 +65,7 @@ export function GameInstance({tryCode}: GameInstanceProps) {
         <PingHandler/>
         <WebSocketHandler/>
       </div>
+      <PlayerHand/>
     </div>
   )
 }
