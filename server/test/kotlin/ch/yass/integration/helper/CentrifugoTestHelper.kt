@@ -8,6 +8,7 @@ import ch.yass.game.pubsub.PlayerDisconnected
 import ch.yass.game.pubsub.PlayerJoined
 import ch.yass.game.pubsub.ShowWeis
 import ch.yass.game.pubsub.UpdateActive
+import ch.yass.game.pubsub.UpdateGschobe
 import ch.yass.game.pubsub.UpdateHand
 import ch.yass.game.pubsub.UpdatePoints
 import ch.yass.game.pubsub.UpdatePossibleWeise
@@ -44,6 +45,7 @@ class CentrifugoTestHelper(val mapper: ObjectMapper) {
             "PlayerJoined" -> mapper.treeToValue(node, PlayerJoined::class.java)
             "PlayerDisconnected" -> mapper.treeToValue(node, PlayerDisconnected::class.java)
             "GameFinished" -> mapper.treeToValue(node, GameFinished::class.java)
+            "UpdateGschobe" -> mapper.treeToValue(node, UpdateGschobe::class.java)
             else -> throw IllegalArgumentException("Unknown action type: ${node["type"].asText()}")
         }
     }

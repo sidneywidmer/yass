@@ -43,6 +43,10 @@ class ActionAssertions(private val actions: List<Action>) {
         assertTrue(actions.any { it is UpdateTrump && it.trump == trump })
     }
 
+    fun hasGschobe(position: Position) {
+        assertTrue(actions.any { it is UpdateGschobe && it.position == position })
+    }
+
     fun hasWinner(player: InternalPlayer) {
         assertTrue(actions.any { it is GameFinished && it.winners.contains(Player.from(player)) })
     }

@@ -560,6 +560,12 @@ components:
           $ref: '#/components/schemas/Position'
         trump:
           $ref: '#/components/schemas/Trump'
+        trumpChosenBy:
+          $ref: '#/components/schemas/Position'
+          nullable: true
+        gschobeBy:
+          $ref: '#/components/schemas/Position'
+          nullable: true
         weise:
           type: array
           items:

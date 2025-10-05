@@ -118,6 +118,7 @@ class PlayerTest : Integration() {
         val north = positionSeat(Position.NORTH, state.seats)
         cth.assertActions(north.uuid, cth.parseActions(centrifugo.allServeEvents)).apply {
             hasTrump(Trump.HEARTS)
+            hasGschobe(Position.EAST)
             hasCount(UpdatePossibleWeise::class, 1)
             hasPlayedCard(Suit.HEARTS, Rank.TEN)
             hasPlayedCard(Suit.HEARTS, Rank.EIGHT)

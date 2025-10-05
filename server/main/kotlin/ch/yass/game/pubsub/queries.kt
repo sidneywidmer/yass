@@ -91,18 +91,18 @@ fun cardPlayedActions(state: GameState, card: Card, playedBy: Seat, seat: Seat):
     )
 }
 
-fun trumpChosenActions(state: GameState, trump: Trump, seat: Seat): List<Action> {
+fun trumpChosenActions(state: GameState, trump: Trump, position: Position, seat: Seat): List<Action> {
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.seats, state.tricks)
-    val cards =
-        currentHand(state.hands).cardsOf(seat.position) // We don't care about CardInHand since the state is wurst
+    // We don't care about CardInHand since the state is wurst
+    val cards = currentHand(state.hands).cardsOf(seat.position)
     val weise = withoutStoeckPoints(possibleWeiseWithPoints(cards, trump))
 
     return listOf(
         UpdatePossibleWeise(weise),
         UpdateActive(activePosition),
         UpdateState(nextState),
-        UpdateTrump(trump),
+        UpdateTrump(trump, position),
     )
 }
 
@@ -138,14 +138,21 @@ fun stoeckGewiesenActions(hand: Hand, weis: Weis, playedBy: Seat, state: GameSta
     )
 }
 
-fun geschobenActions(state: GameState): List<Action> {
+fun geschobenActions(state: GameState, gschobe: Gschobe, position: Position): List<Action> {
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.seats, state.tricks)
 
-    return listOf(
+    val actions = mutableListOf(
         UpdateActive(activePosition),
         UpdateState(nextState)
     )
+
+    // Only send UpdateGschobe if the player chose YES (to push the decision)
+    if (gschobe == Gschobe.YES) {
+        actions.add(UpdateGschobe(position))
+    }
+
+    return actions
 }
 
 fun playerJoinedActions(state: GameState, newPlayer: InternalPlayer, joinedAtSeat: Seat): List<Action> {
