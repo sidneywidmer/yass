@@ -17,8 +17,8 @@ export function ChooseTrump() {
 
   /**
    * We handle 3 cases  here:
-   * 1. Game is still in state SCHIEBE and the player chose SCHIEBE as "trump", meaning we well schiebe
-   * 2. Game is in state SCHIEBE and the playe chose a trump (e.g. HEARTS), meaning we will tell the api to NO SCHIEBE and directly after send the trump
+   * 1. Game is still in state SCHIEBE and the player chose SCHIEBE as "trump", meaning we will schiebe
+   * 2. Game is in state SCHIEBE and the player chose a trump (e.g. HEARTS), meaning we will tell the api to NO SCHIEBE and directly after send the trump
    * 3. Game is in state TRUMP, meaning the partner chose SCHIEBE so we just select the trump
    */
   const selectTrump = async (trump: Exclude<Trump, "FREESTYLE"> | "SCHIEBE") => {
@@ -41,7 +41,7 @@ export function ChooseTrump() {
 
   return (
     <Dialog open={true} modal>
-      <DialogContent disableClose={true} className="sm:max-w-md" onPointerDownOutside={e => e.preventDefault()}>
+      <DialogContent disableClose={true} className="sm:max-w-md" onPointerDownOutside={e => e.preventDefault()} container={document.getElementById('root')}>
         <DialogTitle className="text-center">{t("chooseTrump.title")}</DialogTitle>
         <DialogDescription className="sr-only">{t("chooseTrump.description")}</DialogDescription>
         <div className="flex flex-col gap-4 items-center pt-4">

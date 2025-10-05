@@ -87,6 +87,7 @@ export function PlayerHand() {
   const playCard = useGameStateStore(state => state.playCard)
   const isMyPos = useGameStateStore((state) => state.activePosition === state.position)
   const isPlayCardState = useGameStateStore((state) => state.state === "PLAY_CARD")
+  const state = useGameStateStore(state => state.state)
 
   const handleAxiosError = useAxiosErrorHandler()
   const isTouch = useMemo(() => isTouchDevice(), [])
@@ -136,12 +137,16 @@ export function PlayerHand() {
     return card.state == "PLAYABLE" && isMyPos && isPlayCardState
   }
 
+  const cardsAboveOverlay = () => {
+    return isMyPos && ["WEISEN_FIRST", "TRUMP", "SCHIEBE"].includes(state!!)
+  }
+
   const createCardAnimation = ({card, animationType, position, isTouch}: CardAnimationConfig) => {
     const baseAnimation = {
       y: position.offset,
       rotate: position.angle,
       scale: 1,
-      filter: cardPlayable(card) ? ANIMATION_CONFIG.BRIGHTNESS.PLAYABLE : ANIMATION_CONFIG.BRIGHTNESS.DISABLED,
+      filter: (cardsAboveOverlay() || cardPlayable(card)) ? ANIMATION_CONFIG.BRIGHTNESS.PLAYABLE : ANIMATION_CONFIG.BRIGHTNESS.DISABLED,
       zIndex: position.index,
       transition: {duration: ANIMATION_CONFIG.DURATIONS.INITIAL, ease: ANIMATION_CONFIG.EASING}
     }
@@ -160,12 +165,12 @@ export function PlayerHand() {
 
   // Update all card animations when playable state changes
   useEffect(() => {
-    if (!isMyPos || !isPlayCardState) {
+    if (!isMyPos) {
       return
     }
 
     filteredCards.forEach((card, i) => {
-      const filter = cardPlayable(card) ? ANIMATION_CONFIG.BRIGHTNESS.PLAYABLE : ANIMATION_CONFIG.BRIGHTNESS.DISABLED
+      const filter = (cardsAboveOverlay() || cardPlayable(card)) ? ANIMATION_CONFIG.BRIGHTNESS.PLAYABLE : ANIMATION_CONFIG.BRIGHTNESS.DISABLED
       getCardControlsByIndex(i).start({filter: filter})
     })
   }, [cards, isMyPos, isPlayCardState])
@@ -232,7 +237,7 @@ export function PlayerHand() {
   }
 
   return (
-    <div className="fixed -bottom-[60px] w-full flex justify-center">
+    <div id={"playerHand"} className={`fixed -bottom-[60px] w-full flex justify-center ${cardsAboveOverlay() ? "z-50" : ""}`}>
       <motion.div
         className="flex -space-x-10"
         key={totalCards}

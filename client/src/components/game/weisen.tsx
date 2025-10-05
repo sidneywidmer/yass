@@ -37,8 +37,8 @@ export function Weisen() {
   }
 
   return (
-    <Dialog open={open} modal>
-      <DialogContent disableClose={true} className="sm:max-w-md" onPointerDownOutside={e => e.preventDefault()}>
+    <Dialog open={open}>
+      <DialogContent disableClose={true} className="sm:max-w-md" onPointerDownOutside={e => e.preventDefault()} container={document.getElementById('root')}>
         <DialogTitle className="text-center">{t("weisen.title")}</DialogTitle>
         <DialogDescription className="sr-only">{t("weisen.description")}</DialogDescription>
         <div className="space-y-6 max-h-[60vh] overflow-y-auto p-2">
