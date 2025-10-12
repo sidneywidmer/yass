@@ -13,6 +13,7 @@ interface ActionHandler {
 
 const useGameActions = () => {
   const [actionQueue, setActionQueue] = useState<GameAction[]>([])
+  const [isPaused, setIsPaused] = useState(false)
   const processingRef = useRef(false)
   const playCard = useGameStateStore(state => state.playCard)
   const addCardsToHand = useGameStateStore(state => state.addCardsToHand)
@@ -107,10 +108,23 @@ const useGameActions = () => {
   }
 
   const processNextAction = useCallback(async () => {
-    if (processingRef.current || actionQueue.length === 0) return
+    // Don't process if already processing, queue is empty, or paused
+    if (processingRef.current || actionQueue.length === 0 || isPaused) return
+
+    const action = actionQueue[0]
+
+    // Special handling for ClearPlayedCards: check if weise overlay is open otherwise it's possible the player
+    // doesn't see all the cards played by bots
+    if (action.type === 'ClearPlayedCards') {
+      const isWeiseOverlayOpen = useGameStateStore.getState().weiseOverlayOpen
+
+      if (isWeiseOverlayOpen) {
+        setIsPaused(true)
+        return
+      }
+    }
 
     processingRef.current = true
-    const action = actionQueue[0]
     const handler = actionHandlers[action.type]
 
     if (handler) {
@@ -122,7 +136,7 @@ const useGameActions = () => {
 
     setActionQueue(queue => queue.slice(1))
     processingRef.current = false
-  }, [actionQueue])
+  }, [actionQueue, isPaused])
 
   const addActions = useCallback((actions: GameAction[]) => {
     setActionQueue(queue => [...queue, ...actions])
@@ -131,6 +145,30 @@ const useGameActions = () => {
   useEffect(() => {
     processNextAction()
   }, [actionQueue, processNextAction])
+
+  // Resume queue processing 2 seconds after weise overlay closes
+  useEffect(() => {
+    if (!isPaused) return
+
+    let timer: NodeJS.Timeout | null = null
+
+    const unsubscribe = useGameStateStore.subscribe((state, prevState) => {
+      // Detect when overlay closes (transitions from true to false) while we're paused
+      if (prevState.weiseOverlayOpen && !state.weiseOverlayOpen) {
+        // Start the 2-second countdown
+        timer = setTimeout(() => {
+          setIsPaused(false)
+          // Trigger queue processing to resume (will process the ClearPlayedCards)
+          processNextAction()
+        }, 2000)
+      }
+    })
+
+    return () => {
+      unsubscribe()
+      if (timer) clearTimeout(timer)
+    }
+  }, [isPaused, processNextAction])
 
   return {addActions}
 }

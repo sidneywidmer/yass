@@ -25,6 +25,7 @@ type FlatGameState = Omit<JoinGameResponse, 'seat'> & {
   gschobeBy?: Position
   weise: WeisWithPoints[]
   otherWeise: { [position: string]: WeisWithPoints[] }
+  weiseOverlayOpen: boolean
 }
 
 interface GameStateActions {
@@ -36,6 +37,7 @@ interface GameStateActions {
   clearCards: (position: Position) => Promise<void>
   addWeis: (position: string, weis: WeisWithPoints) => void
   clearWeise: () => void
+  setWeiseOverlayOpen: (open: boolean) => void
   getPlayer: (position: Position) => PlayerAtTable | undefined
 }
 
@@ -54,7 +56,8 @@ const initialState: FlatGameState = {
   otherWeise: {},
   cardsPlayed: [],
   otherPlayers: [],
-  isConnected: false
+  isConnected: false,
+  weiseOverlayOpen: false
 }
 
 export const useGameStateStore = create<FlatGameState & GameStateActions>((set) => ({
@@ -96,6 +99,7 @@ export const useGameStateStore = create<FlatGameState & GameStateActions>((set) 
     }
   })),
   clearWeise: () => set({otherWeise: {}}),
+  setWeiseOverlayOpen: (open: boolean) => set({weiseOverlayOpen: open}),
   getPlayer: (position: Position) => {
     const otherPlayers: Array<PlayerAtTable> = useGameStateStore.getState().otherPlayers!!
     return otherPlayers.find(p => p.position === position)
