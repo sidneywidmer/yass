@@ -10,16 +10,19 @@ export function ShowWeise() {
   const [open, setOpen] = useState(false)
   const otherWeise = useGameStateStore(state => state.otherWeise)
   const clearWeise = useGameStateStore(state => state.clearWeise)
+  const setWeiseOverlayOpen = useGameStateStore(state => state.setWeiseOverlayOpen)
   const {t} = useTranslation()
 
   useEffect(() => {
     if (Object.keys(otherWeise).length > 0) {
       setOpen(true)
+      setWeiseOverlayOpen(true)
     }
-  }, [otherWeise])
+  }, [otherWeise, setWeiseOverlayOpen])
 
   const handleClose = () => {
     setOpen(false)
+    setWeiseOverlayOpen(false)
     clearWeise()
   }
 
