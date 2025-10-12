@@ -346,3 +346,10 @@ fun getLosingTeam(points: Points): TeamWithPoints =
     Team.entries
         .map { TeamWithPoints(it, getTeamPoints(points, it)) }
         .minBy { it.points }
+
+fun trumpChosenBy(hand: Hand): Position? {
+    if (hand.trump == Trump.FREESTYLE) return null
+    return if (hand.gschobe == Gschobe.YES) Team.getPartner(hand.startingPosition) else hand.startingPosition
+}
+
+fun gschobeBy(hand: Hand): Position? = if (hand.gschobe == Gschobe.YES) hand.startingPosition else null

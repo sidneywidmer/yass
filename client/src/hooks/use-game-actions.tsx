@@ -32,6 +32,10 @@ const useGameActions = () => {
     UpdateHand: {
       handle: async (action) => {
         addCardsToHand(action.cards)
+        // New hand means new trump will be chosen, clear the previous trump chooser and gschobe
+        if (action.newCards) {
+          useGameStateStore.setState({trumpChosenBy: undefined, gschobeBy: undefined})
+        }
       }
     },
     ClearPlayedCards: {
@@ -45,7 +49,10 @@ const useGameActions = () => {
       handle: async (action) => useGameStateStore.setState({state: action.state}),
     },
     UpdateTrump: {
-      handle: async (action) => useGameStateStore.setState({trump: action.trump}),
+      handle: async (action) => useGameStateStore.setState({trump: action.trump, trumpChosenBy: action.position}),
+    },
+    UpdateGschobe: {
+      handle: async (action) => useGameStateStore.setState({gschobeBy: action.position}),
     },
     UpdateActive: {
       handle: async (action) => useGameStateStore.setState({activePosition: action.position}),

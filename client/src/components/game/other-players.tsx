@@ -1,9 +1,10 @@
-import {Bot, User} from "lucide-react"
+import {Bot, User, Forward} from "lucide-react"
 import {cn, getRelativePosition, getResponsiveValue} from "@/lib/utils"
 import {Position} from "@/api/generated"
 import {useGameStateStore} from "@/store/game-state"
 import {Card} from "@/components/ui/card.tsx";
 import {AnimatePresence, motion} from "framer-motion"
+import {TrumpIcon} from "@/components/game/trump-icon"
 
 const VERTICAL = getResponsiveValue(200, 250)
 const HORIZONTAL = getResponsiveValue(160, 230)
@@ -56,6 +57,9 @@ export function OtherPlayers() {
   const otherPlayers = useGameStateStore(state => state.otherPlayers)
   const position = useGameStateStore(state => state.position)
   const activePosition = useGameStateStore(state => state.activePosition)
+  const trump = useGameStateStore(state => state.trump)
+  const trumpChosenBy = useGameStateStore(state => state.trumpChosenBy)
+  const gschobeBy = useGameStateStore(state => state.gschobeBy)
   return (
     <>
       <AnimatePresence mode="popLayout" initial={true}>
@@ -70,6 +74,12 @@ export function OtherPlayers() {
             <Card className="h-10 p-3 flex flex-row items-center justify-center gap-2 overflow-hidden">
               {player.bot ? (<Bot className="h-4 w-4"/>) : (<User className="h-4 w-4"/>)}
               <span className="text-sm text-center">{player.name}</span>
+              {trump && trumpChosenBy === player.position && (
+                <TrumpIcon trump={trump} className="w-4 h-4"/>
+              )}
+              {gschobeBy === player.position && (
+                <Forward className="w-4 h-4"/>
+              )}
               <StatusIndicator
                 status={player.status!!}
                 isActive={player.position == activePosition && !player.bot}

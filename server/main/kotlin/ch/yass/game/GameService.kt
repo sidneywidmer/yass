@@ -147,6 +147,7 @@ class GameService(
         val state = repo.getState(game)
         val chosenTrump = Trump.valueOf(request.trump)
         val nextState = nextState(state)
+        val position = state.seats.first { it.playerId == player.id }.position
 
         ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
         ensure(expectedState(listOf(State.TRUMP, State.TRUMP_BOT), nextState)) { InvalidState(nextState, state) }
@@ -156,7 +157,7 @@ class GameService(
         repo.chooseTrump(chosenTrump, currentHand(state.hands))
 
         val freshState = repo.getState(game)
-        publishForSeats(state.seats) { seat -> trumpChosenActions(freshState, chosenTrump, seat) }
+        publishForSeats(state.seats) { seat -> trumpChosenActions(freshState, chosenTrump, position, seat) }
 
         gameLoop(game)
 
@@ -230,6 +231,7 @@ class GameService(
         val nextState = nextState(state)
         val gschobe = Gschobe.valueOf(request.gschobe)
         val currentHand = currentHand(state.hands)
+        val position = state.seats.first { it.playerId == player.id }.position
 
         ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
         ensure(expectedState(listOf(State.SCHIEBE, State.SCHIEBE_BOT), nextState)) { InvalidState(nextState, state) }
@@ -237,7 +239,7 @@ class GameService(
 
         repo.schiebe(gschobe, currentHand)
 
-        val actions = geschobenActions(repo.getState(game))
+        val actions = geschobenActions(repo.getState(game), gschobe, position)
         publishForSeats(state.seats) { actions }
 
         gameLoop(game)

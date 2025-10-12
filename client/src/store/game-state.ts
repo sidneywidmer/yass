@@ -21,6 +21,8 @@ type FlatGameState = Omit<JoinGameResponse, 'seat'> & {
   state?: State
   activePosition?: Position
   trump?: Trump
+  trumpChosenBy?: Position
+  gschobeBy?: Position
   weise: WeisWithPoints[]
   otherWeise: { [position: string]: WeisWithPoints[] }
 }
@@ -66,6 +68,8 @@ export const useGameStateStore = create<FlatGameState & GameStateActions>((set) 
     state: response.seat?.state,
     activePosition: response.seat?.activePosition,
     trump: response.seat?.trump,
+    trumpChosenBy: response.seat?.trumpChosenBy ?? undefined,
+    gschobeBy: response.seat?.gschobeBy ?? undefined,
     weise: response.seat?.weise ?? []
   }),
   reset: () => set(initialState),

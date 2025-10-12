@@ -10,7 +10,8 @@ data class UpdateState(val state: State) : Action
 data class UpdateActive(val position: Position) : Action
 data class UpdateHand(val cards: List<CardInHand>, val newCards: Boolean) : Action
 data class UpdatePoints(val points: Points) : Action
-data class UpdateTrump(val trump: Trump) : Action
+data class UpdateTrump(val trump: Trump, val position: Position) : Action
+data class UpdateGschobe(val position: Position) : Action
 data class UpdatePossibleWeise(val weise: List<WeisWithPoints>) : Action
 data class ShowWeis(val position: Position, val weis: WeisWithPoints) : Action
 data class PlayerJoined(val player: PlayerAtTable) : Action

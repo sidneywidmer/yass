@@ -14,7 +14,7 @@ export function WebSocketHandler() {
     const transports = [
       {
         transport: 'websocket' as TransportName,
-        endpoint: import.meta.env.VITE_CENTRIFUGO_API_URL_WS + '/connection/websocket',
+        endpoint: import.meta.env.VITE_CENTRIFUGO_API_URL + '/connection/websocket',
       },
     ];
 

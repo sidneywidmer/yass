@@ -185,6 +185,8 @@ export type SeatState = {
     state?: State;
     activePosition?: Position;
     trump?: Trump;
+    trumpChosenBy?: (Position) | null;
+    gschobeBy?: (Position) | null;
     weise?: Array<WeisWithPoints>;
 };
 
