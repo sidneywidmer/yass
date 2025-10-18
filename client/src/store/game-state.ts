@@ -34,6 +34,7 @@ interface GameStateActions {
   removeCardFromHand: (card: CardInHand) => void
   addCardsToHand: (cards: CardInHand[]) => void
   playCard: (card: CardOnTable) => void
+  resetActivePosition: () => void
   clearCards: (position: Position) => Promise<void>
   addWeis: (position: string, weis: WeisWithPoints) => void
   clearWeise: () => void
@@ -99,6 +100,7 @@ export const useGameStateStore = create<FlatGameState & GameStateActions>((set) 
     }
   })),
   clearWeise: () => set({otherWeise: {}}),
+  resetActivePosition: () => set({activePosition: undefined}),
   setWeiseOverlayOpen: (open: boolean) => set({weiseOverlayOpen: open}),
   getPlayer: (position: Position) => {
     const otherPlayers: Array<PlayerAtTable> = useGameStateStore.getState().otherPlayers!!

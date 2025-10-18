@@ -84,6 +84,7 @@ export function PlayerHand() {
   const cards = useGameStateStore(state => state.cards)
   const position = useGameStateStore(state => state.position)
   const removeCardFromHand = useGameStateStore(state => state.removeCardFromHand)
+  const resetActivePosition = useGameStateStore(state => state.resetActivePosition)
   const playCard = useGameStateStore(state => state.playCard)
   const isMyPos = useGameStateStore((state) => state.activePosition === state.position)
   const isPlayCardState = useGameStateStore((state) => state.state === "PLAY_CARD")
@@ -176,6 +177,7 @@ export function PlayerHand() {
   }, [cards, isMyPos, isPlayCardState])
 
   const playCardAction = (card: CardInHand) => {
+    resetActivePosition()
     api.playCard({game: gameUuid!!, card: {suit: card.suit, rank: card.rank, skin: "french"}})
       .catch(handleAxiosError)
 
@@ -237,7 +239,8 @@ export function PlayerHand() {
   }
 
   return (
-    <div id={"playerHand"} className={`fixed -bottom-[60px] w-full flex justify-center ${cardsAboveOverlay() ? "z-50" : ""}`}>
+    <div id={"playerHand"}
+         className={`fixed -bottom-[60px] w-full flex justify-center ${cardsAboveOverlay() ? "z-50" : ""}`}>
       <motion.div
         className="flex -space-x-10"
         key={totalCards}
