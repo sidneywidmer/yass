@@ -7,15 +7,15 @@ import java.util.EnumMap
 
 /**
  * Get the order of a round based on a position. So if it's EAST's turn we
- * know the next player is SOUTH. I bet there's a million clever
+ * know the next player is NORTH. I bet there's a million clever
  * implementations of this but probably none is as readable.
  */
 fun positionsOrderedWithStart(position: Position): List<Position> {
     return when (position) {
-        Position.NORTH -> listOf(Position.NORTH, Position.EAST, Position.SOUTH, Position.WEST)
-        Position.EAST -> listOf(Position.EAST, Position.SOUTH, Position.WEST, Position.NORTH)
-        Position.SOUTH -> listOf(Position.SOUTH, Position.WEST, Position.NORTH, Position.EAST)
-        Position.WEST -> listOf(Position.WEST, Position.NORTH, Position.EAST, Position.SOUTH)
+        Position.NORTH -> listOf(Position.NORTH, Position.WEST, Position.SOUTH, Position.EAST)
+        Position.EAST -> listOf(Position.EAST, Position.NORTH, Position.WEST, Position.SOUTH)
+        Position.SOUTH -> listOf(Position.SOUTH, Position.EAST, Position.NORTH, Position.WEST)
+        Position.WEST -> listOf(Position.WEST, Position.SOUTH, Position.EAST, Position.NORTH)
     }
 }
 
@@ -41,9 +41,9 @@ fun randomHand(forcedDeck: List<Card>?): EnumMap<Position, List<Card>> {
 
     return mapOf(
         Position.NORTH to sort(deck.subList(0, 9).map { Card(it.second, it.first, "french") }),
-        Position.EAST to sort(deck.subList(9, 18).map { Card(it.second, it.first, "french") }),
+        Position.WEST to sort(deck.subList(9, 18).map { Card(it.second, it.first, "french") }),
         Position.SOUTH to sort(deck.subList(18, 27).map { Card(it.second, it.first, "french") }),
-        Position.WEST to sort(deck.subList(27, 36).map { Card(it.second, it.first, "french") }),
+        Position.EAST to sort(deck.subList(27, 36).map { Card(it.second, it.first, "french") }),
     ).toEnumMap()
 }
 
@@ -56,16 +56,16 @@ fun sortByPoints(cards: List<Card>, trump: Trump): List<Card> = cards.sortedWith
 
 fun botName(position: Position): String = when (position) {
     Position.NORTH -> "Unit-N0R7H"
-    Position.EAST -> "Bot-3000"
+    Position.WEST -> "Bot-3000"
     Position.SOUTH -> "CyberS1X"
-    Position.WEST -> "RoboW-X"
+    Position.EAST -> "RoboW-X"
 }
 
 fun botId(position: Position): Int {
     return when (position) {
         Position.NORTH -> -1
-        Position.EAST -> -2
+        Position.WEST -> -2
         Position.SOUTH -> -3
-        Position.WEST -> -4
+        Position.EAST -> -4
     }
 }
