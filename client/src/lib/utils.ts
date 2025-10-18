@@ -43,16 +43,18 @@ export const isTouchDevice = () => {
 
 export const preloadAssets = () => {
   const suits = ['CLUBS', 'DIAMONDS', 'HEARTS', 'SPADES'];
-  const ranks = ['ACE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'TEN', 'JACK', 'QUEEN', 'KING'];
+  const ranks = ['ACE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'TEN', 'JACK', 'QUEEN', 'KING'];
   const jokers = ['JOKER-2', 'JOKER-3'];
-  const path = '/cards/french/';
 
   const promises: any[] = [];
 
-  // Build the list of URLs first
+  // Build the list of URLs for French and Swiss cards
   const imageUrls = [
-    ...suits.flatMap(suit => ranks.map(rank => `${path}${suit}-${rank}.svg`)),
-    ...jokers.map(joker => `${path}${joker}.svg`)
+    // French cards (SVG)
+    ...suits.flatMap(suit => ranks.map(rank => `/cards/french/${suit}-${rank}.svg`)),
+    ...jokers.map(joker => `/cards/french/${joker}.svg`),
+    // Swiss cards (PNG)
+    ...suits.flatMap(suit => ranks.map(rank => `/cards/swiss/${suit}-${rank}.png`))
   ];
 
   console.log(`Preloading ${imageUrls.length} images...`);

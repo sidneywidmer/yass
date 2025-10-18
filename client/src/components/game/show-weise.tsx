@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useEffect} from 'react'
 import {Dialog, DialogContent, DialogTitle} from '@/components/ui/dialog'
 import {useGameStateStore} from '@/store/game-state'
 import {Card} from '@/components/game/card'
@@ -7,27 +7,25 @@ import {Position} from "@/api/generated";
 import {DialogDescription} from "@radix-ui/react-dialog";
 
 export function ShowWeise() {
-  const [open, setOpen] = useState(false)
   const otherWeise = useGameStateStore(state => state.otherWeise)
+  const weiseOverlayOpen = useGameStateStore(state => state.weiseOverlayOpen)
   const clearWeise = useGameStateStore(state => state.clearWeise)
   const setWeiseOverlayOpen = useGameStateStore(state => state.setWeiseOverlayOpen)
   const {t} = useTranslation()
 
   useEffect(() => {
     if (Object.keys(otherWeise).length > 0) {
-      setOpen(true)
       setWeiseOverlayOpen(true)
     }
   }, [otherWeise, setWeiseOverlayOpen])
 
   const handleClose = () => {
-    setOpen(false)
     setWeiseOverlayOpen(false)
     clearWeise()
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog open={weiseOverlayOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
         <DialogTitle className="text-center">{t("weisen.title_alt")}</DialogTitle>
         <DialogDescription></DialogDescription>
