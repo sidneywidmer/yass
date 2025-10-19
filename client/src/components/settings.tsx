@@ -1,6 +1,7 @@
-import {Languages, SettingsIcon, Spade, User} from 'lucide-react';
+import {Languages, LogOut, SettingsIcon, Spade, User} from 'lucide-react';
 import {useSettingsStore} from "@/store/settings.ts";
 import {usePlayerStore} from "@/store/player.ts";
+import {useGameStateStore} from "@/store/game-state.ts";
 import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Separator} from "@/components/ui/separator.tsx";
@@ -8,15 +9,56 @@ import {useTranslation} from "react-i18next";
 import Logout from "@/components/logout.tsx";
 import {SupportedLanguage} from "@/types/language.ts";
 import {CardDeck} from "@/types/card-deck.ts";
+import {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog.tsx";
+import CodeWithCopy from "@/components/code-with-copy.tsx";
 
 const Settings = () => {
   const {language, setLanguage, cardDeck, setCardDeck} = useSettingsStore();
   const isAuthenticated = usePlayerStore(state => state.isAuthenticated)
   const name = usePlayerStore(state => state.name)
+  const gameUuid = useGameStateStore(state => state.gameUuid)
+  const code = useGameStateStore(state => state.code)
   const {t} = useTranslation();
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setOpen(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown, { capture: true });
+    return () => window.removeEventListener('keydown', handleKeyDown, { capture: true });
+  }, []);
+
+  const handleOpenLeaveDialog = () => {
+    setShowLeaveDialog(true);
+    setOpen(false); // Close the settings sheet
+  };
+
+  const handleLeaveGame = () => {
+    navigate('/');
+    setShowLeaveDialog(false);
+  };
 
   return (
-    <Sheet>
+    <>
+    <Sheet open={open} onOpenChange={setOpen} modal={false}>
       <SheetTrigger asChild>
         <div className="fixed top-4 right-4 z-10">
           <Button variant="outline" size="icon">
@@ -33,6 +75,20 @@ const Settings = () => {
           <Separator/>
         </div>
         <div className="space-y-4">
+          {/* Leave Game Section */}
+          {gameUuid && (
+            <div>
+              <Button
+                variant="destructive"
+                className="w-full"
+                onClick={handleOpenLeaveDialog}
+              >
+                <LogOut className="mr-2 h-4 w-4"/>
+                {t("settings.leaveGame")}
+              </Button>
+            </div>
+          )}
+
           {/* User Profile Section */}
           {isAuthenticated && (
             <div>
@@ -112,6 +168,28 @@ const Settings = () => {
         </div>
       </SheetContent>
     </Sheet>
+
+    <AlertDialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t("settings.leaveGameConfirm.title")}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {t("settings.leaveGameConfirm.description")}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <div className="space-y-2">
+          <div className="text-sm text-muted-foreground">{t("settings.leaveGameConfirm.rejoinInfo")}</div>
+          <CodeWithCopy code={code!}/>
+        </div>
+        <AlertDialogFooter>
+          <AlertDialogCancel>{t("settings.leaveGameConfirm.cancel")}</AlertDialogCancel>
+          <AlertDialogAction onClick={handleLeaveGame}>
+            {t("settings.leaveGameConfirm.confirm")}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 };
 
