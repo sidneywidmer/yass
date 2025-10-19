@@ -4,7 +4,15 @@
     "language": "Language",
     "deck": "Cardstyle",
     "deckSwiss": "Swissgerman",
-    "deckFrench": "French"
+    "deckFrench": "French",
+    "leaveGame": "Leave Game",
+    "leaveGameConfirm": {
+      "title": "Leave Game",
+      "description": "Are you sure you want to leave the current game?",
+      "rejoinInfo": "You can rejoin anytime with this code:",
+      "cancel": "Cancel",
+      "confirm": "Leave"
+    }
   },
   "errors": {
     "title": "Ooops",

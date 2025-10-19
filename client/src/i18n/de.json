@@ -4,7 +4,15 @@
     "language": "Sprache",
     "deck": "Kartenset",
     "deckSwiss": "Deutschschweiz",
-    "deckFrench": "Französisch"
+    "deckFrench": "Französisch",
+    "leaveGame": "Spiel verlassen",
+    "leaveGameConfirm": {
+      "title": "Spiel verlassen",
+      "description": "Bist du sicher dass du das aktuelle Spiel verlassen willst?",
+      "rejoinInfo": "Du kannst mit folgendem Code jederzeit wieder beitreten:",
+      "cancel": "Abbrechen",
+      "confirm": "Verlassen"
+    }
   },
   "errors": {
     "title": "Fehler",
