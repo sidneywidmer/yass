@@ -16,6 +16,8 @@ import {GameFinished} from "@/components/game/game-finished.tsx";
 import {useErrorStore} from "@/store/error.ts";
 import {useTranslation} from "react-i18next";
 import {useNavigate} from "react-router-dom";
+import CodeWithCopy from "@/components/code-with-copy.tsx";
+import QRCode from "react-qr-code";
 
 interface GameInstanceProps {
   tryCode: string
@@ -23,6 +25,7 @@ interface GameInstanceProps {
 
 export function GameInstance({tryCode}: GameInstanceProps) {
   const setGameState = useGameStateStore(state => state.setGameState);
+  const otherPlayers = useGameStateStore(state => state.otherPlayers);
   const handleAxiosError = useAxiosErrorHandler()
   const {t} = useTranslation()
   const {addError} = useErrorStore()
@@ -64,6 +67,16 @@ export function GameInstance({tryCode}: GameInstanceProps) {
         <GameFinished/>
         <PingHandler/>
         <WebSocketHandler/>
+        {otherPlayers && otherPlayers.length < 4 && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+              <CodeWithCopy code={tryCode}/>
+              <div className="bg-white p-4 rounded-lg">
+                <QRCode value={`${window.location.origin}/game/${tryCode}`} size={100}/>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       <PlayerHand/>
     </div>
