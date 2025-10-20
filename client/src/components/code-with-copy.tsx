@@ -4,13 +4,17 @@ import {useState} from "react";
 
 interface CodeWithCopyProps {
   code: string;
+  copyFullUrl?: boolean;
 }
 
-const CodeWithCopy = ({code}: CodeWithCopyProps) => {
+const CodeWithCopy = ({code, copyFullUrl = false}: CodeWithCopyProps) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(code);
+    const textToCopy = copyFullUrl
+      ? `${window.location.origin}/game/${code}`
+      : code;
+    await navigator.clipboard.writeText(textToCopy);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
