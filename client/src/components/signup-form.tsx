@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {Button} from "@/components/ui/button"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
 import {Input} from "@/components/ui/input"
@@ -6,31 +6,42 @@ import {Label} from "@/components/ui/label"
 import {Switch} from "@/components/ui/switch"
 import {useOry} from '@/hooks/use-ory.tsx'
 import {useTranslation} from 'react-i18next'
-import {useLocation} from "react-router";
+import {useLocation, useNavigate} from "react-router";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip.tsx";
 import {AlertCircle, HelpCircle, Loader2} from "lucide-react";
 import {Link} from "react-router-dom";
-import {cn} from "@/lib/utils.ts";
+import {cn, getValidRedirectPath} from "@/lib/utils.ts";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
 import {useAnon} from "@/hooks/use-anon.tsx";
 import {useAsyncAction} from "@/hooks/use-async-action";
+import {useAuth} from "@/hooks/use-auth.tsx";
 
 export function SignupForm() {
   const location = useLocation()
+  const navigate = useNavigate()
   const [isGuest, setIsGuest] = useState(location.state?.isGuest || false)
   const {t} = useTranslation()
   const {signup, signupError} = useOry()
   const {anonSignup, anonSignupError} = useAnon()
+  const {isAuthenticated, initialized} = useAuth()
+
+  const redirectTo = getValidRedirectPath(location.state?.from)
+
+  useEffect(() => {
+    if (initialized && isAuthenticated) {
+      navigate('/', {replace: true})
+    }
+  }, [initialized])
   
   const {execute: executeSignup, isLoading, hasError, reset} = useAsyncAction(async (data: {username: string, email?: string, password?: string}) => {
     if (isGuest) {
-      return anonSignup(data.username)
+      return anonSignup(data.username, redirectTo)
     }
     return signup({
       username: data.username,
       email: data.email!,
       password: data.password!
-    })
+    }, redirectTo)
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,6 +53,14 @@ export function SignupForm() {
       email: formData.get('email') as string,
       password: formData.get('password') as string
     })
+  }
+
+  if (!initialized) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    )
   }
 
   return (
@@ -144,7 +163,7 @@ export function SignupForm() {
 
             <div className="text-center text-sm">
               {t("auth.login.prompt")}&nbsp;
-              <Link to="/login" className="underline underline-offset-4">
+              <Link to="/login" state={{from: location.state?.from}} className="underline underline-offset-4">
                 {t("auth.login.link")}
               </Link>
             </div>
