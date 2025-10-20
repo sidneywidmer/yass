@@ -1,6 +1,15 @@
 import {clsx, type ClassValue} from "clsx"
+
 import {twMerge} from "tailwind-merge"
 import {Position} from "@/api/generated";
+
+export const getValidRedirectPath = (from: any): string | undefined => {
+  if (!from?.pathname) return undefined
+  if (from.pathname.startsWith('/game/')) {
+    return from.pathname
+  }
+  return undefined
+}
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

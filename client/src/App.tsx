@@ -3,7 +3,6 @@ import Root from "@/routes/root.tsx";
 import Login from "@/routes/login.tsx";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import {AuthGuard} from "@/auth/auth-guard.tsx";
-import {AuthRedirect} from "@/auth/auth-redirect.tsx";
 import '@/i18n';
 import {MainWrapper} from "@/components/main-wrapper.tsx";
 import Signup from "@/routes/signup.tsx";
@@ -19,11 +18,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/login",
-    element: <AuthRedirect><MainWrapper><Login/></MainWrapper></AuthRedirect>,
+    element: <MainWrapper><Login/></MainWrapper>,
   },
   {
     path: "/signup",
-    element: <AuthRedirect><MainWrapper><Signup/></MainWrapper></AuthRedirect>,
+    element: <MainWrapper><Signup/></MainWrapper>,
   },
   {
     path: "/game/:code",

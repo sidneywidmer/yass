@@ -15,11 +15,11 @@ export const useAnon = () => {
   const {t}: { t: TFunction } = useTranslation()
 
 
-  const anonSignup = (username: string) => {
+  const anonSignup = (username: string, redirectTo?: string) => {
     api.anonSignup({name: username})
       .then((response) => {
         setAnonPlayer(response.data!!.uuid, response.data!!.name)
-        navigate('/')
+        navigate(redirectTo || '/')
       })
       .catch((error) => {
         handleError(error)

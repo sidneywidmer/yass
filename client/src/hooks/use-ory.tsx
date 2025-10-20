@@ -22,7 +22,7 @@ export const useOry = () => {
     return csrfNode?.attributes.value || ""
   }
 
-  const login = (credentials: { email: string; password: string }) =>
+  const login = (credentials: { email: string; password: string }, redirectTo?: string) =>
     ory.createBrowserLoginFlow()
       .then(flow => ory.updateLoginFlow({
         flow: flow.data.id,
@@ -37,7 +37,7 @@ export const useOry = () => {
         let oryUuid = response.data.session.identity?.id
         let username = response.data.session.identity?.traits.name
         setOryPlayer(oryUuid!!, username)
-        navigate('/')
+        navigate(redirectTo || '/')
       })
       .catch(error => {
         setLoginError(getOryErrorMessage(error.response.data, t));
@@ -45,7 +45,7 @@ export const useOry = () => {
         logout()
       })
 
-  const signup = (credentials: { email: string; password: string; username: string }) =>
+  const signup = (credentials: { email: string; password: string; username: string }, redirectTo?: string) =>
     ory.createBrowserRegistrationFlow()
       .then(flow => ory.updateRegistrationFlow({
         flow: flow.data.id,
@@ -63,7 +63,7 @@ export const useOry = () => {
         let oryUuid = response.data.identity.id
         let username = response.data.identity.traits.name
         setOryPlayer(oryUuid!!, username)
-        navigate('/')
+        navigate(redirectTo || '/')
       })
       .catch((error) => {
         setSignupError(getOryErrorMessage(error.response.data, t));

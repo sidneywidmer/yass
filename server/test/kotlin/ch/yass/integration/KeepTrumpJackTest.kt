@@ -40,8 +40,8 @@ class KeepTrumpJackTest : Integration() {
         val state = getState()
 
         val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
-        val foo = cardsInHand(currentHand(state.hands), player, state)
-        val playableCards = foo.filter { it.state == CardInHandState.PLAYABLE }
+        val cards = cardsInHand(currentHand(state.hands), player, state)
+        val playableCards = cards.filter { it.state == CardInHandState.PLAYABLE }
 
         // When only Trump Jack -> all cards are playable
         assertTrue { playableCards.size == 9 }
