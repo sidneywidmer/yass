@@ -69,16 +69,29 @@
   "create": {
     "title": "Spiel erstellen",
     "description": "Erstelle ein neues Spiel mit verschiedenen Einstellungen",
-    "bots": "Bot-Spieler",
+    "players": "Spieler",
+    "config": {
+      "meVsBots": "Ich gegen 3 Bots",
+      "meAndFriendVsBots": "Ich und ein Freund gegen 2 Bots",
+      "meAndBotVsFriendAndBot": "Ich und ein Bot gegen einen Freund und einen Bot",
+      "allFriends": "Ich und 3 Freunde (keine Bots)"
+    },
+    "configDescription": {
+      "playerPlayerVsPlayerPlayer": "2 Spieler gegen 2 Spieler",
+      "playerPlayerVsPlayerBot": "2 Spieler gegen Spieler und Bot",
+      "playerPlayerVsBotBot": "2 Spieler gegen 2 Bots",
+      "playerBotVsPlayerPlayer": "Spieler und Bot gegen 2 Spieler",
+      "playerBotVsPlayerBot": "Spieler und Bot gegen Spieler und Bot",
+      "playerBotVsBotBot": "Spieler und Bot gegen 2 Bots",
+      "botBotVsPlayerPlayer": "2 Bots gegen 2 Spieler",
+      "botBotVsPlayerBot": "2 Bots gegen Spieler und Bot",
+      "botBotVsBotBot": "2 Bots gegen 2 Bots"
+    },
     "winningCondition": "Spielende",
     "points": "Punkte",
     "hands": "Hände",
     "value": "Zielwert",
-    "submit": "Erstellen",
-    "botNorth": "Norden",
-    "botSouth": "Süden",
-    "botEast": "Osten",
-    "botWest": "Westen"
+    "submit": "Erstellen"
   },
   "main": {
     "title": "Hallo",

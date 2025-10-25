@@ -77,7 +77,24 @@
   "create": {
     "title": "Create Game",
     "description": "Create a new custom game with different settings",
-    "bots": "Bot Players",
+    "players": "Players",
+    "config": {
+      "meVsBots": "Me vs 3 bots",
+      "meAndFriendVsBots": "Me and a friend vs 2 bots",
+      "meAndBotVsFriendAndBot": "Me and a bot vs a friend and a bot",
+      "allFriends": "Me and 3 friends (no bots)"
+    },
+    "configDescription": {
+      "playerPlayerVsPlayerPlayer": "2 Players vs 2 Players",
+      "playerPlayerVsPlayerBot": "2 Players vs Player and Bot",
+      "playerPlayerVsBotBot": "2 Players vs 2 Bots",
+      "playerBotVsPlayerPlayer": "Player and Bot vs 2 Players",
+      "playerBotVsPlayerBot": "Player and Bot vs Player and Bot",
+      "playerBotVsBotBot": "Player and Bot vs 2 Bots",
+      "botBotVsPlayerPlayer": "2 Bots vs 2 Players",
+      "botBotVsPlayerBot": "2 Bots vs Player and Bot",
+      "botBotVsBotBot": "2 Bots vs 2 Bots"
+    },
     "winningCondition": "Winning Condition",
     "points": "Points",
     "hands": "Hands",
