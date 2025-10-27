@@ -6,27 +6,24 @@ import ch.yass.core.contract.Middleware
 import ch.yass.core.error.DomainException
 import ch.yass.core.error.domainExceptionHandler
 import ch.yass.core.error.globalExceptionHandler
+import ch.yass.core.middleware.MDCMiddleware
+import ch.yass.core.middleware.RequestLoggerMiddleware
 import ch.yass.identity.AuthMiddleware
 import ch.yass.identity.ImpersonateMiddleware
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.path
 import io.javalin.config.EventConfig
 import io.javalin.json.JavalinJackson
-import jakarta.servlet.DispatcherType
-import org.eclipse.jetty.servlet.FilterHolder
 import org.flywaydb.core.Flyway
 import org.kodein.di.DI
 import org.kodein.di.allInstances
 import org.kodein.di.direct
 import org.kodein.di.instance
 import org.slf4j.LoggerFactory
-import org.zalando.logbook.Logbook
-import org.zalando.logbook.servlet.LogbookFilter
-import java.util.*
 import com.typesafe.config.Config as ConfigSettings
 
 
-class Bootstrap(private val config: ConfigSettings, private val logbook: Logbook) {
+class Bootstrap(private val config: ConfigSettings) {
     fun start(di: DI) {
         setupFlyway()
 
@@ -44,15 +41,13 @@ class Bootstrap(private val config: ConfigSettings, private val logbook: Logbook
                     it.allowCredentials = true
                 }
             }
-            javalinConfig.jetty.modifyServletContextHandler { handler ->
-                handler.addFilter(FilterHolder(LogbookFilter(logbook)), "/*", EnumSet.of(DispatcherType.REQUEST))
-            }
         }
 
         // Register all middlewares here. We're doing this manually to ensure
         // the correct order (opposed to just also use di.allInstances()).
         val middlewares: List<Middleware> = listOf(
             di.direct.instance<MDCMiddleware>(),
+            di.direct.instance<RequestLoggerMiddleware>(),
             di.direct.instance<AuthMiddleware>(),
             di.direct.instance<ImpersonateMiddleware>(),
         )
@@ -103,7 +98,7 @@ class Bootstrap(private val config: ConfigSettings, private val logbook: Logbook
         }
 
         app.afterMatched { ctx ->
-            middlewares.forEach { it.after(ctx) }
+            middlewares.reversed().forEach { it.after(ctx) }
         }
     }
 }

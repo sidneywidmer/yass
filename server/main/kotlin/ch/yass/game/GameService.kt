@@ -3,8 +3,10 @@ package ch.yass.game
 import arrow.core.raise.Raise
 import arrow.core.raise.ensure
 import ch.yass.admin.dsl.interpretCards
+import ch.yass.core.contract.MDCAttributes.*
 import ch.yass.core.error.*
 import ch.yass.core.helper.associateWithToEnum
+import ch.yass.core.helper.logger
 import ch.yass.core.pubsub.Action
 import ch.yass.core.pubsub.Channel
 import ch.yass.core.pubsub.PubSub
@@ -23,7 +25,9 @@ import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
 import ch.yass.game.pubsub.*
 import kotlinx.coroutines.*
+import org.slf4j.MDC
 import java.util.*
+import java.util.UUID
 import kotlinx.coroutines.channels.Channel as EventChannel
 
 class GameService(
@@ -36,10 +40,8 @@ class GameService(
      * We use scope and eventChannel to also emmit our publishForSeats Actions. This helps greatly with
      * writing integration tests since we can wait for specific actions to complete in our coroutine contexts.
      */
-    @Suppress("UNUSED_PARAMETER")
     var scope = CoroutineScope(Dispatchers.Default + CoroutineExceptionHandler { _, exception ->
-        // TODO: we should fire an action so our clients know the game is stuck because
-        //  tome bot ran into a bug.
+        logger().error("Exception in coroutine:", exception)
     })
 
     data class AsyncEvent(val seatUUID: UUID, val action: Action)
@@ -48,6 +50,21 @@ class GameService(
      * Gives us visibility on what the async bots are doing day in day out.
      */
     var eventChannel: EventChannel<AsyncEvent> = EventChannel()
+
+    /**
+     * This ensures that logging context (e.g., traceId) is available in async operations.
+     */
+    private fun launchWithMDC(block: suspend () -> Unit) {
+        val mdcSnapshot = MDC.getCopyOfContextMap()
+        scope.launch {
+            if (mdcSnapshot != null) {
+                MDC.put(TRACE_ID.value, UUID.randomUUID().toString())
+                MDC.put(PARENT_TRACE_ID.value, mdcSnapshot[TRACE_ID.value])
+            }
+
+            block()
+        }
+    }
 
     /**
      * Validate settings, create a new game in the db, create players for all bots and seat them
@@ -272,7 +289,7 @@ class GameService(
     }
 
     private fun publishForSeats(seats: List<Seat>, action: (Seat) -> List<Action>) {
-        scope.launch {
+        launchWithMDC {
             seats.forEach { seat ->
                 action.invoke(seat)
                     .forEach { action -> eventChannel.send(AsyncEvent(seat.uuid, action)) }
@@ -319,14 +336,14 @@ class GameService(
 
             State.TRUMP -> {}
             State.SCHIEBE -> {}
-            State.PLAY_CARD_BOT -> scope.launch { playAsBot(updatedState) }
-            State.TRUMP_BOT -> scope.launch { trumpAsBot(updatedState) }
-            State.SCHIEBE_BOT -> scope.launch { schiebeAsBot(updatedState) }
+            State.PLAY_CARD_BOT -> launchWithMDC { playAsBot(updatedState) }
+            State.TRUMP_BOT -> launchWithMDC { trumpAsBot(updatedState) }
+            State.SCHIEBE_BOT -> launchWithMDC { schiebeAsBot(updatedState) }
             State.WEISEN_FIRST -> {}
-            State.WEISEN_FIRST_BOT -> scope.launch { weisenAsBot(updatedState) }
+            State.WEISEN_FIRST_BOT -> launchWithMDC { weisenAsBot(updatedState) }
             State.WEISEN_SECOND -> weisenSecond(updatedState)
 
-            State.WEISEN_SECOND_BOT -> scope.launch { weisenAsBot(updatedState) }
+            State.WEISEN_SECOND_BOT -> launchWithMDC { weisenAsBot(updatedState) }
             State.NEW_TRICK -> {
                 repo.createTrick(currentHand(updatedState.hands))
                 val state = repo.getState(game)
