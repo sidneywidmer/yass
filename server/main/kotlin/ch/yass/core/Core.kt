@@ -2,6 +2,8 @@ package ch.yass.core
 
 import ch.yass.Yass
 import ch.yass.core.helper.config
+import ch.yass.core.middleware.MDCMiddleware
+import ch.yass.core.middleware.RequestLoggerMiddleware
 import ch.yass.core.pubsub.PubSub
 import ch.yass.game.dto.db.InternalPlayer
 import com.fasterxml.jackson.databind.DeserializationFeature
@@ -28,13 +30,6 @@ import org.kodein.di.direct
 import org.kodein.di.instance
 import org.kodein.type.erased
 import org.slf4j.LoggerFactory
-import org.zalando.logbook.Logbook
-import org.zalando.logbook.core.DefaultHttpLogWriter
-import org.zalando.logbook.core.DefaultSink
-import org.zalando.logbook.core.HeaderFilters.replaceCookies
-import org.zalando.logbook.core.HeaderFilters.replaceHeaders
-import org.zalando.logbook.json.JsonHttpLogFormatter
-import org.zalando.logbook.okhttp.LogbookInterceptor
 import com.typesafe.config.Config as ConfigSettings
 
 
@@ -42,9 +37,10 @@ object Core {
     val module = DI.Module("Core module") {
         bindSingleton { ConfigFactory.load() }
         bindSingleton { createDSLContext(instance()) }
-        bindSingleton { createLogbook() }
-        bindSingleton { Bootstrap(instance(), instance()) }
+        bindSingleton { Bootstrap(instance()) }
         bindSingleton { MDCMiddleware() }
+        bindSingleton { RequestLoggerMiddleware() }
+        bindSingleton { TraceInterceptor() }
         bindSingleton { LoggerFactory.getLogger("Yass") }
         bindSingleton { createJsonMapper() }
         bindSingleton { createCentrifugoClient(instance()) }
@@ -69,17 +65,7 @@ object Core {
             .jobScheduler
     }
 
-    private fun createLogbook(): Logbook {
-        val sink = DefaultSink(JsonHttpLogFormatter(), DefaultHttpLogWriter())
-
-        return Logbook.builder()
-            .headerFilter(replaceCookies("ory_kratos_session"::equals, "logbook-replaced"))
-            .headerFilter(replaceHeaders("x-api-key"::equals, "logbook-replaced"))
-            .sink(sink)
-            .build()
-    }
-
-    private fun createCentrifugoClient(logbook: Logbook): CentrifugoClient {
+    private fun createCentrifugoClient(traceInterceptor: TraceInterceptor): CentrifugoClient {
         val client = OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val requestWithApiKey = chain.request().newBuilder()
@@ -88,7 +74,7 @@ object Core {
 
                 chain.proceed(requestWithApiKey)
             }
-            .addNetworkInterceptor(LogbookInterceptor(logbook))
+            .addInterceptor(traceInterceptor)
             .build()
 
         return CentrifugoClient(client)

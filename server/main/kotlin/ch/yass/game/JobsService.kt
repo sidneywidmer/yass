@@ -44,7 +44,6 @@ class JobsService(
             scheduler.createRecurrently(playerPing)
             scheduler.createRecurrently(gameStatus)
         }
-
     }
 
     /**

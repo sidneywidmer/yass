@@ -9,6 +9,7 @@ import ch.yass.core.error.*
 import ch.yass.core.helper.createToken
 import ch.yass.core.helper.errorResponse
 import ch.yass.core.helper.hashToken
+import ch.yass.core.helper.logger
 import ch.yass.core.helper.successResponse
 import ch.yass.core.helper.toUUID
 import ch.yass.core.helper.validate

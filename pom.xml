@@ -90,26 +90,6 @@
             <version>2.3.1</version>
         </dependency>
         <dependency>
-            <groupId>org.zalando</groupId>
-            <artifactId>logbook-core</artifactId>
-            <version>3.6.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.zalando</groupId>
-            <artifactId>logbook-json</artifactId>
-            <version>3.8.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.zalando</groupId>
-            <artifactId>logbook-okhttp</artifactId>
-            <version>3.6.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.zalando</groupId>
-            <artifactId>logbook-servlet</artifactId>
-            <version>3.6.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.jobrunr</groupId>
             <artifactId>jobrunr</artifactId>
             <version>6.3.3</version>
@@ -207,6 +187,11 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
             <version>1.5.18</version>
+        </dependency>
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>7.4</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.janino</groupId>

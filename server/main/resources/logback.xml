@@ -1,17 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="false">
-    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <timeZone>UTC</timeZone>
+            <timestampPattern>yyyy-MM-dd'T'HH:mm:ss.SSS'Z'</timestampPattern>
+            <includeMdcKeyName>traceId</includeMdcKeyName>
+            <includeMdcKeyName>parentTraceId</includeMdcKeyName>
+            <fieldNames>
+                <timestamp>time</timestamp>
+                <message>message</message>
+                <logger>logger</logger>
+                <level>level</level>
+                <levelValue>[ignore]</levelValue>
+            </fieldNames>
+            <customFields>{"service":"yass-server"}</customFields>
+        </encoder>
+    </appender>
+
+    <appender name="DEFAULT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <Pattern>%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %X %msg%n</pattern>
         </encoder>
     </appender>
 
     <root level="INFO">
-        <appender-ref ref="Console"/>
+        <appender-ref ref="DEFAULT"/>
     </root>
 
-    <!-- Development Environment -->
-    <if condition='property("ENVIRONMENT").contains("development")'>
+    <!-- Local Environment -->
+    <if condition='property("ENVIRONMENT").contains("local")'>
         <then>
             <logger name="Yass" level="INFO"/>
         </then>
@@ -24,19 +41,10 @@
         </then>
     </if>
 
-    <!-- Acceptance Environment -->
-    <if condition='property("ENVIRONMENT").contains("acceptance")'>
-        <then>
-            <logger name="Yass" level="INFO"/>
-            <logger name="org.zalando.logbook" level="TRACE"/>
-        </then>
-    </if>
-
     <!-- Production Environment -->
     <if condition='property("ENVIRONMENT").contains("production")'>
         <then>
             <logger name="Yass" level="INFO"/>
-            <logger name="org.zalando.logbook" level="TRACE"/>
         </then>
     </if>
 
