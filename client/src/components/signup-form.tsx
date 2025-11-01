@@ -29,7 +29,7 @@ export function SignupForm() {
 
   useEffect(() => {
     if (initialized && isAuthenticated) {
-      navigate('/', {replace: true})
+      navigate('/lobby', {replace: true})
     }
   }, [initialized])
   

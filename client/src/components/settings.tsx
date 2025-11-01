@@ -52,7 +52,7 @@ const Settings = () => {
   };
 
   const handleLeaveGame = () => {
-    navigate('/');
+    navigate('/lobby');
     setShowLeaveDialog(false);
   };
 

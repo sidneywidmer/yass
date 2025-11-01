@@ -19,7 +19,7 @@ export const useAnon = () => {
     api.anonSignup({name: username})
       .then((response) => {
         setAnonPlayer(response.data!!.uuid, response.data!!.name)
-        navigate(redirectTo || '/')
+        navigate(redirectTo || '/lobby')
       })
       .catch((error) => {
         handleError(error)

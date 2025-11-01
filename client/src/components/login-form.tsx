@@ -23,7 +23,7 @@ export function LoginForm() {
 
   useEffect(() => {
     if (initialized && isAuthenticated) {
-      navigate('/', {replace: true})
+      navigate('/lobby', {replace: true})
     }
   }, [initialized])
 

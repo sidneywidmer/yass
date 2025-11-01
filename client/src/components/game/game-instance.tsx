@@ -36,14 +36,14 @@ export function GameInstance({tryCode}: GameInstanceProps) {
       })
       .catch(error => {
         if (error.response?.status === 404) {
-          navigate('/')
+          navigate('/lobby')
           return addError({
             title: t('errors.gameNotFound.title'),
             description: t('errors.gameNotFound.description')
           })
         }
         if (error.response.data.payload.domainError == "GameAlreadyFull") {
-          navigate('/')
+          navigate('/lobby')
           return addError({
             title: t('errors.gameFull.title'),
             description: t('errors.gameFull.description')
