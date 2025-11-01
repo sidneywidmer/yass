@@ -7,7 +7,7 @@ export function Header() {
   const isAuthenticated = usePlayerStore(state => state.isAuthenticated);
 
   return (
-    <div className="flex w-full flex-col items-center bg-background p-6 md:p-10 md:pt-16 lg:pt-20">
+    <div className="flex w-full flex-col items-center bg-background p-6 md:p-10 md:pt-16 lg:pt-20 pb-20">
       <div className="flex w-full max-w-2xl flex-col gap-8 text-center">
         {/* Main Heading - Serif */}
         <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-medium leading-tight text-foreground">
@@ -20,7 +20,7 @@ export function Header() {
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4 pb-12">
           <Button
             size="lg"
             onClick={() => navigate(isAuthenticated ? "/lobby" : "/signup")}
