@@ -215,7 +215,7 @@
       "title": "Play Jass with your friends, online",
       "description": "No installation, no nonsense. Just hop in and play.",
       "signUp": "Sign Up",
-      "instantPlay": "Instant play"
+      "playAsGuest": "Play as guest"
     },
     "features": {
       "title": "Why you'll like it",

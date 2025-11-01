@@ -215,7 +215,7 @@
       "title": "Spiele Jass mit deinen Freunden, online",
       "description": "Keine Installation, kein Umschweif. Einfach rein und spielen.",
       "signUp": "Registrieren",
-      "instantPlay": "Sofort spielen"
+      "playAsGuest": "Als Gast spielen"
     },
     "features": {
       "title": "Warum dir das gefällt",
