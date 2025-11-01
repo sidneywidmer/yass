@@ -33,7 +33,7 @@ export function Blog() {
             {posts.map((post) => (
               <div
                 key={post.slug}
-                className="flex flex-col gap-4 pb-6 border-b border-border hover:opacity-75 transition-opacity"
+                className="flex flex-col gap-4 pb-6 hover:opacity-75 transition-opacity"
               >
                 <div>
                   <p className="font-sans text-sm text-muted-foreground mb-2">
