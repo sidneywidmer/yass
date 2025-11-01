@@ -51,7 +51,7 @@ export function Header() {
         {/* Right Column - Game Showcase */}
         <div className="relative w-full lg:w-1/2 flex items-center justify-center lg:justify-end">
           <img
-            src="https://picsum.photos/400/600"
+            src="/assets/game.png"
             alt="Jass game showcase"
             className="w-full max-w-xs md:max-w-sm lg:max-w-md rounded-lg shadow-lg"
           />
