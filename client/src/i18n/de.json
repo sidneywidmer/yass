@@ -204,5 +204,54 @@
   "chooseTrump": {
     "title": "Trump wählen",
     "description": "Trump wählen"
+  },
+  "landing": {
+    "navigation": {
+      "login": "Anmelden",
+      "lobby": "Spiele",
+      "settings": "Einstellungen"
+    },
+    "header": {
+      "title": "Spiele Jass mit deinen Freunden, online",
+      "description": "Keine Installation, kein Umschweif. Einfach rein und spielen.",
+      "signUp": "Registrieren",
+      "instantPlay": "Sofort spielen"
+    },
+    "features": {
+      "title": "Warum dir das gefällt",
+      "subtitle": "Von Spielern, für Spieler.",
+      "earlyBird": {
+        "title": "Frühe Vögel",
+        "description": "Wir bauen noch daran. Hilf uns, es besser zu machen, indem du spielst und Feedback gibst. Sei Teil von etwas Kleinem und Feinem."
+      },
+      "noAds": {
+        "title": "Keine Werbung, Kein Tracking",
+        "description": "Nur das Spiel. Keine Werbung, kein Tracking, kein Schnickschnack. Von Jass-Spielern, für Jass-Spieler."
+      },
+      "fastSimple": {
+        "title": "Schnell & Einfach",
+        "description": "Rein, spielen, raus. Eine elegante Oberfläche, die dir nicht im Weg steht."
+      }
+    },
+    "blog": {
+      "title": "Neueste Beiträge",
+      "subtitle": "Was wir denken und bauen.",
+      "readMore": "Mehr lesen",
+      "posts": {
+        "humbleBeginnings": {
+          "title": "Wie alles anfing",
+          "abstract": "Ein paar Jass-Fans wurden müde von veralteten Plattformen. Also bauten wir etwas Besseres. Dies ist die Geschichte, warum Yass existiert."
+        },
+        "architecture": {
+          "title": "Wie es funktioniert (Nerd-Kram)",
+          "abstract": "Interessiert dich wie es gebaut ist? Lese über die Technologie hinter Jass—Echtzeit-Updates, saubere Architektur und warum wir das gewählt haben."
+        }
+      }
+    },
+    "footer": {
+      "madeWith": "Gemacht mit",
+      "inSwitzerland": "in der Schweiz",
+      "copyright": "© {{year}} Yass. Alle Rechte vorbehalten."
+    }
   }
 }

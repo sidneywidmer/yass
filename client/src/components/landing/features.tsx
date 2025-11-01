@@ -1,38 +1,40 @@
 import { Zap, Github, Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function Features() {
+  const { t } = useTranslation();
   const features = [
     {
-      title: "Early Bird",
-      description: "It's a beta, expect bugs but be the first to test and give feedback. Help shape the future of the platform and join a community of early adopters.",
+      title: t("landing.features.earlyBird.title"),
+      description: t("landing.features.earlyBird.description"),
       icon: Zap
     },
     {
-      title: "Opensource",
-      description: "No ads, no tracking, all opensource. Full transparency and community-driven development with no corporate agenda.",
+      title: t("landing.features.noAds.title"),
+      description: t("landing.features.noAds.description"),
       icon: Github
     },
     {
-      title: "Clean",
-      description: "Snappy and clean UI with fast interactions. Enjoy a distraction-free experience designed for speed and simplicity.",
+      title: t("landing.features.fastSimple.title"),
+      description: t("landing.features.fastSimple.description"),
       icon: Sparkles
     }
   ];
 
   return (
     <div className="w-full border-t border-border">
-      <div className="flex w-full flex-col items-center bg-background p-6 md:p-10 md:py-20">
-        <div className="flex w-full max-w-6xl flex-col gap-12">
+      <div className="flex w-full flex-col items-center bg-background p-6 pt-10 md:p-10 md:py-20">
+        <div className="flex w-full max-w-6xl flex-col gap-8 md:gap-12">
           <div className="text-center max-w-2xl mx-auto">
             <h2 className="font-serif text-4xl md:text-5xl font-medium text-foreground mb-4">
-              Features
+              {t("landing.features.title")}
             </h2>
             <p className="font-sans text-lg text-muted-foreground leading-relaxed">
-              Yass is built with players in mind. Experience gaming the way it should be—transparent, fast, and community-driven.
+              {t("landing.features.subtitle")}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
             {features.map((feature) => {
               const Icon = feature.icon;
               return (

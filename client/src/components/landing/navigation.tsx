@@ -1,16 +1,15 @@
-import { GalleryVerticalEnd, Menu } from "lucide-react";
-import { Button } from "@/components/ui/button.tsx";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet.tsx";
+import { GalleryVerticalEnd } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Settings from "@/components/settings.tsx";
 import { usePlayerStore } from "@/store/player.ts";
+import { useTranslation } from "react-i18next";
 
 export function Navigation() {
   const navigate = useNavigate();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const isAuthenticated = usePlayerStore(state => state.isAuthenticated);
+  const { t } = useTranslation();
 
   return (
     <>
@@ -30,14 +29,14 @@ export function Navigation() {
             </button>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          {/* Navigation Links - Always Visible */}
+          <div className="flex items-center gap-6">
             {!isAuthenticated && (
               <button
                 onClick={() => navigate("/login")}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                Login
+                {t("landing.navigation.login")}
               </button>
             )}
             {isAuthenticated && (
@@ -45,67 +44,15 @@ export function Navigation() {
                 onClick={() => navigate("/lobby")}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                Lobby
+                {t("landing.navigation.lobby")}
               </button>
             )}
             <button
               onClick={() => setSettingsOpen(true)}
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              Settings
+              {t("landing.navigation.settings")}
             </button>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="relative"
-                >
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-64">
-                <div className="flex flex-col gap-6 mt-8">
-                  <div className="flex flex-col gap-2">
-                    {!isAuthenticated && (
-                      <button
-                        onClick={() => {
-                          navigate("/login");
-                          setMobileMenuOpen(false);
-                        }}
-                        className="text-left text-sm font-medium hover:text-primary transition-colors"
-                      >
-                        Login
-                      </button>
-                    )}
-                    {isAuthenticated && (
-                      <button
-                        onClick={() => {
-                          navigate("/lobby");
-                          setMobileMenuOpen(false);
-                        }}
-                        className="text-left text-sm font-medium hover:text-primary transition-colors"
-                      >
-                        Lobby
-                      </button>
-                    )}
-                    <button
-                      onClick={() => {
-                        setSettingsOpen(true);
-                        setMobileMenuOpen(false);
-                      }}
-                      className="text-left text-sm font-medium hover:text-primary transition-colors"
-                    >
-                      Settings
-                    </button>
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
           </div>
         </div>
       </div>

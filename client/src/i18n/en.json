@@ -204,5 +204,54 @@
   "chooseTrump": {
     "title": "Choose trump",
     "description": "Choose trump"
+  },
+  "landing": {
+    "navigation": {
+      "login": "Login",
+      "lobby": "Lobby",
+      "settings": "Settings"
+    },
+    "header": {
+      "title": "Play Jass with your friends, online",
+      "description": "No installation, no nonsense. Just hop in and play.",
+      "signUp": "Sign Up",
+      "instantPlay": "Instant play"
+    },
+    "features": {
+      "title": "Why you'll like it",
+      "subtitle": "Built by players, for players.",
+      "earlyBird": {
+        "title": "Early Bird",
+        "description": "We're still building this. Help us shape it by playing and giving feedback. Be part of something small and fun."
+      },
+      "noAds": {
+        "title": "No Ads, No Tracking",
+        "description": "Just the game. No ads, no tracking, no nonsense. Built by Jass players for Jass players."
+      },
+      "fastSimple": {
+        "title": "Fast & Simple",
+        "description": "Get in, play, get out. A snappy UI that doesn't get in your way."
+      }
+    },
+    "blog": {
+      "title": "Latest posts",
+      "subtitle": "What we're thinking and building.",
+      "readMore": "Read more",
+      "posts": {
+        "humbleBeginnings": {
+          "title": "How this all started",
+          "abstract": "A couple of Jass enthusiasts got tired of playing on outdated platforms. So we built something better. This is the story of why Yass exists."
+        },
+        "architecture": {
+          "title": "How it works (nerd stuff)",
+          "abstract": "Interested in how it's built? Read about the tech behind Jass—real-time updates, clean architecture, and why we chose what we chose."
+        }
+      }
+    },
+    "footer": {
+      "madeWith": "Made with",
+      "inSwitzerland": "in Switzerland",
+      "copyright": "© {{year}} Yass. All rights reserved."
+    }
   }
 }
