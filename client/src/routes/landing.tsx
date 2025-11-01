@@ -1,6 +1,7 @@
 import { Navigation } from "@/components/landing/navigation.tsx";
 import { Header } from "@/components/landing/header.tsx";
 import { Features } from "@/components/landing/features.tsx";
+import { Blog } from "@/components/landing/blog.tsx";
 
 export default function Landing() {
   return (
@@ -8,6 +9,7 @@ export default function Landing() {
       <Navigation />
       <Header />
       <Features />
+      <Blog />
     </>
   );
 }
