@@ -65,4 +65,7 @@
   body {
     @apply bg-background text-foreground font-sans text-base;
   }
+  a {
+    @apply underline hover:no-underline;
+  }
 }

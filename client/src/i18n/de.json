@@ -208,29 +208,29 @@
   "landing": {
     "navigation": {
       "login": "Anmelden",
-      "lobby": "Spiele",
+      "lobby": "Spielen",
       "settings": "Einstellungen"
     },
     "header": {
-      "title": "Spiele Jass mit deinen Freunden, online",
-      "description": "Keine Installation, kein Umschweif. Einfach rein und spielen.",
+      "title": "Unser Nationalspiel — modern umgsetzt",
+      "description": "Keine Installation, keine Werbung und gratis. Den Foiver unds s'Weggli halt.",
       "signUp": "Registrieren",
-      "playAsGuest": "Als Gast spielen"
+      "playAsGuest": "als Gast spielen"
     },
     "features": {
-      "title": "Warum dir das gefällt",
-      "subtitle": "Von Spielern, für Spieler.",
+      "title": "Yass Features",
+      "subtitle": "Jassteppich und Holzplättli-Hintergrund sind für die Beiz reserviert.",
       "earlyBird": {
-        "title": "Frühe Vögel",
-        "description": "Wir bauen noch daran. Hilf uns, es besser zu machen, indem du spielst und Feedback gibst. Sei Teil von etwas Kleinem und Feinem."
+        "title": "Early Bird",
+        "description": "Es wird noch fleissig an der Platfform geschraubt. Sei von Anfang an dabei und hilf mit deinem Feedback die Entwicklung in die richtige Richtung zu lenken."
       },
       "noAds": {
-        "title": "Keine Werbung, Kein Tracking",
-        "description": "Nur das Spiel. Keine Werbung, kein Tracking, kein Schnickschnack. Von Jass-Spielern, für Jass-Spieler."
+        "title": "Open Source",
+        "description": "Yass ist <a href=\"https://github.com/sidneywidmer/yass\" target=\"_blank\">quelloffen</a>, werbefrei und gratis. Falls du ein Fehler findest freue ich mich über deinen Pullrequest!"
       },
       "fastSimple": {
         "title": "Schnell & Einfach",
-        "description": "Rein, spielen, raus. Eine elegante Oberfläche, die dir nicht im Weg steht."
+        "description": "Intuitives Interface, schnelle Reaktionszeiten und Mehrsprachigkeit - das ist mein Ziel für Yass."
       }
     },
     "blog": {

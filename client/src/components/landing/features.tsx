@@ -1,23 +1,23 @@
-import { Zap, Github, Sparkles } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import {Bird, Github, Zap} from "lucide-react";
+import {useTranslation} from "react-i18next";
 
 export function Features() {
-  const { t } = useTranslation();
+  const {t} = useTranslation();
   const features = [
     {
       title: t("landing.features.earlyBird.title"),
       description: t("landing.features.earlyBird.description"),
-      icon: Zap
+      icon: Bird
     },
     {
       title: t("landing.features.noAds.title"),
-      description: t("landing.features.noAds.description"),
+      description: t("landing.features.noAds.description", {interpolation: {escapeValue: false}}),
       icon: Github
     },
     {
       title: t("landing.features.fastSimple.title"),
       description: t("landing.features.fastSimple.description"),
-      icon: Sparkles
+      icon: Zap
     }
   ];
 
@@ -42,13 +42,14 @@ export function Features() {
                   key={feature.title}
                   className="flex flex-col gap-4 p-8 rounded-lg hover:shadow-lg transition-shadow"
                 >
-                  <Icon className="h-8 w-8 text-foreground" />
+                  <Icon className="h-8 w-8 text-foreground"/>
                   <h3 className="font-sans text-2xl font-semibold text-foreground">
                     {feature.title}
                   </h3>
-                  <p className="font-sans text-base text-muted-foreground leading-relaxed">
-                    {feature.description}
-                  </p>
+                  <p
+                    className="font-sans text-base text-muted-foreground leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: feature.description }}
+                  />
                 </div>
               );
             })}
