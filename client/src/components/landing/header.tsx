@@ -50,11 +50,18 @@ export function Header() {
 
         {/* Right Column - Game Showcase */}
         <div className="relative w-full lg:w-1/2 flex items-center justify-center lg:justify-end">
-          <img
-            src="/assets/game.png"
-            alt="Jass game showcase"
-            className="w-full max-w-xs md:max-w-sm lg:max-w-md rounded-lg shadow-lg"
-          />
+          <video
+            autoPlay
+            loop
+            muted
+            className="w-full max-w-[500px] rounded-lg shadow-lg border border-foreground/20"
+          >
+            <source src="/assets/demo.mp4" type="video/mp4" />
+            <img
+              src="/assets/demo.png"
+              className="w-full max-w-[500px] rounded-lg shadow-lg border border-foreground/20"
+            />
+          </video>
         </div>
       </div>
     </div>
