@@ -16,7 +16,7 @@ export default function Analyze() {
     api.analyzeGame(code!!)
       .then(response => setAnalysis(response.data!))
       .catch(error => {
-        navigate("/")
+        navigate("/lobby")
         handleAxiosError(error)
       })
   }, [code])

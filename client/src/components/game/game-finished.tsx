@@ -70,7 +70,7 @@ export function GameFinished() {
             >
               {t("finished.analyze")}</Button>
             <Button variant={"outline"} type="submit"
-                    onClick={() => navigate('/')}
+                    onClick={() => navigate('/lobby')}
             >{t("finished.back")}</Button>
           </div>
         </div>

@@ -4,6 +4,16 @@ module.exports = {
     content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
     theme: {
     	extend: {
+    		fontFamily: {
+    			serif: ['IBM Plex Serif', 'serif'],
+    			sans: ['Inter', 'sans-serif']
+    		},
+    		fontSize: {
+    			base: '1.0625rem' // 17px
+    		},
+    		fontWeight: {
+    			medium: '500'
+    		},
     		borderRadius: {
     			lg: 'var(--radius)',
     			md: 'calc(var(--radius) - 2px)',

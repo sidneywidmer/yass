@@ -23,7 +23,13 @@ import {
 } from "@/components/ui/alert-dialog.tsx";
 import CodeWithCopy from "@/components/code-with-copy.tsx";
 
-const Settings = () => {
+interface SettingsProps {
+  triggerVariant?: 'fixed' | 'inline' | 'none';
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange }: SettingsProps) => {
   const {language, setLanguage, cardDeck, setCardDeck} = useSettingsStore();
   const isAuthenticated = usePlayerStore(state => state.isAuthenticated)
   const name = usePlayerStore(state => state.name)
@@ -31,20 +37,32 @@ const Settings = () => {
   const code = useGameStateStore(state => state.code)
   const {t} = useTranslation();
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+
+  // Use controlled state if provided, otherwise use internal state
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+
+  const setOpen = (value: boolean | ((prev: boolean) => boolean)) => {
+    const newValue = typeof value === 'function' ? value(open) : value;
+    if (onOpenChange) {
+      onOpenChange(newValue);
+    } else {
+      setInternalOpen(newValue);
+    }
+  };
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
-        setOpen(prev => !prev);
+        setOpen(false);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown, { capture: true });
     return () => window.removeEventListener('keydown', handleKeyDown, { capture: true });
-  }, []);
+  }, [open, onOpenChange]);
 
   const handleOpenLeaveDialog = () => {
     setShowLeaveDialog(true);
@@ -52,20 +70,26 @@ const Settings = () => {
   };
 
   const handleLeaveGame = () => {
-    navigate('/');
+    navigate('/lobby');
     setShowLeaveDialog(false);
   };
+
+  const triggerClasses = triggerVariant === 'fixed'
+    ? "fixed top-4 right-4 z-10"
+    : "";
 
   return (
     <>
     <Sheet open={open} onOpenChange={setOpen} modal={false}>
-      <SheetTrigger asChild>
-        <div className="fixed top-4 right-4 z-10">
-          <Button variant="outline" size="icon">
-            <SettingsIcon className="h-4 w-4"/>
-          </Button>
-        </div>
-      </SheetTrigger>
+      {triggerVariant !== 'none' && (
+        <SheetTrigger asChild>
+          <div className={triggerClasses}>
+            <Button variant="outline" size="icon">
+              <SettingsIcon className="h-4 w-4"/>
+            </Button>
+          </div>
+        </SheetTrigger>
+      )}
       <SheetContent>
         <SheetHeader>
           <SheetTitle>{t("settings.title")}</SheetTitle>
