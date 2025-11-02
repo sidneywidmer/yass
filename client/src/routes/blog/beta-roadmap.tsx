@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button.tsx";
 import { useNavigate } from "react-router-dom";
 import { Bot, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
+import { useSettingsStore } from "@/store/settings.ts";
 
 const StatusIndicator = ({ status }: { status: string }) => {
   return (
@@ -21,11 +23,20 @@ const StatusIndicator = ({ status }: { status: string }) => {
 
 export default function BetaRoadmapBlog() {
   const navigate = useNavigate();
-  const publishDate = new Intl.DateTimeFormat("de-CH", {
+  const { t } = useTranslation();
+  const language = useSettingsStore((state) => state.language);
+
+  const publishDate = new Intl.DateTimeFormat(language === "de" ? "de-CH" : "en-US", {
     year: "numeric",
     month: "long",
     day: "numeric"
   }).format(new Date("2024-11-02"));
+
+  const isEnglish = language === "en";
+  const works = t("landing.blog.posts.betaRoadmap.works", { returnObjects: true }) as string[];
+  const buildSites = t("landing.blog.posts.betaRoadmap.buildSites", { returnObjects: true }) as string[];
+  const roadmap = t("landing.blog.posts.betaRoadmap.roadmap", { returnObjects: true }) as string[];
+  const future = t("landing.blog.posts.betaRoadmap.future", { returnObjects: true }) as string[];
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -38,14 +49,23 @@ export default function BetaRoadmapBlog() {
                 {publishDate}
               </p>
               <h1 className="font-serif text-4xl md:text-5xl font-medium text-foreground mb-6">
-                Start der Beta & Roadmap
+                {t("landing.blog.posts.betaRoadmap.title")}
               </h1>
             </div>
 
             <div className="space-y-6 text-base">
-              <p className="font-sans text-foreground leading-relaxed">
-                Es ist soweit! Seit gut <a href="https://github.com/sidneywidmer/yass/commit/f0e905ad5c135d2b0e857b59c376789846668d18" target="_blank" rel="noopener noreferrer">3 Jahren</a> versuche ich immer mal wieder etwas Zeit für «Yass» freizuschaufeln und endlich gibt es eine Version die es Wert ist, der Welt gezeigt zu werden.
-              </p>
+              {isEnglish && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                  <p className="font-sans text-sm text-blue-900">
+                    {t("landing.blog.posts.betaRoadmap.aiDisclaimer")}
+                  </p>
+                </div>
+              )}
+
+              <p
+                className="font-sans text-foreground leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: t("landing.blog.posts.betaRoadmap.intro") }}
+              />
 
               <div className="pt-2">
                 <Button
@@ -53,74 +73,88 @@ export default function BetaRoadmapBlog() {
                   onClick={() => navigate("/signup")}
                   className="font-semibold px-8"
                 >
-                  Jetzt spielen
+                  {t("landing.blog.posts.betaRoadmap.playButton")}
                 </Button>
               </div>
 
               <div className="pt-4">
                 <h2 className="font-serif text-2xl font-medium text-foreground mb-4">
-                  Spielstatus und Betatester
+                  {t("landing.blog.posts.betaRoadmap.statusTitle")}
                 </h2>
                 <p className="font-sans text-foreground leading-relaxed mb-4">
-                  Damit der eigentliche Release nicht in einem Debakel endet, bin ich auf deine Hilfe angewiesen. Hilf mit den aktuellen Stand der Applikation zu testen.
+                  {t("landing.blog.posts.betaRoadmap.statusP1")}
                 </p>
-                <p className="font-sans text-foreground leading-relaxed mb-4">
-                  Kurze Anekdote nebenbei: Als ich die App nach 2.5 Jahren Entwicklung zum ersten Mal einem Kollegen gezeigt habe, meinte der nur: «Sidney, du weisst aber schon, dass wir normalerweise im <i>Gegenuhrzeigersinn</i> Jassen, oder?». Ouch!
-                </p>
+                <p
+                  className="font-sans text-foreground leading-relaxed mb-4"
+                  dangerouslySetInnerHTML={{ __html: t("landing.blog.posts.betaRoadmap.statusP2") }}
+                />
                 <p className="font-sans text-foreground leading-relaxed">
-                  Falls du einen Fehler findest, kannst du diesen jederzeit direkt melden. TBD. Ob Rechtschreibfehler im Text, Fehler in der Spiellogik oder etwas Unverständliches im User Interface - ich freue mich über jede Meldung.
+                  {t("landing.blog.posts.betaRoadmap.statusP3")}
                 </p>
               </div>
 
               <div>
                 <h2 className="font-serif text-2xl font-medium text-foreground mb-4">
-                  Was funktioniert
+                  {t("landing.blog.posts.betaRoadmap.worksTitle")}
                 </h2>
                 <ul className="space-y-2 list-disc list-outside pl-5 font-sans text-foreground">
-                  <li>Login als Gast oder mit E-Mail und Passwort</li>
-                  <li>Spiel erstellen und entweder auf Anzahl Punkt oder Anzahl Hände spielen (gegen <Bot className="inline h-4 w-4 mx-0.5" /> Bots oder mit <User className="inline h-4 w-4 mx-0.5" /> Partner:in)</li>
-                  <li>Einem Spiel entweder per QR Code oder mit Code beitreten</li>
-                  <li>Die "Präsenz" aller Spieler:innen wird mittels kleinem Kreis angezeigt: <StatusIndicator status="BOT" />, <StatusIndicator status="CONNECTED" />, <StatusIndicator status="DISCONNECTED" /></li>
-                  <li>Karten spielen, Weisen, Schieben, Trumpfen, Stöck</li>
-                  <li>Aktueller Punktestand anzeigen</li>
-                  <li>Analyse Ansicht nach abgeschlossenem Spiel</li>
+                  {works.map((item, idx) => (
+                    <li key={idx}>
+                      {idx === 1 ? (
+                        <>
+                          {item.split(" bots oder mit ")[0]} <Bot className="inline h-4 w-4 mx-0.5" /> bots oder mit <User className="inline h-4 w-4 mx-0.5" /> {item.includes("Partner") ? item.split("mit ")[1] : "Partner"}
+                        </>
+                      ) : idx === 3 ? (
+                        <>
+                          {item}: <StatusIndicator status="BOT" />, <StatusIndicator status="CONNECTED" />, <StatusIndicator status="DISCONNECTED" />
+                        </>
+                      ) : (
+                        item
+                      )}
+                    </li>
+                  ))}
                 </ul>
               </div>
 
               <div>
                 <h2 className="font-serif text-2xl font-medium text-foreground mb-4">
-                  Baustellen
+                  {t("landing.blog.posts.betaRoadmap.buildSitesTitle")}
                 </h2>
                 <ul className="space-y-2 list-disc list-outside pl-5 font-sans text-foreground">
-                  <li>Die Bots sind absolute Jass-Anfänger. Das liegt einerseits daran, dass ich selber ein nicht wirklich guter Jasser bin und andererseits daran, dass ich erst ein paar <a href="https://github.com/sidneywidmer/yass/blob/master/server/main/kotlin/ch/yass/game/bot/play.kt" target="_blank" rel="noopener noreferrer">wenige Heuristiken</a> umgesetzt habe. Das System ist aber da und kann beliebig erweitert werden.</li>
-                  <li>Viele Verbesserungen am Code der die Funktionalität aber nicht gross betrifft (Update Kotlin, Migration weg von `context`, entfernen des legacy "Skin" Systems, Performance Optimierungen, verbessertes Monitoring/Alerting, e.t.c)</li>
+                  {buildSites.map((item, idx) => (
+                    <li
+                      key={idx}
+                      dangerouslySetInnerHTML={{ __html: item }}
+                    />
+                  ))}
                 </ul>
               </div>
 
               <div>
                 <h2 className="font-serif text-2xl font-medium text-foreground mb-4">
-                  Roadmap
+                  {t("landing.blog.posts.betaRoadmap.roadmapTitle")}
                 </h2>
                 <p className="font-sans text-foreground leading-relaxed mb-4">
-                  Yass ist noch lange nicht da, wo ich es gerne haben würde. Die folgenden Features sind in naher Zukunft geplant:
+                  {t("landing.blog.posts.betaRoadmap.roadmapIntro")}
                 </p>
                 <ul className="space-y-2 list-disc list-outside pl-5 font-sans text-foreground mb-4">
-                  <li>Starker Fokus auf Multiplayer: Automatische Gegnersuche, Rangliste und Spielhistorie</li>
-                  <li>Blog: Detaillierte Posts über die Architektur und wie Entwickler selber eine Version von Yass betreiben können</li>
-                  <li>Bot Intelligenz: Verbesserte Heuristiken und Monte Carlo Simulation um Bots zu echten Gegnern zu machen</li>
+                  {roadmap.map((item, idx) => (
+                    <li key={idx}>{item}</li>
+                  ))}
                 </ul>
               </div>
 
               <div>
                 <h2 className="font-serif text-2xl font-medium text-foreground mb-4">
-                  Zukunftsmusik
+                  {t("landing.blog.posts.betaRoadmap.futureTitle")}
                 </h2>
                 <p className="font-sans text-foreground leading-relaxed mb-4">
-                  Ein paar Langzeit Ideen, die so in meinem Kopf herumschwirren:
+                  {t("landing.blog.posts.betaRoadmap.futureIntro")}
                 </p>
                 <ul className="space-y-2 list-disc list-outside pl-5 font-sans text-foreground">
-                  <li>Eigene Bots schreiben: Die Möglichkeit für Entwickler, selber einen Bot zu programmieren und gegen andere Bots und echte Spieler zu testen.</li>
-                  <li>Turniersystem für Veranstalter, Vereine oder Firmen um einfach online Jassturniere veranstalten zu können</li>
+                  {future.map((item, idx) => (
+                    <li key={idx}>{item}</li>
+                  ))}
                 </ul>
               </div>
             </div>

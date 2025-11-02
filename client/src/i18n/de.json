@@ -240,7 +240,41 @@
       "posts": {
         "betaRoadmap": {
           "title": "Start der Beta & Roadmap",
-          "abstract": "Endlich ist es soweit! Yass zeigt sich der Welt und startet in die Beta-Phase. Finde heraus wie du helfen kannst und was für die Zukunft geplant ist."
+          "abstract": "Endlich ist es soweit! Yass zeigt sich der Welt und startet in die Beta-Phase. Finde heraus wie du helfen kannst und was für die Zukunft geplant ist.",
+          "intro": "Es ist soweit! Seit gut <a href=\"https://github.com/sidneywidmer/yass/commit/f0e905ad5c135d2b0e857b59c376789846668d18\" target=\"_blank\" rel=\"noopener noreferrer\">3 Jahren</a> versuche ich immer mal wieder etwas Zeit für «Yass» freizuschaufeln und endlich gibt es eine Version die es Wert ist, der Welt gezeigt zu werden.",
+          "playButton": "Jetzt spielen",
+          "statusTitle": "Spielstatus und Betatester",
+          "statusP1": "Damit der eigentliche Release nicht in einem Debakel endet, bin ich auf deine Hilfe angewiesen. Hilf mit dem aktuellen Stand der Applikation zu testen.",
+          "statusP2": "Kurze Anekdote nebenbei: Als ich die App nach 2.5 Jahren Entwicklung zum ersten Mal einem Kollegen gezeigt habe, meinte der nur: «Sidney, du weisst aber schon, dass wir normalerweise im <i>Gegenuhrzeigersinn</i> Jassen, oder?». Ouch!",
+          "statusP3": "Falls du einen Fehler findest, kannst du diesen jederzeit direkt melden. Ob Rechtschreibfehler im Text, Fehler in der Spiellogik oder etwas Unverständliches im User Interface - ich freue mich über jede Meldung.",
+          "worksTitle": "Was funktioniert",
+          "works": [
+            "Login als Gast oder mit E-Mail und Passwort",
+            "Spiel erstellen und entweder auf Anzahl Punkt oder Anzahl Hände spielen (gegen Bots oder mit Partner:in)",
+            "Einem Spiel entweder per QR Code oder mit Code beitreten",
+            "Die «Präsenz» aller Spieler:innen wird mittels kleinem Kreis angezeigt",
+            "Karten spielen, Weisen, Schieben, Trumpfen, Stöck",
+            "Aktueller Punktestand anzeigen",
+            "Analyse Ansicht nach abgeschlossenem Spiel"
+          ],
+          "buildSitesTitle": "Baustellen",
+          "buildSites": [
+            "Die Bots sind absolute Jass-Anfänger. Das liegt einerseits daran, dass ich selber ein nicht wirklich guter Jasser bin und andererseits daran, dass ich erst ein paar wenige <a href=\"https://github.com/sidneywidmer/yass/blob/master/server/main/kotlin/ch/yass/game/bot/play.kt\" target=\"_blank\" rel=\"noopener noreferrer\">Heuristiken</a> umgesetzt habe. Das System ist aber da und kann beliebig erweitert werden.",
+            "Viele Verbesserungen am Code der die Funktionalität aber nicht gross betrifft (Update Kotlin, Migration weg von `context`, entfernen des legacy «Skin» Systems, Performance Optimierungen, verbessertes Monitoring/Alerting, etc.)"
+          ],
+          "roadmapTitle": "Roadmap",
+          "roadmapIntro": "Yass ist noch lange nicht da, wo ich es gerne haben würde. Die folgenden Features sind in naher Zukunft geplant:",
+          "roadmap": [
+            "Starker Fokus auf Multiplayer: Automatische Gegnersuche, Rangliste und Spielhistorie",
+            "Blog: Detaillierte Posts über die Architektur und wie Entwickler selber eine Version von Yass betreiben können",
+            "Bot Intelligenz: Verbesserte Heuristiken und Monte Carlo Simulation um Bots zu echten Gegnern zu machen"
+          ],
+          "futureTitle": "Zukunftsmusik",
+          "futureIntro": "Ein paar Langzeit Ideen, die so in meinem Kopf herumschwirren:",
+          "future": [
+            "Eigene Bots schreiben: Die Möglichkeit für Entwickler, selber einen Bot zu programmieren und gegen andere Bots und echte Spieler zu testen.",
+            "Turniersystem für Veranstalter, Vereine oder Firmen um einfach online Jassturniere veranstalten zu können"
+          ]
         }
       }
     },
