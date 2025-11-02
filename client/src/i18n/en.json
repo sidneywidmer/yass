@@ -245,15 +245,15 @@
           "intro": "It's finally here! For the past <a href=\"https://github.com/sidneywidmer/yass/commit/f0e905ad5c135d2b0e857b59c376789846668d18\" target=\"_blank\" rel=\"noopener noreferrer\">3 years</a> I've been trying to find time for «Yass» here and there, and finally there's a version worth showing to the world.",
           "playButton": "Play Now",
           "statusTitle": "Beta Status & Testing",
-          "statusP1": "To make sure the release isn't a disaster, I rely on your help. Please test the current state of the application.",
+          "statusP1": "To make sure the release isn't a total disaster, I rely on your help testing the current state of the application.",
           "statusP2": "A quick anecdote: When I first showed the app to a colleague after 2.5 years of development, he simply said: «Sidney, you do know we play jass <i>counter-clockwise</i>, right?». Ouch!",
           "statusP3": "If you find a bug, you can report it anytime. Whether it's spelling errors in the text, bugs in the game logic, or something confusing in the user interface - I'm happy about every report.",
           "worksTitle": "What's Working",
           "works": [
             "Login as guest or with email and password",
-            "Create a game and play either to a point total or number of hands (against bots or with a partner)",
+            "Create a game and play either to a point total or number of hands (against <1/> bots or with <2/> a partner)",
             "Join a game via QR code or game code",
-            "Presence of all players shown via small circle",
+            "Presence of all players shown via small circle: <1/>, <2/>, <3/>",
             "Play cards, declare wieses, push, call trump, stoeck",
             "View current score",
             "Analysis view after completed game"
@@ -261,7 +261,7 @@
           "buildSitesTitle": "Work in Progress",
           "buildSites": [
             "The bots are absolute jass beginners. This is partly because I'm not really a good jass player myself, and partly because I've only implemented a few <a href=\"https://github.com/sidneywidmer/yass/blob/master/server/main/kotlin/ch/yass/game/bot/play.kt\" target=\"_blank\" rel=\"noopener noreferrer\">heuristics</a> so far. The system is there and can be extended as needed.",
-            "Many code improvements that don't affect functionality much (Kotlin update, migration away from `context`, removing the legacy «Skin» system, performance optimizations, improved monitoring/alerting, etc.)"
+            "Many code improvements that don't affect functionality much (Kotlin update, migration away from <code>context</code>, removing the legacy «Skin» system, performance optimizations, improved monitoring/alerting, etc.)"
           ],
           "roadmapTitle": "Roadmap",
           "roadmapIntro": "Yass is nowhere near where I want it to be. The following features are planned for the near future:",
@@ -274,7 +274,7 @@
           "futureIntro": "A few long-term ideas that are swirling around in my head:",
           "future": [
             "Custom Bot Development: The ability for developers to write their own bot and test it against other bots and real players.",
-            "Tournament System for organizers, clubs, or companies to easily host online jass tournaments"
+            "Tournament System for organizers, clubs, or companies to easily host online Jass tournaments"
           ]
         }
       }

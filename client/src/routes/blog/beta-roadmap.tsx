@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button.tsx";
 import { useNavigate } from "react-router-dom";
 import { Bot, User } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { useSettingsStore } from "@/store/settings.ts";
 
 const StatusIndicator = ({ status }: { status: string }) => {
@@ -101,13 +101,22 @@ export default function BetaRoadmapBlog() {
                   {works.map((item, idx) => (
                     <li key={idx}>
                       {idx === 1 ? (
-                        <>
-                          {item.split(" bots oder mit ")[0]} <Bot className="inline h-4 w-4 mx-0.5" /> bots oder mit <User className="inline h-4 w-4 mx-0.5" /> {item.includes("Partner") ? item.split("mit ")[1] : "Partner"}
-                        </>
+                        <Trans
+                          i18nKey={`landing.blog.posts.betaRoadmap.works.${idx}`}
+                          components={{
+                            1: <Bot className="inline h-4 w-4 mx-0.5" />,
+                            2: <User className="inline h-4 w-4 mx-0.5" />
+                          }}
+                        />
                       ) : idx === 3 ? (
-                        <>
-                          {item}: <StatusIndicator status="BOT" />, <StatusIndicator status="CONNECTED" />, <StatusIndicator status="DISCONNECTED" />
-                        </>
+                        <Trans
+                          i18nKey={`landing.blog.posts.betaRoadmap.works.${idx}`}
+                          components={{
+                            1: <StatusIndicator status="BOT" />,
+                            2: <StatusIndicator status="CONNECTED" />,
+                            3: <StatusIndicator status="DISCONNECTED" />
+                          }}
+                        />
                       ) : (
                         item
                       )}
