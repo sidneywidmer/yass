@@ -238,13 +238,9 @@
       "subtitle": "Was wir denken und bauen.",
       "readMore": "Mehr lesen",
       "posts": {
-        "humbleBeginnings": {
-          "title": "Wie alles anfing",
-          "abstract": "Ein paar Jass-Fans wurden müde von veralteten Plattformen. Also bauten wir etwas Besseres. Dies ist die Geschichte, warum Yass existiert."
-        },
-        "architecture": {
-          "title": "Wie es funktioniert (Nerd-Kram)",
-          "abstract": "Interessiert dich wie es gebaut ist? Lese über die Technologie hinter Jass—Echtzeit-Updates, saubere Architektur und warum wir das gewählt haben."
+        "betaRoadmap": {
+          "title": "Start der Beta & Roadmap",
+          "abstract": "Endlich ist es soweit! Yass zeigt sich der Welt und startet in die Beta-Phase. Finde heraus wie du helfen kannst und was für die Zukunft geplant ist."
         }
       }
     },

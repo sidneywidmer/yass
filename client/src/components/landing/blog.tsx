@@ -2,21 +2,23 @@ import { ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export function Blog() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const posts = [
     {
-      title: t("landing.blog.posts.humbleBeginnings.title"),
-      date: "November 1, 2024",
-      abstract: t("landing.blog.posts.humbleBeginnings.abstract"),
-      slug: "humble-beginnings"
-    },
-    {
-      title: t("landing.blog.posts.architecture.title"),
-      date: "October 28, 2024",
-      abstract: t("landing.blog.posts.architecture.abstract"),
-      slug: "architecture-overview"
+      title: t("landing.blog.posts.betaRoadmap.title"),
+      date: new Date("2024-11-02"),
+      abstract: t("landing.blog.posts.betaRoadmap.abstract"),
+      slug: "beta-roadmap"
     }
   ];
+
+  const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat(i18n.language === "de" ? "de-CH" : "en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    }).format(date);
+  };
 
   return (
     <div className="w-full border-t border-border">
@@ -31,7 +33,7 @@ export function Blog() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+          <div className="grid grid-cols-1 gap-4 md:gap-8 max-w-2xl mx-auto w-full">
             {posts.map((post) => (
               <div
                 key={post.slug}
@@ -39,7 +41,7 @@ export function Blog() {
               >
                 <div>
                   <p className="font-sans text-sm text-muted-foreground mb-2">
-                    {post.date}
+                    {formatDate(post.date)}
                   </p>
                   <h3 className="font-sans text-2xl font-semibold text-foreground mb-3">
                     {post.title}
