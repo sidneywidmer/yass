@@ -1,35 +1,56 @@
 # Yass
 
-## Start
+A modern, browser-based implementation of Jass — the classic Swiss card game.
 
-Start the application for local development like so:
-  1. `$ docker compse up`
-  2. `$ ./mvnw exec:java -Dexec.mainClass="ch.yass.Yass"`
+**Play the game:** [yass.gg](https://yass.gg)
 
-## DB Changes
+## About
 
-- Add migration to resources
-- Make sure to set db.migrate to true in the application.conf and start the application, this will automatically trigger
-  the DB migrations (see Bootstrap.setupFlyway)
-- Manually trigger jooq-codegen:generate
+Yass brings the beloved Swiss national card game to the modern web. No installation needed, no ads, and completely free to play. Play against bots or with friends, all directly in your browser.
 
-## Error handling
+## Features
 
-We strongly differentiate between logical failures and exceptions. Anything that is out of the scope of our
-domain, or we can't handle it anyway because it's an _unexpected_ state, returns an exception. Anything that
-we _can_ handle should be solved via arrow `raise`-DSL and context receivers. See DomainError.kt for examples
-of errors we currently have.
+- Login as guest or with email and password
+- Create a game and play either to a point total or number of hands
+- Play against bots or with a partner
+- Join a game via QR code or game code
+- Real-time presence indicators for all players
+- Full game mechanics: declare weise, schiebe, trump, Stoeck
+- Display current score
+- Detailed analysis view after each game
+- Choose language and playing card style
 
-## Config
+## Technology Stack
 
-Config file is under resources/application.conf. The environment variables need to be provided otherwise the application
-won't start (direnv is a good solution for this `direnv`)
+### Backend
+- **Language**: Kotlin
+- **Framework**: Javalin
+- **Database**: PostgreSQL with jOOQ for type-safe queries
+- **Real-time**: Centrifugo WebSockets
+- **Authentication**: Ory
 
-## Deployment
+### Frontend - Main Client
+- **Framework**: React with TypeScript
+- **Styling**: Tailwind CSS
+- **Components**: shadcn/ui
+- **State Management**: Zustand
+- **i18n**: react-i18next
+- **Real-time**: Centrifuge client
 
-KISS: 
-1. ./mvnw clean package -DskipTests
-2. npm run build
-3. rsync -avz --delete dist/ root@{server}:/var/www/frontend/
-4. rsync -avz --delete target/server-1.0.0-SNAPSHOT.jar root@{server}:/opt/yass/yass.jar
-5. ssh to server and `service yass restart`
+## Game Screenshots / Demo
+
+![Yass in action](client/public/assets/demo.png)
+
+For a video demo, see: [Demo](client/public/assets/demo.mp4)
+
+## Contributing
+
+So far contributions are not open to the public. I will update this as soon as I figured out on how I can handle this best.
+
+## License
+
+This project is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International](https://creativecommons.org/licenses/by-nc/4.0/) (CC BY-NC 4.0).
+
+You are free to use, modify, and distribute this work as long as:
+- You provide appropriate attribution
+- Your use is non-commercial
