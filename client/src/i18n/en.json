@@ -254,7 +254,7 @@
             "Create a game and play either to a point total or number of hands (against <1/> bots or with <2/> a partner)",
             "Join a game via QR code or game code",
             "Presence of all players shown via small circle: <1/>, <2/>, <3/>",
-            "Play cards, declare wieses, push, call trump, stoeck",
+            "Play cards, weisen, schiebe, trump, Stoeck",
             "View current score",
             "Analysis view after completed game"
           ],
