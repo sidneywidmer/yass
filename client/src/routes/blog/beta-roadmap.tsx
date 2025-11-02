@@ -68,13 +68,13 @@ export default function BetaRoadmapBlog() {
                   Kurze Anekdote nebenbei: Als ich die App nach 2.5 Jahren Entwicklung zum ersten Mal einem Kollegen gezeigt habe, meinte der nur: «Sidney, du weisst aber schon, dass wir normalerweise im <i>Gegenuhrzeigersinn</i> Jassen, oder?». Ouch!
                 </p>
                 <p className="font-sans text-foreground leading-relaxed">
-                  Falls du einen Fehler findest, kannst du diesen jederzeit direkt melden. TBD. Ob Rechtschreibfehler im Text, Fehler in der Spiellogik oder etwas unverständliches im User Interface - ich freue mich über jede Meldung.
+                  Falls du einen Fehler findest, kannst du diesen jederzeit direkt melden. TBD. Ob Rechtschreibfehler im Text, Fehler in der Spiellogik oder etwas Unverständliches im User Interface - ich freue mich über jede Meldung.
                 </p>
               </div>
 
               <div>
                 <h2 className="font-serif text-2xl font-medium text-foreground mb-4">
-                  Was schon alles funktioniert:
+                  Was funktioniert
                 </h2>
                 <ul className="space-y-2 list-disc list-outside pl-5 font-sans text-foreground">
                   <li>Login als Gast oder mit E-Mail und Passwort</li>
@@ -89,7 +89,7 @@ export default function BetaRoadmapBlog() {
 
               <div>
                 <h2 className="font-serif text-2xl font-medium text-foreground mb-4">
-                  Was noch nicht so gut funktioniert:
+                  Baustellen
                 </h2>
                 <ul className="space-y-2 list-disc list-outside pl-5 font-sans text-foreground">
                   <li>Die Bots sind absolute Jass-Anfänger. Das liegt einerseits daran, dass ich selber ein nicht wirklich guter Jasser bin und andererseits daran, dass ich erst ein paar <a href="https://github.com/sidneywidmer/yass/blob/master/server/main/kotlin/ch/yass/game/bot/play.kt" target="_blank" rel="noopener noreferrer">wenige Heuristiken</a> umgesetzt habe. Das System ist aber da und kann beliebig erweitert werden.</li>
@@ -106,17 +106,17 @@ export default function BetaRoadmapBlog() {
                 </p>
                 <ul className="space-y-2 list-disc list-outside pl-5 font-sans text-foreground mb-4">
                   <li>Starker Fokus auf Multiplayer: Automatische Gegnersuche, Rangliste und Spielhistorie</li>
-                  <li>Blog: Detailierte Posts über die Architektur und wie Entwickler selber eine Version von Yass betreiben können</li>
+                  <li>Blog: Detaillierte Posts über die Architektur und wie Entwickler selber eine Version von Yass betreiben können</li>
                   <li>Bot Intelligenz: Verbesserte Heuristiken und Monte Carlo Simulation um Bots zu echten Gegnern zu machen</li>
                 </ul>
               </div>
 
               <div>
                 <h2 className="font-serif text-2xl font-medium text-foreground mb-4">
-                  Langzeit Ideen
+                  Zukunftsmusik
                 </h2>
                 <p className="font-sans text-foreground leading-relaxed mb-4">
-                  Ein paar Langzeit Ideen die so in meinem Kopf herumschwirren:
+                  Ein paar Langzeit Ideen, die so in meinem Kopf herumschwirren:
                 </p>
                 <ul className="space-y-2 list-disc list-outside pl-5 font-sans text-foreground">
                   <li>Eigene Bots schreiben: Die Möglichkeit für Entwickler, selber einen Bot zu programmieren und gegen andere Bots und echte Spieler zu testen.</li>
