@@ -53,10 +53,10 @@ export type Card = {
 };
 
 export type CardInHand = {
-    suit?: Suit;
-    rank?: Rank;
-    skin?: string;
-    state?: 'PLAYABLE' | 'UNPLAYABLE' | 'ALREADY_PLAYED';
+    suit: Suit;
+    rank: Rank;
+    skin?: Skin;
+    state: 'PLAYABLE' | 'UNPLAYABLE' | 'ALREADY_PLAYED';
 };
 
 export type state = 'PLAYABLE' | 'UNPLAYABLE' | 'ALREADY_PLAYED';
@@ -64,7 +64,7 @@ export type state = 'PLAYABLE' | 'UNPLAYABLE' | 'ALREADY_PLAYED';
 export type CardOnTable = {
     suit?: Suit;
     rank?: Rank;
-    skin?: string;
+    skin?: Skin;
     position?: Position;
 };
 
@@ -189,6 +189,8 @@ export type SeatState = {
     gschobeBy?: (Position) | null;
     weise?: Array<WeisWithPoints>;
 };
+
+export type Skin = 'DEFAULT' | 'HALLOWEEN01' | 'ABSTRACT01' | 'BETA01' | 'WAVE01';
 
 export type State = 'WAITING_FOR_PLAYERS' | 'PLAY_CARD' | 'PLAY_CARD_BOT' | 'SCHIEBE' | 'SCHIEBE_BOT' | 'WEISEN_FIRST' | 'WEISEN_FIRST_BOT' | 'WEISEN_SECOND' | 'WEISEN_SECOND_BOT' | 'TRUMP' | 'TRUMP_BOT' | 'NEW_TRICK' | 'NEW_HAND' | 'FINISHED';
 

@@ -26,6 +26,7 @@ fun cardValueUneufeTrump(card: Card): Int = rankValueDescending(card.rank)
 fun cardValueObeabeTrump(card: Card): Int = rankValueAscending(card.rank)
 
 fun rankValueAscending(rank: Rank): Int = when (rank) {
+    Rank.WELCOME -> 0
     Rank.SIX -> 1
     Rank.SEVEN -> 2
     Rank.EIGHT -> 3
@@ -38,6 +39,7 @@ fun rankValueAscending(rank: Rank): Int = when (rank) {
 }
 
 fun rankValueDescending(rank: Rank): Int = when (rank) {
+    Rank.WELCOME -> 0
     Rank.SIX -> 9
     Rank.SEVEN -> 8
     Rank.EIGHT -> 7

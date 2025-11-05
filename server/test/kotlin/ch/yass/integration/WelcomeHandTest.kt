@@ -38,7 +38,7 @@ class WelcomeHandTest : Integration() {
                     south(cards = "welcome")
                     west(cards = "welcome")
                     tricks {
-                        trick(north = "W6", east = "W6", south = "W6", west = null)
+                        trick(north = "WW", east = "WW", south = "WW", west = null)
                     }
                 }
             }
@@ -79,7 +79,7 @@ class WelcomeHandTest : Integration() {
 
         // WEST plays the last missing card in this trick -> should result in a new hand
         val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
-        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "SIX"))
+        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "WELCOME"))
 
         // TODO: don't launch in global scope, manage this somehow
         fold(

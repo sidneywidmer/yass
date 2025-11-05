@@ -14,7 +14,7 @@ class TraceInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val correlationId = correlationId()
         val requestWithTraceId = chain.request().newBuilder()
-            .header("X-Trace-ID", MDC.get(TRACE_ID.value))
+            .header("X-Trace-ID", MDC.get(TRACE_ID.value) ?: "unknown")
             .build()
 
         logger().info(buildRequestLog(correlationId, requestWithTraceId))

@@ -109,7 +109,7 @@ class PlayerTest : Integration() {
             hasCount(ClearPlayedCards::class, 1)
             hasState(State.NEW_HAND) // When welcome hand is finished new hand is dealt
             hasState(State.SCHIEBE) // And instantly goes to state SCHIEBE (first state in new trick)
-            hasPlayedCard(Suit.WELCOME, Rank.SIX) // Actually 4 of those where played
+            hasPlayedCard(Suit.WELCOME, Rank.WELCOME) // Actually 4 of those where played
         }
         centrifugo.resetRequests()
     }
@@ -447,25 +447,25 @@ class PlayerTest : Integration() {
 
         // NORTH plays the first card
         recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "SIX"))
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "WELCOME"))
             service.play(request, north)
         }) { fail() }
 
         // Next up WEST
         recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "SIX"))
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "WELCOME"))
             service.play(request, west)
         }) { fail() }
 
         // SOUTH
         recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "SIX"))
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "WELCOME"))
             service.play(request, south)
         }) { fail() }
 
         // EAST
         val newState = recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "SIX"))
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "WELCOME"))
             service.play(request, east)
         }) { fail() }
 

@@ -579,10 +579,14 @@ components:
         rank:
           $ref: '#/components/schemas/Rank'
         skin:
-          type: string
+          $ref: '#/components/schemas/Skin'
         state:
           type: string
           enum: [ PLAYABLE, UNPLAYABLE, ALREADY_PLAYED ]
+      required:
+        - suit
+        - rank
+        - state
 
     CardOnTable:
       type: object
@@ -592,7 +596,7 @@ components:
         rank:
           $ref: '#/components/schemas/Rank'
         skin:
-          type: string
+          $ref: '#/components/schemas/Skin'
         position:
           $ref: '#/components/schemas/Position'
 
@@ -617,6 +621,10 @@ components:
     Rank:
       type: string
       enum: [ SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE, HELLO ]
+
+    Skin:
+      type: string
+      enum: [ DEFAULT, HALLOWEEN01, ABSTRACT01, BETA01, WAVE01 ]
 
     Trump:
       type: string

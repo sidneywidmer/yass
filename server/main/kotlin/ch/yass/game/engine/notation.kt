@@ -5,6 +5,7 @@ import ch.yass.game.dto.Rank
 import ch.yass.game.dto.Suit
 
 val rankMap = mapOf(
+    Rank.WELCOME to "W",
     Rank.SIX to "6",
     Rank.SEVEN to "7",
     Rank.EIGHT to "8",
