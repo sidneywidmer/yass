@@ -12,11 +12,12 @@ export function MainWrapper({children}: WrapperProps) {
   useAuth();
   const location = useLocation();
   const isLandingPage = location.pathname === "/";
+  const isBlogPage = location.pathname.startsWith("/blog");
 
   return (
     <>
       <Toaster richColors theme="light" duration={10000} closeButton={true}/>
-      {!isLandingPage && <Settings triggerVariant="fixed"/>}
+      {!isLandingPage && !isBlogPage && <Settings triggerVariant="fixed"/>}
       {children}
     </>
   )

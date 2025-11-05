@@ -1,9 +1,9 @@
-import { GalleryVerticalEnd } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import {GalleryVerticalEnd} from "lucide-react";
+import {useState} from "react";
+import {useNavigate} from "react-router-dom";
 import Settings from "@/components/settings.tsx";
-import { usePlayerStore } from "@/store/player.ts";
-import { useTranslation } from "react-i18next";
+import {usePlayerStore} from "@/store/player.ts";
+import {useTranslation} from "react-i18next";
 
 export function Navigation() {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ export function Navigation() {
           <div className="flex-shrink-0 flex items-center gap-2">
             <button
               onClick={() => navigate("/")}
-              className="flex items-center gap-2 font-semibold hover:opacity-80 transition-opacity"
+              className="flex items-center gap-2 font-semibold hover:opacity-80 transition-opacity no-underline"
             >
               <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
                 <GalleryVerticalEnd className="size-4" />
@@ -34,7 +34,7 @@ export function Navigation() {
             {!isAuthenticated && (
               <button
                 onClick={() => navigate("/login")}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors no-underline"
               >
                 {t("landing.navigation.login")}
               </button>
@@ -42,7 +42,7 @@ export function Navigation() {
             {isAuthenticated && (
               <button
                 onClick={() => navigate("/lobby")}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors no-underline"
               >
                 {t("landing.navigation.lobby")}
               </button>
@@ -53,6 +53,14 @@ export function Navigation() {
             >
               {t("landing.navigation.settings")}
             </button>
+            <a
+              href="https://github.com/sidneywidmer/yass/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors no-underline"
+            >
+              GitHub
+            </a>
           </div>
         </div>
       </div>

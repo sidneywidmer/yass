@@ -1,7 +1,9 @@
 import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 export function Blog() {
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const posts = [
     {
@@ -50,13 +52,13 @@ export function Blog() {
                 <p className="font-sans text-base text-muted-foreground leading-relaxed flex-grow">
                   {post.abstract}
                 </p>
-                <a
-                  href={`/blog/${post.slug}`}
+                <button
+                  onClick={() => navigate(`/blog/${post.slug}`)}
                   className="font-sans text-base font-medium text-foreground hover:text-primary transition-colors flex items-center gap-2 pt-2"
                 >
                   {t("landing.blog.readMore")}
                   <ArrowRight className="h-4 w-4" />
-                </a>
+                </button>
               </div>
             ))}
           </div>
