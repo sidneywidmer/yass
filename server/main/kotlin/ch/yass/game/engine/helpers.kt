@@ -40,10 +40,10 @@ fun randomHand(forcedDeck: List<Card>?): EnumMap<Position, List<Card>> {
     val deck = forcedDeck?.map { Pair(it.rank, it.suit) } ?: deck()
 
     return mapOf(
-        Position.NORTH to sort(deck.subList(0, 9).map { Card(it.second, it.first, "french") }),
-        Position.WEST to sort(deck.subList(9, 18).map { Card(it.second, it.first, "french") }),
-        Position.SOUTH to sort(deck.subList(18, 27).map { Card(it.second, it.first, "french") }),
-        Position.EAST to sort(deck.subList(27, 36).map { Card(it.second, it.first, "french") }),
+        Position.NORTH to sort(deck.subList(0, 9).map { Card(it.second, it.first) }),
+        Position.WEST to sort(deck.subList(9, 18).map { Card(it.second, it.first) }),
+        Position.SOUTH to sort(deck.subList(18, 27).map { Card(it.second, it.first) }),
+        Position.EAST to sort(deck.subList(27, 36).map { Card(it.second, it.first) }),
     ).toEnumMap()
 }
 

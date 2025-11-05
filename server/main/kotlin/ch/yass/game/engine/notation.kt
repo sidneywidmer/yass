@@ -32,5 +32,5 @@ fun notationToCard(rank: String, suit: String): Card {
 
     require(suitEnum != null && rankEnum != null) { "Could not parse notation $rank$suit" }
 
-    return Card(suitEnum, rankEnum, "french")
+    return Card(suitEnum, rankEnum)
 }

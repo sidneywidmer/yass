@@ -178,7 +178,7 @@ export function PlayerHand() {
 
   const playCardAction = (card: CardInHand) => {
     resetActivePosition()
-    api.playCard({game: gameUuid!!, card: {suit: card.suit, rank: card.rank, skin: "french"}})
+    api.playCard({game: gameUuid!!, card: {suit: card.suit, rank: card.rank, skin: card.skin}})
       .catch(handleAxiosError)
 
     hoveredIndexRef.current = null

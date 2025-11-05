@@ -217,7 +217,7 @@ object SignalStrongSuitNearBock : PlayReason {
         val bockOfSuit = params.bock.firstOrNull { it.suit == card.suit }
         if (bockOfSuit == null) return false
 
-        val allOfSuit = allOfSuit(card.suit).map { Card(it.second, it.first, "french") }
+        val allOfSuit = allOfSuit(card.suit).map { Card(it.second, it.first) }
         val allRemainingOfSuit = sortByPoints(allOfSuit, params.hand.trump).dropWhile { it != bockOfSuit }
         val nearBock = allRemainingOfSuit[1] // second card in that list is our near bock
 
@@ -358,7 +358,7 @@ private fun isPartnerWinning(
 
 private fun remainingTrumps(tricks: List<Trick>, trump: Trump): List<Card> {
     val all = deck()
-        .map { Card(it.second, it.first, "french") }
+        .map { Card(it.second, it.first) }
         .filter { trump.equalsSuit(it.suit) }
     val played = tricks.flatMap { it.cards() }.filter { trump.equalsSuit(it.suit) }
 
@@ -369,7 +369,7 @@ private fun remainingTrumps(tricks: List<Trick>, trump: Trump): List<Card> {
  * Get bock cards from all suits (including trump)
  */
 private fun remainingBocks(tricks: List<Trick>, trump: Trump): List<Card> {
-    val all = deck().map { Card(it.second, it.first, "french") }
+    val all = deck().map { Card(it.second, it.first) }
     val played = tricks.flatMap { it.cards() }
 
     return all.minus(played.toSet())

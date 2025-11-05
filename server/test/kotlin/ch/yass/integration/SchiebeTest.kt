@@ -48,7 +48,7 @@ class SchiebeTest : Integration() {
         val state = getState()
 
         val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
-        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("CLUBS", "NINE", "french"))
+        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("CLUBS", "NINE"))
 
         recover({ service.play(request, player) }) {
             assertTrue(it is InvalidState)
