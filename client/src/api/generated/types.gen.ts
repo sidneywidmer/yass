@@ -190,7 +190,7 @@ export type SeatState = {
     weise?: Array<WeisWithPoints>;
 };
 
-export type Skin = 'DEFAULT' | 'HALLOWEEN01' | 'ABSTRACT01' | 'BETA01' | 'WAVE01';
+export type Skin = 'DEFAULT' | 'HALLOWEEN01' | 'ABSTRACT01' | 'BETA01' | 'AURORA01' | 'HOLZSTOCK01';
 
 export type State = 'WAITING_FOR_PLAYERS' | 'PLAY_CARD' | 'PLAY_CARD_BOT' | 'SCHIEBE' | 'SCHIEBE_BOT' | 'WEISEN_FIRST' | 'WEISEN_FIRST_BOT' | 'WEISEN_SECOND' | 'WEISEN_SECOND_BOT' | 'TRUMP' | 'TRUMP_BOT' | 'NEW_TRICK' | 'NEW_HAND' | 'FINISHED';
 

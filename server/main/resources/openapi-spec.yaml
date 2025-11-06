@@ -624,7 +624,7 @@ components:
 
     Skin:
       type: string
-      enum: [ DEFAULT, HALLOWEEN01, ABSTRACT01, BETA01, WAVE01 ]
+      enum: [ DEFAULT, HALLOWEEN01, ABSTRACT01, BETA01, AURORA01, HOLZSTOCK01 ]
 
     Trump:
       type: string

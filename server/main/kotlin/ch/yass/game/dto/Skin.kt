@@ -5,5 +5,6 @@ enum class Skin {
     HALLOWEEN01,
     ABSTRACT01,
     BETA01,
-    WAVE01,
+    AURORA01,
+    HOLZSTOCK01,
 }
