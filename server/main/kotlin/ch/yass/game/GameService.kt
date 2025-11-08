@@ -103,12 +103,13 @@ class GameService(
                 )
             } else {
                 listOf(
+                    Card(Suit.WELCOME, Rank.WELCOME, Skin.MESSAGE_GOODLUCK01),
+                    Card(Suit.WELCOME, Rank.WELCOME, Skin.MESSAGE_GOODLUCK02),
                     Card(Suit.WELCOME, Rank.WELCOME, Skin.SLANG_HOLZSTOCK01),
                     Card(Suit.WELCOME, Rank.WELCOME, Skin.BETA_HELMETKING01),
                     Card(Suit.WELCOME, Rank.WELCOME, Skin.NATURE_MOUNTAIN01),
                     Card(Suit.WELCOME, Rank.WELCOME, Skin.FESTIVE_HALLOWEEN01),
-                    Card(Suit.WELCOME, Rank.WELCOME, Skin.ABSTRACT_GOODLUCK01)
-                )
+                ).shuffled().take(4)
             }
         }
         val hand = repo.createHand(NewHand(game, newSeat.position, cards, Trump.FREESTYLE, Gschobe.NO))

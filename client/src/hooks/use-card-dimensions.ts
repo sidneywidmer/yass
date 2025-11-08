@@ -6,7 +6,7 @@ import {useGameStateStore} from "@/store/game-state.ts";
 const SWISS_ASPECT_RATIO = 320 / 208;
 const FRENCH_ASPECT_RATIO = 355.19 / 261.11;
 
-export const CARD_WIDTH = getResponsiveValue(74, 110);
+export const CARD_WIDTH = getResponsiveValue(74, 105);
 
 export const useCardDimensions = () => {
   const cardDeck = useSettingsStore(settings => settings.cardDeck);
