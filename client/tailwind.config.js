@@ -5,7 +5,7 @@ module.exports = {
     theme: {
     	extend: {
     		fontFamily: {
-    			serif: ['IBM Plex Serif', 'serif'],
+    			serif: ['Young Serif', 'serif'],
     			sans: ['Inter', 'sans-serif']
     		},
     		fontSize: {

@@ -78,7 +78,7 @@ export default function BetaRoadmapBlog() {
               </div>
 
               <div className="pt-4">
-                <h2 className="font-serif text-2xl font-medium text-foreground mb-4">
+                <h2 className="font-sans text-2xl font-medium text-foreground mb-4">
                   {t("landing.blog.posts.betaRoadmap.statusTitle")}
                 </h2>
                 <p className="font-sans text-foreground leading-relaxed mb-4">
@@ -94,7 +94,7 @@ export default function BetaRoadmapBlog() {
               </div>
 
               <div>
-                <h2 className="font-serif text-2xl font-medium text-foreground mb-4">
+                <h2 className="font-sans text-2xl font-medium text-foreground mb-4">
                   {t("landing.blog.posts.betaRoadmap.worksTitle")}
                 </h2>
                 <ul className="space-y-2 list-disc list-outside pl-5 font-sans text-foreground">
@@ -126,7 +126,7 @@ export default function BetaRoadmapBlog() {
               </div>
 
               <div>
-                <h2 className="font-serif text-2xl font-medium text-foreground mb-4">
+                <h2 className="font-sans text-2xl font-medium text-foreground mb-4">
                   {t("landing.blog.posts.betaRoadmap.buildSitesTitle")}
                 </h2>
                 <ul className="space-y-2 list-disc list-outside pl-5 font-sans text-foreground">
@@ -140,7 +140,7 @@ export default function BetaRoadmapBlog() {
               </div>
 
               <div>
-                <h2 className="font-serif text-2xl font-medium text-foreground mb-4">
+                <h2 className="font-sans text-2xl font-medium text-foreground mb-4">
                   {t("landing.blog.posts.betaRoadmap.roadmapTitle")}
                 </h2>
                 <p className="font-sans text-foreground leading-relaxed mb-4">
@@ -154,7 +154,7 @@ export default function BetaRoadmapBlog() {
               </div>
 
               <div>
-                <h2 className="font-serif text-2xl font-medium text-foreground mb-4">
+                <h2 className="font-sans text-2xl font-medium text-foreground mb-4">
                   {t("landing.blog.posts.betaRoadmap.futureTitle")}
                 </h2>
                 <p className="font-sans text-foreground leading-relaxed mb-4">
