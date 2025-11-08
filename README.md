@@ -1,4 +1,4 @@
-# Yass
+<img src="client/public/assets/logo.png" alt="Yass" width="200">
 
 A modern, browser-based implementation of Jass — the classic Swiss card game.
 

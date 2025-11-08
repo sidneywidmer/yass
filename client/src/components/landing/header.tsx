@@ -17,7 +17,7 @@ export function Header() {
         {/* Left Column - Text Content */}
         <div className="relative flex w-full lg:w-1/2 flex-col gap-8 text-center lg:text-left">
           {/* Main Heading - Serif */}
-          <h1 className="relative z-10 font-serif text-4xl md:text-5xl lg:text-6xl font-medium leading-tight text-foreground">
+          <h1 className="relative z-10 font-serif text-4xl md:text-5xl lg:text-6xl font-normal leading-tight text-foreground">
             {t("landing.header.title")}
           </h1>
 

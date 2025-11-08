@@ -24,19 +24,18 @@ export function Navigation() {
     <>
     <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm transition-all duration-300" style={{paddingTop: isScrolled ? "0" : "10px", paddingBottom: isScrolled ? "0" : "10px"}}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`flex justify-between items-center transition-all duration-300 ${isScrolled ? "h-16" : "h-20"}`}>
+        <div className={`flex justify-between items-center transition-all duration-300 ${isScrolled ? "h-16" : "h-32"}`}>
           {/* Logo */}
-          <div className="flex-shrink-0 flex items-center gap-2">
+          <div className="flex-shrink-0 flex items-center gap-4">
             <button
               onClick={() => navigate("/")}
-              className="flex items-center gap-2 font-semibold hover:opacity-80 transition-opacity no-underline"
+              className="flex items-center font-young hover:opacity-80 transition-opacity no-underline"
             >
               <img
                 src={isScrolled ? "/assets/logo-abstract.png" : "/assets/logo.png"}
                 alt="Yass"
-                className={`w-auto transition-all duration-300 ${isScrolled ? "h-6" : "h-16"}`}
+                className={`w-auto transition-all duration-300 ml-4 ${isScrolled ? "h-6" : "h-[88px]"}`}
               />
-              {!isScrolled && <span>Yass</span>}
             </button>
           </div>
 
