@@ -24,6 +24,7 @@ interface GameInstanceProps {
 
 export function GameInstance({tryCode}: GameInstanceProps) {
   const setGameState = useGameStateStore(state => state.setGameState);
+  const resetGameState = useGameStateStore(state => state.reset);
   const handleAxiosError = useAxiosErrorHandler()
   const {t} = useTranslation()
   const addError = useErrorStore(error => error.addError)
@@ -51,6 +52,10 @@ export function GameInstance({tryCode}: GameInstanceProps) {
         }
         return handleAxiosError(error)
       })
+
+    return () => {
+      resetGameState()
+    }
   }, [tryCode])
 
   return (
