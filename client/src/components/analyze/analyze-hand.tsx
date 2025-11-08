@@ -15,7 +15,7 @@ interface AnalyzeHandProps {
 
 export function AnalyzeHand({hand, index, playerPositionMap}: AnalyzeHandProps) {
   const {t} = useTranslation()
-  const {cardDeck} = useSettingsStore()
+  const cardDeck = useSettingsStore(settings => settings.cardDeck)
 
   return (
     <AccordionItem key={index} value={`item-${index}`}>
