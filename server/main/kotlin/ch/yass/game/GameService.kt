@@ -95,13 +95,21 @@ class GameService(
         //       be done when the player joins at the table.
         // Creating player always starts game
         val cards = Position.entries.associateWithToEnum {
-            listOf(
-                Card(Suit.WELCOME, Rank.WELCOME, Skin.ABSTRACT01),
-                Card(Suit.WELCOME, Rank.WELCOME, Skin.BETA01),
-                Card(Suit.WELCOME, Rank.WELCOME, Skin.AURORA01),
-                Card(Suit.WELCOME, Rank.WELCOME, Skin.HOLZSTOCK01),
-                Card(Suit.WELCOME, Rank.WELCOME, Skin.HALLOWEEN01)
-            )
+            if (settings.botPositions().contains(it)) {
+                listOf(
+                    Card(Suit.WELCOME, Rank.WELCOME, Skin.BOT01),
+                    Card(Suit.WELCOME, Rank.WELCOME, Skin.BOT02),
+                    Card(Suit.WELCOME, Rank.WELCOME, Skin.BOT03)
+                )
+            } else {
+                listOf(
+                    Card(Suit.WELCOME, Rank.WELCOME, Skin.SLANG_HOLZSTOCK01),
+                    Card(Suit.WELCOME, Rank.WELCOME, Skin.BETA_HELMETKING01),
+                    Card(Suit.WELCOME, Rank.WELCOME, Skin.NATURE_MOUNTAIN01),
+                    Card(Suit.WELCOME, Rank.WELCOME, Skin.FESTIVE_HALLOWEEN01),
+                    Card(Suit.WELCOME, Rank.WELCOME, Skin.ABSTRACT_GOODLUCK01)
+                )
+            }
         }
         val hand = repo.createHand(NewHand(game, newSeat.position, cards, Trump.FREESTYLE, Gschobe.NO))
         repo.createTrick(hand)

@@ -285,12 +285,17 @@ val playReasons = listOf(
 )
 
 fun getPlayCandidate(player: InternalPlayer, state: GameState): PlayCandidate {
+    // Welcome hand - let's keep it simple here
     val hand = currentHand(state.hands)
     val trick = currentTrick(state.tricks)
     val cards = cardsInHand(hand, player, state)
     val playable = cards.filter { it.state == CardInHandState.PLAYABLE }.map { Card.from(it) }
     val lead = currentLeadPositionOfHand(hand, tricksOfHand(state.tricks, hand), state.seats)
     val position = playerSeat(player, state.seats).position
+
+    if (state.hands.size == 1) {
+        return PlayCandidate(Card.from(cards.random()), emptyList())
+    }
 
     // Some "Facts" about the current state of the game
     val notGschobeOpeningLead = notGschobeOpeningLead(trick, tricksOfHand(state.tricks, hand), hand)

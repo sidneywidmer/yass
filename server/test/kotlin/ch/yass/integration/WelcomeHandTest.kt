@@ -12,6 +12,7 @@ import ch.yass.game.api.PlayedCard
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Gschobe
 import ch.yass.game.dto.Position
+import ch.yass.game.dto.Skin
 import ch.yass.game.dto.Trump
 import ch.yass.game.engine.playerAtPosition
 import org.junit.jupiter.api.Assertions.*
@@ -64,7 +65,7 @@ class WelcomeHandTest : Integration() {
         val state = getState()
 
         val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
-        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("CLUBS", "TEN"))
+        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "WELCOME", Skin.BOT01.name))
 
         fold(
             { service.play(request, player) },

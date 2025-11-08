@@ -2,9 +2,12 @@ package ch.yass.game.dto
 
 enum class Skin {
     DEFAULT,
-    HALLOWEEN01,
-    ABSTRACT01,
-    BETA01,
-    AURORA01,
-    HOLZSTOCK01,
+    ABSTRACT_GOODLUCK01,
+    NATURE_MOUNTAIN01,
+    BETA_HELMETKING01,
+    FESTIVE_HALLOWEEN01,
+    SLANG_HOLZSTOCK01,
+    BOT01,
+    BOT02,
+    BOT03,
 }

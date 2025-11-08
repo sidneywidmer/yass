@@ -6,8 +6,12 @@ export type AnalyzeGameStateResponse = {
         [key: string]: TotalPoints;
     };
     gameUuid: string;
-    winners: TeamWithPoints;
-    losers: TeamWithPoints;
+    winners: {
+        [key: string]: TeamWithPoints;
+    };
+    losers: {
+        [key: string]: TeamWithPoints;
+    };
 };
 
 export type AnalyzeHand = {
@@ -165,7 +169,7 @@ export type PlayerWithWeise = {
 
 export type Position = 'NORTH' | 'EAST' | 'SOUTH' | 'WEST';
 
-export type Rank = 'SIX' | 'SEVEN' | 'EIGHT' | 'NINE' | 'TEN' | 'JACK' | 'QUEEN' | 'KING' | 'ACE' | 'HELLO';
+export type Rank = 'SIX' | 'SEVEN' | 'EIGHT' | 'NINE' | 'TEN' | 'JACK' | 'QUEEN' | 'KING' | 'ACE' | 'WELCOME';
 
 export type SchiebeRequest = {
     game: string;
@@ -190,7 +194,7 @@ export type SeatState = {
     weise?: Array<WeisWithPoints>;
 };
 
-export type Skin = 'DEFAULT' | 'HALLOWEEN01' | 'ABSTRACT01' | 'BETA01' | 'AURORA01' | 'HOLZSTOCK01';
+export type Skin = 'DEFAULT' | 'ABSTRACT_GOODLUCK01' | 'NATURE_MOUNTAIN01' | 'BETA_HELMETKING01' | 'FESTIVE_HALLOWEEN01' | 'SLANG_HOLZSTOCK01' | 'BOT01' | 'BOT02' | 'BOT03';
 
 export type State = 'WAITING_FOR_PLAYERS' | 'PLAY_CARD' | 'PLAY_CARD_BOT' | 'SCHIEBE' | 'SCHIEBE_BOT' | 'WEISEN_FIRST' | 'WEISEN_FIRST_BOT' | 'WEISEN_SECOND' | 'WEISEN_SECOND_BOT' | 'TRUMP' | 'TRUMP_BOT' | 'NEW_TRICK' | 'NEW_HAND' | 'FINISHED';
 

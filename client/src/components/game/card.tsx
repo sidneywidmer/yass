@@ -9,8 +9,8 @@ interface CardProps {
 }
 
 const getCardImageSrc = (card: C, cardDeck: CardDeck): string => {
-  if (card.suit === "WELCOME") {
-    return `/cards/welcome/${card.suit!!}-${card.rank!!}.svg`;
+  if (card.suit === "WELCOME" && card.rank == "WELCOME") {
+    return `/cards/welcome/${card.skin!!}.png`;
   }
 
   if (cardDeck === CardDeck.SWISS) {
@@ -21,12 +21,12 @@ const getCardImageSrc = (card: C, cardDeck: CardDeck): string => {
 };
 
 export function Card({card, className}: CardProps) {
-  const {cardDeck} = useSettingsStore();
+  const cardDeck = useSettingsStore(settings => settings.cardDeck);
   const imageSrc = getCardImageSrc(card, cardDeck);
 
   return (
     <div className={cn(
-      "w-full h-full rounded-lg bg-white shadow-md ring-1 ring-black/10 border border-gray-50",
+      "w-full h-full rounded-lg bg-white shadow-md ring-1 ring-black/10 border-gray-50 overflow-hidden",
       className
     )}>
       <img
