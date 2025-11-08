@@ -4,7 +4,7 @@ import {useErrorStore} from "@/store/error.ts";
 import {useCallback} from "react";
 export const useAxiosErrorHandler = () => {
   const {t} = useTranslation()
-  const {addError} = useErrorStore()
+  const addError = useErrorStore(error => error.addError)
 
   return useCallback((error: AxiosError) => {
     if (!error.response) {

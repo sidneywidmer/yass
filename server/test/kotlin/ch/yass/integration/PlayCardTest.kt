@@ -48,7 +48,7 @@ class PlayCardTest : Integration() {
         val state = getState()
 
         val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
-        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("CLUBS", "SEVEN", "french"))
+        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("CLUBS", "SEVEN"))
 
         recover({ service.play(request, player) }) {
             assertTrue(it is PlayerDoesNotOwnCard)
@@ -60,7 +60,7 @@ class PlayCardTest : Integration() {
         val state = getState()
 
         val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
-        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "JACK", "french"))
+        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "JACK"))
 
         fold(
             { service.play(request, player) },
@@ -77,7 +77,7 @@ class PlayCardTest : Integration() {
         val state = getState()
 
         val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
-        val playedCard = PlayedCard("SPADES", "SIX", "french")
+        val playedCard = PlayedCard("SPADES", "SIX")
         val request = PlayCardRequest(state.game.uuid.toString(), playedCard)
 
         fold(

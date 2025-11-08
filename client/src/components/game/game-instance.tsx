@@ -26,7 +26,7 @@ export function GameInstance({tryCode}: GameInstanceProps) {
   const setGameState = useGameStateStore(state => state.setGameState);
   const handleAxiosError = useAxiosErrorHandler()
   const {t} = useTranslation()
-  const {addError} = useErrorStore()
+  const addError = useErrorStore(error => error.addError)
   const navigate = useNavigate()
 
   useEffect(() => {

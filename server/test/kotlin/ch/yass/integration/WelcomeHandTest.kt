@@ -12,6 +12,7 @@ import ch.yass.game.api.PlayedCard
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.Gschobe
 import ch.yass.game.dto.Position
+import ch.yass.game.dto.Skin
 import ch.yass.game.dto.Trump
 import ch.yass.game.engine.playerAtPosition
 import org.junit.jupiter.api.Assertions.*
@@ -38,7 +39,7 @@ class WelcomeHandTest : Integration() {
                     south(cards = "welcome")
                     west(cards = "welcome")
                     tricks {
-                        trick(north = "W6", east = "W6", south = "W6", west = null)
+                        trick(north = "WW", east = "WW", south = "WW", west = null)
                     }
                 }
             }
@@ -50,7 +51,7 @@ class WelcomeHandTest : Integration() {
         val state = getState()
 
         val player = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
-        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "SIX", "french"))
+        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "SIX"))
 
         fold(
             { service.play(request, player) },
@@ -64,7 +65,7 @@ class WelcomeHandTest : Integration() {
         val state = getState()
 
         val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
-        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("CLUBS", "TEN", "french"))
+        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "WELCOME", Skin.BOT01.name))
 
         fold(
             { service.play(request, player) },
@@ -79,7 +80,7 @@ class WelcomeHandTest : Integration() {
 
         // WEST plays the last missing card in this trick -> should result in a new hand
         val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
-        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "SIX", "french"))
+        val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "WELCOME"))
 
         // TODO: don't launch in global scope, manage this somehow
         fold(
@@ -98,7 +99,7 @@ class WelcomeHandTest : Integration() {
         val unknonwId = "b562227b-cc63-48cc-919e-9a115bbf7c6e"
 
         val player = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
-        val request = PlayCardRequest(unknonwId, PlayedCard("WELCOME", "SIX", "french"))
+        val request = PlayCardRequest(unknonwId, PlayedCard("WELCOME", "SIX"))
 
         fold(
             { service.play(request, player) },

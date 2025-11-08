@@ -217,7 +217,7 @@ object SignalStrongSuitNearBock : PlayReason {
         val bockOfSuit = params.bock.firstOrNull { it.suit == card.suit }
         if (bockOfSuit == null) return false
 
-        val allOfSuit = allOfSuit(card.suit).map { Card(it.second, it.first, "french") }
+        val allOfSuit = allOfSuit(card.suit).map { Card(it.second, it.first) }
         val allRemainingOfSuit = sortByPoints(allOfSuit, params.hand.trump).dropWhile { it != bockOfSuit }
         val nearBock = allRemainingOfSuit[1] // second card in that list is our near bock
 
@@ -285,12 +285,17 @@ val playReasons = listOf(
 )
 
 fun getPlayCandidate(player: InternalPlayer, state: GameState): PlayCandidate {
+    // Welcome hand - let's keep it simple here
     val hand = currentHand(state.hands)
     val trick = currentTrick(state.tricks)
     val cards = cardsInHand(hand, player, state)
     val playable = cards.filter { it.state == CardInHandState.PLAYABLE }.map { Card.from(it) }
     val lead = currentLeadPositionOfHand(hand, tricksOfHand(state.tricks, hand), state.seats)
     val position = playerSeat(player, state.seats).position
+
+    if (state.hands.size == 1) {
+        return PlayCandidate(Card.from(cards.random()), emptyList())
+    }
 
     // Some "Facts" about the current state of the game
     val notGschobeOpeningLead = notGschobeOpeningLead(trick, tricksOfHand(state.tricks, hand), hand)
@@ -358,7 +363,7 @@ private fun isPartnerWinning(
 
 private fun remainingTrumps(tricks: List<Trick>, trump: Trump): List<Card> {
     val all = deck()
-        .map { Card(it.second, it.first, "french") }
+        .map { Card(it.second, it.first) }
         .filter { trump.equalsSuit(it.suit) }
     val played = tricks.flatMap { it.cards() }.filter { trump.equalsSuit(it.suit) }
 
@@ -369,7 +374,7 @@ private fun remainingTrumps(tricks: List<Trick>, trump: Trump): List<Card> {
  * Get bock cards from all suits (including trump)
  */
 private fun remainingBocks(tricks: List<Trick>, trump: Trump): List<Card> {
-    val all = deck().map { Card(it.second, it.first, "french") }
+    val all = deck().map { Card(it.second, it.first) }
     val played = tricks.flatMap { it.cards() }
 
     return all.minus(played.toSet())

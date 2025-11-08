@@ -94,7 +94,24 @@ class GameService(
         //       unlocked so we can't deal the full hand yet if we don't know all the players. This should
         //       be done when the player joins at the table.
         // Creating player always starts game
-        val cards = Position.entries.associateWithToEnum { interpretCards("welcome") }
+        val cards = Position.entries.associateWithToEnum {
+            if (settings.botPositions().contains(it)) {
+                listOf(
+                    Card(Suit.WELCOME, Rank.WELCOME, Skin.BOT01),
+                    Card(Suit.WELCOME, Rank.WELCOME, Skin.BOT02),
+                    Card(Suit.WELCOME, Rank.WELCOME, Skin.BOT03)
+                )
+            } else {
+                listOf(
+                    Card(Suit.WELCOME, Rank.WELCOME, Skin.MESSAGE_GOODLUCK01),
+                    Card(Suit.WELCOME, Rank.WELCOME, Skin.MESSAGE_GOODLUCK02),
+                    Card(Suit.WELCOME, Rank.WELCOME, Skin.SLANG_HOLZSTOCK01),
+                    Card(Suit.WELCOME, Rank.WELCOME, Skin.BETA_HELMETKING01),
+                    Card(Suit.WELCOME, Rank.WELCOME, Skin.NATURE_MOUNTAIN01),
+                    Card(Suit.WELCOME, Rank.WELCOME, Skin.FESTIVE_HALLOWEEN01),
+                ).shuffled().take(4)
+            }
+        }
         val hand = repo.createHand(NewHand(game, newSeat.position, cards, Trump.FREESTYLE, Gschobe.NO))
         repo.createTrick(hand)
 
@@ -391,7 +408,7 @@ class GameService(
         }
 
         val candidate = chooseTrumpForBot(botPlayer, state)
-        val request = ChooseTrumpRequest(state.game.uuid.toString(), candidate!!.trump.name)
+        val request = ChooseTrumpRequest(state.game.uuid.toString(), candidate.trump.name)
 
         return trump(request, botPlayer)
     }
@@ -406,7 +423,7 @@ class GameService(
         val card = chooseCardForBot(botPlayer, state).card
         val request = PlayCardRequest(
             state.game.uuid.toString(),
-            PlayedCard(card.suit.toString(), card.rank.toString(), card.skin)
+            PlayedCard(card.suit.toString(), card.rank.toString(), card.skin.toString())
         )
 
         return play(request, botPlayer)
@@ -430,7 +447,6 @@ class GameService(
     private fun weisenAsBot(state: GameState): GameState {
         val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)
 
-        // TODO: Better decision
         val weis = chooseWeisForBot(botPlayer, state)
         val request = WeisenRequest(state.game.uuid.toString(), weis)
 

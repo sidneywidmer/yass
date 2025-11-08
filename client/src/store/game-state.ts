@@ -78,7 +78,7 @@ export const useGameStateStore = create<FlatGameState & GameStateActions>((set) 
   }),
   reset: () => set(initialState),
   removeCardFromHand: (card) => set((state) => ({
-    cards: state.cards.filter(c => !(card.suit === c.suit && card.rank === c.rank))
+    cards: state.cards.filter(c => !(card.suit === c.suit && card.rank === c.rank && card.skin == c.skin))
   })),
   playCard: (card) => set((state) => ({
     cardsPlayed: [...state.cardsPlayed!!, card]

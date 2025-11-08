@@ -9,6 +9,6 @@ Content-Type: application/json
   "card": {
     "suit": "SPADES",
     "rank": "NINE",
-    "skin": "french"
+    "skin": "DEFAULT"
   }
 }

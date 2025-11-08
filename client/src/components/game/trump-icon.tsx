@@ -21,8 +21,8 @@ interface TrumpIconProps {
 }
 
 export function TrumpIcon({trump, className = "w-8 h-8"}: TrumpIconProps) {
-  const {cardDeck} = useSettingsStore()
-  
+  const cardDeck = useSettingsStore(settings => settings.cardDeck)
+
   if (!trumpConfigs[trump]) return null
 
   const {fileName} = trumpConfigs[trump]

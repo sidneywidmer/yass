@@ -70,7 +70,7 @@ class BotTest : Integration() {
 
         val north = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
         val northSeat = playerSeat(north, state.seats)
-        val playedCard = PlayedCard("CLUBS", "NINE", "french")
+        val playedCard = PlayedCard("CLUBS", "NINE")
         val request = PlayCardRequest(state.game.uuid.toString(), playedCard)
 
         waitUntilEvent(

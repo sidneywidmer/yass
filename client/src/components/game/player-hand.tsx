@@ -178,12 +178,12 @@ export function PlayerHand() {
 
   const playCardAction = (card: CardInHand) => {
     resetActivePosition()
-    api.playCard({game: gameUuid!!, card: {suit: card.suit, rank: card.rank, skin: "french"}})
+    api.playCard({game: gameUuid!!, card: {suit: card.suit, rank: card.rank, skin: card.skin}})
       .catch(handleAxiosError)
 
     hoveredIndexRef.current = null
     triggerCardHover(null, filteredCards)
-    playCard({suit: card.suit, rank: card.rank, position: position})
+    playCard({suit: card.suit, rank: card.rank, skin: card.skin, position: position})
     removeCardFromHand(card)
   }
 
@@ -264,8 +264,8 @@ export function PlayerHand() {
 
             return (
               <motion.div
-                layoutId={`cardlayout-${position}-${card.suit}-${card.rank}`}
-                key={`cardhand-${card.suit}-${card.rank}`}
+                layoutId={`cardlayout-${position}-${card.suit}-${card.rank}-${card.skin}`}
+                key={`cardhand-${card.suit}-${card.rank}-${card.skin}`}
                 data-card-index={i}
                 className={`transition-shadow ${cardPlayable(card) ? 'hover:shadow-xl' : ''}`}
                 style={{
@@ -274,14 +274,12 @@ export function PlayerHand() {
                   height: CARD_HEIGHT,
                 }}
                 layout
-                transition={{
-                  layout: {duration: 0.3, ease: [0.4, 0, 0.2, 1]}
-                }}
+                transition={{layout: {duration: 0.3, ease: [0.4, 0, 0.2, 1]}}}
                 initial={initialAnimation}
                 animate={getCardControlsByIndex(i)}
                 onClick={() => cardClicked(card, i)}
               >
-                <Card card={{suit: card.suit!!, rank: card.rank!!}}/>
+                <Card card={{suit: card.suit!!, rank: card.rank!!, skin: card.skin!!}}/>
               </motion.div>
             )
           })}

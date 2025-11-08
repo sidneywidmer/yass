@@ -5,6 +5,7 @@ import ch.yass.game.dto.Rank
 import ch.yass.game.dto.Suit
 
 val rankMap = mapOf(
+    Rank.WELCOME to "W",
     Rank.SIX to "6",
     Rank.SEVEN to "7",
     Rank.EIGHT to "8",
@@ -32,5 +33,5 @@ fun notationToCard(rank: String, suit: String): Card {
 
     require(suitEnum != null && rankEnum != null) { "Could not parse notation $rank$suit" }
 
-    return Card(suitEnum, rankEnum, "french")
+    return Card(suitEnum, rankEnum)
 }

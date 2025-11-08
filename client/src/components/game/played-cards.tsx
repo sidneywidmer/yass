@@ -69,8 +69,8 @@ export function PlayedCards() {
         <AnimatePresence initial={true}>
           {cardsPlayed!!.map((card) => (
             <motion.div
-              layoutId={`cardlayout-${card.position}-${card.suit}-${card.rank}`}
-              key={`cardtable-${card.position}-${card.suit}-${card.rank}`}
+              layoutId={`cardlayout-${card.position}-${card.suit}-${card.rank}-${card.skin}`}
+              key={`cardtable-${card.position}-${card.suit}-${card.rank}-${card.skin}`}
               className="absolute origin-center"
               initial={getInitialPosition(getRelativePosition(position!!, card.position!!))}
               layout

@@ -1,0 +1,14 @@
+package ch.yass.game.dto
+
+enum class Skin {
+    DEFAULT,
+    NATURE_MOUNTAIN01,
+    BETA_HELMETKING01,
+    FESTIVE_HALLOWEEN01,
+    SLANG_HOLZSTOCK01,
+    MESSAGE_GOODLUCK01,
+    MESSAGE_GOODLUCK02,
+    BOT01,
+    BOT02,
+    BOT03,
+}
