@@ -24,55 +24,109 @@ export function Navigation() {
     <>
     <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm transition-all duration-300" style={{paddingTop: isScrolled ? "0" : "10px", paddingBottom: isScrolled ? "0" : "10px"}}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`flex justify-between items-center transition-all duration-300 ${isScrolled ? "h-16" : "h-32"}`}>
-          {/* Logo */}
-          <div className="flex-shrink-0 flex items-center gap-4">
+        {/* Mobile: Vertical layout when not scrolled */}
+        {!isScrolled && (
+          <div className="lg:hidden flex flex-col items-center gap-6 py-4">
+            {/* Logo */}
             <button
               onClick={() => navigate("/")}
               className="flex items-center font-young hover:opacity-80 transition-opacity no-underline"
             >
               <img
-                src={isScrolled ? "/assets/logo-abstract.png" : "/assets/logo.png"}
+                src="/assets/logo.png"
                 alt="Yass"
-                className={`w-auto transition-all duration-300 ml-4 ${isScrolled ? "h-6" : "h-[88px]"}`}
+                className="w-auto h-[88px]"
               />
             </button>
-          </div>
 
-          {/* Navigation Links - Always Visible */}
-          <div className="flex items-center gap-6">
-            {!isAuthenticated && (
+            {/* Navigation Links - Centered */}
+            <div className="flex items-center gap-6 flex-wrap justify-center">
+              {!isAuthenticated && (
+                <button
+                  onClick={() => navigate("/login")}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors no-underline"
+                >
+                  {t("landing.navigation.login")}
+                </button>
+              )}
+              {isAuthenticated && (
+                <button
+                  onClick={() => navigate("/lobby")}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors no-underline"
+                >
+                  {t("landing.navigation.lobby")}
+                </button>
+              )}
               <button
-                onClick={() => navigate("/login")}
+                onClick={() => setSettingsOpen(true)}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {t("landing.navigation.settings")}
+              </button>
+              <a
+                href="https://github.com/sidneywidmer/yass/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors no-underline"
               >
-                {t("landing.navigation.login")}
-              </button>
-            )}
-            {isAuthenticated && (
-              <button
-                onClick={() => navigate("/lobby")}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors no-underline"
-              >
-                {t("landing.navigation.lobby")}
-              </button>
-            )}
-            <button
-              onClick={() => setSettingsOpen(true)}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {t("landing.navigation.settings")}
-            </button>
-            <a
-              href="https://github.com/sidneywidmer/yass/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors no-underline"
-            >
-              GitHub
-            </a>
+                GitHub
+              </a>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Desktop / Scrolled: Horizontal layout */}
+        {(isScrolled || window.innerWidth >= 1024) && (
+          <div className={`flex justify-between items-center transition-all duration-300 ${isScrolled ? "h-16" : "h-32"}`}>
+            {/* Logo */}
+            <div className="flex-shrink-0 flex items-center gap-4">
+              <button
+                onClick={() => navigate("/")}
+                className="flex items-center font-young hover:opacity-80 transition-opacity no-underline"
+              >
+                <img
+                  src={isScrolled ? "/assets/logo-abstract.png" : "/assets/logo.png"}
+                  alt="Yass"
+                  className={`w-auto transition-all duration-300 ml-4 ${isScrolled ? "h-6" : "h-[88px]"}`}
+                />
+              </button>
+            </div>
+
+            {/* Navigation Links - Always Visible */}
+            <div className="flex items-center gap-6">
+              {!isAuthenticated && (
+                <button
+                  onClick={() => navigate("/login")}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors no-underline"
+                >
+                  {t("landing.navigation.login")}
+                </button>
+              )}
+              {isAuthenticated && (
+                <button
+                  onClick={() => navigate("/lobby")}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors no-underline"
+                >
+                  {t("landing.navigation.lobby")}
+                </button>
+              )}
+              <button
+                onClick={() => setSettingsOpen(true)}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {t("landing.navigation.settings")}
+              </button>
+              <a
+                href="https://github.com/sidneywidmer/yass/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors no-underline"
+              >
+                GitHub
+              </a>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
     <Settings

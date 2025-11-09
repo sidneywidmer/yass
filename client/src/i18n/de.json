@@ -221,6 +221,7 @@
     "description": "Trump wählen"
   },
   "landing": {
+    "betaAnnouncement": "Alle infos zum Start der Beta im Blog",
     "navigation": {
       "login": "Anmelden",
       "lobby": "Spielen",
