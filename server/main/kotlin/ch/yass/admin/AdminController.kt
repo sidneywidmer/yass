@@ -6,6 +6,7 @@ import ch.yass.admin.api.internal.CreateMessage
 import ch.yass.core.contract.Controller
 import ch.yass.core.helper.config
 import ch.yass.core.helper.errorResponse
+import ch.yass.core.helper.logger
 import ch.yass.core.helper.successResponse
 import ch.yass.core.helper.validate
 import ch.yass.identity.EndpointRole
@@ -43,6 +44,9 @@ class AdminController(
     private fun message(ctx: Context) = either {
         val request = validate<MessageRequest>(ctx.body())
         val player = player(ctx)
+
+        logger().info("trigger_alert: New message: ${request.message}")
+
         messageService.createMessage(
             CreateMessage(
                 player,

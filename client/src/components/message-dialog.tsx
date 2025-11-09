@@ -17,6 +17,7 @@ import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
 import {AlertCircle, Loader2} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
+import {toast} from "sonner";
 
 interface MessageDialogProps {
   open: boolean;
@@ -58,6 +59,7 @@ const MessageDialog = ({
         path,
         gameUuid: gameUuid || undefined,
       });
+      toast.success(t("settings.message.success"));
       onOpenChange(false);
       onSubmit?.();
     } catch (err: any) {

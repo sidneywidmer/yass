@@ -18,14 +18,15 @@
     "sendMessage": "Send Feedback",
     "message": {
       "title": "Send Feedback",
-      "description": "Share your feedback, report a bug, or send a message",
+      "description": "Found a bug, unclear UI or just a feedback?",
       "message": "Message",
       "messagePlaceholder": "Your message here...",
       "user": "User",
       "path": "Page",
       "game": "Game",
       "cancel": "Cancel",
-      "submit": "Send"
+      "submit": "Send",
+      "success": "Thanks for your message!"
     }
   },
   "errors": {
@@ -261,7 +262,7 @@
           "statusTitle": "Beta Status & Testing",
           "statusP1": "To make sure the release isn't a total disaster, I rely on your help testing the current state of the application.",
           "statusP2": "A quick anecdote: When I first showed the app to a colleague after 2.5 years of development, he simply said: «Sidney, you do know we play jass <i>counter-clockwise</i>, right?». Ouch!",
-          "statusP3": "If you find a bug, you can report it anytime. Whether it's spelling errors in the text, bugs in the game logic, or something confusing in the user interface - I'm happy about every report.",
+          "statusP3": "If you find a bug, you can report it anytime by submitting the form found in your settings. Whether it's spelling errors in the text, bugs in the game logic, or something confusing in the user interface - I'm happy about every report.",
           "worksTitle": "What's Working",
           "works": [
             "Login as guest or with email and password",

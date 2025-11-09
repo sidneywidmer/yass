@@ -17,15 +17,16 @@
     "feedback": "Feedback",
     "sendMessage": "Nachricht senden",
     "message": {
-      "title": "Feedback senden",
-      "description": "Teile dein Feedback, melde einen Fehler oder schreibe eine Nachricht",
+      "title": "Nachricht senden",
+      "description": "Fehler gefunden, unklares UI oder einfach nur ein Feedback?",
       "message": "Nachricht",
       "messagePlaceholder": "Deine Nachricht hier...",
       "user": "Benutzer",
       "path": "Seite",
       "game": "Spiel",
       "cancel": "Abbrechen",
-      "submit": "Senden"
+      "submit": "Senden",
+      "success": "Danke für deine Nachricht!"
     }
   },
   "errors": {
@@ -260,7 +261,7 @@
           "statusTitle": "Spielstatus und Betatester",
           "statusP1": "Damit der eigentliche Release nicht in einem Debakel endet, bin ich auf deine Hilfe angewiesen. Hilf mit den aktuellen Stand der Applikation zu testen.",
           "statusP2": "Kurze Anekdote nebenbei: Als ich die App nach 2.5 Jahren Entwicklung zum ersten Mal einem Kollegen gezeigt habe, meinte der nur: «Sidney, du weisst aber schon, dass wir normalerweise im <i>Gegenuhrzeigersinn</i> Jassen, oder?». Ouch!",
-          "statusP3": "Falls du einen Fehler findest, kannst du diesen jederzeit direkt melden. Ob Rechtschreibfehler im Text, Fehler in der Spiellogik oder etwas Unverständliches im User Interface - ich freue mich über jede Meldung.",
+          "statusP3": "Falls du einen Fehler findest, kannst du diesen jederzeit direkt via Formular unter Einstellungen melden. Ob Rechtschreibfehler im Text, Fehler in der Spiellogik oder etwas Unverständliches im User Interface - ich freue mich über jede Meldung.",
           "worksTitle": "Was funktioniert",
           "works": [
             "Login als Gast oder mit E-Mail und Passwort",
