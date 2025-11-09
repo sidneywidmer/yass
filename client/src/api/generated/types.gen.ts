@@ -6,12 +6,8 @@ export type AnalyzeGameStateResponse = {
         [key: string]: TotalPoints;
     };
     gameUuid: string;
-    winners: {
-        [key: string]: TeamWithPoints;
-    };
-    losers: {
-        [key: string]: TeamWithPoints;
-    };
+    winners : TeamWithPoints;
+    losers: TeamWithPoints;
 };
 
 export type AnalyzeHand = {
