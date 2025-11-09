@@ -6,6 +6,7 @@ package ch.yass.db
 
 import ch.yass.db.tables.Game
 import ch.yass.db.tables.Hand
+import ch.yass.db.tables.Message
 import ch.yass.db.tables.Player
 import ch.yass.db.tables.Seat
 import ch.yass.db.tables.Trick
@@ -41,6 +42,11 @@ open class Public : SchemaImpl("public", DefaultCatalog.DEFAULT_CATALOG) {
     val HAND: Hand get() = Hand.HAND
 
     /**
+     * The table <code>public.message</code>.
+     */
+    val MESSAGE: Message get() = Message.MESSAGE
+
+    /**
      * The table <code>public.player</code>.
      */
     val PLAYER: Player get() = Player.PLAYER
@@ -60,6 +66,7 @@ open class Public : SchemaImpl("public", DefaultCatalog.DEFAULT_CATALOG) {
     override fun getTables(): List<Table<*>> = listOf(
         Game.GAME,
         Hand.HAND,
+        Message.MESSAGE,
         Player.PLAYER,
         Seat.SEAT,
         Trick.TRICK

@@ -17,7 +17,7 @@ data class Seat(
     var uuid: String,
     var createdAt: LocalDateTime,
     var updatedAt: LocalDateTime,
-    var playerId: Int,
+    var playerId: Int? = null,
     var gameId: Int,
     var position: String,
     var rejoinedAt: LocalDateTime? = null,
@@ -46,7 +46,11 @@ data class Seat(
             return false
         if (this.updatedAt != o.updatedAt)
             return false
-        if (this.playerId != o.playerId)
+        if (this.playerId == null) {
+            if (o.playerId != null)
+                return false
+        }
+        else if (this.playerId != o.playerId)
             return false
         if (this.gameId != o.gameId)
             return false
@@ -80,7 +84,7 @@ data class Seat(
         result = prime * result + this.uuid.hashCode()
         result = prime * result + this.createdAt.hashCode()
         result = prime * result + this.updatedAt.hashCode()
-        result = prime * result + this.playerId.hashCode()
+        result = prime * result + (if (this.playerId == null) 0 else this.playerId.hashCode())
         result = prime * result + this.gameId.hashCode()
         result = prime * result + this.position.hashCode()
         result = prime * result + (if (this.rejoinedAt == null) 0 else this.rejoinedAt.hashCode())

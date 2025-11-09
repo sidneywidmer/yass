@@ -34,9 +34,9 @@ open class SeatRecord private constructor() : UpdatableRecordImpl<SeatRecord>(Se
         set(value): Unit = set(3, value)
         get(): LocalDateTime = get(3) as LocalDateTime
 
-    open var playerId: Int
+    open var playerId: Int?
         set(value): Unit = set(4, value)
-        get(): Int = get(4) as Int
+        get(): Int? = get(4) as Int?
 
     open var gameId: Int
         set(value): Unit = set(5, value)
@@ -67,7 +67,7 @@ open class SeatRecord private constructor() : UpdatableRecordImpl<SeatRecord>(Se
     /**
      * Create a detached, initialised SeatRecord
      */
-    constructor(id: Int? = null, uuid: String, createdAt: LocalDateTime, updatedAt: LocalDateTime, playerId: Int, gameId: Int, position: String, rejoinedAt: LocalDateTime? = null, playerPing: LocalDateTime? = null, status: String? = null): this() {
+    constructor(id: Int? = null, uuid: String, createdAt: LocalDateTime, updatedAt: LocalDateTime, playerId: Int? = null, gameId: Int, position: String, rejoinedAt: LocalDateTime? = null, playerPing: LocalDateTime? = null, status: String? = null): this() {
         this.id = id
         this.uuid = uuid
         this.createdAt = createdAt

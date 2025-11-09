@@ -6,11 +6,13 @@ package ch.yass.db.keys
 
 import ch.yass.db.tables.Game
 import ch.yass.db.tables.Hand
+import ch.yass.db.tables.Message
 import ch.yass.db.tables.Player
 import ch.yass.db.tables.Seat
 import ch.yass.db.tables.Trick
 import ch.yass.db.tables.records.GameRecord
 import ch.yass.db.tables.records.HandRecord
+import ch.yass.db.tables.records.MessageRecord
 import ch.yass.db.tables.records.PlayerRecord
 import ch.yass.db.tables.records.SeatRecord
 import ch.yass.db.tables.records.TrickRecord
@@ -28,6 +30,7 @@ import org.jooq.impl.Internal
 
 val GAME_PKEY: UniqueKey<GameRecord> = Internal.createUniqueKey(Game.GAME, DSL.name("game_pkey"), arrayOf(Game.GAME.ID), true)
 val HAND_PKEY: UniqueKey<HandRecord> = Internal.createUniqueKey(Hand.HAND, DSL.name("hand_pkey"), arrayOf(Hand.HAND.ID), true)
+val MESSAGE_PKEY: UniqueKey<MessageRecord> = Internal.createUniqueKey(Message.MESSAGE, DSL.name("message_pkey"), arrayOf(Message.MESSAGE.ID), true)
 val PLAYER_PKEY: UniqueKey<PlayerRecord> = Internal.createUniqueKey(Player.PLAYER, DSL.name("player_pkey"), arrayOf(Player.PLAYER.ID), true)
 val SEAT_PKEY: UniqueKey<SeatRecord> = Internal.createUniqueKey(Seat.SEAT, DSL.name("seat_pkey"), arrayOf(Seat.SEAT.ID), true)
 val TRICK_PKEY: UniqueKey<TrickRecord> = Internal.createUniqueKey(Trick.TRICK, DSL.name("trick_pkey"), arrayOf(Trick.TRICK.ID), true)
