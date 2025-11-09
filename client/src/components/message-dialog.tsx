@@ -1,6 +1,5 @@
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -11,6 +10,13 @@ import {
 import {Input} from "@/components/ui/input.tsx";
 import {Textarea} from "@/components/ui/textarea.tsx";
 import {useTranslation} from "react-i18next";
+import {useState} from "react";
+import {api} from "@/api/client";
+import {useAsyncAction} from "@/hooks/use-async-action";
+import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
+import {AlertCircle, Loader2} from "lucide-react";
+import {Button} from "@/components/ui/button.tsx";
 
 interface MessageDialogProps {
   open: boolean;
@@ -20,7 +26,7 @@ interface MessageDialogProps {
   userName: string;
   path: string;
   gameUuid: string;
-  onSubmit: () => void;
+  onSubmit?: () => void;
 }
 
 const MessageDialog = ({
@@ -34,6 +40,33 @@ const MessageDialog = ({
   onSubmit,
 }: MessageDialogProps) => {
   const {t} = useTranslation();
+  const handleAxiosError = useAxiosErrorHandler();
+  const [error, setError] = useState<string | null>(null);
+
+  const {
+    execute: executeSubmitMessage,
+    isLoading,
+  } = useAsyncAction(async (messageData: {message: string; path: string; gameUuid?: string}) => {
+    return api.submitMessage(messageData);
+  });
+
+  const handleSubmitMessage = async () => {
+    setError(null);
+    try {
+      await executeSubmitMessage({
+        message,
+        path,
+        gameUuid: gameUuid || undefined,
+      });
+      onOpenChange(false);
+      onSubmit?.();
+    } catch (err: any) {
+      if (err.response?.status === 422) {
+        return setError(t('errors.validation.description'));
+      }
+      handleAxiosError(err);
+    }
+  };
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -45,6 +78,16 @@ const MessageDialog = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="space-y-4">
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>{t("errors.title")}</AlertTitle>
+              <AlertDescription>
+                {error}
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="space-y-2">
             <label className="text-sm font-medium">{t("settings.message.message")}</label>
             <Textarea
@@ -54,6 +97,7 @@ const MessageDialog = ({
               maxLength={1000}
               rows={4}
               className="resize-none"
+              disabled={isLoading}
             />
             <div className="text-xs text-muted-foreground text-right">
               {message.length}/1000
@@ -89,10 +133,14 @@ const MessageDialog = ({
         </div>
 
         <AlertDialogFooter>
-          <AlertDialogCancel>{t("settings.message.cancel")}</AlertDialogCancel>
-          <AlertDialogAction onClick={onSubmit} disabled={!message.trim()}>
+          <AlertDialogCancel disabled={isLoading}>{t("settings.message.cancel")}</AlertDialogCancel>
+          <Button
+            onClick={handleSubmitMessage}
+            disabled={!message.trim() || isLoading}
+          >
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {t("settings.message.submit")}
-          </AlertDialogAction>
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

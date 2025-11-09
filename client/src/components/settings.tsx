@@ -84,17 +84,6 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
     setOpen(false); // Close the settings sheet
   };
 
-  const handleSubmitMessage = () => {
-    const message = {
-      message: messageText,
-      user: name,
-      path: location.pathname,
-      game: gameUuid || ""
-    };
-    console.log("Message submission:", message);
-    setShowMessageDialog(false);
-  };
-
   const triggerClasses = triggerVariant === 'fixed'
     ? "fixed top-4 right-4 z-10"
     : "";
@@ -261,7 +250,6 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
       userName={name || ""}
       path={location.pathname}
       gameUuid={gameUuid || ""}
-      onSubmit={handleSubmitMessage}
     />
     </>
   );
