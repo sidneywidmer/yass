@@ -12,6 +12,20 @@
       "rejoinInfo": "Du kannst mit folgendem Code jederzeit wieder beitreten:",
       "cancel": "Abbrechen",
       "confirm": "Verlassen"
+    },
+    "game": "Spiel",
+    "feedback": "Feedback",
+    "sendMessage": "Nachricht senden",
+    "message": {
+      "title": "Feedback senden",
+      "description": "Teile dein Feedback, melde einen Fehler oder schreibe eine Nachricht",
+      "message": "Nachricht",
+      "messagePlaceholder": "Deine Nachricht hier...",
+      "user": "Benutzer",
+      "path": "Seite",
+      "game": "Spiel",
+      "cancel": "Abbrechen",
+      "submit": "Senden"
     }
   },
   "errors": {

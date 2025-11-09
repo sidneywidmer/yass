@@ -87,6 +87,7 @@ class AuthController(
                     maxAge = 60 * 60 * 24 * 365 // 1 year
                 }
             )
+            logger().info("trigger_alert: New guest user signed up ${player.name} (${player.uuid})")
             AnonSignupResponse(player.uuid, player.name)
         }.fold(
             { errorResponse(ctx, it) },

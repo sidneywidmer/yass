@@ -339,6 +339,7 @@ class GameService(
                 repo.finishGame(game)
                 val state = repo.getState(game)
                 val actions = gameFinishedActions(state)
+                logger().info("trigger_alert: Game finished ${game.code}")
                 publishForSeats(updatedState.seats) { actions }
             }
 

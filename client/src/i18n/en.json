@@ -12,6 +12,20 @@
       "rejoinInfo": "You can rejoin anytime with this code:",
       "cancel": "Cancel",
       "confirm": "Leave"
+    },
+    "game": "Game",
+    "feedback": "Feedback",
+    "sendMessage": "Send Feedback",
+    "message": {
+      "title": "Send Feedback",
+      "description": "Share your feedback, report a bug, or send a message",
+      "message": "Message",
+      "messagePlaceholder": "Your message here...",
+      "user": "User",
+      "path": "Page",
+      "game": "Game",
+      "cancel": "Cancel",
+      "submit": "Send"
     }
   },
   "errors": {

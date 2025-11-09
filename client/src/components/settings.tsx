@@ -10,7 +10,7 @@ import Logout from "@/components/logout.tsx";
 import {SupportedLanguage} from "@/types/language.ts";
 import {CardDeck} from "@/types/card-deck.ts";
 import {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useLocation} from "react-router-dom";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,8 +20,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog.tsx";
+} from "@/components/ui/alert-dialog.tsx"; // For leave game dialog
 import CodeWithCopy from "@/components/code-with-copy.tsx";
+import MessageDialog from "@/components/message-dialog.tsx";
 
 interface SettingsProps {
   triggerVariant?: 'fixed' | 'inline' | 'none';
@@ -39,6 +40,9 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
   const navigate = useNavigate();
   const [internalOpen, setInternalOpen] = useState(false);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const [showMessageDialog, setShowMessageDialog] = useState(false);
+  const [messageText, setMessageText] = useState("");
+  const location = useLocation();
 
   // Use controlled state if provided, otherwise use internal state
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
@@ -74,6 +78,23 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
     setShowLeaveDialog(false);
   };
 
+  const handleOpenMessageDialog = () => {
+    setMessageText("");
+    setShowMessageDialog(true);
+    setOpen(false); // Close the settings sheet
+  };
+
+  const handleSubmitMessage = () => {
+    const message = {
+      message: messageText,
+      user: name,
+      path: location.pathname,
+      game: gameUuid || ""
+    };
+    console.log("Message submission:", message);
+    setShowMessageDialog(false);
+  };
+
   const triggerClasses = triggerVariant === 'fixed'
     ? "fixed top-4 right-4 z-10"
     : "";
@@ -95,27 +116,10 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
           <SheetTitle>{t("settings.title")}</SheetTitle>
           <SheetDescription></SheetDescription>
         </SheetHeader>
-        <div className="py-4">
-          <Separator/>
-        </div>
         <div className="space-y-4">
-          {/* Leave Game Section */}
-          {gameUuid && (
-            <div>
-              <Button
-                variant="destructive"
-                className="w-full"
-                onClick={handleOpenLeaveDialog}
-              >
-                <LogOut className="mr-2 h-4 w-4"/>
-                {t("settings.leaveGame")}
-              </Button>
-            </div>
-          )}
-
           {/* User Profile Section */}
           {isAuthenticated && (
-            <div>
+            <>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <User className="h-5 w-5 text-muted-foreground"/>
@@ -123,72 +127,107 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
                 </div>
                 <Logout/>
               </div>
-            </div>
+              <Separator/>
+            </>
           )}
 
-          {/* Language Switch Section */}
-          <div>
-            <h3 className="text-sm font-medium mb-2 flex items-center">
-              <Languages className="mr-2 h-5 w-5 text-muted-foreground"/>
-              {t("settings.language")}
-            </h3>
-            <div className="flex space-x-2">
-              <Button
-                variant={language === SupportedLanguage.EN ? "secondary" : "outline"}
-                onClick={() => setLanguage(SupportedLanguage.EN)}
-              >
-                <img
-                  src="https://flagcdn.com/w20/gb.png"
-                  width="20"
-                  className="inline-block"
-                  alt="english"/>
-              </Button>
-              <Button
-                variant={language === SupportedLanguage.DE ? "secondary" : "outline"}
-                onClick={() => setLanguage(SupportedLanguage.DE)}
-              >
-                <img
-                  src="https://flagcdn.com/w20/de.png"
-                  width="20"
-                  className="inline-block"
-                  alt="german"/>
-              </Button>
+          {/* Game Section */}
+          <div className="space-y-4">
+            {gameUuid && (
+              <div>
+                <h3 className="text-sm font-medium mb-3">{t("settings.game")}</h3>
+                <Button
+                  variant="destructive"
+                  className="w-full"
+                  onClick={handleOpenLeaveDialog}
+                >
+                  <LogOut className="mr-2 h-4 w-4"/>
+                  {t("settings.leaveGame")}
+                </Button>
+              </div>
+            )}
+
+            {/* Language Switch */}
+            <div>
+              <h3 className="text-sm font-medium mb-2 flex items-center">
+                <Languages className="mr-2 h-5 w-5 text-muted-foreground"/>
+                {t("settings.language")}
+              </h3>
+              <div className="flex space-x-2">
+                <Button
+                  variant={language === SupportedLanguage.EN ? "secondary" : "outline"}
+                  onClick={() => setLanguage(SupportedLanguage.EN)}
+                >
+                  <img
+                    src="https://flagcdn.com/w20/gb.png"
+                    width="20"
+                    className="inline-block"
+                    alt="english"/>
+                </Button>
+                <Button
+                  variant={language === SupportedLanguage.DE ? "secondary" : "outline"}
+                  onClick={() => setLanguage(SupportedLanguage.DE)}
+                >
+                  <img
+                    src="https://flagcdn.com/w20/de.png"
+                    width="20"
+                    className="inline-block"
+                    alt="german"/>
+                </Button>
+              </div>
+            </div>
+
+            {/* Card Deck Switch */}
+            <div>
+              <h3 className="text-sm font-medium mb-2 flex items-center">
+                <Spade className="mr-2 h-5 w-5 text-muted-foreground"/>
+                {t("settings.deck")}
+              </h3>
+              <div className="flex space-x-2">
+                <Button
+                  variant={cardDeck === CardDeck.SWISS ? "secondary" : "outline"}
+                  onClick={() => setCardDeck(CardDeck.SWISS)}
+                >
+                  <img
+                    src="/trumps/swiss/HEARTS.svg"
+                    width="16"
+                    height="16"
+                    className="mr-2"
+                    alt="swiss hearts"/>
+                  {t("settings.deckSwiss")}
+                </Button>
+                <Button
+                  variant={cardDeck === CardDeck.FRENCH ? "secondary" : "outline"}
+                  onClick={() => setCardDeck(CardDeck.FRENCH)}
+                >
+                  <img
+                    src="/trumps/french/HEARTS.svg"
+                    width="16"
+                    height="16"
+                    className="mr-2"
+                    alt="french hearts"/>
+                  {t("settings.deckFrench")}
+                </Button>
+              </div>
             </div>
           </div>
 
-          {/* Card Deck Switch Section */}
-          <div>
-            <h3 className="text-sm font-medium mb-2 flex items-center">
-              <Spade className="mr-2 h-5 w-5 text-muted-foreground"/>
-              {t("settings.deck")}
-            </h3>
-            <div className="flex space-x-2">
-              <Button
-                variant={cardDeck === CardDeck.SWISS ? "secondary" : "outline"}
-                onClick={() => setCardDeck(CardDeck.SWISS)}
-              >
-                <img
-                  src="/trumps/swiss/HEARTS.svg"
-                  width="16"
-                  height="16"
-                  className="mr-2"
-                  alt="swiss hearts"/>
-                {t("settings.deckSwiss")}
-              </Button>
-              <Button
-                variant={cardDeck === CardDeck.FRENCH ? "secondary" : "outline"}
-                onClick={() => setCardDeck(CardDeck.FRENCH)}
-              >
-                <img
-                  src="/trumps/french/HEARTS.svg"
-                  width="16"
-                  height="16"
-                  className="mr-2"
-                  alt="french hearts"/>
-                {t("settings.deckFrench")}
-              </Button>
-            </div>
-          </div>
+          {/* Feedback Section */}
+          {isAuthenticated && (
+            <>
+              <Separator/>
+              <div>
+                <h3 className="text-sm font-medium mb-3">{t("settings.feedback")}</h3>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleOpenMessageDialog}
+                >
+                  {t("settings.sendMessage")}
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </SheetContent>
     </Sheet>
@@ -213,6 +252,17 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+
+    <MessageDialog
+      open={showMessageDialog}
+      onOpenChange={setShowMessageDialog}
+      message={messageText}
+      onMessageChange={setMessageText}
+      userName={name || ""}
+      path={location.pathname}
+      gameUuid={gameUuid || ""}
+      onSubmit={handleSubmitMessage}
+    />
     </>
   );
 };

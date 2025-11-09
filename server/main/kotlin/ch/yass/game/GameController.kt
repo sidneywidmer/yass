@@ -5,6 +5,7 @@ import arrow.core.raise.ensure
 import ch.yass.core.contract.Controller
 import ch.yass.core.error.PlayerDoesNotOwnSeat
 import ch.yass.core.helper.errorResponse
+import ch.yass.core.helper.logger
 import ch.yass.core.helper.successResponse
 import ch.yass.core.helper.toUUID
 import ch.yass.core.helper.validate
@@ -59,6 +60,8 @@ class GameController(private val service: GameService, private val repo: GameRep
         val request = validate<CreateCustomGameRequest>(ctx.body())
         val player = player(ctx)
         val code = service.create(request, player)
+
+        logger().info("trigger_alert: New game just started $code")
 
         CreateCustomGameResponse(code)
     }.fold(
