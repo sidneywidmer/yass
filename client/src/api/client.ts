@@ -3,7 +3,7 @@ import {
   AnonLinkData,
   AnonSignupData, ChooseTrumpRequest,
   CreateCustomGameRequest,
-  JoinGameRequest, PingSeatRequest,
+  JoinGameRequest, MessageRequest, PingSeatRequest,
   PlayCardRequest, SchiebeRequest,
   SubscribeData, WeisenRequest
 } from './generated';
@@ -54,5 +54,9 @@ export const api = {
     client: customClient,
     path: {code: code},  // For URL parameters
     params: {}  // For query parameters (empty in this case)
+  }),
+  submitMessage: (data: MessageRequest) => generatedApi.postAdminMessage({
+    client: customClient,
+    body: data
   }),
 };

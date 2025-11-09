@@ -110,6 +110,21 @@ export type JoinGameResponse = {
     finished?: (GameFinished) | null;
 };
 
+export type MessageRequest = {
+    /**
+     * The feedback or message content
+     */
+    message: string;
+    /**
+     * The browser path where the message was submitted from
+     */
+    path: string;
+    /**
+     * The UUID of the game if the message is related to a specific game
+     */
+    gameUuid?: (string) | null;
+};
+
 export type PingSeatRequest = {
     seat: string;
 };
@@ -271,6 +286,14 @@ export type GetAdminAnalyzeGameByCodeData = {
 export type GetAdminAnalyzeGameByCodeResponse = (AnalyzeGameStateResponse);
 
 export type GetAdminAnalyzeGameByCodeError = unknown;
+
+export type PostAdminMessageData = {
+    body: MessageRequest;
+};
+
+export type PostAdminMessageResponse = (SuccessfulActionResponse);
+
+export type PostAdminMessageError = unknown;
 
 export type PostGameCreateData = {
     body: CreateCustomGameRequest;

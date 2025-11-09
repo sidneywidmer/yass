@@ -6,6 +6,7 @@ package ch.yass.db.tables.references
 
 import ch.yass.db.tables.Game
 import ch.yass.db.tables.Hand
+import ch.yass.db.tables.Message
 import ch.yass.db.tables.Player
 import ch.yass.db.tables.Seat
 import ch.yass.db.tables.Trick
@@ -21,6 +22,11 @@ val GAME: Game = Game.GAME
  * The table <code>public.hand</code>.
  */
 val HAND: Hand = Hand.HAND
+
+/**
+ * The table <code>public.message</code>.
+ */
+val MESSAGE: Message = Message.MESSAGE
 
 /**
  * The table <code>public.player</code>.

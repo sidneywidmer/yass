@@ -2,8 +2,8 @@ package ch.yass.game
 
 import arrow.core.raise.Raise
 import arrow.core.raise.ensure
-import ch.yass.admin.dsl.interpretCards
-import ch.yass.core.contract.MDCAttributes.*
+import ch.yass.core.contract.MDCAttributes.PARENT_TRACE_ID
+import ch.yass.core.contract.MDCAttributes.TRACE_ID
 import ch.yass.core.error.*
 import ch.yass.core.helper.associateWithToEnum
 import ch.yass.core.helper.logger
@@ -27,7 +27,6 @@ import ch.yass.game.pubsub.*
 import kotlinx.coroutines.*
 import org.slf4j.MDC
 import java.util.*
-import java.util.UUID
 import kotlinx.coroutines.channels.Channel as EventChannel
 
 class GameService(
@@ -339,6 +338,7 @@ class GameService(
                 repo.finishGame(game)
                 val state = repo.getState(game)
                 val actions = gameFinishedActions(state)
+                logger().info("trigger_alert: Game finished ${game.code}")
                 publishForSeats(updatedState.seats) { actions }
             }
 

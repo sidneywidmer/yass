@@ -101,7 +101,7 @@ open class Seat(
     /**
      * The column <code>public.seat.player_id</code>.
      */
-    val PLAYER_ID: TableField<SeatRecord, Int?> = createField(DSL.name("player_id"), SQLDataType.INTEGER.nullable(false), this, "")
+    val PLAYER_ID: TableField<SeatRecord, Int?> = createField(DSL.name("player_id"), SQLDataType.INTEGER, this, "")
 
     /**
      * The column <code>public.seat.game_id</code>.

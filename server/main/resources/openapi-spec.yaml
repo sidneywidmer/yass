@@ -21,6 +21,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AnalyzeGameStateResponse'
+  /admin/message:
+    post:
+      summary: Submit a message, feedback, or bug report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageRequest'
+      responses:
+        '200':
+          description: Message submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessfulActionResponse'
   /game/create:
     post:
       summary: Create a new game
@@ -832,3 +848,25 @@ components:
           description: Ory session token to link with anonymous account
       required:
         - orySession
+
+    MessageRequest:
+      type: object
+      required:
+        - message
+        - path
+      properties:
+        message:
+          type: string
+          minLength: 1
+          maxLength: 1024
+          description: The feedback or message content
+        path:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: The browser path where the message was submitted from
+        gameUuid:
+          type: string
+          format: uuid
+          nullable: true
+          description: The UUID of the game if the message is related to a specific game
