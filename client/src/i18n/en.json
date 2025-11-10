@@ -221,7 +221,7 @@
     "description": "Choose trump"
   },
   "landing": {
-    "betaAnnouncement": "Read the beta announcement post",
+    "betaAnnouncement": "Read the beta announcement",
     "navigation": {
       "login": "Login",
       "lobby": "Play",

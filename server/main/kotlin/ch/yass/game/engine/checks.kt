@@ -3,6 +3,7 @@ package ch.yass.game.engine
 import arrow.core.raise.Raise
 import arrow.core.raise.ensure
 import ch.yass.core.error.CardNotPlayable
+import ch.yass.core.error.CardUndertrumps
 import ch.yass.core.error.GameError
 import ch.yass.core.error.PlayerDoesNotOwnCard
 import ch.yass.game.api.internal.GameState
@@ -152,8 +153,45 @@ context(Raise<GameError>)
 fun cardIsPlayable(card: Card, player: InternalPlayer, state: GameState): Boolean {
     ensure(playerOwnsCard(player, card, state)) { PlayerDoesNotOwnCard(player, card, state) }
     ensure(cardFollowsLead(card, player, state)) { CardNotPlayable(card, player, state) }
+    ensure(!cardUndertrumps(card, player, state)) { CardUndertrumps(card, player, state) }
 
     return true
+}
+
+fun cardUndertrumps(card: Card, player: InternalPlayer, state: GameState): Boolean {
+    val hand = currentHand(state.hands)
+    if (hand.trump.toSuit() != card.suit) {
+        return false // card is not trump suit, can't undertrump :)
+    }
+
+    val seat = playerSeat(player, state.seats)
+    val cards = hand.cardsOf(seat.position).filter { playerOwnsCard(player, it, state) }
+    val unplayedTrumps = cards.filter { it.suit == hand.trump.toSuit() }
+    if (unplayedTrumps.size == cards.size) {
+        return false // player has only trumps left, impossible to undertrump
+    }
+
+    val trick = currentTrick(state.tricks)
+    val leadPosition = currentLeadPositionOfHand(hand, tricksOfHand(state.tricks, hand), state.seats)
+    val leadCard = trick.cardOf(leadPosition)
+    if (hand.trump.toSuit() == leadCard?.suit) {
+        return false // first card in trick is a trump, it's impossible to undertrump in this whole trick
+    }
+
+    val highestTrumpInTrick = trick.cards()
+        .filter { it.suit == hand.trump.toSuit() }
+        .filter { it != leadCard }
+        .maxByOrNull { cardValue(it, hand.trump) }
+
+    if (highestTrumpInTrick == null) {
+        return false // no other card in the trick (except maybe lead but doesn't matter) is a trump
+    }
+
+    if (cardValue(highestTrumpInTrick, hand.trump) < cardValue(card, hand.trump)) {
+        return false // we're not undertrumping, the card is higher
+    }
+
+    return true // Undertrump!
 }
 
 fun cardFollowsLead(card: Card, player: InternalPlayer, state: GameState): Boolean {

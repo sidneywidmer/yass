@@ -40,6 +40,7 @@ data class PlayerDoesNotOwnSeat(val player: InternalPlayer, val seatUuid: String
 data class PlayerIsLocked(val player: InternalPlayer, val state: GameState) : GameError
 data class PlayerDoesNotOwnCard(val player: InternalPlayer, val card: Card, val state: GameState) : GameError
 data class CardNotPlayable(val card: Card, val player: InternalPlayer, val state: GameState) : GameError
+data class CardUndertrumps(val card: Card, val player: InternalPlayer, val state: GameState) : GameError
 data class InvalidState(val nextState: State, val state: GameState) : GameError
 data class TrumpInvalid(val trump: Trump) : GameError
 data class WeisInvalid(val weis: Weis) : GameError
