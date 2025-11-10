@@ -220,6 +220,9 @@
     "title": "Trumpf wählen",
     "description": "Trumpf wählen"
   },
+  "welcomeHand": {
+    "message": "Spiel eine Karte um die anderen Spieler zu begrüssen"
+  },
   "landing": {
     "betaAnnouncement": "Alle Infos zur Beta im Blog",
     "navigation": {

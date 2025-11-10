@@ -40,6 +40,7 @@ interface GameStateActions {
   clearWeise: () => void
   setWeiseOverlayOpen: (open: boolean) => void
   getPlayer: (position: Position) => PlayerAtTable | undefined
+  isWelcomeHand: () => boolean
 }
 
 const initialState: FlatGameState = {
@@ -105,5 +106,11 @@ export const useGameStateStore = create<FlatGameState & GameStateActions>((set) 
   getPlayer: (position: Position) => {
     const otherPlayers: Array<PlayerAtTable> = useGameStateStore.getState().otherPlayers!!
     return otherPlayers.find(p => p.position === position)
+  },
+  isWelcomeHand: (): boolean => {
+    const state = useGameStateStore.getState();
+    const cards = state.cards;
+    return !cards || cards.length === 0 ||
+      cards.some(card => card.suit === 'WELCOME' && card.rank === 'WELCOME');
   }
 }))

@@ -220,6 +220,9 @@
     "title": "Choose trump",
     "description": "Choose trump"
   },
+  "welcomeHand": {
+    "message": "Play any card to say hello to other players"
+  },
   "landing": {
     "betaAnnouncement": "Read the beta announcement",
     "navigation": {
