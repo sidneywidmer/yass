@@ -217,11 +217,11 @@
     }
   },
   "chooseTrump": {
-    "title": "Trump wählen",
-    "description": "Trump wählen"
+    "title": "Trumpf wählen",
+    "description": "Trumpf wählen"
   },
   "landing": {
-    "betaAnnouncement": "Alle infos zum Start der Beta im Blog",
+    "betaAnnouncement": "Alle Infos zur Beta im Blog",
     "navigation": {
       "login": "Anmelden",
       "lobby": "Spielen",
