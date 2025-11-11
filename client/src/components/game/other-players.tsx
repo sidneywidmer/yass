@@ -53,6 +53,17 @@ const StatusIndicator = ({status, isActive}: { status: string, isActive?: boolea
   )
 }
 
+const WeisPointsBubble = ({ points }: { points: number }) => {
+  return (
+    <div className="relative">
+      <div className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap relative">
+        {points}
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-0 h-0 border-r-8 border-r-gray-200 border-t-8 border-t-transparent border-b-8 border-b-transparent"></div>
+      </div>
+    </div>
+  )
+}
+
 export function OtherPlayers() {
   const otherPlayers = useGameStateStore(state => state.otherPlayers)
   const position = useGameStateStore(state => state.position)
@@ -71,20 +82,25 @@ export function OtherPlayers() {
             initial={{opacity: 0}}
             animate={positionStyles[getRelativePosition(position!, player.position!)]}
           >
-            <Card className="h-10 p-3 flex flex-row items-center justify-center gap-2 overflow-hidden">
-              {player.bot ? (<Bot className="h-4 w-4"/>) : (<User className="h-4 w-4"/>)}
-              <span className="text-sm text-center">{player.name}</span>
-              {trump && trumpChosenBy === player.position && (
-                <TrumpIcon trump={trump} className="w-4 h-4"/>
-              )}
-              {gschobeBy === player.position && (
-                <Forward className="w-4 h-4"/>
-              )}
-              <StatusIndicator
-                status={player.status!}
-                isActive={player.position == activePosition && !player.bot}
-              />
-            </Card>
+            <div className="relative">
+              <Card className="h-10 p-3 flex flex-row items-center justify-center gap-2 overflow-hidden">
+                {player.bot ? (<Bot className="h-4 w-4"/>) : (<User className="h-4 w-4"/>)}
+                <span className="text-sm text-center">{player.name}</span>
+                {trump && trumpChosenBy === player.position && (
+                  <TrumpIcon trump={trump} className="w-4 h-4"/>
+                )}
+                {gschobeBy === player.position && (
+                  <Forward className="w-4 h-4"/>
+                )}
+                <StatusIndicator
+                  status={player.status!}
+                  isActive={player.position == activePosition && !player.bot}
+                />
+              </Card>
+              <div className="absolute top-1/2 -right-16 transform -translate-y-1/2">
+                <WeisPointsBubble points={120} />
+              </div>
+            </div>
           </motion.div>
         ))}
       </AnimatePresence>

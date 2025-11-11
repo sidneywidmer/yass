@@ -8,6 +8,17 @@ import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 import {api} from "@/api/client.ts";
 import {isTouchDevice} from "@/lib/utils.ts";
 
+const WeisPointsBubble = ({ points }: { points: number }) => {
+  return (
+    <div className="relative">
+      <div className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap">
+        {points}
+      </div>
+      <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-gray-200"></div>
+    </div>
+  )
+}
+
 type AnimationType = 'initial' | 'hover' | 'adjacentLeft' | 'adjacentRight'
 
 type CardPosition = {
@@ -89,6 +100,8 @@ export function PlayerHand() {
   const isMyPos = useGameStateStore((state) => state.activePosition === state.position)
   const isPlayCardState = useGameStateStore((state) => state.state === "PLAY_CARD")
   const state = useGameStateStore(state => state.state)
+
+  const weisDisplayBottom = CARD_HEIGHT * 1.1
 
   const handleAxiosError = useAxiosErrorHandler()
   const isTouch = useMemo(() => isTouchDevice(), [])
@@ -239,18 +252,24 @@ export function PlayerHand() {
   if (!cards) return null
 
   return (
-    <div id={"playerHand"}
-         className={`fixed -bottom-[60px] w-full flex justify-center ${cardsAboveOverlay() ? "z-50" : ""}`}>
-      <motion.div
-        className="flex -space-x-10"
-        key={totalCards}
-        drag={isTouch}
-        dragConstraints={{left: 0, right: 0, top: 0, bottom: 0}}
-        dragElastic={0}
-        onDrag={(_, info) => handleDrag({clientX: info.point.x, clientY: info.point.y})}
-        onMouseMove={(mouse) => !isTouch && handleDrag(mouse)}
-        onMouseLeave={() => !isTouch && triggerCardHover(null, filteredCards)}
-      >
+    <>
+      <div id={"weisPointsDisplay"}
+           className={`fixed w-full flex justify-center ${cardsAboveOverlay() ? "z-50" : ""}`}
+           style={{bottom: `${weisDisplayBottom}px`}}>
+        <WeisPointsBubble points={75} />
+      </div>
+      <div id={"playerHand"}
+           className={`fixed -bottom-[60px] w-full flex justify-center ${cardsAboveOverlay() ? "z-50" : ""}`}>
+        <motion.div
+          className="flex -space-x-10"
+          key={totalCards}
+          drag={isTouch}
+          dragConstraints={{left: 0, right: 0, top: 0, bottom: 0}}
+          dragElastic={0}
+          onDrag={(_, info) => handleDrag({clientX: info.point.x, clientY: info.point.y})}
+          onMouseMove={(mouse) => !isTouch && handleDrag(mouse)}
+          onMouseLeave={() => !isTouch && triggerCardHover(null, filteredCards)}
+        >
         <AnimatePresence mode="popLayout" initial={true}>
           {filteredCards.map((card, i) => {
             const offset = calculateOffset(i, totalCards)
@@ -284,7 +303,8 @@ export function PlayerHand() {
             )
           })}
         </AnimatePresence>
-      </motion.div>
-    </div>
+        </motion.div>
+      </div>
+    </>
   )
 }
