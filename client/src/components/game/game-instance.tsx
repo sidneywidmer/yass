@@ -18,6 +18,7 @@ import {useTranslation} from "react-i18next";
 import {useNavigate} from "react-router-dom";
 import {Share} from "@/components/game/share.tsx";
 import {WelcomeHandInfo} from "@/components/game/welcome-hand-info.tsx";
+import {WeisAnnouncement} from "@/components/game/weis-announcement.tsx";
 
 interface GameInstanceProps {
   tryCode: string
@@ -79,6 +80,7 @@ export function GameInstance({tryCode}: GameInstanceProps) {
         <ChooseTrump/>
         <Weisen/>
         <ShowWeise/>
+        <WeisAnnouncement/>
         <GameFinished/>
         <PingHandler/>
         <WebSocketHandler/>
