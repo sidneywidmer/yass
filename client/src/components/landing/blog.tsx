@@ -8,7 +8,7 @@ export function Blog() {
   const posts = [
     {
       title: t("landing.blog.posts.betaRoadmap.title"),
-      date: new Date("2024-11-02"),
+      date: new Date("2025-11-02"),
       abstract: t("landing.blog.posts.betaRoadmap.abstract"),
       slug: "beta-roadmap"
     }
