@@ -320,7 +320,7 @@
                 <configuration>
                     <jvmTarget>21</jvmTarget>
                     <args>
-                        <arg>-Xcontext-receivers</arg>
+                        <arg>-Xcontext-parameters</arg>
                         <arg>-opt-in=kotlin.ExperimentalStdlibApi</arg>
                     </args>
                 </configuration>

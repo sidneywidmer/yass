@@ -2,7 +2,6 @@ package ch.yass.identity
 
 import arrow.core.Either
 import arrow.core.raise.Raise
-import arrow.core.raise.catch
 import arrow.core.raise.either
 import arrow.core.raise.ensureNotNull
 import ch.yass.core.contract.CtxAttributes.PLAYER
@@ -45,9 +44,9 @@ class AuthMiddleware(
         }
     }
 
-    context(Raise<Unauthorized>)
+    context(r: Raise<Unauthorized>)
     private fun getSession(cookie: String?): Session =
-        catch({
+        try {
             oryClient.frontend.toSession(null, cookie?.let { "ory_kratos_session=$cookie" }, null)
-        }) { e: ApiException -> raise(Unauthorized(e)) }
+        } catch (e: ApiException) { r.raise(Unauthorized(e)) }
 }

@@ -16,7 +16,7 @@ class MessageService(
     private val db: DSLContext
 ) {
 
-    context(Raise<GameNotFound>)
+    context(_: Raise<GameNotFound>)
     fun createMessage(message: CreateMessage) {
         val game = message.gameUuid?.let { gameRepository.getByUUID(message.gameUuid) }
         val meta = MessageMeta(
