@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build --mode production",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate-client": "openapi-ts -i ../server/main/resources/openapi-spec.yaml -o ./src/api/generated -c @hey-api/client-axios"
+    "generate-client": "openapi-ts -i ../server/main/resources/openapi-spec.yaml -o ./src/api/generated -c @hey-api/client-axios",
+    "test": "vitest run"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -48,6 +49,8 @@
     "@eslint/js": "^9.17.0",
     "@hey-api/client-axios": "^0.3.4",
     "@hey-api/openapi-ts": "^0.60.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^22.10.2",
     "@types/react": "^18.3.17",
     "@types/react-dom": "^18.3.5",
@@ -57,10 +60,12 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.16",
     "globals": "^15.13.0",
+    "happy-dom": "^20.9.0",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.18.1",
-    "vite": "^6.0.3"
+    "vite": "^6.0.3",
+    "vitest": "^3.2.4"
   }
 }
