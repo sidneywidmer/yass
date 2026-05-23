@@ -1,4 +1,4 @@
-import {motion} from "framer-motion"
+import {motion} from "motion/react"
 import {useEffect, useState} from "react"
 import {useGameStateStore} from "@/store/game-state"
 import {TrumpIcon} from "@/components/game/trump-icon"

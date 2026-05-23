@@ -1,4 +1,4 @@
-import {AnimatePresence, motion} from "framer-motion"
+import {AnimatePresence, motion} from "motion/react"
 import {useGameStateStore} from "@/store/game-state"
 import {Card} from "@/components/game/card.tsx";
 import {useCardDimensions} from "@/hooks/use-card-dimensions.ts";

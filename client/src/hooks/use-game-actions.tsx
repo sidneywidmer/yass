@@ -150,7 +150,7 @@ const useGameActions = () => {
   useEffect(() => {
     if (!isPaused) return
 
-    let timer: NodeJS.Timeout | null = null
+    let timer: ReturnType<typeof setTimeout> | null = null
 
     const unsubscribe = useGameStateStore.subscribe((state, prevState) => {
       // Detect when overlay closes (transitions from true to false) while we're paused

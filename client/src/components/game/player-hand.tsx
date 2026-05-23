@@ -1,6 +1,6 @@
 import {useGameStateStore} from "@/store/game-state.ts";
 import {CardInHand} from "@/api/generated";
-import {AnimatePresence, motion, useAnimation} from "framer-motion"
+import {AnimatePresence, motion, useAnimation} from "motion/react"
 import {useEffect, useMemo, useRef} from "react";
 import {Card} from "@/components/game/card.tsx";
 import {useCardDimensions} from "@/hooks/use-card-dimensions.ts";

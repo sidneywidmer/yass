@@ -1,4 +1,4 @@
-import {Bird, Github, Zap} from "lucide-react";
+import {Bird, Code2, Zap} from "lucide-react";
 import {useTranslation} from "react-i18next";
 
 export function Features() {
@@ -12,7 +12,7 @@ export function Features() {
     {
       title: t("landing.features.noAds.title"),
       description: t("landing.features.noAds.description", {interpolation: {escapeValue: false}}),
-      icon: Github
+      icon: Code2
     },
     {
       title: t("landing.features.fastSimple.title"),

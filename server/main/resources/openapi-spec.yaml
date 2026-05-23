@@ -330,13 +330,9 @@ components:
           type: string
           format: uuid
         winners:
-          type: object
-          additionalProperties:
-            $ref: '#/components/schemas/TeamWithPoints'
+          $ref: '#/components/schemas/TeamWithPoints'
         losers:
-          type: object
-          additionalProperties:
-            $ref: '#/components/schemas/TeamWithPoints'
+          $ref: '#/components/schemas/TeamWithPoints'
 
     AnalyzeHand:
       type: object

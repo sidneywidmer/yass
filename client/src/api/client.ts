@@ -7,12 +7,13 @@ import {
   PlayCardRequest, SchiebeRequest,
   SubscribeData, WeisenRequest
 } from './generated';
-import {createClient} from "@hey-api/client-axios";
+import {createClient} from './generated/client';
+import type {InternalAxiosRequestConfig} from 'axios';
 
 const customClient = createClient({
   baseURL: import.meta.env.VITE_YASS_API_URL,
   withCredentials: true,
-  validateStatus: (status) => status >= 200 && status < 300,
+  validateStatus: (status: number) => status >= 200 && status < 300,
   throwOnError: true
 });
 
@@ -22,7 +23,7 @@ const getAnonToken = () => {
   return JSON.parse(stored).state.token;
 };
 
-customClient.instance.interceptors.request.use((request) => {
+customClient.instance.interceptors.request.use((request: InternalAxiosRequestConfig) => {
   const token = getAnonToken()
   if (token) {
     request.headers['X-Anon-Token'] = token;

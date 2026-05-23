@@ -5,7 +5,7 @@ import {useAxiosErrorHandler} from '@/hooks/use-axios-error-handler'
 
 export function PingHandler() {
   const uuid = useGameStateStore(state => state.uuid)
-  const intervalRef = useRef<NodeJS.Timeout>()
+  const intervalRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const handleError = useAxiosErrorHandler()
 
   useEffect(() => {

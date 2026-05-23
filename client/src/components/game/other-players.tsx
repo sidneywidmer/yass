@@ -3,7 +3,7 @@ import {cn, getRelativePosition, getResponsiveValue} from "@/lib/utils"
 import {Position} from "@/api/generated"
 import {useGameStateStore} from "@/store/game-state"
 import {Card} from "@/components/ui/card.tsx";
-import {AnimatePresence, motion} from "framer-motion"
+import {AnimatePresence, motion} from "motion/react"
 import {TrumpIcon} from "@/components/game/trump-icon"
 
 const VERTICAL = getResponsiveValue(200, 250)
