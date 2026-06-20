@@ -1,16 +1,38 @@
 import {useCallback, useEffect, useRef, useState} from 'react'
 import {useGameStateStore} from '@/store/game-state'
+import {CardInHand, CardOnTable, GameFinished, PlayerAtTable, Position, State, TotalPoints, Trump, WeisWithPoints} from '@/api/generated'
 
-interface GameAction {
-  type: string
+type CardPlayedAction = { type: 'CardPlayed'; card: CardOnTable }
+type UpdateHandAction = { type: 'UpdateHand'; cards: CardInHand[]; newCards?: boolean }
+type ClearPlayedCardsAction = { type: 'ClearPlayedCards'; position: Position }
+type UpdateStateAction = { type: 'UpdateState'; state: State }
+type UpdateTrumpAction = { type: 'UpdateTrump'; trump: Trump; position: Position }
+type UpdateGschobeAction = { type: 'UpdateGschobe'; position: Position }
+type UpdateActiveAction = { type: 'UpdateActive'; position: Position }
+type UpdatePossibleWeiseAction = { type: 'UpdatePossibleWeise'; weise: WeisWithPoints[] }
+type GameFinishedAction = { type: 'GameFinished' } & GameFinished
+type UpdatePointsAction = { type: 'UpdatePoints'; points: Record<string, TotalPoints> }
+type ShowWeisAction = { type: 'ShowWeis'; position: Position; weis: WeisWithPoints }
+type PlayerJoinedAction = { type: 'PlayerJoined'; player: PlayerAtTable }
+type PlayerDisconnectedAction = { type: 'PlayerDisconnected'; player: PlayerAtTable }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any
-}
+export type GameAction =
+  | CardPlayedAction
+  | UpdateHandAction
+  | ClearPlayedCardsAction
+  | UpdateStateAction
+  | UpdateTrumpAction
+  | UpdateGschobeAction
+  | UpdateActiveAction
+  | UpdatePossibleWeiseAction
+  | GameFinishedAction
+  | UpdatePointsAction
+  | ShowWeisAction
+  | PlayerJoinedAction
+  | PlayerDisconnectedAction
 
-interface ActionHandler {
-  handle: (action: GameAction) => Promise<void>
-}
+type ActionHandlerFn<T extends GameAction> = (action: T) => Promise<void>
+type ActionHandlerMap = { [K in GameAction['type']]: ActionHandlerFn<Extract<GameAction, { type: K }>> }
 
 const useGameActions = () => {
   const [actionQueue, setActionQueue] = useState<GameAction[]>([])
@@ -22,91 +44,65 @@ const useGameActions = () => {
   const clearCards = useGameStateStore(state => state.clearCards)
   const addWeis = useGameStateStore(state => state.addWeis)
 
-  const actionHandlers: Record<string, ActionHandler> = {
-    CardPlayed: {
-      handle: async (action) => {
-        if (position == action.card.position) {
-          return
-        }
-        playCard(action.card)
+  const actionHandlers = {
+    CardPlayed: async (action: CardPlayedAction) => {
+      if (position == action.card.position) {
+        return
+      }
+      playCard(action.card)
+    },
+    UpdateHand: async (action: UpdateHandAction) => {
+      addCardsToHand(action.cards)
+      // New hand means new trump will be chosen, clear the previous trump chooser and gschobe
+      if (action.newCards) {
+        useGameStateStore.setState({trumpChosenBy: undefined, gschobeBy: undefined})
       }
     },
-    UpdateHand: {
-      handle: async (action) => {
-        addCardsToHand(action.cards)
-        // New hand means new trump will be chosen, clear the previous trump chooser and gschobe
-        if (action.newCards) {
-          useGameStateStore.setState({trumpChosenBy: undefined, gschobeBy: undefined})
-        }
+    ClearPlayedCards: async (action: ClearPlayedCardsAction) => {
+      // Allow enough time the players to register what card was played
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await clearCards(action.position)
+    },
+    UpdateState: async (action: UpdateStateAction) => useGameStateStore.setState({state: action.state}),
+    UpdateTrump: async (action: UpdateTrumpAction) => useGameStateStore.setState({trump: action.trump, trumpChosenBy: action.position}),
+    UpdateGschobe: async (action: UpdateGschobeAction) => useGameStateStore.setState({gschobeBy: action.position}),
+    UpdateActive: async (action: UpdateActiveAction) => useGameStateStore.setState({activePosition: action.position}),
+    UpdatePossibleWeise: async (action: UpdatePossibleWeiseAction) => useGameStateStore.setState({weise: action.weise}),
+    GameFinished: async (action: GameFinishedAction) => useGameStateStore.setState({
+      finished: {
+        winners: action.winners,
+        losers: action.losers,
+        winnerPoints: action.winnerPoints,
+        loserPoints: action.loserPoints
       }
+    }),
+    UpdatePoints: async (action: UpdatePointsAction) => {
+      useGameStateStore.setState({points: action.points})
     },
-    ClearPlayedCards: {
-      handle: async (action) => {
-        // Allow enough time the players to register what card was played
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        await clearCards(action.position)
-      }
-    },
-    UpdateState: {
-      handle: async (action) => useGameStateStore.setState({state: action.state}),
-    },
-    UpdateTrump: {
-      handle: async (action) => useGameStateStore.setState({trump: action.trump, trumpChosenBy: action.position}),
-    },
-    UpdateGschobe: {
-      handle: async (action) => useGameStateStore.setState({gschobeBy: action.position}),
-    },
-    UpdateActive: {
-      handle: async (action) => useGameStateStore.setState({activePosition: action.position}),
-    },
-    UpdatePossibleWeise: {
-      handle: async (action) => useGameStateStore.setState({weise: action.weise}),
-    },
-    GameFinished: {
-      handle: async (action) => useGameStateStore.setState({
-        finished: {
-          winners: action.winners,
-          losers: action.losers,
-          winnerPoints: action.winnerPoints,
-          loserPoints: action.loserPoints
-        }
-      }),
-    },
-    UpdatePoints: {
-      handle: async (action) => {
-        useGameStateStore.setState({points: action.points})
-      },
-    },
-    ShowWeis: {
-      handle: async (action) => addWeis(action.position, action.weis)
-    },
-    PlayerJoined: {
-      handle: async (action) => useGameStateStore.setState((state) => {
-        const existingPlayerIndex = state.otherPlayers!.findIndex(p => p.uuid === action.player.uuid)
+    ShowWeis: async (action: ShowWeisAction) => addWeis(action.position, action.weis),
+    PlayerJoined: async (action: PlayerJoinedAction) => useGameStateStore.setState((state) => {
+      const existingPlayerIndex = state.otherPlayers!.findIndex(p => p.uuid === action.player.uuid)
 
-        if (existingPlayerIndex !== -1) {
-          return {
-            otherPlayers: state.otherPlayers!.map((p, i) =>
-              i === existingPlayerIndex ? {...p, status: "CONNECTED"} : p
-            )
-          }
-        }
-
+      if (existingPlayerIndex !== -1) {
         return {
-          otherPlayers: [...state.otherPlayers!, action.player]
+          otherPlayers: state.otherPlayers!.map((p, i) =>
+            i === existingPlayerIndex ? {...p, status: 'CONNECTED' as const} : p
+          )
         }
-      })
-    },
-    PlayerDisconnected: {
-      handle: async (action) => useGameStateStore.setState((state) => ({
-        otherPlayers: state.otherPlayers!.map(player =>
-          player.uuid === action.player.uuid
-            ? {...player, status: "DISCONNECTED"}
-            : player
-        )
-      }))
-    }
-  }
+      }
+
+      return {
+        otherPlayers: [...state.otherPlayers!, action.player]
+      }
+    }),
+    PlayerDisconnected: async (action: PlayerDisconnectedAction) => useGameStateStore.setState((state) => ({
+      otherPlayers: state.otherPlayers!.map(player =>
+        player.uuid === action.player.uuid
+          ? {...player, status: 'DISCONNECTED' as const}
+          : player
+      )
+    }))
+  } satisfies ActionHandlerMap
 
   const processNextAction = useCallback(async () => {
     // Don't process if already processing, queue is empty, or paused
@@ -126,11 +122,11 @@ const useGameActions = () => {
     }
 
     processingRef.current = true
-    const handler = actionHandlers[action.type]
+    const handler = (actionHandlers as Record<string, ActionHandlerFn<GameAction>>)[action.type]
 
     if (handler) {
       await new Promise(resolve => setTimeout(resolve, 50))
-      await handler.handle(action)
+      await handler(action)
     } else {
       console.log("no handler for action found", action)
     }

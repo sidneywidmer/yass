@@ -11,6 +11,7 @@ import {useAsyncAction} from "@/hooks/use-async-action"
 import {CreateCustomGameRequest} from "@/api/generated";
 import {DialogDescription} from "@radix-ui/react-dialog";
 import {useState} from "react";
+import {isAxiosError} from "axios";
 import {useNavigate} from "react-router-dom";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 
@@ -82,10 +83,9 @@ export function CreateGameOverlay() {
       setOpen(false)
       navigate(`/game/${response.data?.code}`)
     } catch (error: unknown) {
-      const axiosErr = error as { response?: { status?: number; data?: { payload?: unknown; error?: string } } }
-      if (axiosErr.response?.status === 422) {
+      if (isAxiosError(error) && error.response?.status === 422) {
         // Handle constraint violations
-        const payload = axiosErr.response?.data?.payload
+        const payload = error.response.data?.payload
         if (Array.isArray(payload)) {
           const violation = (payload as Array<{ path: string }>).find(v => v.path === 'winningConditionValue')
           if (violation) {
@@ -94,14 +94,14 @@ export function CreateGameOverlay() {
         }
 
         // Handle domain-specific errors
-        switch ((axiosErr.response?.data?.payload as { error?: string })?.error) {
+        switch ((error.response.data?.payload as { error?: string })?.error) {
           case "GameSettingsMaxBots":
             return setError(t('errors.gameSettings.maxBots'))
           case "GameSettingsInvalidValue":
             return setError(t('errors.gameSettings.invalidValue'))
         }
       }
-      handleAxiosError(error as Parameters<typeof handleAxiosError>[0])
+      handleAxiosError(error)
     }
   }
 

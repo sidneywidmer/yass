@@ -46,7 +46,7 @@ export function GameInstance({tryCode}: GameInstanceProps) {
             description: t('errors.gameNotFound.description')
           })
         }
-        if (error.response.data.payload.domainError == "GameAlreadyFull") {
+        if (error.response?.data?.payload?.domainError == "GameAlreadyFull") {
           navigate('/lobby')
           return addError({
             title: t('errors.gameFull.title'),
