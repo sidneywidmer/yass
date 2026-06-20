@@ -4,6 +4,7 @@ import {useGameStateStore} from '@/store/game-state'
 interface GameAction {
   type: string
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any
 }
 
@@ -81,24 +82,24 @@ const useGameActions = () => {
     },
     PlayerJoined: {
       handle: async (action) => useGameStateStore.setState((state) => {
-        const existingPlayerIndex = state.otherPlayers!!.findIndex(p => p.uuid === action.player.uuid)
+        const existingPlayerIndex = state.otherPlayers!.findIndex(p => p.uuid === action.player.uuid)
 
         if (existingPlayerIndex !== -1) {
           return {
-            otherPlayers: state.otherPlayers!!.map((p, i) =>
+            otherPlayers: state.otherPlayers!.map((p, i) =>
               i === existingPlayerIndex ? {...p, status: "CONNECTED"} : p
             )
           }
         }
 
         return {
-          otherPlayers: [...state.otherPlayers!!, action.player]
+          otherPlayers: [...state.otherPlayers!, action.player]
         }
       })
     },
     PlayerDisconnected: {
       handle: async (action) => useGameStateStore.setState((state) => ({
-        otherPlayers: state.otherPlayers!!.map(player =>
+        otherPlayers: state.otherPlayers!.map(player =>
           player.uuid === action.player.uuid
             ? {...player, status: "DISCONNECTED"}
             : player
@@ -136,6 +137,7 @@ const useGameActions = () => {
 
     setActionQueue(queue => queue.slice(1))
     processingRef.current = false
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actionQueue, isPaused])
 
   const addActions = useCallback((actions: GameAction[]) => {
@@ -143,6 +145,7 @@ const useGameActions = () => {
   }, [])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     processNextAction()
   }, [actionQueue, processNextAction])
 

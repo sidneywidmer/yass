@@ -12,7 +12,7 @@ export function PingHandler() {
     if (!uuid) return
 
     const ping = async () => {
-      await api.pingSeat({seat: uuid!!})
+      await api.pingSeat({seat: uuid!})
         .catch(handleError)
     }
 
@@ -22,6 +22,7 @@ export function PingHandler() {
         clearInterval(intervalRef.current)
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uuid])
 
   return null

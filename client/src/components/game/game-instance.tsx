@@ -35,7 +35,7 @@ export function GameInstance({tryCode}: GameInstanceProps) {
   useEffect(() => {
     api.joinGame({code: tryCode})
       .then((response) => {
-        setGameState(response.data!!)
+        setGameState(response.data!)
         setIsLoading(false)
       })
       .catch(error => {
@@ -59,6 +59,7 @@ export function GameInstance({tryCode}: GameInstanceProps) {
     return () => {
       resetGameState()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tryCode])
 
   if (isLoading) {

@@ -31,6 +31,26 @@ const getTeamConfig = (leftTeam: TeamComposition, rightTeam: TeamComposition): P
   return configMap[`${leftTeam}-${rightTeam}`] || configMap['player-player-bot-bot']
 }
 
+const TeamButton = ({team, selected, onClick}: { team: TeamComposition, selected: boolean, onClick: () => void }) => {
+  return (
+    <Button
+      onClick={onClick}
+      variant={selected ? "default" : "outline"}
+      className="w-full h-auto py-4 flex flex-col items-center gap-2"
+    >
+      <div className="flex gap-1">
+        {(team === 'player-player' || team === 'player-bot') && <User className="h-5 w-5"/>}
+        {team === 'player-bot' && <Bot className="h-5 w-5"/>}
+        {team === 'bot-bot' && <>
+            <Bot className="h-5 w-5"/>
+            <Bot className="h-5 w-5"/>
+        </>}
+        {team === 'player-player' && <User className="h-5 w-5"/>}
+      </div>
+    </Button>
+  )
+}
+
 export function CreateGameOverlay() {
   const {t} = useTranslation()
   const handleAxiosError = useAxiosErrorHandler()
@@ -61,26 +81,27 @@ export function CreateGameOverlay() {
       const response = await executeCreateGame(settings)
       setOpen(false)
       navigate(`/game/${response.data?.code}`)
-    } catch (error: any) {
-      if (error.response?.status === 422) {
+    } catch (error: unknown) {
+      const axiosErr = error as { response?: { status?: number; data?: { payload?: unknown; error?: string } } }
+      if (axiosErr.response?.status === 422) {
         // Handle constraint violations
-        const payload = error.response?.data?.payload
+        const payload = axiosErr.response?.data?.payload
         if (Array.isArray(payload)) {
-          const violation = payload.find((v: any) => v.path === 'winningConditionValue')
+          const violation = (payload as Array<{ path: string }>).find(v => v.path === 'winningConditionValue')
           if (violation) {
             return setError(t('errors.gameSettings.invalidValue'))
           }
         }
 
         // Handle domain-specific errors
-        switch (error.response?.data?.payload?.error) {
+        switch ((axiosErr.response?.data?.payload as { error?: string })?.error) {
           case "GameSettingsMaxBots":
             return setError(t('errors.gameSettings.maxBots'))
           case "GameSettingsInvalidValue":
             return setError(t('errors.gameSettings.invalidValue'))
         }
       }
-      handleAxiosError(error)
+      handleAxiosError(error as Parameters<typeof handleAxiosError>[0])
     }
   }
 
@@ -122,26 +143,6 @@ export function CreateGameOverlay() {
       'bot-bot-bot-bot': 'botBotVsBotBot',
     }
     return keyMap[`${nsTeam}-${ewTeam}`] || 'playerBotVsBotBot'
-  }
-
-  const TeamButton = ({team, selected, onClick}: { team: TeamComposition, selected: boolean, onClick: () => void }) => {
-    return (
-      <Button
-        onClick={onClick}
-        variant={selected ? "default" : "outline"}
-        className="w-full h-auto py-4 flex flex-col items-center gap-2"
-      >
-        <div className="flex gap-1">
-          {(team === 'player-player' || team === 'player-bot') && <User className="h-5 w-5"/>}
-          {team === 'player-bot' && <Bot className="h-5 w-5"/>}
-          {team === 'bot-bot' && <>
-              <Bot className="h-5 w-5"/>
-              <Bot className="h-5 w-5"/>
-          </>}
-          {team === 'player-player' && <User className="h-5 w-5"/>}
-        </div>
-      </Button>
-    )
   }
 
   return (

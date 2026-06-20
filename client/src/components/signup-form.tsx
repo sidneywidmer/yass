@@ -31,7 +31,7 @@ export function SignupForm() {
     if (initialized && isAuthenticated) {
       navigate('/lobby', {replace: true})
     }
-  }, [initialized])
+  }, [initialized, isAuthenticated, navigate])
   
   const {execute: executeSignup, isLoading, hasError, reset} = useAsyncAction(async (data: {username: string, email?: string, password?: string}) => {
     if (isGuest) {

@@ -1,21 +1,15 @@
 import {motion} from "motion/react"
-import {useEffect, useState} from "react"
 import {useGameStateStore} from "@/store/game-state"
 import {TrumpIcon} from "@/components/game/trump-icon"
 
 export function CurrentTrump() {
   const trump = useGameStateStore(state => state.trump)
-  const [key, setKey] = useState(0)
-
-  useEffect(() => {
-    setKey(prev => prev + 1)
-  }, [trump])
 
   if (!trump) return null
 
   return (
     <motion.div
-      key={key}
+      key={trump}
       initial={{scale: 0.5}}
       animate={{scale: 1}}
       transition={{

@@ -82,7 +82,7 @@ export const useGameStateStore = create<FlatGameState & GameStateActions>((set) 
     cards: state.cards.filter(c => !(card.suit === c.suit && card.rank === c.rank && card.skin == c.skin))
   })),
   playCard: (card) => set((state) => ({
-    cardsPlayed: [...state.cardsPlayed!!, card]
+    cardsPlayed: [...state.cardsPlayed!, card]
   })),
   addCardsToHand: (cards) => set({cards: cards}),
   clearCards: async (position) => {
@@ -104,7 +104,7 @@ export const useGameStateStore = create<FlatGameState & GameStateActions>((set) 
   resetActivePosition: () => set({activePosition: undefined}),
   setWeiseOverlayOpen: (open: boolean) => set({weiseOverlayOpen: open}),
   getPlayer: (position: Position) => {
-    const otherPlayers: Array<PlayerAtTable> = useGameStateStore.getState().otherPlayers!!
+    const otherPlayers: Array<PlayerAtTable> = useGameStateStore.getState().otherPlayers!
     return otherPlayers.find(p => p.position === position)
   },
   isWelcomeHand: (): boolean => {

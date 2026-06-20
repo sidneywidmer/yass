@@ -12,7 +12,7 @@ export function Share() {
   return (
     <div className="absolute inset-0 flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
-        <CodeWithCopy code={code!!} copyFullUrl={true}/>
+        <CodeWithCopy code={code!} copyFullUrl={true}/>
         <div className="bg-white p-4 rounded-lg">
           <QRCode value={`${window.location.origin}/game/${code}`} size={100}/>
         </div>

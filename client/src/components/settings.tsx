@@ -66,6 +66,7 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
 
     window.addEventListener('keydown', handleKeyDown, { capture: true });
     return () => window.removeEventListener('keydown', handleKeyDown, { capture: true });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, onOpenChange]);
 
   const handleOpenLeaveDialog = () => {

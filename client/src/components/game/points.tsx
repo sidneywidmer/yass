@@ -1,7 +1,8 @@
 import {useGameStateStore} from "@/store/game-state"
 import {cn} from "@/lib/utils"
 import {motion, AnimatePresence} from "motion/react"
-import {useRef, useEffect, useState} from "react"
+import {useEffect, useState} from "react"
+import {TotalPoints} from "@/api/generated"
 
 interface TeamSums {
   total: number
@@ -14,17 +15,17 @@ interface TeamTotals {
   EAST_WEST: TeamSums
 }
 
-function calculateTeamTotals(teams: any): TeamTotals {
+function calculateTeamTotals(teams: Record<string, TotalPoints>): TeamTotals {
   return {
     NORTH_SOUTH: {
-      total: teams.NORTH.cardPoints + teams.SOUTH.cardPoints + teams.NORTH.weisPoints + teams.SOUTH.weisPoints,
-      totalCardPoints: teams.NORTH.cardPoints + teams.SOUTH.cardPoints,
-      totalWeisPoints: teams.NORTH.weisPoints + teams.SOUTH.weisPoints,
+      total: (teams.NORTH.cardPoints ?? 0) + (teams.SOUTH.cardPoints ?? 0) + (teams.NORTH.weisPoints ?? 0) + (teams.SOUTH.weisPoints ?? 0),
+      totalCardPoints: (teams.NORTH.cardPoints ?? 0) + (teams.SOUTH.cardPoints ?? 0),
+      totalWeisPoints: (teams.NORTH.weisPoints ?? 0) + (teams.SOUTH.weisPoints ?? 0),
     },
     EAST_WEST: {
-      total: teams.EAST.cardPoints + teams.WEST.cardPoints + teams.EAST.weisPoints + teams.WEST.weisPoints,
-      totalCardPoints: teams.EAST.cardPoints + teams.WEST.cardPoints,
-      totalWeisPoints: teams.EAST.weisPoints + teams.WEST.weisPoints,
+      total: (teams.EAST.cardPoints ?? 0) + (teams.WEST.cardPoints ?? 0) + (teams.EAST.weisPoints ?? 0) + (teams.WEST.weisPoints ?? 0),
+      totalCardPoints: (teams.EAST.cardPoints ?? 0) + (teams.WEST.cardPoints ?? 0),
+      totalWeisPoints: (teams.EAST.weisPoints ?? 0) + (teams.WEST.weisPoints ?? 0),
     },
   }
 }
@@ -36,25 +37,27 @@ interface PointsProps {
 const Points = ({team}: PointsProps) => {
   const points = useGameStateStore(state => state.points)
   const position = useGameStateStore(state => state.position)
-  const previousTotalRef = useRef(0)
+  const [previousTotal, setPreviousTotal] = useState(0)
+  const [showDiff, setShowDiff] = useState(false)
   const totals = calculateTeamTotals(points)
   const currentTotal = totals[team].total
   const relevantTeam = (position === 'NORTH' || position === 'SOUTH') ? 'NORTH_SOUTH' : 'EAST_WEST'
   const isRelevant = team === relevantTeam
-  const difference = currentTotal - previousTotalRef.current
-  const [showDiff, setShowDiff] = useState(false)
+  const difference = currentTotal - previousTotal
 
   useEffect(() => {
-    if (difference > 0) {
+    const diff = currentTotal - previousTotal
+    if (diff > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowDiff(true)
       const timeout = setTimeout(() => setShowDiff(false), 2000)
       return () => clearTimeout(timeout)
     }
-  }, [difference])
+  }, [currentTotal]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      previousTotalRef.current = currentTotal
+      setPreviousTotal(currentTotal)
     }, 1000)
     return () => clearTimeout(timeout)
   }, [currentTotal])
