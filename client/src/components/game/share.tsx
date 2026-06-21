@@ -1,5 +1,5 @@
 import CodeWithCopy from "@/components/code-with-copy.tsx";
-import QRCode from "react-qr-code";
+import { QRCode } from "react-qr-code";
 import {useGameStateStore} from "@/store/game-state.ts";
 
 export function Share() {
