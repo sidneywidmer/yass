@@ -101,7 +101,7 @@ export function CreateGameOverlay() {
             return setError(t('errors.gameSettings.invalidValue'))
         }
       }
-      handleAxiosError(error)
+      if (isAxiosError(error)) handleAxiosError(error)
     }
   }
 

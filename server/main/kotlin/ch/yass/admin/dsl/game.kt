@@ -53,7 +53,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
             uuid = UUID.randomUUID().toString()
             createdAt = LocalDateTime.now(ZoneOffset.UTC)
             updatedAt = LocalDateTime.now(ZoneOffset.UTC)
-            playerId = player.id!!
+            playerId = player.id
             gameId = game.id
             position = p.position.name
             rejoinedAt = null
@@ -61,7 +61,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
             store()
         }
 
-        player.id!! to p.position
+        player.id to p.position
     }
 
     state.hands.map { h ->
@@ -89,7 +89,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
                 uuid = UUID.randomUUID().toString()
                 createdAt = LocalDateTime.now(ZoneOffset.UTC)
                 updatedAt = LocalDateTime.now(ZoneOffset.UTC)
-                handId = hand.id!!
+                handId = hand.id
                 store()
             }
         }
@@ -99,7 +99,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
                 uuid = UUID.randomUUID().toString()
                 createdAt = LocalDateTime.now(ZoneOffset.UTC)
                 updatedAt = LocalDateTime.now(ZoneOffset.UTC)
-                handId = hand.id!!
+                handId = hand.id
                 north = toDbJson(interpretCard(t.north))
                 east = toDbJson(interpretCard(t.east))
                 south = toDbJson(interpretCard(t.south))

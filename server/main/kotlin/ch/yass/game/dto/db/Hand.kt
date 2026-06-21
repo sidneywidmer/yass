@@ -27,7 +27,7 @@ data class Hand(
     companion object {
         fun fromRecord(hand: HandRecord): Hand {
             return Hand(
-                hand.id!!,
+                hand.id,
                 UUID.fromString(hand.uuid),
                 hand.createdAt,
                 hand.updatedAt,

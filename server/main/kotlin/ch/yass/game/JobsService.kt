@@ -34,12 +34,12 @@ class JobsService(
             val playerPing = aRecurringJob()
                 .withId("PLAYER_PING_JOB")
                 .withInterval(Duration.ofSeconds(10))
-                .withDetails { playerPing() }
+                .withJobLambda { playerPing() }
 
             val gameStatus = aRecurringJob()
                 .withId("GAMES_STATUS_JOB")
                 .withInterval(Duration.ofSeconds(30))
-                .withDetails { gameStatus() }
+                .withJobLambda { gameStatus() }
 
             scheduler.createRecurrently(playerPing)
             scheduler.createRecurrently(gameStatus)
