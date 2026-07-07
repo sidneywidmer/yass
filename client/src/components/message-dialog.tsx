@@ -62,11 +62,12 @@ const MessageDialog = ({
       toast.success(t("settings.message.success"));
       onOpenChange(false);
       onSubmit?.();
-    } catch (err: any) {
-      if (err.response?.status === 422) {
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { status?: number } }
+      if (axiosErr.response?.status === 422) {
         return setError(t('errors.validation.description'));
       }
-      handleAxiosError(err);
+      handleAxiosError(err as Parameters<typeof handleAxiosError>[0]);
     }
   };
 

@@ -5,7 +5,7 @@ import {useSettingsStore} from "@/store/settings.ts"
 import {AnalyzeHand as AnalyzeHandType, PlayerWithCards, Position, TrickWithCards} from "@/api/generated"
 import {Badge} from "@/components/ui/badge.tsx"
 import {AnalyzeTrick} from "@/components/analyze/analyze-trick"
-import {TEAM_COLOR_MAP} from "@/components/analyze/analyze-instance.tsx";
+import {TEAM_COLOR_MAP} from "@/components/analyze/analyze-constants";
 
 interface AnalyzeHandProps {
   hand: AnalyzeHandType

@@ -153,10 +153,10 @@ class AuthController(
         )
     }
 
-    context(Raise<CanNotLinkAnonAccount>)
+    context(r: Raise<CanNotLinkAnonAccount>)
     private fun getSession(player: InternalPlayer, orySession: String): Session =
-        arrow.core.raise.catch({
+        try {
             oryClient.frontend.toSession(orySession, null, null)
-        }) { _: ApiException -> raise(CanNotLinkAnonAccount(player, orySession)) }
+        } catch (_: ApiException) { r.raise(CanNotLinkAnonAccount(player, orySession)) }
 
 }

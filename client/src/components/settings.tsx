@@ -9,7 +9,7 @@ import {useTranslation} from "react-i18next";
 import Logout from "@/components/logout.tsx";
 import {SupportedLanguage} from "@/types/language.ts";
 import {CardDeck} from "@/types/card-deck.ts";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {useNavigate, useLocation} from "react-router-dom";
 import {
   AlertDialog,
@@ -47,14 +47,14 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
   // Use controlled state if provided, otherwise use internal state
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
 
-  const setOpen = (value: boolean | ((prev: boolean) => boolean)) => {
+  const setOpen = useCallback((value: boolean | ((prev: boolean) => boolean)) => {
     const newValue = typeof value === 'function' ? value(open) : value;
     if (onOpenChange) {
       onOpenChange(newValue);
     } else {
       setInternalOpen(newValue);
     }
-  };
+  }, [open, onOpenChange]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -66,7 +66,7 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
 
     window.addEventListener('keydown', handleKeyDown, { capture: true });
     return () => window.removeEventListener('keydown', handleKeyDown, { capture: true });
-  }, [open, onOpenChange]);
+  }, [setOpen]);
 
   const handleOpenLeaveDialog = () => {
     setShowLeaveDialog(true);

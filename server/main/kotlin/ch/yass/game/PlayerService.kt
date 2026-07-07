@@ -28,7 +28,7 @@ class PlayerService(private val db: DSLContext) {
      * Get a User dto from the ory session. If the user does not exist or changed its name - e.g.
      * via ory self-service - update it in our DB.
      */
-    context(Raise<StringNoValidUUID>, Raise<OryIdentityWithoutName>)
+    context(_: Raise<StringNoValidUUID>, _: Raise<OryIdentityWithoutName>)
     fun fromSession(session: Session): InternalPlayer {
         val oryUuid = session.identity!!.id.toUUID()
         val name = getNameFromIdentity(session.identity!!)
@@ -90,11 +90,11 @@ class PlayerService(private val db: DSLContext) {
         )
     }
 
-    context(Raise<CanNotLinkAnonAccount>)
+    context(r: Raise<CanNotLinkAnonAccount>)
     fun linkAnonAccount(player: InternalPlayer, oryUuid: UUID, orySession: String): InternalPlayer {
         // Just make sure no funky stuff is going on and we don't have an existing player with this ory uuid already set
         val existingOryUuids = db.fetchCount(PLAYER, PLAYER.ORY_UUID.eq(oryUuid.toString()))
-        ensure(existingOryUuids == 0) { CanNotLinkAnonAccount(player, orySession) }
+        r.ensure(existingOryUuids == 0) { CanNotLinkAnonAccount(player, orySession) }
 
         return db.update(PLAYER)
             .setNull(PLAYER.ANON_TOKEN)
@@ -149,11 +149,11 @@ class PlayerService(private val db: DSLContext) {
     private fun getOrCreateByOry(oryUuid: UUID, newOryPlayer: NewOryPlayer): InternalPlayer =
         getByOryUuid(oryUuid) ?: create(newOryPlayer)
 
-    context(Raise<OryIdentityWithoutName>)
+    context(r: Raise<OryIdentityWithoutName>)
     private fun getNameFromIdentity(identity: Identity): String {
         val email = with(identity.traits as LinkedTreeMap<*, *>) { get("name") as? String? }
 
-        return email ?: raise(OryIdentityWithoutName(identity))
+        return email ?: r.raise(OryIdentityWithoutName(identity))
     }
 }
 

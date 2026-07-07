@@ -13,16 +13,16 @@ import org.valiktor.ConstraintViolationException
  * validation defined this will automatically get triggered by jackson. If
  * anything goes wrong, an appropriate DomainError will be returned.
  */
-context(Raise<ValidationError>)
+context(r: Raise<ValidationError>)
 inline fun <reified T> validate(json: String): T {
     return try {
         jackson().readValue(json, T::class.java)
     } catch (exception: ValueInstantiationException) {
         when (exception.cause) {
-            is ConstraintViolationException -> raise(ValiktorError((exception.cause as ConstraintViolationException).constraintViolations))
-            else -> raise(JsonNotMappable(null, exception.cause))
+            is ConstraintViolationException -> r.raise(ValiktorError((exception.cause as ConstraintViolationException).constraintViolations))
+            else -> r.raise(JsonNotMappable(null, exception.cause))
         }
     } catch (exception: JacksonException) {
-        raise(JsonNotMappable(T::class.java.toString(), exception))
+        r.raise(JsonNotMappable(T::class.java.toString(), exception))
     }
 }

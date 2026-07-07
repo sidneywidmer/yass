@@ -4,7 +4,7 @@ import {TFunction} from "i18next";
 export type ErrorMessage = {
   id: number;
   text: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   field?: string;
 }
 
@@ -26,14 +26,14 @@ const findErrorMessage = (nodes: UiNode[] = []): ErrorDetails | null => {
   };
 };
 
-export const getOryErrorMessage = (data: any, t: TFunction): ErrorMessage | null => {
-  const topError: UiText = data?.ui?.messages?.find((msg: UiText) => msg.type === 'error');
+export const getOryErrorMessage = (data: { ui?: { messages?: UiText[]; nodes?: UiNode[] } } | null | undefined, t: TFunction): ErrorMessage | null => {
+  const topError = data?.ui?.messages?.find((msg: UiText) => msg.type === 'error');
   const error = topError ? {ui: topError} as ErrorDetails : findErrorMessage(data?.ui?.nodes);
 
   return error ? {
     id: error.ui.id,
-    text: t(`errors.ory.${error.ui.id}`, {...error.ui.context ?? {}}),
-    context: error.ui.context,
+    text: t(`errors.ory.${error.ui.id}`, {...(error.ui.context as Record<string, unknown> ?? {})}),
+    context: error.ui.context as Record<string, unknown> | undefined,
     field: error.field
   } : null;
 };

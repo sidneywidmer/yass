@@ -149,11 +149,11 @@ fun isGameFinished(state: GameState): Boolean {
     }
 }
 
-context(Raise<GameError>)
+context(r: Raise<GameError>)
 fun cardIsPlayable(card: Card, player: InternalPlayer, state: GameState): Boolean {
-    ensure(playerOwnsCard(player, card, state)) { PlayerDoesNotOwnCard(player, card, state) }
-    ensure(cardFollowsLead(card, player, state)) { CardNotPlayable(card, player, state) }
-    ensure(!cardUndertrumps(card, player, state)) { CardUndertrumps(card, player, state) }
+    r.ensure(playerOwnsCard(player, card, state)) { PlayerDoesNotOwnCard(player, card, state) }
+    r.ensure(cardFollowsLead(card, player, state)) { CardNotPlayable(card, player, state) }
+    r.ensure(!cardUndertrumps(card, player, state)) { CardUndertrumps(card, player, state) }
 
     return true
 }

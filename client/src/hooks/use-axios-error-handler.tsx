@@ -46,5 +46,5 @@ export const useAxiosErrorHandler = () => {
           description: t('errors.unknown.description')
         })
     }
-  }, [addError]);
+  }, [addError, t]);
 }

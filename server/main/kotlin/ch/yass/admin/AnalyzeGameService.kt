@@ -28,12 +28,12 @@ import ch.yass.admin.api.analzye.Hand as AnalyzeHand
  */
 class AnalyzeGameService(private val gameService: GameService) {
 
-    context(Raise<GameWithCodeNotFound>, Raise<PlayerNotInGame>, Raise<GameNotFinished>)
+    context(_: Raise<GameWithCodeNotFound>, inGame: Raise<PlayerNotInGame>, finished: Raise<GameNotFinished>)
     fun analyze(code: String, player: InternalPlayer): AnalyzeGameStateResponse {
         val state = gameService.getStateByCode(code)
 
-        ensure<PlayerNotInGame>(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
-        ensure<GameNotFinished>(state.game.status == GameStatus.FINISHED) { GameNotFinished(state.game.uuid.toString()) }
+        inGame.ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
+        finished.ensure(state.game.status == GameStatus.FINISHED) { GameNotFinished(state.game.uuid.toString()) }
 
         val hands = state.hands.reversed().map { mapHand(it, state) }
         val points = pointsByPositionTotal(state.hands, state.tricks)

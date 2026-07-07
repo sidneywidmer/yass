@@ -4,7 +4,7 @@ import {Card as PlayingCard} from "@/components/game/card"
 import {useCardDimensions} from "@/hooks/use-card-dimensions.ts"
 import {cn} from "@/lib/utils.ts"
 import {PlayedCardWithPlayer, Position, TrickWithCards} from "@/api/generated"
-import {TEAM_BORDER_MAP, TEAM_COLOR_MAP} from "@/components/analyze/analyze-instance.tsx";
+import {TEAM_BORDER_MAP, TEAM_COLOR_MAP} from "@/components/analyze/analyze-constants";
 
 interface AnalyzeTrickProps {
   trick: TrickWithCards

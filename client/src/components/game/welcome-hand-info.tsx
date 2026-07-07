@@ -1,18 +1,12 @@
 import {useGameStateStore} from "@/store/game-state.ts";
-import {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 
 export function WelcomeHandInfo() {
   const isWelcomeHand = useGameStateStore(state => state.isWelcomeHand());
   const cardsPlayed = useGameStateStore(state => state.cardsPlayed);
-  const [showMessage, setShowMessage] = useState(true);
   const {t} = useTranslation();
 
-  useEffect(() => {
-    if (cardsPlayed && cardsPlayed.length > 0) {
-      setShowMessage(false);
-    }
-  }, [cardsPlayed]);
+  const showMessage = !cardsPlayed || cardsPlayed.length === 0;
 
   if (!isWelcomeHand || !showMessage) {
     return null;

@@ -22,7 +22,7 @@ data class Trick(
     companion object {
         fun fromRecord(trick: TrickRecord): Trick {
             return Trick(
-                trick.id!!,
+                trick.id,
                 UUID.fromString(trick.uuid),
                 trick.createdAt,
                 trick.updatedAt,

@@ -25,7 +25,7 @@ export function LoginForm() {
     if (initialized && isAuthenticated) {
       navigate('/lobby', {replace: true})
     }
-  }, [initialized])
+  }, [initialized, isAuthenticated, navigate])
 
   const {execute: executeLogin, isLoading, hasError, reset} = useAsyncAction(async (credentials: {
     email: string,

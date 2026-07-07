@@ -3,6 +3,7 @@ import {usePlayerStore} from "@/store/player.ts";
 import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 import {ory} from "@/api/ory.ts";
 import {ErrorMessage, getOryErrorMessage} from "@/api/helpers.ts";
+import {UiNode} from "@ory/client";
 import {useState} from "react";
 import {useTranslation} from "react-i18next";
 
@@ -15,11 +16,11 @@ export const useOry = () => {
   const [signupError, setSignupError] = useState<ErrorMessage | null>(null)
   const {t} = useTranslation();
 
-  const getCsrfToken = (flow: any): string => {
-    let csrfNode = flow.ui.nodes.find(
-      (node: any) => node.attributes.name === "csrf_token"
+  const getCsrfToken = (flow: { ui: { nodes: UiNode[] } }): string => {
+    const csrfNode = flow.ui.nodes.find(
+      (node: UiNode) => (node.attributes as { name?: string }).name === "csrf_token"
     )
-    return csrfNode?.attributes.value || ""
+    return (csrfNode?.attributes as { value?: string })?.value || ""
   }
 
   const login = (credentials: { email: string; password: string }, redirectTo?: string) =>
@@ -34,9 +35,9 @@ export const useOry = () => {
         }
       }))
       .then(response => {
-        let oryUuid = response.data.session.identity?.id
-        let username = response.data.session.identity?.traits.name
-        setOryPlayer(oryUuid!!, username)
+        const oryUuid = response.data.session.identity?.id
+        const username = response.data.session.identity?.traits.name
+        setOryPlayer(oryUuid!, username)
         navigate(redirectTo || '/')
       })
       .catch(error => {
@@ -60,9 +61,9 @@ export const useOry = () => {
         }
       }))
       .then(response => {
-        let oryUuid = response.data.identity.id
-        let username = response.data.identity.traits.name
-        setOryPlayer(oryUuid!!, username)
+        const oryUuid = response.data.identity.id
+        const username = response.data.identity.traits.name
+        setOryPlayer(oryUuid!, username)
         navigate(redirectTo || '/')
       })
       .catch((error) => {

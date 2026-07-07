@@ -3,7 +3,7 @@ import {cn, getRelativePosition, getResponsiveValue} from "@/lib/utils"
 import {Position} from "@/api/generated"
 import {useGameStateStore} from "@/store/game-state"
 import {Card} from "@/components/ui/card.tsx";
-import {AnimatePresence, motion} from "framer-motion"
+import {AnimatePresence, motion} from "motion/react"
 import {TrumpIcon} from "@/components/game/trump-icon"
 
 const VERTICAL = getResponsiveValue(200, 250)
@@ -67,9 +67,9 @@ export function OtherPlayers() {
           <motion.div
             key={player.uuid}
             className="absolute top-1/2 left-1/2"
-            style={positionStylesInitial[getRelativePosition(position!!, player.position!!)]}
+            style={positionStylesInitial[getRelativePosition(position!, player.position!)]}
             initial={{opacity: 0}}
-            animate={positionStyles[getRelativePosition(position!!, player.position!!)]}
+            animate={positionStyles[getRelativePosition(position!, player.position!)]}
           >
             <Card className="h-10 p-3 flex flex-row items-center justify-center gap-2 overflow-hidden">
               {player.bot ? (<Bot className="h-4 w-4"/>) : (<User className="h-4 w-4"/>)}
@@ -81,7 +81,7 @@ export function OtherPlayers() {
                 <Forward className="w-4 h-4"/>
               )}
               <StatusIndicator
-                status={player.status!!}
+                status={player.status!}
                 isActive={player.position == activePosition && !player.bot}
               />
             </Card>

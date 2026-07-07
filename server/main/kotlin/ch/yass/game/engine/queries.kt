@@ -208,12 +208,12 @@ fun maybeActivePlayer(
 ): InternalPlayer? =
     maybePlayerAtPosition(activePosition(hands, seats, tricks), seats, players)
 
-context(Raise<GameAlreadyFull>)
+context(r: Raise<GameAlreadyFull>)
 fun randomFreePosition(occupiedSeats: List<Seat>): Position {
     val occupied = occupiedSeats.map { it.position }.toSet()
     val all = Position.entries.toSet()
 
-    return all.minus(occupied).randomOrNull() ?: raise(GameAlreadyFull)
+    return all.minus(occupied).randomOrNull() ?: r.raise(GameAlreadyFull)
 }
 
 fun startingPlayersSeatOfHand(hand: Hand, seats: List<Seat>): Seat =

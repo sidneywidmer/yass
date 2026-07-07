@@ -13,15 +13,16 @@ export default function Analyze() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    api.analyzeGame(code!!)
+    api.analyzeGame(code!)
       .then(response => setAnalysis(response.data!))
       .catch(error => {
         navigate("/lobby")
         handleAxiosError(error)
       })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code])
 
   if (!analysis) return <div>Loading...</div>
 
-  return <AnalyzeInstance code={code!!} analysis={analysis} />
+  return <AnalyzeInstance code={code!} analysis={analysis} />
 }

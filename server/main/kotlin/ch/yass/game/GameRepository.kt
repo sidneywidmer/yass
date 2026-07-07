@@ -38,7 +38,7 @@ class GameRepository(private val db: DSLContext) {
             .fetchOne(mapping(Game::fromRecord))!!
     }
 
-    context(Raise<GameAlreadyFull>)
+    context(_: Raise<GameAlreadyFull>)
     fun takeASeat(game: Game, player: InternalPlayer, position: Position? = null): Seat {
         val seats = getSeats(game)
         val maybeAlreadySeated = seats.firstOrNull { it.playerId == player.id }
@@ -82,19 +82,19 @@ class GameRepository(private val db: DSLContext) {
         return GameState(refreshedGame, players + bots, seats, hands, tricks)
     }
 
-    context(Raise<GameWithCodeNotFound>)
+    context(r: Raise<GameWithCodeNotFound>)
     fun getByCode(code: String): Game =
         db.selectFrom(GAME)
             .where(GAME.CODE.eq(code))
-            .fetchOneInto(Game::class.java) ?: raise(GameWithCodeNotFound(code))
+            .fetchOneInto(Game::class.java) ?: r.raise(GameWithCodeNotFound(code))
 
-    context(Raise<GameNotFound>)
+    context(r: Raise<GameNotFound>)
     fun getByUUID(uuid: String): Game {
         val game = db.selectFrom(GAME)
             .where(GAME.UUID.eq(uuid))
             .fetchOneInto(Game::class.java)
 
-        return game ?: raise(GameNotFound(uuid))
+        return game ?: r.raise(GameNotFound(uuid))
     }
 
     fun refresh(game: Game): Game {
@@ -103,7 +103,7 @@ class GameRepository(private val db: DSLContext) {
             .fetchOneInto(Game::class.java)!!
     }
 
-    context(Raise<SeatNotFound>)
+    context(r: Raise<SeatNotFound>)
     fun getBySeatUUID(uuid: String): Game {
         val game = db.select()
             .from(SEAT)
@@ -111,7 +111,7 @@ class GameRepository(private val db: DSLContext) {
             .where(SEAT.UUID.eq(uuid))
             .fetchOneInto(Game::class.java)
 
-        return game ?: raise(SeatNotFound(uuid))
+        return game ?: r.raise(SeatNotFound(uuid))
     }
 
     fun chooseTrump(trump: Trump, hand: Hand): Hand =

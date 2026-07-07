@@ -70,7 +70,7 @@ class GameService(
      * as configured in the settings. Then seat the player at a free position, deal everyone
      * some cards and start a fresh trick.
      */
-    context(Raise<DomainError>)
+    context(r: Raise<DomainError>)
     fun create(request: CreateCustomGameRequest, player: InternalPlayer): String {
         val settings = GameSettings.from(request)
 
@@ -78,8 +78,8 @@ class GameService(
             WinningConditionType.HANDS -> settings.winningConditionValue in 1..99
             WinningConditionType.POINTS -> settings.winningConditionValue in 100..9000
         }
-        ensure(settings.botPositions().size < 4) { GameSettingsMaxBots(settings) }
-        ensure(validWcValue) { GameSettingsInvalidValue(settings) }
+        r.ensure(settings.botPositions().size < 4) { GameSettingsMaxBots(settings) }
+        r.ensure(validWcValue) { GameSettingsInvalidValue(settings) }
 
         val game = repo.createGame(settings)
 
@@ -117,7 +117,7 @@ class GameService(
         return game.code
     }
 
-    context(Raise<GameError>, Raise<DbError>)
+    context(_: Raise<GameError>, _: Raise<DbError>)
     fun join(request: JoinGameRequest, player: InternalPlayer): GameState {
         val game = repo.getByCode(request.code)
         val joinedAtSeat = repo.takeASeat(game, player)
@@ -131,24 +131,24 @@ class GameService(
         return repo.getState(game)
     }
 
-    context(Raise<GameWithCodeNotFound>)
+    context(_: Raise<GameWithCodeNotFound>)
     fun getStateByCode(code: String): GameState {
         val game = repo.getByCode(code)
         return repo.getState(game)
     }
 
-    context(Raise<GameError>)
+    context(r: Raise<GameError>)
     fun play(request: PlayCardRequest, player: InternalPlayer): GameState {
         val game = repo.getByUUID(request.game)
         val state = repo.getState(game)
         val playedCard = Card.from(request.card)
         val nextState = nextState(state)
 
-        ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
-        ensure(expectedState(listOf(State.PLAY_CARD, State.PLAY_CARD_BOT), nextState)) {
+        r.ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
+        r.ensure(expectedState(listOf(State.PLAY_CARD, State.PLAY_CARD_BOT), nextState)) {
             InvalidState(nextState, state)
         }
-        ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
+        r.ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
 
         cardIsPlayable(playedCard, player, state)
 
@@ -174,7 +174,7 @@ class GameService(
         return repo.getState(game)
     }
 
-    context(Raise<GameError>)
+    context(r: Raise<GameError>)
     fun trump(request: ChooseTrumpRequest, player: InternalPlayer): GameState {
         val game = repo.getByUUID(request.game)
         val state = repo.getState(game)
@@ -182,10 +182,10 @@ class GameService(
         val nextState = nextState(state)
         val position = state.seats.first { it.playerId == player.id }.position
 
-        ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
-        ensure(expectedState(listOf(State.TRUMP, State.TRUMP_BOT), nextState)) { InvalidState(nextState, state) }
-        ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
-        ensure(Trump.playable().contains(chosenTrump)) { TrumpInvalid(chosenTrump) }
+        r.ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
+        r.ensure(expectedState(listOf(State.TRUMP, State.TRUMP_BOT), nextState)) { InvalidState(nextState, state) }
+        r.ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
+        r.ensure(Trump.playable().contains(chosenTrump)) { TrumpInvalid(chosenTrump) }
 
         repo.chooseTrump(chosenTrump, currentHand(state.hands))
 
@@ -197,7 +197,7 @@ class GameService(
         return repo.getState(game)
     }
 
-    context(Raise<GameError>)
+    context(r: Raise<GameError>)
     fun weisen(request: WeisenRequest, player: InternalPlayer): GameState {
         val game = repo.getByUUID(request.game)
         val state = repo.getState(game)
@@ -205,12 +205,12 @@ class GameService(
         val hand = currentHand(state.hands)
         val seat = playerSeat(player, state.seats)
 
-        ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
-        ensure(expectedState(listOf(State.WEISEN_FIRST, State.WEISEN_FIRST_BOT), nextState)) {
+        r.ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
+        r.ensure(expectedState(listOf(State.WEISEN_FIRST, State.WEISEN_FIRST_BOT), nextState)) {
             InvalidState(nextState, state)
         }
-        ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
-        ensure(possibleWeise(hand.cardsOf(seat.position), hand.trump).contains(request.weis)) {
+        r.ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
+        r.ensure(possibleWeise(hand.cardsOf(seat.position), hand.trump).contains(request.weis)) {
             WeisInvalid(request.weis)
         }
 
@@ -234,7 +234,7 @@ class GameService(
      * one, then after the first trick is over this method automatically publishes ShowWeis actions for all
      * valid but not shown weise of the team with the most weis points. A bit a strange rule...
      */
-    context(Raise<GameError>)
+    context(_: Raise<GameError>)
     private fun weisenSecond(state: GameState) {
         val hand = currentHand(state.hands)
         val remainingWeise = remainingWeise(hand)
@@ -257,7 +257,7 @@ class GameService(
         gameLoop(state.game)
     }
 
-    context(Raise<GameError>)
+    context(r: Raise<GameError>)
     fun schiebe(request: SchiebeRequest, player: InternalPlayer): GameState {
         val game = repo.getByUUID(request.game)
         val state = repo.getState(game)
@@ -266,9 +266,9 @@ class GameService(
         val currentHand = currentHand(state.hands)
         val position = state.seats.first { it.playerId == player.id }.position
 
-        ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
-        ensure(expectedState(listOf(State.SCHIEBE, State.SCHIEBE_BOT), nextState)) { InvalidState(nextState, state) }
-        ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
+        r.ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
+        r.ensure(expectedState(listOf(State.SCHIEBE, State.SCHIEBE_BOT), nextState)) { InvalidState(nextState, state) }
+        r.ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
 
         repo.schiebe(gschobe, currentHand)
 
@@ -280,7 +280,7 @@ class GameService(
         return repo.getState(game)
     }
 
-    context(Raise<SeatNotFound>)
+    context(_: Raise<SeatNotFound>)
     fun disconnectSeat(seatUUID: UUID) {
         val game = repo.getBySeatUUID(seatUUID.toString())
         val state = repo.getState(game)
@@ -293,7 +293,7 @@ class GameService(
         publishForSeats(state.seats) { actions }
     }
 
-    context(Raise<SeatNotFound>)
+    context(_: Raise<SeatNotFound>)
     fun connectSeat(seat: Seat) {
         val game = repo.getBySeatUUID(seat.uuid.toString())
         val state = repo.getState(game)
@@ -328,7 +328,7 @@ class GameService(
      *
      * TODO: Add delays on client side
      */
-    context(Raise<GameError>)
+    context(_: Raise<GameError>)
     @OptIn(DelicateCoroutinesApi::class)
     private fun gameLoop(game: Game) {
         val updatedState = repo.getState(game)
@@ -400,11 +400,11 @@ class GameService(
         publishForSeats(state.seats) { actions }
     }
 
-    context(Raise<GameError>)
+    context(r: Raise<GameError>)
     private fun trumpAsBot(state: GameState): GameState {
         val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)
         if (!botPlayer.bot) {
-            raise(PlayerIsNotBot(botPlayer, state))
+            r.raise(PlayerIsNotBot(botPlayer, state))
         }
 
         val candidate = chooseTrumpForBot(botPlayer, state)
@@ -413,11 +413,11 @@ class GameService(
         return trump(request, botPlayer)
     }
 
-    context(Raise<GameError>)
+    context(r: Raise<GameError>)
     private fun playAsBot(state: GameState): GameState {
         val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)
         if (!botPlayer.bot) {
-            raise(PlayerIsNotBot(botPlayer, state))
+            r.raise(PlayerIsNotBot(botPlayer, state))
         }
 
         val card = chooseCardForBot(botPlayer, state).card
@@ -429,11 +429,11 @@ class GameService(
         return play(request, botPlayer)
     }
 
-    context(Raise<GameError>)
+    context(r: Raise<GameError>)
     private fun schiebeAsBot(state: GameState): GameState {
         val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)
         if (!botPlayer.bot) {
-            raise(PlayerIsNotBot(botPlayer, state))
+            r.raise(PlayerIsNotBot(botPlayer, state))
         }
 
         val gschobe = chooseGschobeForBot(botPlayer, state)
@@ -443,7 +443,7 @@ class GameService(
     }
 
 
-    context(Raise<GameError>)
+    context(_: Raise<GameError>)
     private fun weisenAsBot(state: GameState): GameState {
         val botPlayer = activePlayer(state.hands, state.allPlayers, state.seats, state.tricks)
 

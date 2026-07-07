@@ -33,13 +33,13 @@ class JobsService(
         if (config.getString("environment") != "test") {
             val playerPing = aRecurringJob()
                 .withId("PLAYER_PING_JOB")
-                .withDuration(Duration.ofSeconds(10))
-                .withDetails { playerPing() }
+                .withInterval(Duration.ofSeconds(10))
+                .withJobLambda { playerPing() }
 
             val gameStatus = aRecurringJob()
                 .withId("GAMES_STATUS_JOB")
-                .withDuration(Duration.ofSeconds(30))
-                .withDetails { gameStatus() }
+                .withInterval(Duration.ofSeconds(30))
+                .withJobLambda { gameStatus() }
 
             scheduler.createRecurrently(playerPing)
             scheduler.createRecurrently(gameStatus)

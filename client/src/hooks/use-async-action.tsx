@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 
-export function useAsyncAction<T extends any[], R>(
+export function useAsyncAction<T extends unknown[], R>(
   asyncFn: (...args: T) => Promise<R>
 ) {
   const [isLoading, setIsLoading] = useState(false)

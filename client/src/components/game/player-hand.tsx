@@ -1,6 +1,6 @@
 import {useGameStateStore} from "@/store/game-state.ts";
 import {CardInHand} from "@/api/generated";
-import {AnimatePresence, motion, useAnimation} from "framer-motion"
+import {AnimatePresence, motion, useAnimation} from "motion/react"
 import {useEffect, useMemo, useRef} from "react";
 import {Card} from "@/components/game/card.tsx";
 import {useCardDimensions} from "@/hooks/use-card-dimensions.ts";
@@ -97,11 +97,9 @@ export function PlayerHand() {
 
   const hoveredIndexRef = useRef<number | null>(null)
 
-  if (!cards) return null
-
   const startRotation = useMemo(() => {
     return -(ANIMATION_CONFIG.CARD_ROTATION / 2) - (ANIMATION_CONFIG.CARD_ROTATION * ((totalCards / 2) - 1))
-  }, [totalCards])
+  }, [totalCards]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Create a fixed number of animation controls (max possible cards in hand which is 9). Each card, when being created -
   // gets one of those assigned. Like this we hava a reference to the cards animation handler and can manually invoke
@@ -139,7 +137,7 @@ export function PlayerHand() {
   }
 
   const cardsAboveOverlay = () => {
-    return isMyPos && ["WEISEN_FIRST", "TRUMP", "SCHIEBE"].includes(state!!)
+    return isMyPos && ["WEISEN_FIRST", "TRUMP", "SCHIEBE"].includes(state!)
   }
 
   const createCardAnimation = ({card, animationType, position, isTouch}: CardAnimationConfig) => {
@@ -164,21 +162,9 @@ export function PlayerHand() {
     return 'initial'
   }
 
-  // Update all card animations when playable state changes
-  useEffect(() => {
-    if (!isMyPos) {
-      return
-    }
-
-    filteredCards.forEach((card, i) => {
-      const filter = (cardsAboveOverlay() || cardPlayable(card)) ? ANIMATION_CONFIG.BRIGHTNESS.PLAYABLE : ANIMATION_CONFIG.BRIGHTNESS.DISABLED
-      getCardControlsByIndex(i).start({filter: filter})
-    })
-  }, [cards, isMyPos, isPlayCardState])
-
   const playCardAction = (card: CardInHand) => {
     resetActivePosition()
-    api.playCard({game: gameUuid!!, card: {suit: card.suit, rank: card.rank, skin: card.skin}})
+    api.playCard({game: gameUuid!, card: {suit: card.suit, rank: card.rank, skin: card.skin}})
       .catch(handleAxiosError)
 
     hoveredIndexRef.current = null
@@ -226,7 +212,7 @@ export function PlayerHand() {
     return Math.round((distance * 2 / middle * 10) - (CARD_HEIGHT / 3))
   }
 
-  const handleDrag = (action: any) => {
+  const handleDrag = (action: { clientX: number; clientY: number }) => {
     const element = document.elementFromPoint(action.clientX, action.clientY)
     const cardElement = element?.closest('[data-card-index]')
     if (cardElement) {
@@ -238,6 +224,20 @@ export function PlayerHand() {
     }
   }
 
+  // Update all card animations when playable state changes
+  useEffect(() => {
+    if (!isMyPos) {
+      return
+    }
+
+    filteredCards.forEach((card, i) => {
+      const filter = (cardsAboveOverlay() || cardPlayable(card)) ? ANIMATION_CONFIG.BRIGHTNESS.PLAYABLE : ANIMATION_CONFIG.BRIGHTNESS.DISABLED
+      getCardControlsByIndex(i).start({filter: filter})
+    })
+  }, [cards, isMyPos, isPlayCardState]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!cards) return null
+
   return (
     <div id={"playerHand"}
          className={`fixed -bottom-[60px] w-full flex justify-center ${cardsAboveOverlay() ? "z-50" : ""}`}>
@@ -247,7 +247,7 @@ export function PlayerHand() {
         drag={isTouch}
         dragConstraints={{left: 0, right: 0, top: 0, bottom: 0}}
         dragElastic={0}
-        onDrag={(mouse) => handleDrag(mouse)}
+        onDrag={(_, info) => handleDrag({clientX: info.point.x, clientY: info.point.y})}
         onMouseMove={(mouse) => !isTouch && handleDrag(mouse)}
         onMouseLeave={() => !isTouch && triggerCardHover(null, filteredCards)}
       >
@@ -279,7 +279,7 @@ export function PlayerHand() {
                 animate={getCardControlsByIndex(i)}
                 onClick={() => cardClicked(card, i)}
               >
-                <Card card={{suit: card.suit!!, rank: card.rank!!, skin: card.skin!!}}/>
+                <Card card={{suit: card.suit!, rank: card.rank!, skin: card.skin!}}/>
               </motion.div>
             )
           })}

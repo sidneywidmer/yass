@@ -9,13 +9,10 @@ export function useAuth() {
   const setAnonPlayer = usePlayerStore(state => state.setAnonPlayer)
   const logout = usePlayerStore(state => state.logout)
   const handleAxiosError = useAxiosErrorHandler()
-  const [initialized, setInitialized] = useState(false)
+  const [initialized, setInitialized] = useState(isAuthenticated)
 
   useEffect(() => {
-    if (isAuthenticated) {
-      setInitialized(true)
-      return
-    }
+    if (isAuthenticated) return
 
     const init = async () => {
       api.whoami()
@@ -37,6 +34,7 @@ export function useAuth() {
         })
     }
     init()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {isAuthenticated, initialized}

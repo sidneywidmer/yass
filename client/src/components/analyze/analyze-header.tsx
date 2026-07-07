@@ -2,12 +2,13 @@ import {CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import {Frown, Trophy} from "lucide-react"
 import {cn} from "@/lib/utils.ts"
 import {useTranslation} from "react-i18next"
+import {PlayerWithCards} from "@/api/generated"
 
 interface AnalyzeHeaderProps {
   code: string
   winnerPoints: number | undefined
   loserPoints: number | undefined
-  playerInGame: any
+  playerInGame: PlayerWithCards | null
   winner: boolean
 }
 

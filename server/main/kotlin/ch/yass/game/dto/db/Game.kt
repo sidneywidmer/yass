@@ -19,7 +19,7 @@ data class Game(
     companion object {
         fun fromRecord(game: GameRecord): Game {
             return Game(
-                game.id!!,
+                game.id,
                 UUID.fromString(game.uuid),
                 game.createdAt,
                 game.updatedAt,

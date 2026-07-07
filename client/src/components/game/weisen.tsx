@@ -25,13 +25,13 @@ export function Weisen() {
   }
 
   const onWeisSelect = (weis: Weis) => {
-    api.weisen({game: gameUuid!!, weis: weis})
+    api.weisen({game: gameUuid!, weis: weis})
       .then(() => setOpen(false))
       .catch(handleAxiosError)
   }
 
   const onSkip = () => {
-    api.weisen({game: gameUuid!!, weis: {type: "SKIP", cards: []}})
+    api.weisen({game: gameUuid!, weis: {type: "SKIP", cards: []}})
       .then(() => setOpen(false))
       .catch(handleAxiosError)
   }
@@ -54,7 +54,7 @@ export function Weisen() {
                 <span className="text-sm text-muted-foreground">{weis.points} {t("weisen.points")}</span>
               </div>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {weis.cards!!.map((card, i) => (
+                {weis.cards!.map((card, i) => (
                   <Card key={i} card={card}/>
                 ))}
               </div>

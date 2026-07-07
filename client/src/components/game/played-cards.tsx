@@ -1,23 +1,30 @@
-import {AnimatePresence, motion} from "framer-motion"
+import {AnimatePresence, motion} from "motion/react"
 import {useGameStateStore} from "@/store/game-state"
 import {Card} from "@/components/game/card.tsx";
 import {useCardDimensions} from "@/hooks/use-card-dimensions.ts";
 import {Position} from "@/api/generated";
-import {useMemo} from "react";
 import {getRelativePosition} from "@/lib/utils.ts";
+
+const cardRotations = {
+  NORTH: 180 + (Math.random() * 10 - 5),
+  EAST: -90 + (Math.random() * 10 - 5),
+  SOUTH: (Math.random() * 10 - 5),
+  WEST: 90 + (Math.random() * 10 - 5),
+}
+
+// Give a rare chance to do a full 360
+const woop = (rotation: number): number => {
+  if (Math.random() < 0.05) {
+    return rotation + (rotation >= 0 ? 360 : -360)
+  }
+  return rotation
+}
 
 export function PlayedCards() {
   const clearDirection = useGameStateStore(state => state.clearDirection);
   const cardsPlayed = useGameStateStore(state => state.cardsPlayed);
   const position = useGameStateStore(state => state.position);
   const {CARD_WIDTH, CARD_HEIGHT} = useCardDimensions();
-
-  const cardRotations = useMemo(() => ({
-    NORTH: 180 + (Math.random() * 10 - 5),
-    EAST: -90 + (Math.random() * 10 - 5),
-    SOUTH: (Math.random() * 10 - 5),
-    WEST: 90 + (Math.random() * 10 - 5),
-  }), [])
 
   const getInitialPosition = (position: Position, exclRotate: boolean = false, exclWe = false) => {
     // "We" are always sitting south, no special initial position needs to be calculated
@@ -34,7 +41,7 @@ export function PlayedCards() {
     }
     if (exclRotate) {
       const result = transforms[position]
-      const {rotate, ...rest} = result
+      const {rotate: _rotate, ...rest} = result
       return rest
     }
     return transforms[position]
@@ -50,16 +57,8 @@ export function PlayedCards() {
     return transforms[position]
   }
 
-  // Give a rare chance to do a full 360
-  const woop = (rotation: number): number => {
-    if (Math.random() < 0.05) {
-      return rotation + (rotation >= 0 ? 360 : -360)
-    }
-    return rotation
-  }
-
   const handleExit = () => {
-    return getInitialPosition(getRelativePosition(position!!, clearDirection!!), true, true)
+    return getInitialPosition(getRelativePosition(position!, clearDirection!), true, true)
   }
 
   return (
@@ -67,34 +66,34 @@ export function PlayedCards() {
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" key={"table"}
            style={{width: CARD_WIDTH, height: CARD_HEIGHT}}>
         <AnimatePresence initial={true}>
-          {cardsPlayed!!.map((card) => (
+          {cardsPlayed!.map((card) => (
             <motion.div
               layoutId={`cardlayout-${card.position}-${card.suit}-${card.rank}-${card.skin}`}
               key={`cardtable-${card.position}-${card.suit}-${card.rank}-${card.skin}`}
               className="absolute origin-center"
-              initial={getInitialPosition(getRelativePosition(position!!, card.position!!))}
+              initial={getInitialPosition(getRelativePosition(position!, card.position!))}
               layout
               transition={{
                 layout: {duration: 0.2, ease: [0.4, 0, 0.2, 1]}
               }}
               animate={
-                clearDirection && card.position!! === clearDirection
+                clearDirection && card.position! === clearDirection
                   ? {
-                    ...getPosition(getRelativePosition(position!!, card.position!!)),
+                    ...getPosition(getRelativePosition(position!, card.position!)),
                     opacity: 1,
                     rotate: [
-                      cardRotations[getRelativePosition(position!!, card.position!!)],
-                      cardRotations[getRelativePosition(position!!, card.position!!)] - 15,
-                      cardRotations[getRelativePosition(position!!, card.position!!)] + 15,
-                      cardRotations[getRelativePosition(position!!, card.position!!)] - 10,
-                      cardRotations[getRelativePosition(position!!, card.position!!)] + 10,
-                      cardRotations[getRelativePosition(position!!, card.position!!)]
+                      cardRotations[getRelativePosition(position!, card.position!)],
+                      cardRotations[getRelativePosition(position!, card.position!)] - 15,
+                      cardRotations[getRelativePosition(position!, card.position!)] + 15,
+                      cardRotations[getRelativePosition(position!, card.position!)] - 10,
+                      cardRotations[getRelativePosition(position!, card.position!)] + 10,
+                      cardRotations[getRelativePosition(position!, card.position!)]
                     ],
                     zIndex: 100,
                     transition: {duration: 0.2, ease: "easeOut"}
                   }
                   : {
-                    ...getPosition(getRelativePosition(position!!, card.position!!)),
+                    ...getPosition(getRelativePosition(position!, card.position!)),
                     opacity: 1,
                     transition: {duration: 0.2, ease: "easeOut"}
                   }

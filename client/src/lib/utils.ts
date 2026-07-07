@@ -3,11 +3,10 @@ import {clsx, type ClassValue} from "clsx"
 import {twMerge} from "tailwind-merge"
 import {Position} from "@/api/generated";
 
-export const getValidRedirectPath = (from: any): string | undefined => {
-  if (!from?.pathname) return undefined
-  if (from.pathname.startsWith('/game/')) {
-    return from.pathname
-  }
+export const getValidRedirectPath = (from: unknown): string | undefined => {
+  if (!from || typeof from !== 'object' || !('pathname' in from)) return undefined
+  const pathname = (from as { pathname: string }).pathname
+  if (pathname.startsWith('/game/')) return pathname
   return undefined
 }
 
@@ -17,7 +16,7 @@ export function cn(...inputs: ClassValue[]) {
 
 const POSITIONS: Position[] = ['NORTH', 'EAST', 'SOUTH', 'WEST']
 export const getRelativePosition = (playerPosition: Position, absolutePosition: Position): Position => {
-  let southOffset = 2 - POSITIONS.indexOf(playerPosition!!)
+  const southOffset = 2 - POSITIONS.indexOf(playerPosition!)
   let newPos = POSITIONS.indexOf(absolutePosition) + southOffset
 
   if (newPos > 3) {
@@ -46,7 +45,7 @@ export const getResponsiveValue = (minValue: number, maxValue: number) => {
 
 export const isTouchDevice = () => {
   // lol wat, https://stackoverflow.com/questions/55833326/wrong-maxtouchpoints-and-ontouchstart-in-document-in-chrome-mobile-emulati
-  let maxTouchPoints = navigator.maxTouchPoints & 0xFF;
+  const maxTouchPoints = navigator.maxTouchPoints & 0xFF;
   return 'ontouchstart' in window || maxTouchPoints > 0;
 }
 
@@ -55,7 +54,7 @@ export const preloadAssets = () => {
   const ranks = ['ACE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'TEN', 'JACK', 'QUEEN', 'KING'];
   const jokers = ['JOKER-2', 'JOKER-3'];
 
-  const promises: any[] = [];
+  const promises: Promise<unknown>[] = [];
 
   // Build the list of URLs for French and Swiss cards
   const imageUrls = [

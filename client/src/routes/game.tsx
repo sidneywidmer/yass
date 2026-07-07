@@ -6,7 +6,7 @@ export default function Game() {
 
   return (
     <>
-      <GameInstance tryCode={code!!}/>
+      <GameInstance tryCode={code!}/>
     </>
   );
 }

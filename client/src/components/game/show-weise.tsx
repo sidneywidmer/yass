@@ -42,7 +42,7 @@ export function ShowWeise() {
                   <span className="text-sm text-muted-foreground">{weis.points} {t("weisen.points")}</span>
                 </div>
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                  {weis.cards!!.map((card, i) => (
+                  {weis.cards!.map((card, i) => (
                     <Card key={i} card={card}/>
                   ))}
                 </div>

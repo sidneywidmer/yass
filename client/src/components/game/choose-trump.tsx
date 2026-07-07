@@ -23,14 +23,14 @@ export function ChooseTrump() {
    */
   const selectTrump = async (trump: Exclude<Trump, "FREESTYLE"> | "SCHIEBE") => {
     if (trump === "SCHIEBE") {
-      return api.schiebe({game: gameUuid!!, gschobe: "YES"})
+      return api.schiebe({game: gameUuid!, gschobe: "YES"})
         .catch(handleAxiosError)
     }
 
     const action = state === "SCHIEBE"
-      ? api.schiebe({game: gameUuid!!, gschobe: "NO"})
-        .then(() => api.chooseTrump({game: gameUuid!!, trump}))
-      : api.chooseTrump({game: gameUuid!!, trump})
+      ? api.schiebe({game: gameUuid!, gschobe: "NO"})
+        .then(() => api.chooseTrump({game: gameUuid!, trump}))
+      : api.chooseTrump({game: gameUuid!, trump})
 
     return action.catch(handleAxiosError)
   }

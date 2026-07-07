@@ -35,7 +35,7 @@ export function GameInstance({tryCode}: GameInstanceProps) {
   useEffect(() => {
     api.joinGame({code: tryCode})
       .then((response) => {
-        setGameState(response.data!!)
+        setGameState(response.data!)
         setIsLoading(false)
       })
       .catch(error => {
@@ -46,7 +46,7 @@ export function GameInstance({tryCode}: GameInstanceProps) {
             description: t('errors.gameNotFound.description')
           })
         }
-        if (error.response.data.payload.domainError == "GameAlreadyFull") {
+        if (error.response?.data?.payload?.domainError == "GameAlreadyFull") {
           navigate('/lobby')
           return addError({
             title: t('errors.gameFull.title'),
@@ -59,6 +59,7 @@ export function GameInstance({tryCode}: GameInstanceProps) {
     return () => {
       resetGameState()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tryCode])
 
   if (isLoading) {

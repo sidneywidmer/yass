@@ -10,14 +10,14 @@ interface CardProps {
 
 const getCardImageSrc = (card: C, cardDeck: CardDeck): string => {
   if (card.suit === "WELCOME" && card.rank == "WELCOME") {
-    return `/cards/welcome/${card.skin!!}.png`;
+    return `/cards/welcome/${card.skin!}.png`;
   }
 
   if (cardDeck === CardDeck.SWISS) {
-    return `/cards/swiss/${card.suit!!}-${card.rank!!}.png`;
+    return `/cards/swiss/${card.suit!}-${card.rank!}.png`;
   }
 
-  return `/cards/french/${card.suit!!}-${card.rank!!}.svg`;
+  return `/cards/french/${card.suit!}-${card.rank!}.svg`;
 };
 
 export function Card({card, className}: CardProps) {
@@ -31,7 +31,7 @@ export function Card({card, className}: CardProps) {
     )}>
       <img
         src={imageSrc}
-        alt={`${card.suit!!} ${card.rank!!}`}
+        alt={`${card.suit!} ${card.rank!}`}
         className="w-full h-full"
         draggable={false}
       />
