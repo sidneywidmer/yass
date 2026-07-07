@@ -117,4 +117,8 @@
   a {
     @apply underline hover:no-underline;
   }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }
