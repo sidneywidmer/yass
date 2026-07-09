@@ -130,6 +130,9 @@ fun isHandFinished(tricks: List<Trick>): Boolean = tricks.size == 9 && tricks.fi
 
 fun isTrickFinished(trick: Trick): Boolean = trick.cards().size == 4
 
+fun isFirstRegularTrickOfHand(hand: Hand, tricks: List<Trick>): Boolean =
+    hand.trump != Trump.FREESTYLE && tricks.size == 1
+
 fun isGameFinished(state: GameState): Boolean {
     val settings = state.game.settings
     return when (settings.winningConditionType) {

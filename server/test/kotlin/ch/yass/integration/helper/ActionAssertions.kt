@@ -32,7 +32,7 @@ class ActionAssertions(private val actions: List<Action>) {
     fun hasWeis(type: WeisType, points: Int) {
         assertTrue(
             actions.any { action ->
-                (action as? ShowWeis)?.weis?.let {
+                (action as? ShowWeise)?.weiseByPosition?.values?.flatten()?.any {
                     it.type == type && it.points == points
                 } == true
             }

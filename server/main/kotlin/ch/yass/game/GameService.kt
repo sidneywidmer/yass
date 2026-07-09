@@ -220,7 +220,7 @@ class GameService(
         repo.updateWeise(seat, hand, weise)
 
         val freshState = repo.getState(game)
-        publishForSeats(state.seats) { gewiesenActions(freshState, request.weis, seat, it) }
+        publishForSeats(state.seats) { gewiesenActions(freshState, request.weis, seat) }
 
         gameLoop(game)
 
@@ -228,31 +228,21 @@ class GameService(
     }
 
     /**
-     * After every player played the first card in the trick and showed their weise, the team who has wisen
-     * the most can weis the rest of their potentially not yet shown weise. This can lead to behaviour where
-     * a player sees their own - not made - weis. E.g. a player has two possible weise and they show the first
-     * one, then after the first trick is over this method automatically publishes ShowWeis actions for all
-     * valid but not shown weise of the team with the most weis points. A bit a strange rule...
+     * After every player played the first card in the trick, the team who has gewiesen the most may
+     * weis the rest of their potentially not yet declared weise. The server does this automatically
+     * and store-only: nothing is published here. The reveal of all winning weise (declared and
+     * auto-completed alike) happens via weisRevealActions once the trick completion is handled
+     * in the game loop.
      */
     context(_: Raise<GameError>)
     private fun weisenSecond(state: GameState) {
         val hand = currentHand(state.hands)
         val remainingWeise = remainingWeise(hand)
 
-        weisWinner(hand, state.tricks).map { position ->
-            val weise = hand.weiseOf(position).toMutableList()
-            val actions = withoutStoeck(remainingWeise.getValue(position))
-                .map {
-                    weise.add(it)
-                    ShowWeis(position, it.toWeisWithPoints(hand.trump))
-                }
-
+        weisWinner(hand, state.tricks).forEach { position ->
+            val weise = hand.weiseOf(position) + withoutStoeck(remainingWeise.getValue(position))
             repo.updateWeise(positionSeat(position, state.seats), hand, weise)
-            publishForSeats(state.seats) { actions }
         }
-
-        val points = pointsByPositionTotal(completedHands(state.hands, state.tricks), state.tricks)
-        publishForSeats(state.seats) { listOf(UpdatePoints(points)) }
 
         gameLoop(state.game)
     }
@@ -362,9 +352,10 @@ class GameService(
 
             State.WEISEN_SECOND_BOT -> launchWithMDC { weisenAsBot(updatedState) }
             State.NEW_TRICK -> {
+                val revealActions = weisRevealActions(updatedState)
                 repo.createTrick(currentHand(updatedState.hands))
                 val state = repo.getState(game)
-                publishForSeats(updatedState.seats) { seat -> newTrickActions(state, seat) }
+                publishForSeats(updatedState.seats) { seat -> revealActions + newTrickActions(state, seat) }
                 gameLoop(game)
             }
 
