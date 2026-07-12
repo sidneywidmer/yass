@@ -1,11 +1,12 @@
 import {useGameStateStore} from "@/store/game-state.ts";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle} from "@/components/ui/dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {Card} from "@/components/game/card.tsx";
+import {WeisDisplay} from "@/components/game/weis-display.tsx";
 import {api} from "@/api/client.ts";
 import {useState} from "react";
 import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 import {Weis} from "@/api/generated";
+import {GameStates} from "@/types/game-states.ts";
 import {useTranslation} from "react-i18next";
 
 export function Weisen() {
@@ -13,14 +14,14 @@ export function Weisen() {
   const state = useGameStateStore(state => state.state)
   const weise = useGameStateStore(state => state.weise)
   const gameUuid = useGameStateStore(state => state.gameUuid)
-  const otherWeise = useGameStateStore(state => state.otherWeise)
+  const shownWeise = useGameStateStore(state => state.shownWeise)
   const [open, setOpen] = useState(true)
   const handleAxiosError = useAxiosErrorHandler()
   const {t} = useTranslation()
 
-  // It's possible that we still display weis of other players - wait with opening
+  // It's possible that shown weise of other players are still displayed - wait with opening
   // this overlay so we don't have two open == bad UX
-  if (state !== "WEISEN_FIRST" || Object.entries(otherWeise).length > 0 || !isMyPos) {
+  if (state !== GameStates.WEISEN_FIRST || shownWeise || !isMyPos) {
     return
   }
 
@@ -38,26 +39,17 @@ export function Weisen() {
 
   return (
     <Dialog open={open}>
-      <DialogContent disableClose={true} className="sm:max-w-md" onPointerDownOutside={e => e.preventDefault()} container={document.getElementById('root')}>
+      <DialogContent disableClose={true} className="w-auto min-w-[22rem] max-w-[90vw] sm:max-w-2xl" onPointerDownOutside={e => e.preventDefault()} container={document.getElementById('root')}>
         <DialogTitle className="text-center">{t("weisen.title")}</DialogTitle>
         <DialogDescription className="sr-only">{t("weisen.description")}</DialogDescription>
-        <div className="space-y-6 max-h-[60vh] overflow-y-auto p-2">
+        <div className="flex flex-wrap justify-center gap-4 max-h-[60vh] overflow-y-auto p-2">
           {weise && weise.filter(weis => weis.type !== 'SKIP').map((weis, idx) => (
             <div
               key={idx}
-              className="p-4 rounded-lg hover:bg-muted transition-colors cursor-pointer bg-emerald-100"
+              className="p-4 rounded-lg hover:bg-muted transition-colors cursor-pointer"
               onClick={() => onWeisSelect(weis)}
             >
-              <div className="flex items-center gap-4 mb-2">
-                <span className="font-medium">{t(`weise.${weis.type}`)}</span>
-                <div className="h-4 w-px bg-border"/>
-                <span className="text-sm text-muted-foreground">{weis.points} {t("weisen.points")}</span>
-              </div>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                {weis.cards!.map((card, i) => (
-                  <Card key={i} card={card}/>
-                ))}
-              </div>
+              <WeisDisplay weis={weis}/>
             </div>
           ))}
         </div>

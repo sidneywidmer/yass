@@ -5,6 +5,7 @@ import {Forward} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {api} from "@/api/client.ts";
 import {Trump} from "@/api/generated";
+import {GameStates} from "@/types/game-states.ts";
 import {TrumpIcon} from "@/components/game/trump-icon";
 import {useTranslation} from "react-i18next";
 
@@ -27,7 +28,7 @@ export function ChooseTrump() {
         .catch(handleAxiosError)
     }
 
-    const action = state === "SCHIEBE"
+    const action = state === GameStates.SCHIEBE
       ? api.schiebe({game: gameUuid!, gschobe: "NO"})
         .then(() => api.chooseTrump({game: gameUuid!, trump}))
       : api.chooseTrump({game: gameUuid!, trump})
@@ -35,7 +36,7 @@ export function ChooseTrump() {
     return action.catch(handleAxiosError)
   }
 
-  if ((state !== "SCHIEBE" && state !== "TRUMP") || !isMyPos) {
+  if ((state !== GameStates.SCHIEBE && state !== GameStates.TRUMP) || !isMyPos) {
     return
   }
 
@@ -69,7 +70,7 @@ export function ChooseTrump() {
             </Button>
           </div>
 
-          {state == "SCHIEBE" &&
+          {state == GameStates.SCHIEBE &&
               <div>
                   <Button variant="outline" className="w-11 h-11" onClick={() => selectTrump("SCHIEBE")}>
                       <Forward className="w-6 h-6"/>

@@ -10,7 +10,6 @@ import {WebSocketHandler} from "@/components/game/websocket-handler.tsx";
 import {PingHandler} from "@/components/game/ping-handler.tsx";
 import {ChooseTrump} from "@/components/game/choose-trump.tsx";
 import {Weisen} from "@/components/game/weisen.tsx";
-import {ShowWeise} from "@/components/game/show-weise.tsx";
 import OtherPlayers from "@/components/game/other-players.tsx";
 import {GameFinished} from "@/components/game/game-finished.tsx";
 import {useErrorStore} from "@/store/error.ts";
@@ -18,6 +17,7 @@ import {useTranslation} from "react-i18next";
 import {useNavigate} from "react-router-dom";
 import {Share} from "@/components/game/share.tsx";
 import {WelcomeHandInfo} from "@/components/game/welcome-hand-info.tsx";
+import {WeisAnnouncement} from "@/components/game/weis-announcement.tsx";
 
 interface GameInstanceProps {
   tryCode: string
@@ -78,7 +78,7 @@ export function GameInstance({tryCode}: GameInstanceProps) {
         <OtherPlayers/>
         <ChooseTrump/>
         <Weisen/>
-        <ShowWeise/>
+        <WeisAnnouncement/>
         <GameFinished/>
         <PingHandler/>
         <WebSocketHandler/>

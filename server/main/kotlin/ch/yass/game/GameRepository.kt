@@ -271,7 +271,7 @@ class GameRepository(private val db: DSLContext) {
             .fetchOneInto(Seat::class.java)!!
     }
 
-    fun updateWeise(seat: Seat, hand: Hand, weise: MutableList<Weis>): Hand =
+    fun updateWeise(seat: Seat, hand: Hand, weise: List<Weis>): Hand =
         db.update(HAND)
             .set(HAND.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
             .set(seat.weisColumn(), toDbJson(weise))

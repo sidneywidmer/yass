@@ -13,7 +13,8 @@ data class UpdatePoints(val points: Points) : Action
 data class UpdateTrump(val trump: Trump, val position: Position) : Action
 data class UpdateGschobe(val position: Position) : Action
 data class UpdatePossibleWeise(val weise: List<WeisWithPoints>) : Action
-data class ShowWeis(val position: Position, val weis: WeisWithPoints) : Action
+data class DeclareWeis(val position: Position, val points: Int) : Action
+data class ShowWeise(val weiseByPosition: Map<Position, List<WeisWithPoints>>) : Action
 data class PlayerJoined(val player: PlayerAtTable) : Action
 data class PlayerDisconnected(val player: PlayerAtTable) : Action
 data class GameFinished(

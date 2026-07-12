@@ -24,8 +24,9 @@ type FlatGameState = Omit<JoinGameResponse, 'seat'> & {
   trumpChosenBy?: Position
   gschobeBy?: Position
   weise: WeisWithPoints[]
-  otherWeise: { [position: string]: WeisWithPoints[] }
-  weiseOverlayOpen: boolean
+  declaredWeisPoints: { [position: string]: number }
+  weisWinners?: Position[]
+  shownWeise?: { [position: string]: WeisWithPoints[] }
 }
 
 interface GameStateActions {
@@ -36,9 +37,10 @@ interface GameStateActions {
   playCard: (card: CardOnTable) => void
   resetActivePosition: () => void
   clearCards: (position: Position) => Promise<void>
-  addWeis: (position: string, weis: WeisWithPoints) => void
-  clearWeise: () => void
-  setWeiseOverlayOpen: (open: boolean) => void
+  declareWeis: (position: Position, points: number) => void
+  showWeise: (weiseByPosition: { [position: string]: WeisWithPoints[] }) => void
+  dismissShownWeise: () => void
+  clearDeclaredWeise: () => void
   getPlayer: (position: Position) => PlayerAtTable | undefined
   isWelcomeHand: () => boolean
 }
@@ -55,11 +57,12 @@ const initialState: FlatGameState = {
     WEST: {cardPoints: 0, weisPoints: 0}
   },
   weise: [],
-  otherWeise: {},
+  declaredWeisPoints: {},
+  weisWinners: undefined,
+  shownWeise: undefined,
   cardsPlayed: [],
   otherPlayers: [],
-  isConnected: false,
-  weiseOverlayOpen: false
+  isConnected: false
 }
 
 export const useGameStateStore = create<FlatGameState & GameStateActions>((set) => ({
@@ -94,15 +97,20 @@ export const useGameStateStore = create<FlatGameState & GameStateActions>((set) 
     // Give some time after cleaning the table until the next card comes flying out
     await new Promise(resolve => setTimeout(resolve, 300))
   },
-  addWeis: (position, weis) => set((state) => ({
-    otherWeise: {
-      ...state.otherWeise,
-      [position]: [...(state.otherWeise[position] || []), weis]
-    }
+  declareWeis: (position, points) => set((state) => ({
+    declaredWeisPoints: {...state.declaredWeisPoints, [position]: points}
   })),
-  clearWeise: () => set({otherWeise: {}}),
+  showWeise: (weiseByPosition) => set((state) => {
+    // Stöck reveals mid-play share the dialog but never decide the weis comparison
+    const stoeckOnly = Object.values(weiseByPosition).flat().every(weis => weis.type === 'STOECK')
+    return {
+      shownWeise: weiseByPosition,
+      weisWinners: stoeckOnly ? state.weisWinners : Object.keys(weiseByPosition) as Position[]
+    }
+  }),
+  dismissShownWeise: () => set({shownWeise: undefined}),
+  clearDeclaredWeise: () => set({declaredWeisPoints: {}, weisWinners: undefined}),
   resetActivePosition: () => set({activePosition: undefined}),
-  setWeiseOverlayOpen: (open: boolean) => set({weiseOverlayOpen: open}),
   getPlayer: (position: Position) => {
     const otherPlayers: Array<PlayerAtTable> = useGameStateStore.getState().otherPlayers!
     return otherPlayers.find(p => p.position === position)

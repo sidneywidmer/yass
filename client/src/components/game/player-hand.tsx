@@ -1,12 +1,17 @@
 import {useGameStateStore} from "@/store/game-state.ts";
-import {CardInHand} from "@/api/generated";
+import {CardInHand, State} from "@/api/generated";
+import {GameStates} from "@/types/game-states.ts";
 import {AnimatePresence, motion, useAnimation} from "motion/react"
 import {useEffect, useMemo, useRef} from "react";
 import {Card} from "@/components/game/card.tsx";
 import {useCardDimensions} from "@/hooks/use-card-dimensions.ts";
 import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 import {api} from "@/api/client.ts";
-import {isTouchDevice} from "@/lib/utils.ts";
+import {isTouchDevice, weisVerdictFor} from "@/lib/utils.ts";
+import {WeisPointsBubble} from "@/components/game/weis-points-bubble.tsx";
+
+// While one of these overlays is open the player's own cards render above it
+const OVERLAY_STATES: State[] = [GameStates.WEISEN_FIRST, GameStates.TRUMP, GameStates.SCHIEBE]
 
 type AnimationType = 'initial' | 'hover' | 'adjacentLeft' | 'adjacentRight'
 
@@ -87,8 +92,13 @@ export function PlayerHand() {
   const resetActivePosition = useGameStateStore(state => state.resetActivePosition)
   const playCard = useGameStateStore(state => state.playCard)
   const isMyPos = useGameStateStore((state) => state.activePosition === state.position)
-  const isPlayCardState = useGameStateStore((state) => state.state === "PLAY_CARD")
+  const isPlayCardState = useGameStateStore((state) => state.state === GameStates.PLAY_CARD)
   const state = useGameStateStore(state => state.state)
+  const ownWeisPoints = useGameStateStore(state => state.position ? state.declaredWeisPoints[state.position] : undefined)
+  const weisWinners = useGameStateStore(state => state.weisWinners)
+
+
+  const weisDisplayBottom = CARD_HEIGHT * 1.1
 
   const handleAxiosError = useAxiosErrorHandler()
   const isTouch = useMemo(() => isTouchDevice(), [])
@@ -137,7 +147,7 @@ export function PlayerHand() {
   }
 
   const cardsAboveOverlay = () => {
-    return isMyPos && ["WEISEN_FIRST", "TRUMP", "SCHIEBE"].includes(state!)
+    return isMyPos && OVERLAY_STATES.includes(state!)
   }
 
   const createCardAnimation = ({card, animationType, position, isTouch}: CardAnimationConfig) => {
@@ -239,18 +249,32 @@ export function PlayerHand() {
   if (!cards) return null
 
   return (
-    <div id={"playerHand"}
-         className={`fixed -bottom-[60px] w-full flex justify-center ${cardsAboveOverlay() ? "z-50" : ""}`}>
-      <motion.div
-        className="flex -space-x-10"
-        key={totalCards}
-        drag={isTouch}
-        dragConstraints={{left: 0, right: 0, top: 0, bottom: 0}}
-        dragElastic={0}
-        onDrag={(_, info) => handleDrag({clientX: info.point.x, clientY: info.point.y})}
-        onMouseMove={(mouse) => !isTouch && handleDrag(mouse)}
-        onMouseLeave={() => !isTouch && triggerCardHover(null, filteredCards)}
-      >
+    <>
+      <AnimatePresence>
+        {ownWeisPoints !== undefined && position && (
+          <div id={"weisPointsDisplay"}
+               className={`fixed w-full flex justify-center ${cardsAboveOverlay() ? "z-50" : ""}`}
+               style={{bottom: `${weisDisplayBottom}px`}}>
+            <WeisPointsBubble
+              points={ownWeisPoints}
+              tailDirection="SOUTH"
+              verdict={weisVerdictFor(position, weisWinners)}
+            />
+          </div>
+        )}
+      </AnimatePresence>
+      <div id={"playerHand"}
+           className={`fixed -bottom-[60px] w-full flex justify-center ${cardsAboveOverlay() ? "z-50" : ""}`}>
+        <motion.div
+          className="flex -space-x-10"
+          key={totalCards}
+          drag={isTouch}
+          dragConstraints={{left: 0, right: 0, top: 0, bottom: 0}}
+          dragElastic={0}
+          onDrag={(_, info) => handleDrag({clientX: info.point.x, clientY: info.point.y})}
+          onMouseMove={(mouse) => !isTouch && handleDrag(mouse)}
+          onMouseLeave={() => !isTouch && triggerCardHover(null, filteredCards)}
+        >
         <AnimatePresence mode="popLayout" initial={true}>
           {filteredCards.map((card, i) => {
             const offset = calculateOffset(i, totalCards)
@@ -284,7 +308,8 @@ export function PlayerHand() {
             )
           })}
         </AnimatePresence>
-      </motion.div>
-    </div>
+        </motion.div>
+      </div>
+    </>
   )
 }

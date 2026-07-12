@@ -1,10 +1,11 @@
 import {Bot, User, Forward} from "lucide-react"
-import {cn, getRelativePosition, getResponsiveValue} from "@/lib/utils"
+import {cn, getRelativePosition, getResponsiveValue, weisVerdictFor} from "@/lib/utils"
 import {Position} from "@/api/generated"
 import {useGameStateStore} from "@/store/game-state"
 import {Card} from "@/components/ui/card.tsx";
 import {AnimatePresence, motion} from "motion/react"
 import {TrumpIcon} from "@/components/game/trump-icon"
+import {WeisPointsBubble} from "@/components/game/weis-points-bubble"
 
 const VERTICAL = getResponsiveValue(200, 250)
 const HORIZONTAL = getResponsiveValue(160, 230)
@@ -22,6 +23,7 @@ const positionStylesInitial: Record<Position, { transform: string }> = {
   EAST: {transform: 'translate(calc(-50% + ' + HORIZONTAL + 'px), -50%) rotate(-90deg)'},
   WEST: {transform: 'translate(calc(-50% - ' + HORIZONTAL + 'px), -50%) rotate(-90deg)'}
 }
+
 const StatusIndicator = ({status, isActive}: { status: string, isActive?: boolean }) => {
   return (
     <div className="relative">
@@ -60,6 +62,8 @@ export function OtherPlayers() {
   const trump = useGameStateStore(state => state.trump)
   const trumpChosenBy = useGameStateStore(state => state.trumpChosenBy)
   const gschobeBy = useGameStateStore(state => state.gschobeBy)
+  const declaredWeisPoints = useGameStateStore(state => state.declaredWeisPoints)
+  const weisWinners = useGameStateStore(state => state.weisWinners)
   return (
     <>
       <AnimatePresence mode="popLayout" initial={true}>
@@ -71,20 +75,33 @@ export function OtherPlayers() {
             initial={{opacity: 0}}
             animate={positionStyles[getRelativePosition(position!, player.position!)]}
           >
-            <Card className="h-10 p-3 flex flex-row items-center justify-center gap-2 overflow-hidden">
-              {player.bot ? (<Bot className="h-4 w-4"/>) : (<User className="h-4 w-4"/>)}
-              <span className="text-sm text-center">{player.name}</span>
-              {trump && trumpChosenBy === player.position && (
-                <TrumpIcon trump={trump} className="w-4 h-4"/>
-              )}
-              {gschobeBy === player.position && (
-                <Forward className="w-4 h-4"/>
-              )}
-              <StatusIndicator
-                status={player.status!}
-                isActive={player.position == activePosition && !player.bot}
-              />
-            </Card>
+            <div className="relative">
+              <Card className="h-10 p-3 flex flex-row items-center justify-center gap-2 overflow-hidden">
+                {player.bot ? (<Bot className="h-4 w-4"/>) : (<User className="h-4 w-4"/>)}
+                <span className="text-sm text-center">{player.name}</span>
+                {trump && trumpChosenBy === player.position && (
+                  <TrumpIcon trump={trump} className="w-4 h-4"/>
+                )}
+                {gschobeBy === player.position && (
+                  <Forward className="w-4 h-4"/>
+                )}
+                <StatusIndicator
+                  status={player.status!}
+                  isActive={player.position == activePosition && !player.bot}
+                />
+              </Card>
+              <AnimatePresence>
+                {declaredWeisPoints[player.position!] !== undefined && (
+                  <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3">
+                    <WeisPointsBubble
+                      points={declaredWeisPoints[player.position!]}
+                      tailDirection="WEST"
+                      verdict={weisVerdictFor(player.position!, weisWinners)}
+                    />
+                  </div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
         ))}
       </AnimatePresence>

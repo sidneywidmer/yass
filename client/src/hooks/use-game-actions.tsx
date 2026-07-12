@@ -12,7 +12,8 @@ type UpdateActiveAction = { type: 'UpdateActive'; position: Position }
 type UpdatePossibleWeiseAction = { type: 'UpdatePossibleWeise'; weise: WeisWithPoints[] }
 type GameFinishedAction = { type: 'GameFinished' } & GameFinished
 type UpdatePointsAction = { type: 'UpdatePoints'; points: Record<string, TotalPoints> }
-type ShowWeisAction = { type: 'ShowWeis'; position: Position; weis: WeisWithPoints }
+type DeclareWeisAction = { type: 'DeclareWeis'; position: Position; points: number }
+type ShowWeiseAction = { type: 'ShowWeise'; weiseByPosition: { [position: string]: WeisWithPoints[] } }
 type PlayerJoinedAction = { type: 'PlayerJoined'; player: PlayerAtTable }
 type PlayerDisconnectedAction = { type: 'PlayerDisconnected'; player: PlayerAtTable }
 
@@ -27,7 +28,8 @@ export type GameAction =
   | UpdatePossibleWeiseAction
   | GameFinishedAction
   | UpdatePointsAction
-  | ShowWeisAction
+  | DeclareWeisAction
+  | ShowWeiseAction
   | PlayerJoinedAction
   | PlayerDisconnectedAction
 
@@ -42,7 +44,8 @@ const useGameActions = () => {
   const addCardsToHand = useGameStateStore(state => state.addCardsToHand)
   const position = useGameStateStore(state => state.position)
   const clearCards = useGameStateStore(state => state.clearCards)
-  const addWeis = useGameStateStore(state => state.addWeis)
+  const declareWeis = useGameStateStore(state => state.declareWeis)
+  const showWeise = useGameStateStore(state => state.showWeise)
 
   const actionHandlers = {
     CardPlayed: async (action: CardPlayedAction) => {
@@ -79,7 +82,8 @@ const useGameActions = () => {
     UpdatePoints: async (action: UpdatePointsAction) => {
       useGameStateStore.setState({points: action.points})
     },
-    ShowWeis: async (action: ShowWeisAction) => addWeis(action.position, action.weis),
+    DeclareWeis: async (action: DeclareWeisAction) => declareWeis(action.position, action.points),
+    ShowWeise: async (action: ShowWeiseAction) => showWeise(action.weiseByPosition),
     PlayerJoined: async (action: PlayerJoinedAction) => useGameStateStore.setState((state) => {
       const existingPlayerIndex = state.otherPlayers!.findIndex(p => p.uuid === action.player.uuid)
 
@@ -113,7 +117,7 @@ const useGameActions = () => {
     // Special handling for ClearPlayedCards: check if weise overlay is open otherwise it's possible the player
     // doesn't see all the cards played by bots
     if (action.type === 'ClearPlayedCards') {
-      const isWeiseOverlayOpen = useGameStateStore.getState().weiseOverlayOpen
+      const isWeiseOverlayOpen = useGameStateStore.getState().shownWeise !== undefined
 
       if (isWeiseOverlayOpen) {
         setIsPaused(true)
@@ -152,8 +156,8 @@ const useGameActions = () => {
     let timer: ReturnType<typeof setTimeout> | null = null
 
     const unsubscribe = useGameStateStore.subscribe((state, prevState) => {
-      // Detect when overlay closes (transitions from true to false) while we're paused
-      if (prevState.weiseOverlayOpen && !state.weiseOverlayOpen) {
+      // Detect when the shown weise overlay closes while we're paused
+      if (prevState.shownWeise && !state.shownWeise) {
         // Start the 2-second countdown
         timer = setTimeout(() => {
           setIsPaused(false)

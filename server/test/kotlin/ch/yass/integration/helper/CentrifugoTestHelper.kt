@@ -6,7 +6,8 @@ import ch.yass.game.pubsub.ClearPlayedCards
 import ch.yass.game.pubsub.GameFinished
 import ch.yass.game.pubsub.PlayerDisconnected
 import ch.yass.game.pubsub.PlayerJoined
-import ch.yass.game.pubsub.ShowWeis
+import ch.yass.game.pubsub.DeclareWeis
+import ch.yass.game.pubsub.ShowWeise
 import ch.yass.game.pubsub.UpdateActive
 import ch.yass.game.pubsub.UpdateGschobe
 import ch.yass.game.pubsub.UpdateHand
@@ -41,7 +42,8 @@ class CentrifugoTestHelper(val mapper: ObjectMapper) {
             "UpdatePoints" -> mapper.treeToValue(node, UpdatePoints::class.java)
             "UpdateTrump" -> mapper.treeToValue(node, UpdateTrump::class.java)
             "UpdatePossibleWeise" -> mapper.treeToValue(node, UpdatePossibleWeise::class.java)
-            "ShowWeis" -> mapper.treeToValue(node, ShowWeis::class.java)
+            "DeclareWeis" -> mapper.treeToValue(node, DeclareWeis::class.java)
+            "ShowWeise" -> mapper.treeToValue(node, ShowWeise::class.java)
             "PlayerJoined" -> mapper.treeToValue(node, PlayerJoined::class.java)
             "PlayerDisconnected" -> mapper.treeToValue(node, PlayerDisconnected::class.java)
             "GameFinished" -> mapper.treeToValue(node, GameFinished::class.java)

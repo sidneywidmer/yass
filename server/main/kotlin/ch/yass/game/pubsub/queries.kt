@@ -106,24 +106,37 @@ fun trumpChosenActions(state: GameState, trump: Trump, position: Position, seat:
     )
 }
 
-fun gewiesenActions(state: GameState, weis: Weis, playedBy: Seat, seat: Seat): List<Action> {
+fun gewiesenActions(state: GameState, weis: Weis, playedBy: Seat): List<Action> {
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.seats, state.tricks)
     val points = pointsByPositionTotal(state.hands, state.tricks)
 
-    val actions = listOf(
+    val declareWeis = weis.takeIf { it.type != WeisType.SKIP }
+        ?.let { DeclareWeis(playedBy.position, it.toWeisWithPoints(currentHand(state.hands).trump).points) }
+
+    return listOfNotNull(
         UpdateActive(activePosition),
         UpdateState(nextState),
-        UpdatePoints(points)
-    ).toMutableList()
+        UpdatePoints(points),
+        declareWeis
+    )
+}
 
-    // We don't need to show this weis to the player who just played it - they already know. Also, we don't need to
-    // show other players that they would have possible weise but chose to skip
-    if (seat != playedBy && weis.type != WeisType.SKIP) {
-        actions.add(ShowWeis(playedBy.position, weis.toWeisWithPoints(currentHand(state.hands).trump)))
-    }
+fun weisRevealActions(state: GameState): List<Action> {
+    val hand = currentHand(state.hands)
+    if (!isFirstRegularTrickOfHand(hand, tricksOfHand(state.tricks, hand))) return emptyList()
 
-    return actions
+    // weisWinner always returns a whole team, so a position may have nothing to reveal
+    // (e.g. only the partner weised) - and if nobody weised at all, the whole map is empty
+    val weiseByPosition = weisWinner(hand, state.tricks)
+        .associateWith { position ->
+            hand.weiseOf(position)
+                .filter { it.type != WeisType.STOECK && it.type != WeisType.SKIP }
+                .map { it.toWeisWithPoints(hand.trump) }
+        }
+        .filterValues { it.isNotEmpty() }
+
+    return if (weiseByPosition.isEmpty()) emptyList() else listOf(ShowWeise(weiseByPosition))
 }
 
 /**
@@ -133,7 +146,7 @@ fun gewiesenActions(state: GameState, weis: Weis, playedBy: Seat, seat: Seat): L
 fun stoeckGewiesenActions(hand: Hand, weis: Weis, playedBy: Seat, state: GameState): List<Action> {
     val points = pointsByPositionTotal(state.hands, state.tricks)
     return listOf(
-        ShowWeis(playedBy.position, weis.toWeisWithPoints(hand.trump)),
+        ShowWeise(mapOf(playedBy.position to listOf(weis.toWeisWithPoints(hand.trump)))),
         UpdatePoints(points)
     )
 }

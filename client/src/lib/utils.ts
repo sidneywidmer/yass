@@ -14,6 +14,16 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+const NORTH_SOUTH: Position[] = ['NORTH', 'SOUTH']
+export const isSameTeam = (a: Position, b: Position): boolean =>
+  NORTH_SOUTH.includes(a) === NORTH_SOUTH.includes(b)
+
+export type WeisVerdict = 'none' | 'won' | 'lost'
+export const weisVerdictFor = (position: Position, weisWinners?: Position[]): WeisVerdict => {
+  if (!weisWinners || weisWinners.length === 0) return 'none'
+  return isSameTeam(position, weisWinners[0]) ? 'won' : 'lost'
+}
+
 const POSITIONS: Position[] = ['NORTH', 'EAST', 'SOUTH', 'WEST']
 export const getRelativePosition = (playerPosition: Position, absolutePosition: Position): Position => {
   const southOffset = 2 - POSITIONS.indexOf(playerPosition!)

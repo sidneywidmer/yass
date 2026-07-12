@@ -154,12 +154,13 @@
   },
   "weisen": {
     "title": "Select Weis",
-    "title_alt": "Gewiesen",
     "description": "Choose cards for your weis",
     "points": "Points",
-    "zeroWeis": "Do not weis any points"
+    "zeroWeis": "Do not weis any points",
+    "announcement": "{{name}} weises {{points}} points",
+    "close": "Close"
   },
-  "weis": {
+  "weise": {
     "DREI_BLATT": "3 of a suit",
     "VIER_BLATT": "4 of a suit",
     "FUENF_BLATT": "5 of a suit",
