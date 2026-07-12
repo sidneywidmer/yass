@@ -4,11 +4,13 @@ import {useTranslation} from "react-i18next";
 export function WelcomeHandInfo() {
   const isWelcomeHand = useGameStateStore(state => state.isWelcomeHand());
   const cardsPlayed = useGameStateStore(state => state.cardsPlayed);
+  const otherPlayers = useGameStateStore(state => state.otherPlayers);
   const {t} = useTranslation();
 
+  const allPlayersJoined = !!otherPlayers && otherPlayers.length === 4;
   const showMessage = !cardsPlayed || cardsPlayed.length === 0;
 
-  if (!isWelcomeHand || !showMessage) {
+  if (!isWelcomeHand || !showMessage || !allPlayersJoined) {
     return null;
   }
 
