@@ -1,52 +1,72 @@
-import { Card as CardComponent } from "@/components/game/card";
-import { Card } from "@/components/ui/card";
-import { Card as C } from "@/api/generated";
-import { useCardDimensions } from "@/hooks/use-card-dimensions";
+import {Card} from "@/components/ui/card";
+import {Button} from "@/components/ui/button";
+import {Position, WeisWithPoints} from "@/api/generated";
+import {useGameStateStore} from "@/store/game-state";
+import {WeisDisplay} from "@/components/game/weis-display";
+import {useEffect} from "react";
+import {useTranslation} from "react-i18next";
+import {AnimatePresence, motion} from "motion/react";
 
-export function WeisAnnouncement() {
-  const { CARD_HEIGHT } = useCardDimensions();
+const BUBBLE_LINGER_MS = 800
 
-  // Hardcoded cards for now
-  const weisCards: C[] = [
-    { suit: "HEARTS", rank: "ACE", skin: "default" },
-    { suit: "DIAMONDS", rank: "KING", skin: "default" },
-    { suit: "CLUBS", rank: "QUEEN", skin: "default" },
-    { suit: "SPADES", rank: "JACK", skin: "default" },
-  ];
+function PositionWeise({position, weise}: { position: Position, weise: WeisWithPoints[] }) {
+  const getPlayer = useGameStateStore(state => state.getPlayer)
+  const {t} = useTranslation()
 
-  const smallCardHeight = CARD_HEIGHT * 0.9;
-  const smallCardWidth = smallCardHeight * (2/3);
-  const overlapDistance = smallCardWidth * 0.35;
-  const containerWidth = smallCardWidth + (weisCards.length - 1) * overlapDistance;
+  const totalPoints = weise.reduce((sum, weis) => sum + (weis.points ?? 0), 0)
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-40">
-      <Card className="bg-white p-6 rounded-lg">
-        {/* Text announcement */}
-        <div className="text-center mb-4">
-          <p className="text-xs font-medium">Player XYZ weises 140 points!</p>
-        </div>
-
-        {/* Cards container with overlapping effect */}
-        <div className="relative overflow-hidden" style={{height: `${smallCardHeight}px`, width: `${containerWidth}px`}}>
-          {weisCards.map((card, index) => (
-            <div
-              key={index}
-              className="absolute top-0"
-              style={{
-                width: `${smallCardWidth}px`,
-                height: `${smallCardHeight}px`,
-                left: `${index * overlapDistance}px`,
-                zIndex: index,
-              }}
-            >
-              <CardComponent card={card} />
-            </div>
-          ))}
-          {/* Gradient fade out at bottom */}
-          <div className="absolute bottom-0 left-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-white" style={{width: `${containerWidth}px`, height: `${smallCardHeight}px`, zIndex: 1000}} />
-        </div>
-      </Card>
+    <div className="flex flex-col items-center gap-3">
+      <p className="text-sm font-medium text-center">
+        {t("weisen.announcement", {name: getPlayer(position)?.name ?? position, points: totalPoints})}
+      </p>
+      <div className="flex flex-wrap justify-center gap-4">
+        {weise.map((weis, idx) => (
+          <WeisDisplay key={idx} weis={weis}/>
+        ))}
+      </div>
     </div>
+  )
+}
+
+export function WeisAnnouncement() {
+  // The shown weise live in the store (not local state) because the action queue pauses
+  // ClearPlayedCards while the overlay is open and resumes when it closes
+  const shownWeise = useGameStateStore(state => state.shownWeise)
+  const weisWinners = useGameStateStore(state => state.weisWinners)
+  const dismissShownWeise = useGameStateStore(state => state.dismissShownWeise)
+  const clearDeclaredWeise = useGameStateStore(state => state.clearDeclaredWeise)
+  const {t} = useTranslation()
+
+  useEffect(() => {
+    if (shownWeise || !weisWinners) return
+    const timer = setTimeout(clearDeclaredWeise, BUBBLE_LINGER_MS)
+    return () => clearTimeout(timer)
+  }, [shownWeise, weisWinners, clearDeclaredWeise])
+
+  return (
+    <AnimatePresence>
+      {shownWeise && (
+        <div className="fixed inset-0 flex items-center justify-center z-40">
+          <motion.div
+            initial={{opacity: 0, scale: 0.9}}
+            animate={{opacity: 1, scale: 1}}
+            exit={{opacity: 0, scale: 0.9}}
+            transition={{duration: 0.3, ease: [0.4, 0, 0.2, 1]}}
+          >
+            <Card className="bg-white p-6 rounded-lg flex flex-col gap-6 max-w-[90vw] max-h-[85svh] overflow-y-auto">
+              <div className="flex flex-wrap justify-center gap-x-12 gap-y-6">
+                {Object.entries(shownWeise).map(([position, weise]) => (
+                  <PositionWeise key={position} position={position as Position} weise={weise}/>
+                ))}
+              </div>
+              <Button variant="outline" className="self-center" onClick={dismissShownWeise}>
+                {t("weisen.close")}
+              </Button>
+            </Card>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   );
 }

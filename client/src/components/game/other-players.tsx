@@ -1,10 +1,11 @@
 import {Bot, User, Forward} from "lucide-react"
-import {cn, getRelativePosition, getResponsiveValue} from "@/lib/utils"
+import {cn, getRelativePosition, getResponsiveValue, weisVerdictFor} from "@/lib/utils"
 import {Position} from "@/api/generated"
 import {useGameStateStore} from "@/store/game-state"
 import {Card} from "@/components/ui/card.tsx";
 import {AnimatePresence, motion} from "motion/react"
 import {TrumpIcon} from "@/components/game/trump-icon"
+import {WeisPointsBubble} from "@/components/game/weis-points-bubble"
 
 const VERTICAL = getResponsiveValue(200, 250)
 const HORIZONTAL = getResponsiveValue(160, 230)
@@ -22,6 +23,7 @@ const positionStylesInitial: Record<Position, { transform: string }> = {
   EAST: {transform: 'translate(calc(-50% + ' + HORIZONTAL + 'px), -50%) rotate(-90deg)'},
   WEST: {transform: 'translate(calc(-50% - ' + HORIZONTAL + 'px), -50%) rotate(-90deg)'}
 }
+
 const StatusIndicator = ({status, isActive}: { status: string, isActive?: boolean }) => {
   return (
     <div className="relative">
@@ -53,17 +55,6 @@ const StatusIndicator = ({status, isActive}: { status: string, isActive?: boolea
   )
 }
 
-const WeisPointsBubble = ({ points }: { points: number }) => {
-  return (
-    <div className="relative">
-      <div className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap relative">
-        {points}
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-0 h-0 border-r-8 border-r-gray-200 border-t-8 border-t-transparent border-b-8 border-b-transparent"></div>
-      </div>
-    </div>
-  )
-}
-
 export function OtherPlayers() {
   const otherPlayers = useGameStateStore(state => state.otherPlayers)
   const position = useGameStateStore(state => state.position)
@@ -71,6 +62,8 @@ export function OtherPlayers() {
   const trump = useGameStateStore(state => state.trump)
   const trumpChosenBy = useGameStateStore(state => state.trumpChosenBy)
   const gschobeBy = useGameStateStore(state => state.gschobeBy)
+  const declaredWeisPoints = useGameStateStore(state => state.declaredWeisPoints)
+  const weisWinners = useGameStateStore(state => state.weisWinners)
   return (
     <>
       <AnimatePresence mode="popLayout" initial={true}>
@@ -97,9 +90,17 @@ export function OtherPlayers() {
                   isActive={player.position == activePosition && !player.bot}
                 />
               </Card>
-              <div className="absolute top-1/2 -right-16 transform -translate-y-1/2">
-                <WeisPointsBubble points={120} />
-              </div>
+              <AnimatePresence>
+                {declaredWeisPoints[player.position!] !== undefined && (
+                  <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3">
+                    <WeisPointsBubble
+                      points={declaredWeisPoints[player.position!]}
+                      tailDirection="WEST"
+                      verdict={weisVerdictFor(player.position!, weisWinners)}
+                    />
+                  </div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
         ))}

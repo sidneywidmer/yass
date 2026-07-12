@@ -1,23 +1,17 @@
 import {useGameStateStore} from "@/store/game-state.ts";
-import {CardInHand} from "@/api/generated";
+import {CardInHand, State} from "@/api/generated";
+import {GameStates} from "@/types/game-states.ts";
 import {AnimatePresence, motion, useAnimation} from "motion/react"
 import {useEffect, useMemo, useRef} from "react";
 import {Card} from "@/components/game/card.tsx";
 import {useCardDimensions} from "@/hooks/use-card-dimensions.ts";
 import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 import {api} from "@/api/client.ts";
-import {isTouchDevice} from "@/lib/utils.ts";
+import {isTouchDevice, weisVerdictFor} from "@/lib/utils.ts";
+import {WeisPointsBubble} from "@/components/game/weis-points-bubble.tsx";
 
-const WeisPointsBubble = ({ points }: { points: number }) => {
-  return (
-    <div className="relative">
-      <div className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap">
-        {points}
-      </div>
-      <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-gray-200"></div>
-    </div>
-  )
-}
+// While one of these overlays is open the player's own cards render above it
+const OVERLAY_STATES: State[] = [GameStates.WEISEN_FIRST, GameStates.TRUMP, GameStates.SCHIEBE]
 
 type AnimationType = 'initial' | 'hover' | 'adjacentLeft' | 'adjacentRight'
 
@@ -98,8 +92,11 @@ export function PlayerHand() {
   const resetActivePosition = useGameStateStore(state => state.resetActivePosition)
   const playCard = useGameStateStore(state => state.playCard)
   const isMyPos = useGameStateStore((state) => state.activePosition === state.position)
-  const isPlayCardState = useGameStateStore((state) => state.state === "PLAY_CARD")
+  const isPlayCardState = useGameStateStore((state) => state.state === GameStates.PLAY_CARD)
   const state = useGameStateStore(state => state.state)
+  const ownWeisPoints = useGameStateStore(state => state.position ? state.declaredWeisPoints[state.position] : undefined)
+  const weisWinners = useGameStateStore(state => state.weisWinners)
+
 
   const weisDisplayBottom = CARD_HEIGHT * 1.1
 
@@ -150,7 +147,7 @@ export function PlayerHand() {
   }
 
   const cardsAboveOverlay = () => {
-    return isMyPos && ["WEISEN_FIRST", "TRUMP", "SCHIEBE"].includes(state!)
+    return isMyPos && OVERLAY_STATES.includes(state!)
   }
 
   const createCardAnimation = ({card, animationType, position, isTouch}: CardAnimationConfig) => {
@@ -253,11 +250,19 @@ export function PlayerHand() {
 
   return (
     <>
-      <div id={"weisPointsDisplay"}
-           className={`fixed w-full flex justify-center ${cardsAboveOverlay() ? "z-50" : ""}`}
-           style={{bottom: `${weisDisplayBottom}px`}}>
-        <WeisPointsBubble points={75} />
-      </div>
+      <AnimatePresence>
+        {ownWeisPoints !== undefined && position && (
+          <div id={"weisPointsDisplay"}
+               className={`fixed w-full flex justify-center ${cardsAboveOverlay() ? "z-50" : ""}`}
+               style={{bottom: `${weisDisplayBottom}px`}}>
+            <WeisPointsBubble
+              points={ownWeisPoints}
+              tailDirection="SOUTH"
+              verdict={weisVerdictFor(position, weisWinners)}
+            />
+          </div>
+        )}
+      </AnimatePresence>
       <div id={"playerHand"}
            className={`fixed -bottom-[60px] w-full flex justify-center ${cardsAboveOverlay() ? "z-50" : ""}`}>
         <motion.div
