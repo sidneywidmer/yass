@@ -172,7 +172,7 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
                 <Spade className="mr-2 h-5 w-5 text-muted-foreground"/>
                 {t("settings.deck")}
               </h3>
-              <div className="flex space-x-2">
+              <div className="flex flex-wrap gap-2">
                 <Button
                   variant={cardDeck === CardDeck.SWISS ? "secondary" : "outline"}
                   onClick={() => setCardDeck(CardDeck.SWISS)}
