@@ -2,7 +2,7 @@ import {useGameStateStore} from "@/store/game-state.ts";
 import {CardInHand, State} from "@/api/generated";
 import {GameStates} from "@/types/game-states.ts";
 import {AnimatePresence, motion, useAnimation} from "motion/react"
-import {useEffect, useMemo, useRef} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import {Card} from "@/components/game/card.tsx";
 import {useCardDimensions} from "@/hooks/use-card-dimensions.ts";
 import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
@@ -38,9 +38,12 @@ const getAnimationConfig = (CARD_HEIGHT: number) => ({
     HOVER_DESKTOP: 0.08,
     ADJACENT_TOUCH: 0.06,
     ADJACENT_DESKTOP: 0.08,
-    INITIAL: 0.08
+    INITIAL: 0.08,
+    DEAL: 0.1
   },
   EASING: [0.4, 0, 0.2, 1] as const, // feels "snappy", better than bouncy default of framer
+  DEAL_STAGGER: 0.02, // per-card delay, gives the left-to-right deal-in sweep
+  DEAL_Y_SHIFT: CARD_HEIGHT, // cards rise in from fully below the viewport when dealt
   ADJACENT_ROTATION: 15, // touch only
   BRIGHTNESS: { // depending on state we want to "mute" unplayable cards
     PLAYABLE: "brightness(1)",
@@ -106,6 +109,13 @@ export function PlayerHand() {
   const totalCards = filteredCards.length
 
   const hoveredIndexRef = useRef<number | null>(null)
+  // Cards are only ever removed mid-hand, so a growing count means a fresh deal (or page load)
+  const [prevCardCount, setPrevCardCount] = useState(0)
+  const [isDealingIn, setIsDealingIn] = useState(false)
+  if (totalCards !== prevCardCount) {
+    setPrevCardCount(totalCards)
+    setIsDealingIn(totalCards > prevCardCount)
+  }
 
   const startRotation = useMemo(() => {
     return -(ANIMATION_CONFIG.CARD_ROTATION / 2) - (ANIMATION_CONFIG.CARD_ROTATION * ((totalCards / 2) - 1))
@@ -234,6 +244,31 @@ export function PlayerHand() {
     }
   }
 
+  // Stagger the cards in from the left whenever a fresh hand arrives
+  useEffect(() => {
+    if (!isDealingIn) return
+
+    filteredCards.forEach((card, i) => {
+      const offset = calculateOffset(i, totalCards)
+      const currentAngle = startRotation + ANIMATION_CONFIG.CARD_ROTATION * i
+      const restingAnimation = createCardAnimation({
+        card,
+        animationType: 'initial',
+        position: {offset, angle: currentAngle, index: i},
+        isTouch
+      })
+
+      getCardControlsByIndex(i).start({
+        ...restingAnimation,
+        transition: {
+          duration: ANIMATION_CONFIG.DURATIONS.DEAL,
+          ease: ANIMATION_CONFIG.EASING,
+          delay: i * ANIMATION_CONFIG.DEAL_STAGGER
+        }
+      })
+    })
+  }, [isDealingIn]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Update all card animations when playable state changes
   useEffect(() => {
     if (!isMyPos) {
@@ -299,7 +334,7 @@ export function PlayerHand() {
                 }}
                 layout
                 transition={{layout: {duration: 0.3, ease: [0.4, 0, 0.2, 1]}}}
-                initial={initialAnimation}
+                initial={isDealingIn ? {...initialAnimation, y: initialAnimation.y + ANIMATION_CONFIG.DEAL_Y_SHIFT} : initialAnimation}
                 animate={getCardControlsByIndex(i)}
                 onClick={() => cardClicked(card, i)}
               >
