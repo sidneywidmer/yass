@@ -158,6 +158,8 @@
     "points": "Punkte",
     "zeroWeis": "auf Weis verzichten",
     "announcement": "{{name}} weist {{points}} Punkte",
+    "announcementTitle": "Angesagte Weise",
+    "announcementDescription": "Von den Spielern angesagte Weise",
     "close": "Schliessen"
   },
   "weise": {

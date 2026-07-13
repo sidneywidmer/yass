@@ -158,6 +158,8 @@
     "points": "Points",
     "zeroWeis": "Do not weis any points",
     "announcement": "{{name}} weises {{points}} points",
+    "announcementTitle": "Declared Weise",
+    "announcementDescription": "Weise declared by the players",
     "close": "Close"
   },
   "weise": {

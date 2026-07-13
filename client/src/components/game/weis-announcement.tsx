@@ -1,11 +1,10 @@
-import {Card} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
+import {Dialog, DialogContent, DialogDescription, DialogTitle} from "@/components/ui/dialog";
 import {Position, WeisWithPoints} from "@/api/generated";
 import {useGameStateStore} from "@/store/game-state";
 import {WeisDisplay} from "@/components/game/weis-display";
 import {useEffect} from "react";
 import {useTranslation} from "react-i18next";
-import {AnimatePresence, motion} from "motion/react";
 
 const BUBBLE_LINGER_MS = 800
 
@@ -45,28 +44,19 @@ export function WeisAnnouncement() {
   }, [shownWeise, weisWinners, clearDeclaredWeise])
 
   return (
-    <AnimatePresence>
-      {shownWeise && (
-        <div className="fixed inset-0 flex items-center justify-center z-40">
-          <motion.div
-            initial={{opacity: 0, scale: 0.9}}
-            animate={{opacity: 1, scale: 1}}
-            exit={{opacity: 0, scale: 0.9}}
-            transition={{duration: 0.3, ease: [0.4, 0, 0.2, 1]}}
-          >
-            <Card className="bg-white p-6 rounded-lg flex flex-col gap-6 max-w-[90vw] max-h-[85svh] overflow-y-auto">
-              <div className="flex flex-wrap justify-center gap-x-12 gap-y-6">
-                {Object.entries(shownWeise).map(([position, weise]) => (
-                  <PositionWeise key={position} position={position as Position} weise={weise}/>
-                ))}
-              </div>
-              <Button variant="outline" className="self-center" onClick={dismissShownWeise}>
-                {t("weisen.close")}
-              </Button>
-            </Card>
-          </motion.div>
+    <Dialog open={!!shownWeise}>
+      <DialogContent disableClose={true} className="w-auto max-w-[90vw] max-h-[85svh] overflow-y-auto flex flex-col gap-6" onPointerDownOutside={e => e.preventDefault()} container={document.getElementById('root')}>
+        <DialogTitle className="sr-only">{t("weisen.announcementTitle")}</DialogTitle>
+        <DialogDescription className="sr-only">{t("weisen.announcementDescription")}</DialogDescription>
+        <div className="flex flex-wrap justify-center gap-x-12 gap-y-6">
+          {shownWeise && Object.entries(shownWeise).map(([position, weise]) => (
+            <PositionWeise key={position} position={position as Position} weise={weise}/>
+          ))}
         </div>
-      )}
-    </AnimatePresence>
+        <Button variant="outline" className="self-center" onClick={dismissShownWeise}>
+          {t("weisen.close")}
+        </Button>
+      </DialogContent>
+    </Dialog>
   );
 }
