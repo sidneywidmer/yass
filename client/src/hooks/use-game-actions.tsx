@@ -149,28 +149,20 @@ const useGameActions = () => {
     processNextAction()
   }, [actionQueue, processNextAction])
 
-  // Resume queue processing 2 seconds after weise overlay closes
+  // Resume queue processing when the weise overlay closes
   useEffect(() => {
     if (!isPaused) return
-
-    let timer: ReturnType<typeof setTimeout> | null = null
 
     const unsubscribe = useGameStateStore.subscribe((state, prevState) => {
       // Detect when the shown weise overlay closes while we're paused
       if (prevState.shownWeise && !state.shownWeise) {
-        // Start the 2-second countdown
-        timer = setTimeout(() => {
-          setIsPaused(false)
-          // Trigger queue processing to resume (will process the ClearPlayedCards)
-          processNextAction()
-        }, 2000)
+        setIsPaused(false)
+        // Trigger queue processing to resume (will process the ClearPlayedCards)
+        processNextAction()
       }
     })
 
-    return () => {
-      unsubscribe()
-      if (timer) clearTimeout(timer)
-    }
+    return unsubscribe
   }, [isPaused, processNextAction])
 
   return {addActions}
