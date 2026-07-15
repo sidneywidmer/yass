@@ -36,7 +36,7 @@ class WeisenTest {
         val cards = interpretCards("C6,CK,CQ,C7,C8,CJ,CA,H9,H10,HJ,D9")
 
         val result = possibleWeiseWithPoints(cards, Trump.CLUBS)
-        assert(result.sumOf { it.points } == 90)
+        assert(result.sumOf { it.points } == 180)
     }
 
     @Test

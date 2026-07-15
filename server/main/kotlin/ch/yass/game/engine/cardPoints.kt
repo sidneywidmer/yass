@@ -8,10 +8,10 @@ fun multiplyByTrump(points: Int, trump: Trump): Int {
     return when (trump) {
         Trump.OBEABE -> points * 3
         Trump.UNEUFE -> points * 3
-        Trump.DIAMONDS -> points * 2
-        Trump.HEARTS -> points * 2
-        Trump.CLUBS -> points
-        Trump.SPADES -> points
+        Trump.CLUBS -> points * 2
+        Trump.SPADES -> points * 2
+        Trump.DIAMONDS -> points
+        Trump.HEARTS -> points
         else -> points
     }
 }

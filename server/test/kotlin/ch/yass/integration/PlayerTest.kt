@@ -117,13 +117,13 @@ class PlayerTest : Integration() {
     private fun checkCentrifugoTrick1(state: GameState) {
         val north = positionSeat(Position.NORTH, state.seats)
         cth.assertActions(north.uuid, cth.parseActions(centrifugo.allServeEvents)).apply {
-            hasTrump(Trump.HEARTS)
+            hasTrump(Trump.SPADES)
             hasGschobe(Position.WEST)
             hasCount(UpdatePossibleWeise::class, 1)
-            hasPlayedCard(Suit.HEARTS, Rank.TEN)
-            hasPlayedCard(Suit.HEARTS, Rank.EIGHT)
-            hasPlayedCard(Suit.SPADES, Rank.SIX)
-            hasPlayedCard(Suit.HEARTS, Rank.QUEEN)
+            hasPlayedCard(Suit.SPADES, Rank.TEN)
+            hasPlayedCard(Suit.SPADES, Rank.EIGHT)
+            hasPlayedCard(Suit.HEARTS, Rank.SIX)
+            hasPlayedCard(Suit.SPADES, Rank.QUEEN)
             hasWeis(WeisType.VIER_BLATT, 100)
             hasCount(ClearPlayedCards::class, 1)
         }
@@ -155,23 +155,23 @@ class PlayerTest : Integration() {
 
         // SOUTH plays the first card in the first trick of the second hand
         recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("SPADES", "EIGHT"))
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "EIGHT"))
             service.play(request, south)
         }) { fail() }
 
         recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("SPADES", "NINE"))
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "NINE"))
             service.play(request, east)
         }) { fail() }
 
-        // NORTH will win the trick, S6 is bock
+        // NORTH will win the trick, H6 is bock
         recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("SPADES", "SIX"))
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "SIX"))
             service.play(request, north)
         }) { fail() }
 
         val updatedState = recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("SPADES", "SEVEN"))
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "SEVEN"))
             service.play(request, west)
         }) { fail() }
 
@@ -198,46 +198,46 @@ class PlayerTest : Integration() {
         // just let the hand be played out and check if our state is correct at the end.
         val cardsPlayed = listOf(
             // Trick3: E*->S->W->N
-            PlayCard(Position.EAST, "HJ"),
-            PlayCard(Position.NORTH, "S9"),
-            PlayCard(Position.WEST, "H6"),
-            PlayCard(Position.SOUTH, "C8"),
+            PlayCard(Position.EAST, "SJ"),
+            PlayCard(Position.NORTH, "H9"),
+            PlayCard(Position.WEST, "S6"),
+            PlayCard(Position.SOUTH, "D8"),
 
             // Trick4: E*->S->W->N
-            PlayCard(Position.EAST, "H9"),
-            PlayCard(Position.NORTH, "SJ"),
-            PlayCard(Position.WEST, "H7"),
-            PlayCard(Position.SOUTH, "S8"),
+            PlayCard(Position.EAST, "S9"),
+            PlayCard(Position.NORTH, "HJ"),
+            PlayCard(Position.WEST, "S7"),
+            PlayCard(Position.SOUTH, "H8"),
 
             // Trick5: E->S->W->N*
-            PlayCard(Position.EAST, "SK"),
-            PlayCard(Position.NORTH, "SA"),
-            PlayCard(Position.WEST, "SQ"),
-            PlayCard(Position.SOUTH, "C10"),
+            PlayCard(Position.EAST, "HK"),
+            PlayCard(Position.NORTH, "HA"),
+            PlayCard(Position.WEST, "HQ"),
+            PlayCard(Position.SOUTH, "D10"),
 
             // Trick6: E->S*->W->N
-            PlayCard(Position.NORTH, "DQ"),
-            PlayCard(Position.WEST, "DK"),
-            PlayCard(Position.SOUTH, "DA"),
-            PlayCard(Position.EAST, "D6"),
+            PlayCard(Position.NORTH, "CQ"),
+            PlayCard(Position.WEST, "CK"),
+            PlayCard(Position.SOUTH, "CA"),
+            PlayCard(Position.EAST, "C6"),
 
             // Trick7: E->S*->W->N
-            PlayCard(Position.SOUTH, "CA"),
-            PlayCard(Position.EAST, "D7"),
-            PlayCard(Position.NORTH, "CQ"),
-            PlayCard(Position.WEST, "C6"),
+            PlayCard(Position.SOUTH, "DA"),
+            PlayCard(Position.EAST, "C7"),
+            PlayCard(Position.NORTH, "DQ"),
+            PlayCard(Position.WEST, "D6"),
 
             // Trick8: E->S->W->N*
-            PlayCard(Position.SOUTH, "CJ"),
-            PlayCard(Position.EAST, "D8"),
-            PlayCard(Position.NORTH, "CK"),
-            PlayCard(Position.WEST, "C7"),
+            PlayCard(Position.SOUTH, "DJ"),
+            PlayCard(Position.EAST, "C8"),
+            PlayCard(Position.NORTH, "DK"),
+            PlayCard(Position.WEST, "D7"),
 
             // Trick9: E->S->W->N* (last stich)
-            PlayCard(Position.NORTH, "S10"),
-            PlayCard(Position.WEST, "DJ"),
-            PlayCard(Position.SOUTH, "C9"),
-            PlayCard(Position.EAST, "D10")
+            PlayCard(Position.NORTH, "H10"),
+            PlayCard(Position.WEST, "CJ"),
+            PlayCard(Position.SOUTH, "D9"),
+            PlayCard(Position.EAST, "C10")
         )
 
         val uuid = state.game.uuid.toString()
@@ -276,26 +276,26 @@ class PlayerTest : Integration() {
         val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)
         val east = playerAtPosition(Position.EAST, state.seats, state.allPlayers)
 
-        // West won the last trick so they go again first and again start with HEARTS which is also Stoeck
+        // West won the last trick so they go again first and again start with SPADES which is also Stoeck
         val stateAfterStoeck = recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "KING"))
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("SPADES", "KING"))
             service.play(request, west)
         }) { fail() }
 
         assertTrue(stateAfterStoeck.hands[0].weiseOf(Position.WEST).any { it.type == WeisType.STOECK })
 
         recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("SPADES", "SEVEN"))
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "SEVEN"))
             service.play(request, south)
         }) { fail() }
 
         recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "ACE"))
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("SPADES", "ACE"))
             service.play(request, east)
         }) { fail() }
 
         val stateAfterAllCards = recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("DIAMONDS", "NINE"))
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("CLUBS", "NINE"))
             service.play(request, north)
         }) { fail() }
 
@@ -305,7 +305,7 @@ class PlayerTest : Integration() {
     }
 
     private fun checkPointsTrick1(state: GameState) {
-        // All points are times 2 because trump is HEARTS
+        // All points are times 2 because trump is SPADES
         val points = pointsByPositionTotal(state.hands, state.tricks)
         assertThat(points.getValue(Position.NORTH).cardPoints, equalTo(0))
         assertThat(points.getValue(Position.NORTH).weisPoints, equalTo(40)) // DREI_BLATT
@@ -318,23 +318,23 @@ class PlayerTest : Integration() {
     }
 
     private fun prepareHand2() {
-        val cardsN = interpretCards("S6,H7,D6,C9,S10,HJ,DQ,CK,HA")
-        val cardsW = interpretCards("S7,H8,D9,C10,SJ,HQ,DK,CA,H6")
-        val cardsS = interpretCards("S8,H9,D10,CJ,SQ,HK,DA,C6,H10")
-        val cardsE = interpretCards("S9,H10,DJ,CQ,SK,SA,D8,C7,D7")
+        val cardsN = interpretCards("H6,S7,C6,D9,H10,SJ,CQ,DK,SA")
+        val cardsW = interpretCards("H7,S8,C9,D10,HJ,SQ,CK,DA,S6")
+        val cardsS = interpretCards("H8,S9,C10,DJ,HQ,SK,CA,D6,S10")
+        val cardsE = interpretCards("H9,S10,CJ,DQ,HK,HA,C8,D7,C7")
 
         foresight.pushDeck(cardsN + cardsW + cardsS + cardsE)
     }
 
     private fun prepareHand1() {
-        // Has a DREI_BLATT for 20 Points (S9-SJ)
-        val cardsN = interpretCards("S9,S10,SJ,SA,DQ,D9,CK,CQ,H10")
-        // Will schiebe and has STOECK if west chooses HEARTS as trump (fingers crossed)
-        val cardsW = interpretCards("HQ,HK,H6,H7,DJ,DK,C6,C7,SQ")
-        // Has a VIER_BLATT for 50 Points (C8-CJ) and a DREI_BLATT for 20 Points (S6-S8)
-        val cardsS = interpretCards("C8,C9,C10,CJ,S6,S7,S8,CA,DA")
-        // Has a DREI_BLATT for 20 Points (D6-D9)
-        val cardsE = interpretCards("D6,D7,D8,D10,H8,H9,HJ,HA,SK")
+        // Has a DREI_BLATT for 20 Points (H9-HJ)
+        val cardsN = interpretCards("H9,H10,HJ,HA,CQ,C9,DK,DQ,S10")
+        // Will schiebe and has STOECK if west chooses SPADES as trump (fingers crossed)
+        val cardsW = interpretCards("SQ,SK,S6,S7,CJ,CK,D6,D7,HQ")
+        // Has a VIER_BLATT for 50 Points (D8-DJ) and a DREI_BLATT for 20 Points (H6-H8)
+        val cardsS = interpretCards("D8,D9,D10,DJ,H6,H7,H8,DA,CA")
+        // Has a DREI_BLATT for 20 Points (C6-C9)
+        val cardsE = interpretCards("C6,C7,C8,C10,S8,S9,SJ,SA,HK")
 
         // Manipulate our luck a little
         foresight.pushDeck(cardsN + cardsW + cardsS + cardsE)
@@ -348,7 +348,7 @@ class PlayerTest : Integration() {
 
         // WEST is our start player, let's quickly make sure the state waits for schiebe and we can't just play a card
         recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "QUEEN"))
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("SPADES", "QUEEN"))
             service.play(request, west)
         }) { assertTrue(it is InvalidState && it.nextState == State.SCHIEBE) }
 
@@ -362,27 +362,27 @@ class PlayerTest : Integration() {
         assertThat(stateAfterSchiebe.hands[0].gschobe, equalTo(Gschobe.YES))
 
         val stateAfterTrump = recover({
-            val request = ChooseTrumpRequest(stateAfterSchiebe.game.uuid.toString(), "HEARTS")
+            val request = ChooseTrumpRequest(stateAfterSchiebe.game.uuid.toString(), "SPADES")
             service.trump(request, east)
         }) { fail() }
 
-        assertThat(stateAfterTrump.hands[0].trump, equalTo(Trump.HEARTS))
+        assertThat(stateAfterTrump.hands[0].trump, equalTo(Trump.SPADES))
 
         // West the first card of the hand (and the trick)
         recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "QUEEN"))
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("SPADES", "QUEEN"))
             service.play(request, west)
         }) { fail() }
 
-        // Next up south, has no hearts so they play a low spades - but oh no! They should first declare their weis.
+        // Next up south, has no spades so they play a low hearts - but oh no! They should first declare their weis.
         recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("SPADES", "SIX"))
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "SIX"))
             service.play(request, south)
         }) { assertTrue(it is InvalidState && it.nextState == State.WEISEN_FIRST) }
 
-        // Okay then, let's weis our VIER_BLATT for 50 Points (C9-CJ) first
+        // Okay then, let's weis our VIER_BLATT for 50 Points (D9-DJ) first
         val stateAfterWeis = recover({
-            val weis = Weis(WeisType.VIER_BLATT, interpretCards("C8,C9,C10,CJ"))
+            val weis = Weis(WeisType.VIER_BLATT, interpretCards("D8,D9,D10,DJ"))
             val request = WeisenRequest(state.game.uuid.toString(), weis)
             service.weisen(request, south)
         }) { fail() }
@@ -391,40 +391,40 @@ class PlayerTest : Integration() {
         assertThat(stateAfterWeis.hands[0].weiseOf(Position.SOUTH).first().type, equalTo(WeisType.VIER_BLATT))
         assertThat(stateAfterWeis.hands[0].weiseOf(Position.SOUTH).first().cards.size, equalTo(4))
 
-        // Try again to play that darn S6, this time it should work
+        // Try again to play that darn H6, this time it should work
         recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("SPADES", "SIX"))
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "SIX"))
             service.play(request, south)
         }) { fail() }
 
         // East can also weis a DREI_BLATT...
         recover({
-            val weis = Weis(WeisType.DREI_BLATT, interpretCards("D6,D7,D8"))
+            val weis = Weis(WeisType.DREI_BLATT, interpretCards("C6,C7,C8"))
             val request = WeisenRequest(state.game.uuid.toString(), weis)
             service.weisen(request, east)
         }) { fail() }
 
-        // ...and play a card. Can follow suit with H9
+        // ...and play a card. Can follow suit with S9
         recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "EIGHT"))
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("SPADES", "EIGHT"))
             service.play(request, east)
         }) { fail() }
 
         // Does anyone NOT have a weis these days? North shows their DREI_BLATT...
         recover({
-            val weis = Weis(WeisType.DREI_BLATT, interpretCards("S9,S10,SJ"))
+            val weis = Weis(WeisType.DREI_BLATT, interpretCards("H9,H10,HJ"))
             val request = WeisenRequest(state.game.uuid.toString(), weis)
             service.weisen(request, north)
         }) { fail() }
 
-        // ...and plays H10 because they must follow suit
+        // ...and plays S10 because they must follow suit
         val stateAfterAllCards = recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("HEARTS", "TEN"))
+            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("SPADES", "TEN"))
             service.play(request, north)
         }) { fail() }
 
         // Now something special happened: The Team (N/S, E/W) with the most weise automatically weises any remaining
-        // weise they might have. In our case SOUTH has another DREI_BLATT (S6-S8). Also, a new (empty) trick is initiated
+        // weise they might have. In our case SOUTH has another DREI_BLATT (H6-H8). Also, a new (empty) trick is initiated
         assertThat(stateAfterAllCards.tricks.size, equalTo(3)) // new trick...
         assertThat(stateAfterAllCards.tricks[0].cards().size, equalTo(0)) // ...that is also still empty
 
