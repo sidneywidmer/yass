@@ -5,6 +5,10 @@
     "deck": "Kartenset",
     "deckSwiss": "Deutschschweiz",
     "deckFrench": "Französisch",
+    "playSpeed": "Spielgeschwindigkeit",
+    "playSpeedSlow": "Langsam",
+    "playSpeedMedium": "Mittel",
+    "playSpeedFast": "Schnell",
     "leaveGame": "Spiel verlassen",
     "leaveGameConfirm": {
       "title": "Spiel verlassen",

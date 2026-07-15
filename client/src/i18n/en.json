@@ -5,6 +5,10 @@
     "deck": "Cardstyle",
     "deckSwiss": "Swissgerman",
     "deckFrench": "French",
+    "playSpeed": "Play speed",
+    "playSpeedSlow": "Slow",
+    "playSpeedMedium": "Medium",
+    "playSpeedFast": "Fast",
     "leaveGame": "Leave Game",
     "leaveGameConfirm": {
       "title": "Leave Game",

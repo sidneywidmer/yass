@@ -1,5 +1,7 @@
 import {useCallback, useEffect, useRef, useState} from 'react'
 import {useGameStateStore} from '@/store/game-state'
+import {useSettingsStore} from '@/store/settings'
+import {GameDelay, playSpeedTimings} from '@/types/play-speed'
 import {CardInHand, CardOnTable, GameFinished, PlayerAtTable, Position, State, TotalPoints, Trump, WeisWithPoints} from '@/api/generated'
 
 type CardPlayedAction = { type: 'CardPlayed'; card: CardOnTable }
@@ -36,6 +38,10 @@ export type GameAction =
 type ActionHandlerFn<T extends GameAction> = (action: T) => Promise<void>
 type ActionHandlerMap = { [K in GameAction['type']]: ActionHandlerFn<Extract<GameAction, { type: K }>> }
 
+// Each delay is tuned individually per play speed setting, see playSpeedTimings
+const delay = (timing: GameDelay) =>
+  new Promise(resolve => setTimeout(resolve, playSpeedTimings[useSettingsStore.getState().playSpeed][timing]))
+
 const useGameActions = () => {
   const [actionQueue, setActionQueue] = useState<GameAction[]>([])
   const [isPaused, setIsPaused] = useState(false)
@@ -63,7 +69,7 @@ const useGameActions = () => {
     },
     ClearPlayedCards: async (action: ClearPlayedCardsAction) => {
       // Allow enough time the players to register what card was played
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await delay(GameDelay.CLEAR_TABLE)
       await clearCards(action.position)
     },
     UpdateState: async (action: UpdateStateAction) => useGameStateStore.setState({state: action.state}),
@@ -129,7 +135,7 @@ const useGameActions = () => {
     const handler = (actionHandlers as Record<string, ActionHandlerFn<GameAction>>)[action.type]
 
     if (handler) {
-      await new Promise(resolve => setTimeout(resolve, 50))
+      await delay(GameDelay.NEXT_ACTION)
       await handler(action)
     } else {
       console.log("no handler for action found", action)

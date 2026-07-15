@@ -1,5 +1,7 @@
-import {Languages, LogOut, SettingsIcon, Spade, User} from 'lucide-react';
+import {Gauge, Languages, LogOut, SettingsIcon, Spade, User} from 'lucide-react';
 import {useSettingsStore} from "@/store/settings.ts";
+import {PlaySpeed} from "@/types/play-speed.ts";
+import {Slider} from "@/components/ui/slider.tsx";
 import {usePlayerStore} from "@/store/player.ts";
 import {useGameStateStore} from "@/store/game-state.ts";
 import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet.tsx";
@@ -31,7 +33,7 @@ interface SettingsProps {
 }
 
 const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange }: SettingsProps) => {
-  const {language, setLanguage, cardDeck, setCardDeck} = useSettingsStore();
+  const {language, setLanguage, cardDeck, setCardDeck, playSpeed, setPlaySpeed} = useSettingsStore();
   const isAuthenticated = usePlayerStore(state => state.isAuthenticated)
   const name = usePlayerStore(state => state.name)
   const gameUuid = useGameStateStore(state => state.gameUuid)
@@ -83,6 +85,8 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
     setShowMessageDialog(true);
     setOpen(false); // Close the settings sheet
   };
+
+  const playSpeedOrder = [PlaySpeed.SLOW, PlaySpeed.MEDIUM, PlaySpeed.FAST];
 
   const triggerClasses = triggerVariant === 'fixed'
     ? "fixed top-4 right-4 z-10"
@@ -197,6 +201,26 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
                     alt="french hearts"/>
                   {t("settings.deckFrench")}
                 </Button>
+              </div>
+            </div>
+
+            {/* Play Speed */}
+            <div>
+              <h3 className="text-sm font-medium mb-2 flex items-center">
+                <Gauge className="mr-2 h-5 w-5 text-muted-foreground"/>
+                {t("settings.playSpeed")}
+              </h3>
+              <Slider
+                value={[playSpeedOrder.indexOf(playSpeed)]}
+                onValueChange={([value]) => setPlaySpeed(playSpeedOrder[value])}
+                min={0}
+                max={2}
+                step={1}
+              />
+              <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                <span>{t("settings.playSpeedSlow")}</span>
+                <span>{t("settings.playSpeedMedium")}</span>
+                <span>{t("settings.playSpeedFast")}</span>
               </div>
             </div>
           </div>
