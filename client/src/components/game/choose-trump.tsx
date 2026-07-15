@@ -7,7 +7,20 @@ import {api} from "@/api/client.ts";
 import {Trump} from "@/api/generated";
 import {GameStates} from "@/types/game-states.ts";
 import {TrumpIcon} from "@/components/game/trump-icon";
+import {TrumpMultiplierBadge} from "@/components/game/trump-multiplier-badge";
 import {useTranslation} from "react-i18next";
+
+function TrumpButton({trump, onSelect}: {
+  trump: Exclude<Trump, "FREESTYLE">
+  onSelect: (trump: Exclude<Trump, "FREESTYLE">) => void
+}) {
+  return (
+    <Button variant="outline" className="w-11 h-11 relative" size="icon" onClick={() => onSelect(trump)}>
+      <TrumpIcon trump={trump} className="w-6 h-6"/>
+      <TrumpMultiplierBadge trump={trump}/>
+    </Button>
+  )
+}
 
 export function ChooseTrump() {
   const handleAxiosError = useAxiosErrorHandler()
@@ -47,27 +60,15 @@ export function ChooseTrump() {
         <DialogDescription className="sr-only">{t("chooseTrump.description")}</DialogDescription>
         <div className="flex flex-col gap-4 items-center pt-4">
           <div className="flex gap-4">
-            <Button variant="outline" className="w-11 h-11" size="icon" onClick={() => selectTrump("HEARTS")}>
-              <TrumpIcon trump="HEARTS" className="w-6 h-6"/>
-            </Button>
-            <Button variant="outline" className="w-11 h-11" size="icon" onClick={() => selectTrump("SPADES")}>
-              <TrumpIcon trump="SPADES" className="w-6 h-6"/>
-            </Button>
-            <Button variant="outline" className="w-11 h-11" size="icon" onClick={() => selectTrump("CLUBS")}>
-              <TrumpIcon trump="CLUBS" className="w-6 h-6"/>
-            </Button>
-            <Button variant="outline" className="w-11 h-11" size="icon" onClick={() => selectTrump("DIAMONDS")}>
-              <TrumpIcon trump="DIAMONDS" className="w-6 h-6"/>
-            </Button>
+            <TrumpButton trump="HEARTS" onSelect={selectTrump}/>
+            <TrumpButton trump="DIAMONDS" onSelect={selectTrump}/>
+            <TrumpButton trump="SPADES" onSelect={selectTrump}/>
+            <TrumpButton trump="CLUBS" onSelect={selectTrump}/>
           </div>
 
           <div className="flex gap-4">
-            <Button variant="outline" className="w-11 h-11" size="icon" onClick={() => selectTrump("UNEUFE")}>
-              <TrumpIcon trump="UNEUFE" className="w-6 h-6"/>
-            </Button>
-            <Button variant="outline" className="w-11 h-11" size="icon" onClick={() => selectTrump("OBEABE")}>
-              <TrumpIcon trump="OBEABE" className="w-6 h-6"/>
-            </Button>
+            <TrumpButton trump="UNEUFE" onSelect={selectTrump}/>
+            <TrumpButton trump="OBEABE" onSelect={selectTrump}/>
           </div>
 
           {state == GameStates.SCHIEBE &&
