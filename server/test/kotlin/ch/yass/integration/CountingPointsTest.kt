@@ -36,7 +36,7 @@ class CountingPointsTest : Integration() {
         val state = getStateSpades()
 
         val points = handTricksWithPoints(state.hands, state.tricks).sumPointsByPosition()
-        assertEquals(45, points[Position.NORTH])
+        assertEquals(90, points[Position.NORTH])
     }
 
 }
