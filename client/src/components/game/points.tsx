@@ -1,6 +1,6 @@
 import {useGameStateStore} from "@/store/game-state"
 import {cn} from "@/lib/utils"
-import {motion, AnimatePresence} from "motion/react"
+import {motion, AnimatePresence, useMotionValue, useTransform, animate} from "motion/react"
 import {useEffect, useState} from "react"
 import {TotalPoints} from "@/api/generated"
 
@@ -43,26 +43,33 @@ const Points = ({team}: PointsProps) => {
     return () => clearTimeout(timeout)
   }, [difference])
 
+  const animatedTotal = useMotionValue(total)
+  const displayedTotal = useTransform(animatedTotal, value => Math.round(value))
+
+  useEffect(() => {
+    const controls = animate(animatedTotal, total, {duration: 0.6, ease: "easeOut"})
+    return () => controls.stop()
+  }, [animatedTotal, total])
+
   return (
     <div className="relative">
-      <motion.span
+      <span
         className={cn(
-          "text-lg font-bold inline-block",
+          "text-lg font-bold inline-block tabular-nums",
           isRelevant && "rounded px-2 py-0 border border-blue-200 bg-blue-100"
         )}
-        animate={{scale: difference > 0 ? [1, 1.1, 1] : 1}}
-        transition={{duration: 0.3}}
       >
-        {total}
-      </motion.span>
+        <motion.span>{displayedTotal}</motion.span>
+      </span>
 
       <AnimatePresence>
         {difference > 0 && (
           <motion.span
             className="absolute -right-5 -top-3 z-10 font-semibold text-green-600"
-            initial={{opacity: 0, y: -10}}
-            animate={{opacity: 1, y: 0}}
-            exit={{opacity: 0, y: 10}}
+            initial={{opacity: 0, y: 4}}
+            animate={{opacity: 1, y: -8}}
+            exit={{opacity: 0, y: -20}}
+            transition={{duration: 0.4}}
             key={total}
           >
             +{difference}
