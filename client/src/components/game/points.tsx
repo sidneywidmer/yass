@@ -1,98 +1,76 @@
 import {useGameStateStore} from "@/store/game-state"
 import {cn} from "@/lib/utils"
-import {motion, AnimatePresence} from "motion/react"
+import {motion, AnimatePresence, useMotionValue, useTransform, animate} from "motion/react"
 import {useEffect, useState} from "react"
 import {TotalPoints} from "@/api/generated"
 
-interface TeamSums {
-  total: number
-  totalCardPoints: number
-  totalWeisPoints: number
+type Team = 'NORTH_SOUTH' | 'EAST_WEST'
+
+const TEAM_POSITIONS: Record<Team, [string, string]> = {
+  NORTH_SOUTH: ['NORTH', 'SOUTH'],
+  EAST_WEST: ['EAST', 'WEST'],
 }
 
-interface TeamTotals {
-  NORTH_SOUTH: TeamSums
-  EAST_WEST: TeamSums
-}
+const DIFF_VISIBLE_MS = 2000
 
-function calculateTeamTotals(teams: Record<string, TotalPoints>): TeamTotals {
-  return {
-    NORTH_SOUTH: {
-      total: (teams.NORTH.cardPoints ?? 0) + (teams.SOUTH.cardPoints ?? 0) + (teams.NORTH.weisPoints ?? 0) + (teams.SOUTH.weisPoints ?? 0),
-      totalCardPoints: (teams.NORTH.cardPoints ?? 0) + (teams.SOUTH.cardPoints ?? 0),
-      totalWeisPoints: (teams.NORTH.weisPoints ?? 0) + (teams.SOUTH.weisPoints ?? 0),
-    },
-    EAST_WEST: {
-      total: (teams.EAST.cardPoints ?? 0) + (teams.WEST.cardPoints ?? 0) + (teams.EAST.weisPoints ?? 0) + (teams.WEST.weisPoints ?? 0),
-      totalCardPoints: (teams.EAST.cardPoints ?? 0) + (teams.WEST.cardPoints ?? 0),
-      totalWeisPoints: (teams.EAST.weisPoints ?? 0) + (teams.WEST.weisPoints ?? 0),
-    },
-  }
+function teamTotal(points: Record<string, TotalPoints>, team: Team): number {
+  return TEAM_POSITIONS[team].reduce((sum, position) => {
+    const playerPoints = points[position]
+    return sum + (playerPoints?.cardPoints ?? 0) + (playerPoints?.weisPoints ?? 0)
+  }, 0)
 }
 
 interface PointsProps {
-  team: 'NORTH_SOUTH' | 'EAST_WEST'
+  team: Team
 }
 
 const Points = ({team}: PointsProps) => {
   const points = useGameStateStore(state => state.points)
   const position = useGameStateStore(state => state.position)
-  const [previousTotal, setPreviousTotal] = useState(0)
-  const [showDiff, setShowDiff] = useState(false)
-  const totals = calculateTeamTotals(points)
-  const currentTotal = totals[team].total
-  const relevantTeam = (position === 'NORTH' || position === 'SOUTH') ? 'NORTH_SOUTH' : 'EAST_WEST'
-  const isRelevant = team === relevantTeam
-  const difference = currentTotal - previousTotal
+  const isRelevant = team === ((position === 'NORTH' || position === 'SOUTH') ? 'NORTH_SOUTH' : 'EAST_WEST')
+
+  const total = teamTotal(points, team)
+  const [previousTotal, setPreviousTotal] = useState(total)
+  const [difference, setDifference] = useState(0)
+  if (total !== previousTotal) {
+    setPreviousTotal(total)
+    setDifference(total - previousTotal)
+  }
 
   useEffect(() => {
-    const diff = currentTotal - previousTotal
-    if (diff > 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setShowDiff(true)
-      const timeout = setTimeout(() => setShowDiff(false), 2000)
-      return () => clearTimeout(timeout)
-    }
-  }, [currentTotal]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setPreviousTotal(currentTotal)
-    }, 1000)
+    if (difference === 0) return
+    const timeout = setTimeout(() => setDifference(0), DIFF_VISIBLE_MS)
     return () => clearTimeout(timeout)
-  }, [currentTotal])
+  }, [difference])
+
+  const animatedTotal = useMotionValue(total)
+  const displayedTotal = useTransform(animatedTotal, value => Math.round(value))
+
+  useEffect(() => {
+    const controls = animate(animatedTotal, total, {duration: 0.6, ease: "easeOut"})
+    return () => controls.stop()
+  }, [animatedTotal, total])
 
   return (
     <div className="relative">
-      <motion.span
+      <span
         className={cn(
-          "text-lg font-bold inline-block",
+          "text-lg font-bold inline-block tabular-nums",
           isRelevant && "rounded px-2 py-0 border border-blue-200 bg-blue-100"
         )}
-        initial={{opacity: 1}}
-        animate={{
-          opacity: 1,
-          scale: difference !== 0 ? [1, 1.1, 1] : 1
-        }}
-        transition={{duration: 0.3}}
       >
-        <motion.span
-          initial={{y: 0}}
-          animate={{y: 0}}
-          key={currentTotal}
-        >
-          {currentTotal}
-        </motion.span>
-      </motion.span>
+        <motion.span>{displayedTotal}</motion.span>
+      </span>
 
       <AnimatePresence>
-        {showDiff && difference > 0 && (
+        {difference > 0 && (
           <motion.span
-            className="absolute -right-5 -top-3 font-semibold text-green-600"
-            initial={{opacity: 0, y: -10}}
-            animate={{opacity: 1, y: 0}}
-            exit={{opacity: 0, y: 10}}
-            key={currentTotal}
+            className="absolute -right-5 -top-3 z-10 font-semibold text-green-600"
+            initial={{opacity: 0, y: 4}}
+            animate={{opacity: 1, y: -8}}
+            exit={{opacity: 0, y: -20}}
+            transition={{duration: 0.4}}
+            key={total}
           >
             +{difference}
           </motion.span>
