@@ -13,7 +13,24 @@ import {WeisPointsBubble} from "@/components/game/weis-points-bubble.tsx";
 // While one of these overlays is open the player's own cards render above it
 const OVERLAY_STATES: State[] = [GameStates.WEISEN_FIRST, GameStates.TRUMP, GameStates.SCHIEBE]
 
-type AnimationType = 'initial' | 'hover' | 'adjacentLeft' | 'adjacentRight'
+// No hand to preselect from in these states
+const NO_PRESELECT_STATES: State[] = [GameStates.WAITING_FOR_PLAYERS, GameStates.FINISHED]
+
+// Entering PLAY_CARD from one of these means no card was played right before, so no UpdateHand
+// is queued behind the state change and the last processed card states are already accurate.
+// Entering from anywhere else (turn pass, trick won) a card WAS just played and its UpdateHand
+// is still in the action queue - auto-playing before it arrives acts on stale states and the
+// late UpdateHand then resurrects the played card in the hand.
+const SAFE_PLAY_ENTRY_STATES: State[] = [
+  GameStates.TRUMP, GameStates.TRUMP_BOT,
+  GameStates.SCHIEBE, GameStates.SCHIEBE_BOT,
+  GameStates.WEISEN_FIRST, GameStates.WEISEN_FIRST_BOT,
+  GameStates.WEISEN_SECOND, GameStates.WEISEN_SECOND_BOT
+]
+
+type AnimationType = 'initial' | 'hover' | 'adjacentLeft' | 'adjacentRight' | 'preselected'
+
+const cardKey = (card: CardInHand) => `${card.suit}-${card.rank}-${card.skin}`
 
 type CardPosition = {
   offset: number // this gives us our nice little arch
@@ -26,6 +43,7 @@ type CardAnimationConfig = {
   animationType: AnimationType
   position: CardPosition
   isTouch: boolean
+  preselected?: boolean
 }
 
 // Animation constants factory
@@ -39,7 +57,8 @@ const getAnimationConfig = (CARD_HEIGHT: number) => ({
     ADJACENT_TOUCH: 0.06,
     ADJACENT_DESKTOP: 0.08,
     INITIAL: 0.08,
-    DEAL: 0.1
+    DEAL: 0.1,
+    PRESELECT: 0.15
   },
   EASING: [0.4, 0, 0.2, 1] as const, // feels "snappy", better than bouncy default of framer
   DEAL_STAGGER: 0.02, // per-card delay, gives the left-to-right deal-in sweep
@@ -50,7 +69,8 @@ const getAnimationConfig = (CARD_HEIGHT: number) => ({
     DISABLED: "brightness(0.75)"
   },
   HOVER_BASE_Y: -70 - ((CARD_HEIGHT - 100) / 30) * 20, // hover state based on CARD_HEIGHT, lol try and error
-  HOVER_ADDITIONAL_Y: -10 - ((CARD_HEIGHT - 100) / 30) * 10 // extra lift for main hover
+  HOVER_ADDITIONAL_Y: -10 - ((CARD_HEIGHT - 100) / 30) * 10, // extra lift for main hover
+  PRESELECT_Y: -(CARD_HEIGHT * 1.1) // preselected cards slide way out so they clearly read as "armed"
 } as const)
 
 // Animation overrides for specific card states
@@ -81,6 +101,15 @@ const getAnimationOverrides = (ANIMATION_CONFIG: ReturnType<typeof getAnimationC
       duration: isTouch ? ANIMATION_CONFIG.DURATIONS.ADJACENT_TOUCH : ANIMATION_CONFIG.DURATIONS.ADJACENT_DESKTOP,
       ease: ANIMATION_CONFIG.EASING
     }
+  }),
+  preselected: (_isTouch: boolean) => ({
+    y: ANIMATION_CONFIG.PRESELECT_Y,
+    scale: 1.1,
+    rotate: 0,
+    transition: {
+      duration: ANIMATION_CONFIG.DURATIONS.PRESELECT,
+      ease: ANIMATION_CONFIG.EASING
+    }
   })
 }) as const
 
@@ -109,6 +138,8 @@ export function PlayerHand() {
   const totalCards = filteredCards.length
 
   const hoveredIndexRef = useRef<number | null>(null)
+  // Card preselected while waiting for the own turn, tracked by identity since indices shift when cards leave
+  const preselectedCardRef = useRef<string | null>(null)
   // Cards are only ever removed mid-hand, so a growing count means a fresh deal (or page load)
   const [prevCardCount, setPrevCardCount] = useState(0)
   const [isDealingIn, setIsDealingIn] = useState(false)
@@ -146,7 +177,7 @@ export function PlayerHand() {
       const animationType = getCardAnimationType(i, index, allCards.length)
       const position: CardPosition = {offset, angle: currentAngle, index: i}
 
-      const animation = createCardAnimation({card, animationType, position, isTouch})
+      const animation = createCardAnimation({card, animationType, position, isTouch, preselected: cardPreselected(card)})
 
       getCardControlsByIndex(i).start(animation)
     })
@@ -160,17 +191,24 @@ export function PlayerHand() {
     return isMyPos && OVERLAY_STATES.includes(state!)
   }
 
-  const createCardAnimation = ({card, animationType, position, isTouch}: CardAnimationConfig) => {
+  const cardPreselected = (card: CardInHand) => {
+    return preselectedCardRef.current === cardKey(card)
+  }
+
+  const createCardAnimation = ({card, animationType, position, isTouch, preselected}: CardAnimationConfig) => {
+    // A preselected card stays slid out no matter what hover/reset animations run around it
+    const effectiveType = preselected ? 'preselected' : animationType
+
     const baseAnimation = {
       y: position.offset,
       rotate: position.angle,
       scale: 1,
-      filter: (cardsAboveOverlay() || cardPlayable(card)) ? ANIMATION_CONFIG.BRIGHTNESS.PLAYABLE : ANIMATION_CONFIG.BRIGHTNESS.DISABLED,
+      filter: (cardsAboveOverlay() || cardPlayable(card) || preselected) ? ANIMATION_CONFIG.BRIGHTNESS.PLAYABLE : ANIMATION_CONFIG.BRIGHTNESS.DISABLED,
       zIndex: position.index,
       transition: {duration: ANIMATION_CONFIG.DURATIONS.INITIAL, ease: ANIMATION_CONFIG.EASING}
     }
 
-    const override = ANIMATION_OVERRIDES[animationType as keyof typeof ANIMATION_OVERRIDES]?.(isTouch)
+    const override = ANIMATION_OVERRIDES[effectiveType as keyof typeof ANIMATION_OVERRIDES]?.(isTouch)
     return override ? {...baseAnimation, ...override} : baseAnimation
   }
 
@@ -188,9 +226,29 @@ export function PlayerHand() {
       .catch(handleAxiosError)
 
     hoveredIndexRef.current = null
+    // Clear the preselection only after the reset so the card holds its slid-out
+    // pose until it leaves the hand, instead of dipping back in for a frame
     triggerCardHover(null, filteredCards)
     playCard({suit: card.suit, rank: card.rank, skin: card.skin, position: position})
     removeCardFromHand(card)
+    preselectedCardRef.current = null
+  }
+
+  // Preselecting is possible whenever a direct play isn't: waiting for others, own trump/weisen
+  // overlays or while the trick-clear animation still runs on the own turn
+  const cardPreselectable = () => {
+    return !!state && !NO_PRESELECT_STATES.includes(state) && !(isMyPos && isPlayCardState)
+  }
+
+  const preselectCard = (card: CardInHand) => {
+    preselectedCardRef.current = cardKey(card)
+    triggerCardHover(hoveredIndexRef.current, filteredCards)
+  }
+
+  const unpreselectCard = () => {
+    preselectedCardRef.current = null
+    hoveredIndexRef.current = null
+    triggerCardHover(null, filteredCards)
   }
 
   const cardClicked = (card: CardInHand, index: number) => {
@@ -199,15 +257,34 @@ export function PlayerHand() {
       return cardTapped(card, index)
     }
 
-    if (!cardPlayable(card)) return
-    playCardAction(card)
+    if (cardPreselected(card)) {
+      unpreselectCard()
+      return
+    }
+
+    if (cardPlayable(card)) {
+      playCardAction(card)
+      return
+    }
+
+    if (cardPreselectable()) {
+      preselectCard(card)
+    }
   }
 
   const cardTapped = (card: CardInHand, index: number) => {
-    // Second tap - play the card
+    // Tapping a preselected card slides it back into the hand
+    if (cardPreselected(card)) {
+      unpreselectCard()
+      return
+    }
+
+    // Second tap - play the card, or preselect it while a direct play isn't possible
     if (hoveredIndexRef.current === index) {
       if (cardPlayable(card)) {
         playCardAction(card)
+      } else if (cardPreselectable()) {
+        preselectedCardRef.current = cardKey(card)
       }
 
       // Reset all animations
@@ -248,6 +325,7 @@ export function PlayerHand() {
   useEffect(() => {
     if (!isDealingIn) return
 
+    preselectedCardRef.current = null
     filteredCards.forEach((card, i) => {
       const offset = calculateOffset(i, totalCards)
       const currentAngle = startRotation + ANIMATION_CONFIG.CARD_ROTATION * i
@@ -276,10 +354,44 @@ export function PlayerHand() {
     }
 
     filteredCards.forEach((card, i) => {
-      const filter = (cardsAboveOverlay() || cardPlayable(card)) ? ANIMATION_CONFIG.BRIGHTNESS.PLAYABLE : ANIMATION_CONFIG.BRIGHTNESS.DISABLED
+      const filter = (cardsAboveOverlay() || cardPlayable(card) || cardPreselected(card)) ? ANIMATION_CONFIG.BRIGHTNESS.PLAYABLE : ANIMATION_CONFIG.BRIGHTNESS.DISABLED
       getCardControlsByIndex(i).start({filter: filter})
     })
   }, [cards, isMyPos, isPlayCardState]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-play the preselected card once it becomes playable, otherwise slide it back.
+  // The server publishes UpdateActive/UpdateState before the UpdateHand of the same batch and
+  // the action queue processes them with delays in between - so only act on card states that
+  // arrived after the turn flipped to us (or on a safe entry where none are coming).
+  const prevCardsRef = useRef(cards)
+  const prevStateRef = useRef(state)
+
+  useEffect(() => {
+    const handChanged = prevCardsRef.current !== cards
+    const enteredPlayState = isPlayCardState && !!prevStateRef.current && SAFE_PLAY_ENTRY_STATES.includes(prevStateRef.current)
+    prevCardsRef.current = cards
+    prevStateRef.current = state
+
+    if (!preselectedCardRef.current) return
+
+    const card = filteredCards.find(c => cardKey(c) === preselectedCardRef.current)
+    if (!card) {
+      preselectedCardRef.current = null
+      return
+    }
+
+    if (!isMyPos || !isPlayCardState) return
+
+    // Stale hand - the fresh UpdateHand is still in the queue and will re-trigger this
+    if (!handChanged && !enteredPlayState) return
+
+    if (cardPlayable(card)) {
+      playCardAction(card)
+    } else {
+      // Turned out to be an invalid play - return it to the hand
+      unpreselectCard()
+    }
+  }, [cards, isMyPos, isPlayCardState, state]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!cards) return null
 
