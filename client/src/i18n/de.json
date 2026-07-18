@@ -1,4 +1,11 @@
 {
+  "connection": {
+    "title": "Du scheinst offline zu sein",
+    "description": "Bitte überprüfe deine Internetverbindung. Wir versuchen automatisch, die Verbindung wiederherzustellen.",
+    "retrying": "Neuer Versuch in {{seconds}}s…",
+    "reconnecting": "Verbinde…",
+    "refresh": "Aktualisieren"
+  },
   "settings": {
     "title": "Einstellungen",
     "language": "Sprache",

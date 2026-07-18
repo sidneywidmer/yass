@@ -1,4 +1,11 @@
 {
+  "connection": {
+    "title": "You seem to be offline",
+    "description": "Please check your internet connection. We keep trying to reconnect automatically.",
+    "retrying": "Retrying in {{seconds}}s…",
+    "reconnecting": "Reconnecting…",
+    "refresh": "Refresh"
+  },
   "settings": {
     "title": "Settings",
     "language": "Language",
