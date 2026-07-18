@@ -305,8 +305,9 @@ export function PlayerHand() {
   const calculateOffset = (index: number, totalItems: number): number => {
     const middle = (totalItems - 1) / 2
     const distance = Math.abs(index - middle)
+    const arch = middle === 0 ? 0 : distance * 2 / middle * 10
 
-    return Math.round((distance * 2 / middle * 10) - (CARD_HEIGHT / 3))
+    return Math.round(arch - (CARD_HEIGHT / 3))
   }
 
   const handleDrag = (action: { clientX: number; clientY: number }) => {
