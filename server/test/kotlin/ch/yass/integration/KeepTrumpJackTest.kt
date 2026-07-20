@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test
 
 class KeepTrumpJackTest : Integration() {
     /**
-     * 4 Players in the game and the welcome hand is already played. Clubs is trump and in the first
-     * trick a lot of trumps already went. Now in the second trick its WEST's turn.
+     * 4 Players in the game. Spades is trump and in the first trick a lot of trumps already
+     * went. Now in the second trick its WEST's turn.
      */
     private fun getState(): GameState {
         return game {

@@ -590,8 +590,6 @@ components:
           $ref: '#/components/schemas/Suit'
         rank:
           $ref: '#/components/schemas/Rank'
-        skin:
-          $ref: '#/components/schemas/Skin'
         state:
           type: string
           enum: [ PLAYABLE, UNPLAYABLE, ALREADY_PLAYED ]
@@ -607,8 +605,6 @@ components:
           $ref: '#/components/schemas/Suit'
         rank:
           $ref: '#/components/schemas/Rank'
-        skin:
-          $ref: '#/components/schemas/Skin'
         position:
           $ref: '#/components/schemas/Position'
 
@@ -619,8 +615,6 @@ components:
           type: string
         rank:
           type: string
-        skin:
-          type: string
 
     Position:
       type: string
@@ -628,30 +622,15 @@ components:
 
     Suit:
       type: string
-      enum: [ CLUBS, DIAMONDS, HEARTS, SPADES, WELCOME ]
+      enum: [ CLUBS, DIAMONDS, HEARTS, SPADES ]
 
     Rank:
       type: string
-      enum: [ SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE, WELCOME ]
-
-    Skin:
-      type: string
-      enum: [
-        DEFAULT,
-        NATURE_MOUNTAIN01,
-        BETA_HELMETKING01,
-        FESTIVE_HALLOWEEN01,
-        SLANG_HOLZSTOCK01,
-        MESSAGE_GOODLUCK01,
-        MESSAGE_GOODLUCK02,
-        BOT01,
-        BOT02,
-        BOT03,
-      ]
+      enum: [ SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE ]
 
     Trump:
       type: string
-      enum: [ CLUBS, DIAMONDS, HEARTS, SPADES, OBEABE, UNEUFE, FREESTYLE ]
+      enum: [ CLUBS, DIAMONDS, HEARTS, SPADES, OBEABE, UNEUFE ]
 
     State:
       type: string
@@ -707,8 +686,6 @@ components:
           $ref: '#/components/schemas/Suit'
         rank:
           $ref: '#/components/schemas/Rank'
-        skin:
-          type: string
 
     TotalPoints:
       type: object

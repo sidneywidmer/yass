@@ -5,9 +5,7 @@ enum class Suit {
     CLUBS,
     DIAMONDS,
     HEARTS,
-    SPADES,
-
-    WELCOME;
+    SPADES;
 
     companion object {
         fun regular(): List<Suit> = listOf(CLUBS, DIAMONDS, HEARTS, SPADES)

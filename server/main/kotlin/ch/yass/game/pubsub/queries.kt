@@ -25,13 +25,7 @@ fun newHandActions(state: GameState, seat: Seat): List<Action> {
     val cards = cardsInHand(currentHand(state.hands), player, state)
     val nextState = nextState(state)
     val activePosition = activePosition(state.hands, state.seats, state.tricks)
-
-    // For the welcome hand we don't need to look too hard, just move cards north it doesn't matter
-    val winningPos = if (lastHand.trump == Trump.FREESTYLE) {
-        Position.NORTH
-    } else {
-        winningPositionOfTricks(lastHand, tricksOfHand(state.tricks, lastHand))
-    }
+    val winningPos = winningPositionOfTricks(lastHand, tricksOfHand(state.tricks, lastHand))
 
     return listOf(
         UpdateActive(activePosition),
@@ -86,7 +80,7 @@ fun cardPlayedActions(state: GameState, card: Card, playedBy: Seat, seat: Seat):
     return listOf(
         UpdateActive(activePosition),
         UpdateState(nextState),
-        CardPlayed(CardOnTable(card.suit, card.rank, card.skin, playedBy.position)),
+        CardPlayed(CardOnTable(card.suit, card.rank, playedBy.position)),
         UpdateHand(cards, false),
     )
 }
@@ -124,7 +118,7 @@ fun gewiesenActions(state: GameState, weis: Weis, playedBy: Seat): List<Action> 
 
 fun weisRevealActions(state: GameState): List<Action> {
     val hand = currentHand(state.hands)
-    if (!isFirstRegularTrickOfHand(hand, tricksOfHand(state.tricks, hand))) return emptyList()
+    if (!isFirstRegularTrickOfHand(tricksOfHand(state.tricks, hand))) return emptyList()
 
     // weisWinner always returns a whole team, so a position may have nothing to reveal
     // (e.g. only the partner weised) - and if nobody weised at all, the whole map is empty

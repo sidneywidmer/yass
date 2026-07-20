@@ -29,30 +29,14 @@ class GameStateBuilder(
         PlayerDSL("daniela-west", false, Position.WEST)
     )
 
-    private fun defaultWelcomeHand(): HandDSL = HandDSL(
-        trump = Trump.FREESTYLE,
-        gschobe = Gschobe.NO,
-        north = HandPositionDSL("welcome", true, Position.NORTH),
-        east = HandPositionDSL("welcome", false, Position.EAST),
-        south = HandPositionDSL("welcome", false, Position.SOUTH),
-        west = HandPositionDSL("welcome", false, Position.WEST),
-        tricks = listOf(TrickDSL("W6", "W6", "W6", "W6"))
-    )
-
     /**
-     * Before building we'll automatically inject some default players and the welcome hand
-     * if not explicitly provided. This saves us some boilerplate in our tests.
+     * Before building we'll automatically inject some default players if not explicitly provided.
+     * This saves us some boilerplate in our tests.
      */
     fun build(): GameStateDSL {
         val finalPlayers = players.ifEmpty { defaultPlayers() }
-        
-        val finalHands = when {
-            hands.isEmpty() -> listOf(defaultWelcomeHand())
-            hands.first().trump != Trump.FREESTYLE -> listOf(defaultWelcomeHand()) + hands
-            else -> hands
-        }
-        
-        return GameStateDSL(finalPlayers, finalHands, settings)
+
+        return GameStateDSL(finalPlayers, hands, settings)
     }
 }
 

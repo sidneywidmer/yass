@@ -30,7 +30,7 @@ const SAFE_PLAY_ENTRY_STATES: State[] = [
 
 type AnimationType = 'initial' | 'hover' | 'adjacentLeft' | 'adjacentRight' | 'preselected'
 
-const cardKey = (card: CardInHand) => `${card.suit}-${card.rank}-${card.skin}`
+const cardKey = (card: CardInHand) => `${card.suit}-${card.rank}`
 
 type CardPosition = {
   offset: number // this gives us our nice little arch
@@ -222,14 +222,14 @@ export function PlayerHand() {
 
   const playCardAction = (card: CardInHand) => {
     resetActivePosition()
-    api.playCard({game: gameUuid!, card: {suit: card.suit, rank: card.rank, skin: card.skin}})
+    api.playCard({game: gameUuid!, card: {suit: card.suit, rank: card.rank}})
       .catch(handleAxiosError)
 
     hoveredIndexRef.current = null
     // Clear the preselection only after the reset so the card holds its slid-out
     // pose until it leaves the hand, instead of dipping back in for a frame
     triggerCardHover(null, filteredCards)
-    playCard({suit: card.suit, rank: card.rank, skin: card.skin, position: position})
+    playCard({suit: card.suit, rank: card.rank, position: position})
     removeCardFromHand(card)
     preselectedCardRef.current = null
   }
@@ -436,8 +436,8 @@ export function PlayerHand() {
 
             return (
               <motion.div
-                layoutId={`cardlayout-${position}-${card.suit}-${card.rank}-${card.skin}`}
-                key={`cardhand-${card.suit}-${card.rank}-${card.skin}`}
+                layoutId={`cardlayout-${position}-${card.suit}-${card.rank}`}
+                key={`cardhand-${card.suit}-${card.rank}`}
                 data-card-index={i}
                 className={`transition-shadow ${cardPlayable(card) ? 'hover:shadow-xl' : ''}`}
                 style={{
@@ -451,7 +451,7 @@ export function PlayerHand() {
                 animate={getCardControlsByIndex(i)}
                 onClick={() => cardClicked(card, i)}
               >
-                <Card card={{suit: card.suit!, rank: card.rank!, skin: card.skin!}}/>
+                <Card card={{suit: card.suit!, rank: card.rank!}}/>
               </motion.div>
             )
           })}

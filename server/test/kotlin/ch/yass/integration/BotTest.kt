@@ -34,8 +34,7 @@ class BotTest : Integration() {
     private val repo: GameRepository = container.direct.instance()
 
     /**
-     * 4 Players in the game and the welcome hand is already played. Clubs is trump and in the first
-     * trick a lot of trumps already went. Now in the second trick its WEST's turn.
+     * 4 Players in the game, freshly dealt first hand with Spades as trump, nothing played yet.
      */
     private fun getState(): GameState {
         return game {
@@ -81,8 +80,8 @@ class BotTest : Integration() {
         )
 
         val currentState = repo.getState(state.game)
-        assertThat(currentState.tricks.size, equalTo(91))
-        assertThat(currentState.hands.size, equalTo(11))
+        assertThat(currentState.tricks.size, equalTo(90))
+        assertThat(currentState.hands.size, equalTo(10))
     }
 
     fun <T> waitUntilEvent(

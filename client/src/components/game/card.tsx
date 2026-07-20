@@ -9,10 +9,6 @@ interface CardProps {
 }
 
 const getCardImageSrc = (card: C, cardDeck: CardDeck): string => {
-  if (card.suit === "WELCOME" && card.rank == "WELCOME") {
-    return `/cards/welcome/${card.skin!}.png`;
-  }
-
   if (cardDeck === CardDeck.SWISS) {
     return `/cards/swiss/${card.suit!}-${card.rank!}.png`;
   }

@@ -49,7 +49,7 @@ data class Trick(
     fun cardsByPosition(): List<CardOnTable> {
         return Position.entries
             .mapNotNull { cardOf(it)?.let { card -> Pair(card, it) } }
-            .map { p -> CardOnTable(p.first.suit, p.first.rank, p.first.skin, p.second) }
+            .map { p -> CardOnTable(p.first.suit, p.first.rank, p.second) }
     }
 
     fun withCard(position: Position, card: Card): Trick {

@@ -36,10 +36,6 @@ fun unplayedCardsOfPlayer(
 fun isTrumpSet(hand: Hand?): Boolean = hand?.trump != Trump.NONE
 
 fun isAlreadyGewiesenSecond(tricks: List<Trick>, hand: Hand): Boolean {
-    if (hand.trump == Trump.FREESTYLE) {
-        return true;
-    }
-
     if (tricks.size != 1) {
         return true
     }
@@ -55,12 +51,11 @@ fun isAlreadyGewiesenSecond(tricks: List<Trick>, hand: Hand): Boolean {
 
 /**
  * Check if the given position already played a weis and if it's the right moment to weis. This is the case if:
- * It's not the welcome hand, it has to be the first trick in the hand, the player has not played a card yet,
+ * it has to be the first trick in the hand, the player has not played a card yet,
  * and the player has the possibility to weis with valid weise.
  */
 fun isAlreadyGewiesen(position: Position, hand: Hand, tricks: List<Trick>, weise: List<Weis>): Boolean =
-    hand.trump == Trump.FREESTYLE
-            || tricks.size != 1
+    tricks.size != 1
             || tricks[0].cardOf(position) != null
             || hand.weiseOf(position).isNotEmpty()
             || weise.isEmpty() // No possible weise, we treat this like the player already has gewiesen
@@ -124,20 +119,16 @@ fun couldFollowLead(cards: List<Card>, lead: Card?, trump: Trump): Boolean {
     return cardsOfLeadSuit.isNotEmpty()
 }
 
-fun isWelcomeHandFinished(trick: Trick, hands: List<Hand>): Boolean = trick.cards().size == 4 && hands.size == 1
-
 fun isHandFinished(tricks: List<Trick>): Boolean = tricks.size == 9 && tricks.first().cards().size == 4
 
 fun isTrickFinished(trick: Trick): Boolean = trick.cards().size == 4
 
-fun isFirstRegularTrickOfHand(hand: Hand, tricks: List<Trick>): Boolean =
-    hand.trump != Trump.FREESTYLE && tricks.size == 1
+fun isFirstRegularTrickOfHand(tricks: List<Trick>): Boolean = tricks.size == 1
 
 fun isGameFinished(state: GameState): Boolean {
     val settings = state.game.settings
     return when (settings.winningConditionType) {
         WinningConditionType.HANDS -> {
-            // We don't need an extra +1 for the welcome hand since completedHands doesn't count it anyway...
             completedHands(state.hands, state.tricks).size >= settings.winningConditionValue
         }
 

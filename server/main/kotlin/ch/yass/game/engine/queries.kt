@@ -23,7 +23,7 @@ fun currentHand(hands: List<Hand>): Hand = hands.first()
 fun lastHand(hands: List<Hand>): Hand = hands[1]
 
 /**
- * Hands that have 9 tricks with 4 cards each. Welcome hand is NOT counted since it only has 1 card and 1 trick.
+ * Hands that have 9 tricks with 4 cards each.
  */
 fun completedHands(hands: List<Hand>, tricks: List<Trick>): List<Hand> =
     hands.filter { hand -> tricksOfHand(tricks, hand).filter { trick -> trick.cards().size == 4 }.size == 9 }
@@ -57,7 +57,7 @@ fun cardsInHand(hand: Hand, player: InternalPlayer, state: GameState): List<Card
             { error: GameError -> if (error is PlayerDoesNotOwnCard) CardInHandState.ALREADY_PLAYED else CardInHandState.UNPLAYABLE },
             { CardInHandState.PLAYABLE }
         )
-        CardInHand(it.suit, it.rank, it.skin, cardState)
+        CardInHand(it.suit, it.rank, cardState)
     }
 }
 
@@ -81,9 +81,6 @@ fun nextState(state: GameState): State {
     return when {
         state.allPlayers.size < 4 -> State.WAITING_FOR_PLAYERS
         isGameFinished(state) -> State.FINISHED
-
-        // Special case for "welcome" trick, only one card is played per player
-        isWelcomeHandFinished(trick, state.hands) -> State.NEW_HAND
 
         !isAlreadyGewiesenSecond(tricks, hand) -> State.WEISEN_SECOND  // check for second weis before dealing new hand
         isHandFinished(tricks) -> State.NEW_HAND
@@ -347,9 +344,7 @@ fun getLosingTeam(points: Points): TeamWithPoints =
         .map { TeamWithPoints(it, getTeamPoints(points, it)) }
         .minBy { it.points }
 
-fun trumpChosenBy(hand: Hand): Position? {
-    if (hand.trump == Trump.FREESTYLE) return null
-    return if (hand.gschobe == Gschobe.YES) Team.getPartner(hand.startingPosition) else hand.startingPosition
-}
+fun trumpChosenBy(hand: Hand): Position =
+    if (hand.gschobe == Gschobe.YES) Team.getPartner(hand.startingPosition) else hand.startingPosition
 
 fun gschobeBy(hand: Hand): Position? = if (hand.gschobe == Gschobe.YES) hand.startingPosition else null

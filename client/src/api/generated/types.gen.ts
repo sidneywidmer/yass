@@ -119,32 +119,27 @@ export type SeatState = {
 export type CardInHand = {
     suit: Suit;
     rank: Rank;
-    skin?: Skin;
     state: 'PLAYABLE' | 'UNPLAYABLE' | 'ALREADY_PLAYED';
 };
 
 export type CardOnTable = {
     suit?: Suit;
     rank?: Rank;
-    skin?: Skin;
     position?: Position;
 };
 
 export type PlayedCard = {
     suit?: string;
     rank?: string;
-    skin?: string;
 };
 
 export type Position = 'NORTH' | 'EAST' | 'SOUTH' | 'WEST';
 
-export type Suit = 'CLUBS' | 'DIAMONDS' | 'HEARTS' | 'SPADES' | 'WELCOME';
+export type Suit = 'CLUBS' | 'DIAMONDS' | 'HEARTS' | 'SPADES';
 
-export type Rank = 'SIX' | 'SEVEN' | 'EIGHT' | 'NINE' | 'TEN' | 'JACK' | 'QUEEN' | 'KING' | 'ACE' | 'WELCOME';
+export type Rank = 'SIX' | 'SEVEN' | 'EIGHT' | 'NINE' | 'TEN' | 'JACK' | 'QUEEN' | 'KING' | 'ACE';
 
-export type Skin = 'DEFAULT' | 'NATURE_MOUNTAIN01' | 'BETA_HELMETKING01' | 'FESTIVE_HALLOWEEN01' | 'SLANG_HOLZSTOCK01' | 'MESSAGE_GOODLUCK01' | 'MESSAGE_GOODLUCK02' | 'BOT01' | 'BOT02' | 'BOT03';
-
-export type Trump = 'CLUBS' | 'DIAMONDS' | 'HEARTS' | 'SPADES' | 'OBEABE' | 'UNEUFE' | 'FREESTYLE';
+export type Trump = 'CLUBS' | 'DIAMONDS' | 'HEARTS' | 'SPADES' | 'OBEABE' | 'UNEUFE';
 
 export type State = 'WAITING_FOR_PLAYERS' | 'PLAY_CARD' | 'PLAY_CARD_BOT' | 'SCHIEBE' | 'SCHIEBE_BOT' | 'WEISEN_FIRST' | 'WEISEN_FIRST_BOT' | 'WEISEN_SECOND' | 'WEISEN_SECOND_BOT' | 'TRUMP' | 'TRUMP_BOT' | 'NEW_TRICK' | 'NEW_HAND' | 'FINISHED';
 
@@ -169,7 +164,6 @@ export type WeisWithPoints = {
 export type Card = {
     suit?: Suit;
     rank?: Rank;
-    skin?: string;
 };
 
 export type TotalPoints = {

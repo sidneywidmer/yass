@@ -14,7 +14,6 @@ import ch.yass.game.dto.*
 import ch.yass.game.engine.playerAtPosition
 import ch.yass.game.engine.pointsByPositionTotal
 import ch.yass.game.engine.positionSeat
-import ch.yass.game.pubsub.CardPlayed
 import ch.yass.game.pubsub.ClearPlayedCards
 import ch.yass.game.pubsub.GameFinished
 import ch.yass.game.pubsub.UpdatePossibleWeise
@@ -35,7 +34,7 @@ class PlayerTest : Integration() {
     private val cth = CentrifugoTestHelper(container.direct.instance())
 
     /**
-     * 4 Players in the game and the welcome hand is dealt but not played. s turn.
+     * 4 Players in the game with the first hand freshly dealt. Trump not chosen yet, WEST's turn.
      */
     private fun getState(): GameState {
         return game {
@@ -45,12 +44,16 @@ class PlayerTest : Integration() {
             }
             hands {
                 hand {
-                    trump(Trump.FREESTYLE)
-                    gschobe(Gschobe.NO)
-                    north(cards = "welcome", start = true)
-                    east(cards = "welcome")
-                    south(cards = "welcome")
-                    west(cards = "welcome")
+                    trump(Trump.NONE)
+                    gschobe(Gschobe.NOT_YET)
+                    // Has a DREI_BLATT for 20 Points (H9-HJ)
+                    north(cards = "H9,H10,HJ,HA,CQ,C9,DK,DQ,S10")
+                    // Will schiebe and has STOECK if west chooses SPADES as trump (fingers crossed)
+                    west(cards = "SQ,SK,S6,S7,CJ,CK,D6,D7,HQ", start = true)
+                    // Has a VIER_BLATT for 50 Points (D8-DJ) and a DREI_BLATT for 20 Points (H6-H8)
+                    south(cards = "D8,D9,D10,DJ,H6,H7,H8,DA,CA")
+                    // Has a DREI_BLATT for 20 Points (C6-C9)
+                    east(cards = "C6,C7,C8,C10,S8,S9,SJ,SA,HK")
                     tricks { }
                 }
             }
@@ -67,10 +70,7 @@ class PlayerTest : Integration() {
 
         checkWrongStartPlayer(state)
 
-        prepareHand1()
         prepareHand2()
-        state = playWelcomeHand(state)
-        checkCentrifugoWelcomeHand(state)
 
         state = playHand1Trick1(state)
         checkPointsTrick1(state)
@@ -96,20 +96,6 @@ class PlayerTest : Integration() {
             hasCount(GameFinished::class, 1)
             hasWinner(north)
             hasWinner(south)
-        }
-        centrifugo.resetRequests()
-    }
-
-    private fun checkCentrifugoWelcomeHand(state: GameState) {
-        // There is so many of those events sent and we're not testing all of them yet but focus on the
-        // most important ones.
-        val north = positionSeat(Position.NORTH, state.seats)
-        cth.assertActions(north.uuid, cth.parseActions(centrifugo.allServeEvents)).apply {
-            hasCount(CardPlayed::class, 4) // Every player played a welcome hand
-            hasCount(ClearPlayedCards::class, 1)
-            hasState(State.NEW_HAND) // When welcome hand is finished new hand is dealt
-            hasState(State.SCHIEBE) // And instantly goes to state SCHIEBE (first state in new trick)
-            hasPlayedCard(Suit.WELCOME, Rank.WELCOME) // Actually 4 of those where played
         }
         centrifugo.resetRequests()
     }
@@ -251,8 +237,8 @@ class PlayerTest : Integration() {
             }) { fail() }
         }
 
-        assertThat(newState.hands.size, equalTo(3)) // New empty hand automatically created
-        assertThat(newState.tricks.size, equalTo(11)) // 1 (welcome) + 9 (normal hand) + 1 (empty trick in new hand)
+        assertThat(newState.hands.size, equalTo(2)) // New empty hand automatically created
+        assertThat(newState.tricks.size, equalTo(10)) // 9 (normal hand) + 1 (empty trick in new hand)
         assertThat(newState.hands[0].startingPosition, equalTo(Position.SOUTH))
 
         return newState
@@ -299,7 +285,7 @@ class PlayerTest : Integration() {
             service.play(request, north)
         }) { fail() }
 
-        assertThat(stateAfterAllCards.tricks.size, equalTo(4))
+        assertThat(stateAfterAllCards.tricks.size, equalTo(3))
 
         return stateAfterAllCards
     }
@@ -323,20 +309,6 @@ class PlayerTest : Integration() {
         val cardsS = interpretCards("H8,S9,C10,DJ,HQ,SK,CA,D6,S10")
         val cardsE = interpretCards("H9,S10,CJ,DQ,HK,HA,C8,D7,C7")
 
-        foresight.pushDeck(cardsN + cardsW + cardsS + cardsE)
-    }
-
-    private fun prepareHand1() {
-        // Has a DREI_BLATT for 20 Points (H9-HJ)
-        val cardsN = interpretCards("H9,H10,HJ,HA,CQ,C9,DK,DQ,S10")
-        // Will schiebe and has STOECK if west chooses SPADES as trump (fingers crossed)
-        val cardsW = interpretCards("SQ,SK,S6,S7,CJ,CK,D6,D7,HQ")
-        // Has a VIER_BLATT for 50 Points (D8-DJ) and a DREI_BLATT for 20 Points (H6-H8)
-        val cardsS = interpretCards("D8,D9,D10,DJ,H6,H7,H8,DA,CA")
-        // Has a DREI_BLATT for 20 Points (C6-C9)
-        val cardsE = interpretCards("C6,C7,C8,C10,S8,S9,SJ,SA,HK")
-
-        // Manipulate our luck a little
         foresight.pushDeck(cardsN + cardsW + cardsS + cardsE)
     }
 
@@ -425,7 +397,7 @@ class PlayerTest : Integration() {
 
         // Now something special happened: The Team (N/S, E/W) with the most weise automatically weises any remaining
         // weise they might have. In our case SOUTH has another DREI_BLATT (H6-H8). Also, a new (empty) trick is initiated
-        assertThat(stateAfterAllCards.tricks.size, equalTo(3)) // new trick...
+        assertThat(stateAfterAllCards.tricks.size, equalTo(2)) // new trick...
         assertThat(stateAfterAllCards.tricks[0].cards().size, equalTo(0)) // ...that is also still empty
 
         assertThat(stateAfterAllCards.tricks[1].cards().size, equalTo(4))
@@ -439,62 +411,12 @@ class PlayerTest : Integration() {
         return stateAfterAllCards
     }
 
-    private fun playWelcomeHand(state: GameState): GameState {
-        val north = playerAtPosition(Position.NORTH, state.seats, state.allPlayers)
-        val west = playerAtPosition(Position.WEST, state.seats, state.allPlayers)
-        val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)
-        val east = playerAtPosition(Position.EAST, state.seats, state.allPlayers)
-
-        // NORTH plays the first card
-        recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "WELCOME"))
-            service.play(request, north)
-        }) { fail() }
-
-        // Next up WEST
-        recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "WELCOME"))
-            service.play(request, west)
-        }) { fail() }
-
-        // SOUTH
-        recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "WELCOME"))
-            service.play(request, south)
-        }) { fail() }
-
-        // EAST
-        val newState = recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "WELCOME"))
-            service.play(request, east)
-        }) { fail() }
-
-        // By now we should have a new hand dealt (should be deterministic), a new trick started and check for Centrifugo calls
-        assertThat(newState.hands.size, equalTo(2))
-        assertThat(newState.tricks.size, equalTo(2))
-
-        assertThat(newState.tricks[1].cards().size, equalTo(4)) // all welcome cards
-        assertThat(newState.hands[1].trump, equalTo(Trump.FREESTYLE))
-        assertThat(newState.hands[1].startingPosition, equalTo(Position.NORTH)) // see game state above start = ...
-        assertThat(newState.hands[1].gschobe, equalTo(Gschobe.NO))
-        assertThat(Position.entries.flatMap { newState.hands[1].weiseOf(it) }.size, equalTo(0))
-
-        assertThat(newState.tricks[0].cards().size, equalTo(0)) // no cards played in new trick yet
-        assertThat(newState.hands[0].trump, equalTo(Trump.NONE))
-        assertThat(newState.hands[0].startingPosition, equalTo(Position.WEST)) // comes next after NORTH
-        assertThat(newState.hands[0].gschobe, equalTo(Gschobe.NOT_YET))
-        assertThat(Position.entries.flatMap { newState.hands[0].cardsOf(it) }.size, equalTo(36)) // all cards are dealt
-        assertThat(Position.entries.flatMap { newState.hands[0].weiseOf(it) }.size, equalTo(0))
-
-        return newState
-    }
-
     private fun checkWrongStartPlayer(state: GameState) {
-        // We start off with a bang, it's not souths turn so this should not be possible
+        // We start off with a bang, it's WEST's turn to schiebe so this should not be possible for south
         val south = playerAtPosition(Position.SOUTH, state.seats, state.allPlayers)
         recover({
-            val request = PlayCardRequest(state.game.uuid.toString(), PlayedCard("WELCOME", "SIX"))
-            service.play(request, south)
+            val request = SchiebeRequest(state.game.uuid.toString(), "NO")
+            service.schiebe(request, south)
         }) { assertTrue(it is PlayerIsLocked) }
     }
 }

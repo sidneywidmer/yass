@@ -1,8 +1,6 @@
 package ch.yass.admin.dsl
 
 import ch.yass.game.dto.Card
-import ch.yass.game.dto.Rank
-import ch.yass.game.dto.Suit
 import ch.yass.game.engine.notationToCard
 
 fun interpretCard(card: String?): Card? {
@@ -19,16 +17,6 @@ fun interpretCard(card: String?): Card? {
 fun interpretCards(cards: String?): List<Card> {
     if (cards == null) {
         return emptyList()
-    }
-
-    // Special for welcome hand
-    if (cards == "welcome") {
-        return listOf(
-            Card(Suit.WELCOME, Rank.WELCOME),
-            Card(Suit.WELCOME, Rank.WELCOME),
-            Card(Suit.WELCOME, Rank.WELCOME),
-            Card(Suit.WELCOME, Rank.WELCOME)
-        )
     }
 
     val cardList = cards.split(",")

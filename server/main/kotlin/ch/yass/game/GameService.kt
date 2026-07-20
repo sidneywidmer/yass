@@ -5,7 +5,6 @@ import arrow.core.raise.ensure
 import ch.yass.core.contract.MDCAttributes.PARENT_TRACE_ID
 import ch.yass.core.contract.MDCAttributes.TRACE_ID
 import ch.yass.core.error.*
-import ch.yass.core.helper.associateWithToEnum
 import ch.yass.core.helper.logger
 import ch.yass.core.pubsub.Action
 import ch.yass.core.pubsub.Channel
@@ -89,29 +88,8 @@ class GameService(
         }
         val newSeat = repo.takeASeat(game, player)
 
-        // TODO: This will need some refactoring: The welcome hand should be related to what cards the player
-        //       unlocked so we can't deal the full hand yet if we don't know all the players. This should
-        //       be done when the player joins at the table.
         // Creating player always starts game
-        val cards = Position.entries.associateWithToEnum {
-            if (settings.botPositions().contains(it)) {
-                listOf(
-                    Card(Suit.WELCOME, Rank.WELCOME, Skin.BOT01),
-                    Card(Suit.WELCOME, Rank.WELCOME, Skin.BOT02),
-                    Card(Suit.WELCOME, Rank.WELCOME, Skin.BOT03)
-                )
-            } else {
-                listOf(
-                    Card(Suit.WELCOME, Rank.WELCOME, Skin.MESSAGE_GOODLUCK01),
-                    Card(Suit.WELCOME, Rank.WELCOME, Skin.MESSAGE_GOODLUCK02),
-                    Card(Suit.WELCOME, Rank.WELCOME, Skin.SLANG_HOLZSTOCK01),
-                    Card(Suit.WELCOME, Rank.WELCOME, Skin.BETA_HELMETKING01),
-                    Card(Suit.WELCOME, Rank.WELCOME, Skin.NATURE_MOUNTAIN01),
-                    Card(Suit.WELCOME, Rank.WELCOME, Skin.FESTIVE_HALLOWEEN01),
-                ).shuffled().take(4)
-            }
-        }
-        val hand = repo.createHand(NewHand(game, newSeat.position, cards, Trump.FREESTYLE, Gschobe.NO))
+        val hand = repo.createHand(NewHand(game, newSeat.position, randomHand(foresight.nextDeck())))
         repo.createTrick(hand)
 
         return game.code
@@ -414,7 +392,7 @@ class GameService(
         val card = chooseCardForBot(botPlayer, state).card
         val request = PlayCardRequest(
             state.game.uuid.toString(),
-            PlayedCard(card.suit.toString(), card.rank.toString(), card.skin.toString())
+            PlayedCard(card.suit.toString(), card.rank.toString())
         )
 
         return play(request, botPlayer)
