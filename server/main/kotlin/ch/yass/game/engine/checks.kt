@@ -65,24 +65,24 @@ fun isAlreadyGewiesen(position: Position, hand: Hand, tricks: List<Trick>, weise
             || hand.weiseOf(position).isNotEmpty()
             || weise.isEmpty() // No possible weise, we treat this like the player already has gewiesen
 
-fun isStoeckGewiesen(hand: Hand, weise: List<Weis>, position: Position, tricks: List<Trick>): Boolean {
-    // Already played the stoeck
+/**
+ * The stoeck are weised automatically, this checks if it's time for that: the player holds the stoeck,
+ * has not weised them yet and both cards of the pair are played in the current hand.
+ */
+fun shouldWeisStoeck(hand: Hand, possibleWeise: List<Weis>, position: Position, tricksOfHand: List<Trick>): Boolean {
+    // Already weised the stoeck
     if (hand.weiseOf(position).any { w -> w.type == WeisType.STOECK }) {
-        return true
+        return false
     }
 
     // Not even eligible for stoeck
-    val stoeck = weise.firstOrNull { w -> w.type == WeisType.STOECK }
+    val stoeck = possibleWeise.firstOrNull { w -> w.type == WeisType.STOECK }
     if (stoeck == null) {
-        return true
+        return false
     }
 
-    // Comparing rank is enough, it wouldn't be a valid weis otherweis (haha get it?)
-    val playedStoeckCards = tricks
-        .mapNotNull { trick -> trick.cardOf(position) }
-        .filter { stoeck.cards.any { c -> c.rank == it.rank } }
-
-    return playedStoeckCards.size != stoeck.cards.size // Usually 2 == 2 if both cards are played :)
+    val playedCards = tricksOfHand.mapNotNull { trick -> trick.cardOf(position) }
+    return stoeck.cards.all { c -> playedCards.any { it.rank == c.rank && it.suit == c.suit } }
 }
 
 fun isAlreadyGschobe(hand: Hand?): Boolean = hand?.gschobe != Gschobe.NOT_YET
