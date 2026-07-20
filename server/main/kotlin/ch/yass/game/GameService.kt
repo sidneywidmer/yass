@@ -165,7 +165,7 @@ class GameService(
         //      the activePosition logic for that
         val updatedHand = currentHand(updatedState.hands)
         val weise = possibleWeise(updatedHand.cardsOf(playerSeat.position), updatedHand.trump)
-        if (!isStoeckGewiesen(updatedHand, weise, playerSeat.position, updatedState.tricks)) {
+        if (shouldWeisStoeck(updatedHand, weise, playerSeat.position, tricksOfHand(updatedState.tricks, updatedHand))) {
             weisStoeck(updatedState, playerSeat, updatedHand, weise)
         }
 

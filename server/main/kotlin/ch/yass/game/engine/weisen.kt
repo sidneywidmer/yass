@@ -10,8 +10,7 @@ fun stoeckWeis(cards: List<Card>, trump: Trump): List<Weis> {
         return emptyList()
     }
 
-    val match = listOf(king, queen)
-    return listOf(Weis(WeisType.STOECK, match))
+    return listOf(Weis(WeisType.STOECK, listOf(king, queen)))
 }
 
 /**
