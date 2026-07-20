@@ -15,9 +15,19 @@ export function Weisen() {
   const weise = useGameStateStore(state => state.weise)
   const gameUuid = useGameStateStore(state => state.gameUuid)
   const shownWeise = useGameStateStore(state => state.shownWeise)
-  const [open, setOpen] = useState(true)
+  // Submitting closes the dialog immediately instead of waiting for the state update
+  // to arrive through the delayed action queue. The component stays mounted across hands,
+  // so the flag must be reset when the game state changes, otherwise the dialog stays
+  // invisible for every later weisen phase.
+  const [submitted, setSubmitted] = useState(false)
+  const [prevState, setPrevState] = useState(state)
   const handleAxiosError = useAxiosErrorHandler()
   const {t} = useTranslation()
+
+  if (state !== prevState) {
+    setPrevState(state)
+    setSubmitted(false)
+  }
 
   // It's possible that shown weise of other players are still displayed - wait with opening
   // this overlay so we don't have two open == bad UX
@@ -27,18 +37,18 @@ export function Weisen() {
 
   const onWeisSelect = (weis: Weis) => {
     api.weisen({game: gameUuid!, weis: weis})
-      .then(() => setOpen(false))
+      .then(() => setSubmitted(true))
       .catch(handleAxiosError)
   }
 
   const onSkip = () => {
     api.weisen({game: gameUuid!, weis: {type: "SKIP", cards: []}})
-      .then(() => setOpen(false))
+      .then(() => setSubmitted(true))
       .catch(handleAxiosError)
   }
 
   return (
-    <Dialog open={open}>
+    <Dialog open={!submitted}>
       <DialogContent disableClose={true} className="w-auto min-w-[22rem] max-w-[90vw] sm:max-w-2xl" onPointerDownOutside={e => e.preventDefault()} container={document.getElementById('root')}>
         <DialogTitle className="text-center">{t("weisen.title")}</DialogTitle>
         <DialogDescription className="sr-only">{t("weisen.description")}</DialogDescription>
