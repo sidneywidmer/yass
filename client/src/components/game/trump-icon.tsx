@@ -6,7 +6,6 @@ type TrumpConfig = {
 }
 
 const trumpConfigs: Record<Trump, TrumpConfig> = {
-  FREESTYLE: {fileName: "FREESTYLE.svg",},
   HEARTS: {fileName: "HEARTS.svg",},
   SPADES: {fileName: "SPADES.svg",},
   DIAMONDS: {fileName: "DIAMONDS.svg",},

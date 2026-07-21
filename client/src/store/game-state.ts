@@ -42,7 +42,6 @@ interface GameStateActions {
   dismissShownWeise: () => void
   clearDeclaredWeise: () => void
   getPlayer: (position: Position) => PlayerAtTable | undefined
-  isWelcomeHand: () => boolean
 }
 
 const initialState: FlatGameState = {
@@ -82,7 +81,7 @@ export const useGameStateStore = create<FlatGameState & GameStateActions>((set) 
   }),
   reset: () => set(initialState),
   removeCardFromHand: (card) => set((state) => ({
-    cards: state.cards.filter(c => !(card.suit === c.suit && card.rank === c.rank && card.skin == c.skin))
+    cards: state.cards.filter(c => !(card.suit === c.suit && card.rank === c.rank))
   })),
   playCard: (card) => set((state) => ({
     cardsPlayed: [...state.cardsPlayed!, card]
@@ -114,11 +113,5 @@ export const useGameStateStore = create<FlatGameState & GameStateActions>((set) 
   getPlayer: (position: Position) => {
     const otherPlayers: Array<PlayerAtTable> = useGameStateStore.getState().otherPlayers!
     return otherPlayers.find(p => p.position === position)
-  },
-  isWelcomeHand: (): boolean => {
-    const state = useGameStateStore.getState();
-    const cards = state.cards;
-    return !cards || cards.length === 0 ||
-      cards.some(card => card.suit === 'WELCOME' && card.rank === 'WELCOME');
   }
 }))

@@ -11,8 +11,8 @@ import {TrumpMultiplierBadge} from "@/components/game/trump-multiplier-badge";
 import {useTranslation} from "react-i18next";
 
 function TrumpButton({trump, onSelect}: {
-  trump: Exclude<Trump, "FREESTYLE">
-  onSelect: (trump: Exclude<Trump, "FREESTYLE">) => void
+  trump: Trump
+  onSelect: (trump: Trump) => void
 }) {
   return (
     <Button variant="outline" className="w-11 h-11 relative" size="icon" onClick={() => onSelect(trump)}>
@@ -35,7 +35,7 @@ export function ChooseTrump() {
    * 2. Game is in state SCHIEBE and the player chose a trump (e.g. HEARTS), meaning we will tell the api to NO SCHIEBE and directly after send the trump
    * 3. Game is in state TRUMP, meaning the partner chose SCHIEBE so we just select the trump
    */
-  const selectTrump = async (trump: Exclude<Trump, "FREESTYLE"> | "SCHIEBE") => {
+  const selectTrump = async (trump: Trump | "SCHIEBE") => {
     if (trump === "SCHIEBE") {
       return api.schiebe({game: gameUuid!, gschobe: "YES"})
         .catch(handleAxiosError)

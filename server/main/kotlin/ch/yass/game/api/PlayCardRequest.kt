@@ -1,7 +1,6 @@
 package ch.yass.game.api
 
 import ch.yass.core.valiktor.isRank
-import ch.yass.core.valiktor.isSkin
 import ch.yass.core.valiktor.isSuit
 import org.valiktor.functions.isNotNull
 import org.valiktor.functions.matches
@@ -21,7 +20,6 @@ data class PlayCardRequest(
             validate(PlayCardRequest::card).validate {
                 validate(PlayedCard::suit).isNotNull().isSuit()
                 validate(PlayedCard::rank).isNotNull().isRank()
-                validate(PlayedCard::skin).isSkin()
             }
         }
     }
