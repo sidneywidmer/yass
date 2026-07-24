@@ -32,7 +32,6 @@ class GameService(
     private val repo: GameRepository,
     private val pubSub: PubSub,
     private val playerService: PlayerService,
-    private val foresight: Foresight,
 ) {
     /**
      * We use scope and eventChannel to also emmit our publishForSeats Actions. This helps greatly with
@@ -89,7 +88,7 @@ class GameService(
         val newSeat = repo.takeASeat(game, player)
 
         // Creating player always starts game
-        val hand = repo.createHand(NewHand(game, newSeat.position, randomHand(foresight.nextDeck())))
+        val hand = repo.createHand(NewHand(game, newSeat.position, dealHand(game, handNumber = 0)))
         repo.createTrick(hand)
 
         return game.code
@@ -344,7 +343,10 @@ class GameService(
                     updatedState.seats
                 )
                 val startingPosition = playerSeat(startingPlayer, updatedState.seats).position
-                val newHand = repo.createHand(NewHand(game, startingPosition, randomHand(foresight.nextDeck())))
+                val handNumber = updatedState.hands.size
+                val newHand = repo.createHand(
+                    NewHand(game, startingPosition, dealHand(updatedState.game, handNumber))
+                )
                 repo.createTrick(newHand)
                 val state = repo.getState(game)
                 publishForSeats(updatedState.seats) { seat -> newHandActions(state, seat) }
@@ -420,6 +422,19 @@ class GameService(
         val request = WeisenRequest(state.game.uuid.toString(), weis)
 
         return weisen(request, botPlayer)
+    }
+
+    /**
+     * Deals the next hand: a forced deck (see GameSettings.forcedDecks, used to replicate
+     * errors or for testing) always takes priority and is consumed once used, otherwise the
+     * deal is derived deterministically from the game's seed and handNumber.
+     */
+    private fun dealHand(game: Game, handNumber: Int): EnumMap<Position, List<Card>> {
+        val forcedDeck = game.settings.forcedDecks.firstOrNull()
+        if (forcedDeck != null) {
+            repo.updateSettings(game, game.settings.copy(forcedDecks = game.settings.forcedDecks.drop(1)))
+        }
+        return generateHand(seed = game.seed, handNumber = handNumber, forcedDeck = forcedDeck)
     }
 
 }

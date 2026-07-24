@@ -3,6 +3,7 @@ package ch.yass.unit
 import ch.yass.admin.dsl.interpretCards
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.Trump
+import ch.yass.game.engine.generateHand
 import ch.yass.game.engine.sortByPoints
 import ch.yass.game.engine.upcomingPositions
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -51,5 +52,18 @@ class EngineHelpersTest {
         assertTrue(result6[0] == Position.EAST)
         assertTrue(result6[1] == Position.NORTH)
         assertTrue(result6[2] == Position.WEST)
+    }
+
+    /**
+     * Wo don't trust kotlin or the jvm, just make sure a fixed seed always generates the same hand.
+     */
+    @Test
+    fun testGenerateHandIsStableForAFixedSeed() {
+        val hand = generateHand(seed = 123456, handNumber = 0)
+
+        assertTrue(hand.getValue(Position.NORTH) == interpretCards("C10,CK,D6,DJ,DA,HJ,HA,S8,SJ"))
+        assertTrue(hand.getValue(Position.WEST) == interpretCards("C7,CQ,H6,H7,H9,H10,HQ,S10,SK"))
+        assertTrue(hand.getValue(Position.SOUTH) == interpretCards("C6,C8,D7,D9,DK,H8,HK,S9,SA"))
+        assertTrue(hand.getValue(Position.EAST) == interpretCards("C9,CJ,CA,D8,D10,DQ,S6,S7,SQ"))
     }
 }

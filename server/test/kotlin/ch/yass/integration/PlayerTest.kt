@@ -6,7 +6,6 @@ import ch.yass.admin.dsl.interpretCard
 import ch.yass.admin.dsl.interpretCards
 import ch.yass.core.error.InvalidState
 import ch.yass.core.error.PlayerIsLocked
-import ch.yass.game.Foresight
 import ch.yass.game.GameService
 import ch.yass.game.api.*
 import ch.yass.game.api.internal.GameState
@@ -30,7 +29,6 @@ private data class PlayCard(val position: Position, val card: String)
 
 class PlayerTest : Integration() {
     private val service: GameService = container.direct.instance()
-    private val foresight: Foresight = container.direct.instance()
     private val cth = CentrifugoTestHelper(container.direct.instance())
 
     /**
@@ -41,6 +39,14 @@ class PlayerTest : Integration() {
             settings {
                 wcValue(400) // We'll be achieved in the first trick of the second hand
                 wcType(WinningConditionType.POINTS)
+                forcedDecks {
+                    deck(
+                        "H6,S7,C6,D9,H10,SJ,CQ,DK,SA," +
+                            "H7,S8,C9,D10,HJ,SQ,CK,DA,S6," +
+                            "H8,S9,C10,DJ,HQ,SK,CA,D6,S10," +
+                            "H9,S10,CJ,DQ,HK,HA,C8,D7,C7"
+                    )
+                }
             }
             hands {
                 hand {
@@ -69,8 +75,6 @@ class PlayerTest : Integration() {
         var state = getState()
 
         checkWrongStartPlayer(state)
-
-        prepareHand2()
 
         state = playHand1Trick1(state)
         checkPointsTrick1(state)
@@ -301,15 +305,6 @@ class PlayerTest : Integration() {
         assertThat(points.getValue(Position.SOUTH).weisPoints, equalTo(140)) // DREI_BLATT and VIER_BLATT
         assertThat(points.getValue(Position.EAST).cardPoints, equalTo(0))
         assertThat(points.getValue(Position.EAST).weisPoints, equalTo(0))
-    }
-
-    private fun prepareHand2() {
-        val cardsN = interpretCards("H6,S7,C6,D9,H10,SJ,CQ,DK,SA")
-        val cardsW = interpretCards("H7,S8,C9,D10,HJ,SQ,CK,DA,S6")
-        val cardsS = interpretCards("H8,S9,C10,DJ,HQ,SK,CA,D6,S10")
-        val cardsE = interpretCards("H9,S10,CJ,DQ,HK,HA,C8,D7,C7")
-
-        foresight.pushDeck(cardsN + cardsW + cardsS + cardsE)
     }
 
     private fun playHand1Trick1(state: GameState): GameState {

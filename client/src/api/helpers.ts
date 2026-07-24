@@ -37,10 +37,3 @@ export const getOryErrorMessage = (data: { ui?: { messages?: UiText[]; nodes?: U
     field: error.field
   } : null;
 };
-
-export const generateAnonToken = () => {
-  const tokenBytes = new Uint8Array(128)
-  crypto.getRandomValues(tokenBytes)
-  return `anonToken_${btoa(String.fromCharCode(...tokenBytes))}`
-}
-

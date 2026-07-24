@@ -8,7 +8,8 @@ data class GameSettings(
     val botSouth: Boolean,
     val botWest: Boolean,
     val winningConditionType: WinningConditionType,
-    val winningConditionValue: Int
+    val winningConditionValue: Int,
+    val forcedDecks: List<List<Card>> = emptyList()
 ) {
     companion object {
         fun from(request: CreateCustomGameRequest): GameSettings {
