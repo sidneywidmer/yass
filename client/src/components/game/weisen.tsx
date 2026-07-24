@@ -1,6 +1,5 @@
 import {useGameStateStore} from "@/store/game-state.ts";
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle} from "@/components/ui/dialog.tsx";
-import {Button} from "@/components/ui/button.tsx";
 import {WeisDisplay} from "@/components/game/weis-display.tsx";
 import {api} from "@/api/client.ts";
 import {useState} from "react";
@@ -64,7 +63,13 @@ export function Weisen() {
           ))}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onSkip}>{t("weisen.zeroWeis")}</Button>
+          <button
+            type="button"
+            onClick={onSkip}
+            className="text-xs text-muted-foreground hover:text-foreground hover:underline transition-colors"
+          >
+            {t("weisen.zeroWeis")}
+          </button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -1,7 +1,7 @@
 import {Gauge, Languages, LogOut, SettingsIcon, Spade, User} from 'lucide-react';
 import {useSettingsStore} from "@/store/settings.ts";
 import {PlaySpeed} from "@/types/play-speed.ts";
-import {Slider} from "@/components/ui/slider.tsx";
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group.tsx";
 import {usePlayerStore} from "@/store/player.ts";
 import {useGameStateStore} from "@/store/game-state.ts";
 import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet.tsx";
@@ -87,6 +87,11 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
   };
 
   const playSpeedOrder = [PlaySpeed.SLOW, PlaySpeed.MEDIUM, PlaySpeed.FAST];
+  const playSpeedLabels: Record<PlaySpeed, string> = {
+    [PlaySpeed.SLOW]: t("settings.playSpeedSlow"),
+    [PlaySpeed.MEDIUM]: t("settings.playSpeedMedium"),
+    [PlaySpeed.FAST]: t("settings.playSpeedFast"),
+  };
 
   const triggerClasses = triggerVariant === 'fixed'
     ? "fixed top-4 right-4 z-10"
@@ -210,18 +215,22 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
                 <Gauge className="mr-2 h-5 w-5 text-muted-foreground"/>
                 {t("settings.playSpeed")}
               </h3>
-              <Slider
-                value={[playSpeedOrder.indexOf(playSpeed)]}
-                onValueChange={([value]) => setPlaySpeed(playSpeedOrder[value])}
-                min={0}
-                max={2}
-                step={1}
-              />
-              <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                <span>{t("settings.playSpeedSlow")}</span>
-                <span>{t("settings.playSpeedMedium")}</span>
-                <span>{t("settings.playSpeedFast")}</span>
-              </div>
+              <RadioGroup
+                value={playSpeed}
+                onValueChange={(value) => setPlaySpeed(value as PlaySpeed)}
+                className="flex items-stretch gap-2"
+              >
+                {playSpeedOrder.map((speed) => (
+                  <label
+                    key={speed}
+                    htmlFor={`play-speed-${speed}`}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-md border p-2 text-sm cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-secondary"
+                  >
+                    <RadioGroupItem value={speed} id={`play-speed-${speed}`}/>
+                    {playSpeedLabels[speed]}
+                  </label>
+                ))}
+              </RadioGroup>
             </div>
           </div>
 

@@ -10,6 +10,8 @@ import {
   Trump,
   WeisWithPoints
 } from "@/api/generated"
+import {useSettingsStore} from "@/store/settings.ts"
+import {GameDelay, playSpeedTimings} from "@/types/play-speed.ts"
 
 type FlatGameState = Omit<JoinGameResponse, 'seat'> & {
   isConnected: boolean
@@ -89,8 +91,9 @@ export const useGameStateStore = create<FlatGameState & GameStateActions>((set) 
   addCardsToHand: (cards) => set({cards: cards}),
   clearCards: async (position) => {
     set({clearDirection: position})
-    // Wait for next render cycle, I have no idea if this is a good idea but for now it works #providurium :)
-    await new Promise(resolve => setTimeout(resolve, 1200))
+    // The winning card's shake animation (played-cards.tsx) only takes 200ms, but we hold
+    // here so players have time to register who won the trick before the cards slide away
+    await new Promise(resolve => setTimeout(resolve, playSpeedTimings[useSettingsStore.getState().playSpeed][GameDelay.WINNER_HOLD]))
     set({cardsPlayed: []})
     set({clearDirection: undefined})
     // Give some time after cleaning the table until the next card comes flying out
