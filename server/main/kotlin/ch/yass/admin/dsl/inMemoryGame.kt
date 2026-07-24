@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.random.Random
 
 private object InMemoryIdGenerator {
     private val gameIds = AtomicInteger(100)
@@ -32,7 +33,8 @@ fun inMemoryGame(lambda: GameStateBuilder.() -> Unit): GameState {
         createdAt = now,
         updatedAt = now,
         code = (1..5).map { ('A'..'Z').random() }.joinToString(""),
-        settings = GameSettings(false, false, false, false, state.settings.wcType, state.settings.wcValue),
+        seed = Random.nextInt(100_000, 1_000_000),
+        settings = GameSettings(false, false, false, false, state.settings.wcType, state.settings.wcValue, state.settings.forcedDecks),
         status = GameStatus.RUNNING
     )
 

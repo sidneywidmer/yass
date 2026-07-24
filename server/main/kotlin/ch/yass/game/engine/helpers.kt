@@ -4,6 +4,7 @@ import ch.yass.core.helper.cartesianProduct
 import ch.yass.core.helper.toEnumMap
 import ch.yass.game.dto.*
 import java.util.EnumMap
+import kotlin.random.Random
 
 /**
  * Get the order of a round based on a position. So if it's EAST's turn we
@@ -33,11 +34,13 @@ fun deck(): List<Pair<Rank, Suit>> = cartesianProduct(Rank.regular(), Suit.regul
 fun allOfSuit(suit: Suit): List<Pair<Rank, Suit>> = cartesianProduct(Rank.regular(), listOf(suit))
 
 /**
- * nextDeck allows us to inject a not so random deck in case we need it to replicate
- * errors or for testing.
+ * Deals a hand deterministically from [seed] and [handNumber] (each hand of a game draws from
+ * the same seed but fast-forwards by handNumber draws, so hand 1, 2, 3... of a retried game
+ * always deal the exact same cards), unless [forcedDeck] is given to replicate errors or for
+ * testing.
  */
-fun randomHand(forcedDeck: List<Card>?): EnumMap<Position, List<Card>> {
-    val deck = forcedDeck?.map { Pair(it.rank, it.suit) } ?: deck()
+fun generateHand(seed: Int, handNumber: Int, forcedDeck: List<Card>? = null): EnumMap<Position, List<Card>> {
+    val deck = forcedDeck?.map { Pair(it.rank, it.suit) } ?: seededDeck(seed, handNumber)
 
     return mapOf(
         Position.NORTH to sort(deck.subList(0, 9).map { Card(it.second, it.first) }),
@@ -45,6 +48,13 @@ fun randomHand(forcedDeck: List<Card>?): EnumMap<Position, List<Card>> {
         Position.SOUTH to sort(deck.subList(18, 27).map { Card(it.second, it.first) }),
         Position.EAST to sort(deck.subList(27, 36).map { Card(it.second, it.first) }),
     ).toEnumMap()
+}
+
+private fun seededDeck(seed: Int, handNumber: Int): List<Pair<Rank, Suit>> {
+    val random = Random(seed)
+    repeat(handNumber) { random.nextLong() }
+
+    return cartesianProduct(Rank.regular(), Suit.regular()).shuffled(random)
 }
 
 fun sort(cards: List<Card>): List<Card> = cards.sortedWith(compareBy<Card> { it.suit }.thenBy { it.rank })

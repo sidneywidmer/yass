@@ -13,6 +13,7 @@ data class Game(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
     val code: String,
+    val seed: Int,
     val settings: GameSettings,
     val status: GameStatus
 ) {
@@ -24,6 +25,7 @@ data class Game(
                 game.createdAt,
                 game.updatedAt,
                 game.code,
+                game.seed,
                 fromDbJson<GameSettings>(game.settings),
                 GameStatus.entries.first { it.name == game.status }
             )

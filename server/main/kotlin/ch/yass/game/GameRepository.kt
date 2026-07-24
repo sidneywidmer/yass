@@ -21,22 +21,32 @@ import org.jooq.Records.mapping
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
+import kotlin.random.Random
 
 class GameRepository(private val db: DSLContext) {
 
     fun createGame(settings: GameSettings): Game {
-        return db.insertInto(GAME, GAME.UUID, GAME.CODE, GAME.CREATED_AT, GAME.UPDATED_AT, GAME.SETTINGS, GAME.STATUS)
+        return db.insertInto(GAME, GAME.UUID, GAME.CODE, GAME.CREATED_AT, GAME.UPDATED_AT, GAME.SEED, GAME.SETTINGS, GAME.STATUS)
             .values(
                 UUID.randomUUID().toString(),
                 (1..5).map { ('A'..'Z').random() }.joinToString(""), // TODO: Handle collisions
                 LocalDateTime.now(ZoneOffset.UTC),
                 LocalDateTime.now(ZoneOffset.UTC),
+                Random.nextInt(100_000, 1_000_000),
                 toDbJson(settings),
                 GameStatus.RUNNING.name
             )
             .returningResult(GAME)
             .fetchOne(mapping(Game::fromRecord))!!
     }
+
+    fun updateSettings(game: Game, settings: GameSettings): Game =
+        db.update(GAME)
+            .set(GAME.SETTINGS, toDbJson(settings))
+            .set(GAME.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
+            .where(GAME.ID.eq(game.id))
+            .returningResult(GAME)
+            .fetchOne(mapping(Game::fromRecord))!!
 
     context(_: Raise<GameAlreadyFull>)
     fun takeASeat(game: Game, player: InternalPlayer, position: Position? = null): Seat {

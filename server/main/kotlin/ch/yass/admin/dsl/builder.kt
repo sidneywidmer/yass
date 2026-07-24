@@ -1,5 +1,6 @@
 package ch.yass.admin.dsl
 
+import ch.yass.game.dto.Card
 import ch.yass.game.dto.Gschobe
 import ch.yass.game.dto.Position
 import ch.yass.game.dto.Trump
@@ -38,6 +39,12 @@ class GameStateBuilder(
 
         return GameStateDSL(finalPlayers, hands, settings)
     }
+}
+
+class ForcedDecksBuilder(private var decks: MutableList<List<Card>> = mutableListOf()) {
+    fun deck(cards: String) = decks.add(interpretCards(cards))
+
+    fun build(): List<List<Card>> = decks
 }
 
 class HandsBuilder(private var hands: MutableList<HandDSL> = mutableListOf()) {
@@ -109,7 +116,8 @@ class PlayersBuilder(
 
 class GameSettingsBuilder(
     private var wcType: WinningConditionType = WinningConditionType.HANDS,
-    private var wcValue: Int = 10
+    private var wcValue: Int = 10,
+    private var forcedDecks: List<List<Card>> = emptyList()
 ) {
     fun wcType(type: WinningConditionType) {
         this.wcType = type
@@ -119,5 +127,9 @@ class GameSettingsBuilder(
         this.wcValue = value
     }
 
-    fun build() = GameSettingsDSL(wcType, wcValue)
+    fun forcedDecks(lambda: ForcedDecksBuilder.() -> Unit) {
+        forcedDecks = ForcedDecksBuilder().apply(lambda).build()
+    }
+
+    fun build() = GameSettingsDSL(wcType, wcValue, forcedDecks)
 }
