@@ -2,6 +2,7 @@ package ch.yass.game.dto.db
 
 import ch.yass.core.helper.fromDbJson
 import ch.yass.db.tables.records.GameRecord
+import ch.yass.game.dto.GameKind
 import ch.yass.game.dto.GameSettings
 import ch.yass.game.dto.GameStatus
 import java.time.LocalDateTime
@@ -15,7 +16,8 @@ data class Game(
     val code: String,
     val seed: Int,
     val settings: GameSettings,
-    val status: GameStatus
+    val status: GameStatus,
+    val kind: GameKind
 ) {
     companion object {
         fun fromRecord(game: GameRecord): Game {
@@ -27,7 +29,8 @@ data class Game(
                 game.code,
                 game.seed,
                 fromDbJson<GameSettings>(game.settings),
-                GameStatus.entries.first { it.name == game.status }
+                GameStatus.entries.first { it.name == game.status },
+                GameKind.entries.first { it.name == game.kind }
             )
         }
     }

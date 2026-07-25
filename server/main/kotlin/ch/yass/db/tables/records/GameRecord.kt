@@ -51,6 +51,10 @@ open class GameRecord private constructor() : UpdatableRecordImpl<GameRecord>(Ga
         set(value): Unit = set(7, value)
         get(): Int = get(7) as Int
 
+    open var kind: String
+        set(value): Unit = set(8, value)
+        get(): String = get(8) as String
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -60,7 +64,7 @@ open class GameRecord private constructor() : UpdatableRecordImpl<GameRecord>(Ga
     /**
      * Create a detached, initialised GameRecord
      */
-    constructor(id: Int, uuid: String, createdAt: LocalDateTime, updatedAt: LocalDateTime, code: String, settings: JSON? = null, status: String? = null, seed: Int): this() {
+    constructor(id: Int, uuid: String, createdAt: LocalDateTime, updatedAt: LocalDateTime, code: String, settings: JSON? = null, status: String? = null, seed: Int, kind: String): this() {
         this.id = id
         this.uuid = uuid
         this.createdAt = createdAt
@@ -69,6 +73,7 @@ open class GameRecord private constructor() : UpdatableRecordImpl<GameRecord>(Ga
         this.settings = settings
         this.status = status
         this.seed = seed
+        this.kind = kind
         resetTouchedOnNotNull()
     }
 
@@ -85,6 +90,7 @@ open class GameRecord private constructor() : UpdatableRecordImpl<GameRecord>(Ga
             this.settings = value.settings
             this.status = value.status
             this.seed = value.seed
+            this.kind = value.kind
             resetTouchedOnNotNull()
         }
     }

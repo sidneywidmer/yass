@@ -25,8 +25,8 @@ import kotlin.random.Random
 
 class GameRepository(private val db: DSLContext) {
 
-    fun createGame(settings: GameSettings): Game {
-        return db.insertInto(GAME, GAME.UUID, GAME.CODE, GAME.CREATED_AT, GAME.UPDATED_AT, GAME.SEED, GAME.SETTINGS, GAME.STATUS)
+    fun createGame(settings: GameSettings, kind: GameKind): Game {
+        return db.insertInto(GAME, GAME.UUID, GAME.CODE, GAME.CREATED_AT, GAME.UPDATED_AT, GAME.SEED, GAME.SETTINGS, GAME.STATUS, GAME.KIND)
             .values(
                 UUID.randomUUID().toString(),
                 (1..5).map { ('A'..'Z').random() }.joinToString(""), // TODO: Handle collisions
@@ -34,7 +34,8 @@ class GameRepository(private val db: DSLContext) {
                 LocalDateTime.now(ZoneOffset.UTC),
                 Random.nextInt(100_000, 1_000_000),
                 toDbJson(settings),
-                GameStatus.RUNNING.name
+                GameStatus.RUNNING.name,
+                kind.name
             )
             .returningResult(GAME)
             .fetchOne(mapping(Game::fromRecord))!!

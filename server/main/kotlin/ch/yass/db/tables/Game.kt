@@ -117,6 +117,11 @@ open class Game(
      */
     val SEED: TableField<GameRecord, Int?> = createField(DSL.name("seed"), SQLDataType.INTEGER.nullable(false), this, "")
 
+    /**
+     * The column <code>public.game.kind</code>.
+     */
+    val KIND: TableField<GameRecord, String?> = createField(DSL.name("kind"), SQLDataType.VARCHAR(255).nullable(false), this, "")
+
     private constructor(alias: Name, aliased: Table<GameRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<GameRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
     private constructor(alias: Name, aliased: Table<GameRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
