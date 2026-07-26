@@ -6,6 +6,7 @@ import ch.yass.core.helper.toDbJson
 import ch.yass.db.tables.references.*
 import ch.yass.game.GameRepository
 import ch.yass.game.api.internal.GameState
+import ch.yass.game.dto.GameKind
 import ch.yass.game.dto.GameSettings
 import ch.yass.game.dto.WinningConditionType
 import org.jooq.DSLContext
@@ -39,6 +40,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
         settings = toDbJson(
             GameSettings(false, false, false, false, state.settings.wcType, state.settings.wcValue, state.settings.forcedDecks)
         )
+        kind = GameKind.CUSTOM.name
         store()
     }
     val game = recover({ repo.getByUUID(gameRecord.uuid) }, { throw Exception("invalid uuid") })

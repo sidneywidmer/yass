@@ -79,7 +79,7 @@ class GameService(
         r.ensure(settings.botPositions().size < 4) { GameSettingsMaxBots(settings) }
         r.ensure(validWcValue) { GameSettingsInvalidValue(settings) }
 
-        val game = repo.createGame(settings)
+        val game = repo.createGame(settings, GameKind.CUSTOM)
 
         settings.botPositions().map { position ->
             val botPlayer = playerService.create("Bot", position)
