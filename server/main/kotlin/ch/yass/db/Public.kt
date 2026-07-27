@@ -4,6 +4,7 @@
 package ch.yass.db
 
 
+import ch.yass.db.tables.DailyChallenge
 import ch.yass.db.tables.Game
 import ch.yass.db.tables.Hand
 import ch.yass.db.tables.Message
@@ -31,6 +32,11 @@ open class Public : SchemaImpl(DSL.name("public"), DefaultCatalog.DEFAULT_CATALO
          */
         val PUBLIC: Public = Public()
     }
+
+    /**
+     * The table <code>public.daily_challenge</code>.
+     */
+    val DAILY_CHALLENGE: DailyChallenge get() = DailyChallenge.DAILY_CHALLENGE
 
     /**
      * The table <code>public.game</code>.
@@ -65,6 +71,7 @@ open class Public : SchemaImpl(DSL.name("public"), DefaultCatalog.DEFAULT_CATALO
     override fun getCatalog(): Catalog = DefaultCatalog.DEFAULT_CATALOG
 
     override fun getTables(): List<Table<*>> = listOf(
+        DailyChallenge.DAILY_CHALLENGE,
         Game.GAME,
         Hand.HAND,
         Message.MESSAGE,

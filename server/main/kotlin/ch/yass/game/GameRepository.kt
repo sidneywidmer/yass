@@ -32,7 +32,7 @@ class GameRepository(private val db: DSLContext) {
                 (1..5).map { ('A'..'Z').random() }.joinToString(""), // TODO: Handle collisions
                 LocalDateTime.now(ZoneOffset.UTC),
                 LocalDateTime.now(ZoneOffset.UTC),
-                Random.nextInt(100_000, 1_000_000),
+                Random.nextLong(),
                 toDbJson(settings),
                 GameStatus.RUNNING.name,
                 kind.name

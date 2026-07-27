@@ -14,7 +14,7 @@ data class Game(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
     val code: String,
-    val seed: Int,
+    val seed: Long,
     val settings: GameSettings,
     val status: GameStatus,
     val kind: GameKind

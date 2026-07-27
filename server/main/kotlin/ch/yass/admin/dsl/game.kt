@@ -36,7 +36,7 @@ fun game(lambda: GameStateBuilder.() -> Unit): GameState {
         createdAt = LocalDateTime.now(ZoneOffset.UTC)
         updatedAt = LocalDateTime.now(ZoneOffset.UTC)
         code = (1..5).map { ('A'..'Z').random() }.joinToString("")
-        seed = Random.nextInt(100_000, 1_000_000)
+        seed = Random.nextLong()
         settings = toDbJson(
             GameSettings(false, false, false, false, state.settings.wcType, state.settings.wcValue, state.settings.forcedDecks)
         )
