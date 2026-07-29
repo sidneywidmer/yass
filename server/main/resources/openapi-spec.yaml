@@ -273,17 +273,14 @@ paths:
   /auth/anon/link:
     post:
       summary: Link anonymous account to Ory account
+      description: >
+        Links the anon player of the anon_token cookie to the Ory identity of the ory_kratos_session
+        cookie. Both cookies have to be present, the anon_token cookie gets cleared on success.
       operationId: anonLink
       tags:
         - Auth
       security:
         - anon_token: [ ]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AnonLinkRequest'
       responses:
         '200':
           description: Successfully linked accounts
@@ -812,15 +809,6 @@ components:
       required:
         - name
         - uuid
-
-    AnonLinkRequest:
-      type: object
-      properties:
-        orySession:
-          type: string
-          description: Ory session token to link with anonymous account
-      required:
-        - orySession
 
     MessageRequest:
       type: object

@@ -54,13 +54,17 @@ class AuthController(
      */
     private fun anonLink(ctx: Context) {
         either {
-            val request = validate<AnonLinkRequest>(ctx.body())
+            val sessionCookie = ctx.cookieMap()["ory_kratos_session"] ?: ""
             val player = player(ctx)
 
-            ensureNotNull(player.anonToken) { CanNotLinkAnonAccount(player, request.orySession) }
+            ensureNotNull(player.anonToken) { CanNotLinkAnonAccount(player, sessionCookie) }
 
-            val orySession = getSession(player, request.orySession)
-            playerService.linkAnonAccount(player, orySession.identity!!.id.toUUID(), request.orySession)
+            val orySession = getSession(player, sessionCookie)
+            playerService.linkAnonAccount(player, orySession.identity!!.id.toUUID(), sessionCookie)
+
+            // The anon token is gone from the DB now, so the client has to stop sending it. Otherwise
+            // AuthMiddleware would keep preferring it over the ory session and reject every request.
+            ctx.cookie(anonTokenCookie("", 0))
 
             object {
                 val success = true
@@ -77,16 +81,7 @@ class AuthController(
             val token = createToken()
             val player = playerService.create(NewAnonPlayer(request.name, hashToken(token)))
 
-            ctx.cookie(
-                Cookie("anon_token", token).apply {
-                    isHttpOnly = true
-                    path = "/"
-                    sameSite = SameSite.NONE
-                    secure = true
-                    domain = config.getString("server.cookieDomain")
-                    maxAge = 60 * 60 * 24 * 365 // 1 year
-                }
-            )
+            ctx.cookie(anonTokenCookie(token, 60 * 60 * 24 * 365)) // 1 year
             logger().info("trigger_alert: New guest user signed up ${player.name} (${player.uuid})")
             AnonSignupResponse(player.uuid, player.name)
         }.fold(
@@ -97,20 +92,21 @@ class AuthController(
 
     private fun anonLogout(ctx: Context) {
         playerService.resetAnonToken(player(ctx))
-        ctx.cookie(
-            Cookie("anon_token", "").apply {
-                isHttpOnly = true
-                path = "/"
-                sameSite = SameSite.NONE
-                secure = true
-                domain = config.getString("server.cookieDomain")
-                maxAge = 0 // Delete cookie by setting maxAge to 0
-            }
-        )
+        ctx.cookie(anonTokenCookie("", 0)) // Delete cookie by setting maxAge to 0
         successResponse(ctx, object {
             val result = object {}
         })
     }
+
+    private fun anonTokenCookie(token: String, maxAge: Int) =
+        Cookie("anon_token", token).apply {
+            isHttpOnly = true
+            path = "/"
+            sameSite = SameSite.NONE
+            secure = true
+            domain = config.getString("server.cookieDomain")
+            this.maxAge = maxAge
+        }
 
     private fun whoami(ctx: Context) {
         successResponse(ctx, WhoAmIResponse.from(player(ctx)))
@@ -154,9 +150,9 @@ class AuthController(
     }
 
     context(r: Raise<CanNotLinkAnonAccount>)
-    private fun getSession(player: InternalPlayer, orySession: String): Session =
+    private fun getSession(player: InternalPlayer, sessionCookie: String): Session =
         try {
-            oryClient.frontend.toSession(orySession, null, null)
-        } catch (_: ApiException) { r.raise(CanNotLinkAnonAccount(player, orySession)) }
+            oryClient.frontend.toSession(null, "ory_kratos_session=$sessionCookie", null)
+        } catch (_: ApiException) { r.raise(CanNotLinkAnonAccount(player, sessionCookie)) }
 
 }

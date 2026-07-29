@@ -1,27 +1,37 @@
 //  @name Get new login flow
-GET /self-service/login/api?refresh=&aal= HTTP/1.1
+//  Browser flow (not /api) because the yass server authenticates via the ory_kratos_session
+//  cookie, see AuthMiddleware. The api flow only hands out a session token.
+GET /self-service/login/browser HTTP/1.1
 Host: {{oryBaseUrl}}
 Accept: application/json
 
 > {%
     client.global.set("oryAuthFlow", response.body.id);
+    client.global.set(
+        "oryCsrfToken",
+        response.body.ui.nodes.find(node => node.attributes.name === "csrf_token").attributes.value
+    );
 %}
 
 ###
 
 //  @name Login
-POST /self-service/login?flow={{oryAuthFlow}}
+POST /self-service/login?flow={{oryAuthFlow}} HTTP/1.1
 Host: {{oryBaseUrl}}
 Accept: application/json
-Content-Type: application/x-www-form-urlencoded
+Content-Type: application/json
 
-method = password &
-password = FooBar318318 &
-identifier = hello%40sidney.dev
+{
+  "method": "password",
+  "identifier": "hello@sidney.dev",
+  "password": "FooBar318318",
+  "csrf_token": "{{oryCsrfToken}}"
+}
 
 > {%
-    client.global.set("orySessionToken", response.body.session_token);
+    const session = response.headers.valuesOf("Set-Cookie")
+        .map(value => value.toString())
+        .find(value => value.startsWith("ory_kratos_session="));
+
+    client.global.set("orySessionCookie", session.split(";")[0].split("=")[1]);
 %}
-
-
-

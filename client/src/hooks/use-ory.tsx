@@ -2,6 +2,7 @@ import {useNavigate} from "react-router-dom"
 import {usePlayerStore} from "@/store/player.ts";
 import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 import {ory} from "@/api/ory.ts";
+import {api} from "@/api/client.ts";
 import {ErrorMessage, getOryErrorMessage} from "@/api/helpers.ts";
 import {UiNode} from "@ory/client";
 import {useState} from "react";
@@ -46,7 +47,7 @@ export const useOry = () => {
         logout()
       })
 
-  const signup = (credentials: { email: string; password: string; username: string }, redirectTo?: string) =>
+  const register = (credentials: { email: string; password: string; username: string }) =>
     ory.createBrowserRegistrationFlow()
       .then(flow => ory.updateRegistrationFlow({
         flow: flow.data.id,
@@ -60,6 +61,9 @@ export const useOry = () => {
           csrf_token: getCsrfToken(flow.data)
         }
       }))
+
+  const signup = (credentials: { email: string; password: string; username: string }, redirectTo?: string) =>
+    register(credentials)
       .then(response => {
         const oryUuid = response.data.identity.id
         const username = response.data.identity.traits.name
@@ -71,5 +75,43 @@ export const useOry = () => {
         handleError(error)
       })
 
-  return {login, loginError, signup, signupError}
+  const currentIdentity = () =>
+    ory.toSession().then(response => response.data.identity).catch(() => undefined)
+
+  const oryLogout = () =>
+    ory.createBrowserLogoutFlow().then(flow => ory.updateLogoutFlow({token: flow.data.logout_token}))
+
+  /**
+   * Turns the current guest into a real account. Ory registration gives us the session cookie, the
+   * link call then moves the existing player row over to that identity so uuid, name and game
+   * history are kept.
+   *
+   * A guest can still be holding an ory session, since AuthMiddleware prefers the anon token over it.
+   * Kratos refuses to register while a session exists, so we either reuse that session when it is the
+   * account being created (an upgrade that registered but never linked) or drop it and start over.
+   */
+  const upgradeGuest = async (credentials: { email: string; password: string; username: string }, redirectTo?: string) => {
+    try {
+      let identity = await currentIdentity()
+
+      if (identity?.traits.email !== credentials.email) {
+        if (identity) await oryLogout()
+        identity = (await register(credentials)).data.identity
+      }
+
+      await api.anonLink()
+      setOryPlayer(identity!.id, identity!.traits.name)
+      navigate(redirectTo || '/')
+    } catch (error) {
+      const response = (error as { response?: { data?: { ui?: unknown } } }).response
+      if (response?.data?.ui) {
+        setSignupError(getOryErrorMessage(response.data, t))
+      } else {
+        setSignupError({id: 0, text: t("errors.upgradeFailed")})
+      }
+      handleError(error)
+    }
+  }
+
+  return {login, loginError, signup, upgradeGuest, signupError}
 }

@@ -1,6 +1,5 @@
 import * as generatedApi from './generated';
 import {
-  AnonLinkData,
   AnonSignupData, ChooseTrumpRequest,
   CreateCustomGameRequest,
   JoinGameRequest, MessageRequest, PingSeatRequest,
@@ -38,7 +37,7 @@ export const api = {
   subscribe: (data: SubscribeData['body']) => generatedApi.subscribe({client: customClient, body: data}),
   anonSignup: (data: AnonSignupData['body']) => generatedApi.anonSignup({client: customClient, body: data}),
   anonLogout: () => generatedApi.anonLogout({client: customClient}),
-  anonLink: (data: AnonLinkData['body']) => generatedApi.anonLink({client: customClient, body: data}),
+  anonLink: () => generatedApi.anonLink({client: customClient}),
   connect: () => generatedApi.connect({client: customClient}),
 
   // Game

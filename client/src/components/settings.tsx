@@ -1,4 +1,4 @@
-import {Gauge, Languages, LogOut, SettingsIcon, Spade, User} from 'lucide-react';
+import {Gauge, Languages, LogOut, SettingsIcon, Spade, User, UserPlus} from 'lucide-react';
 import {useSettingsStore} from "@/store/settings.ts";
 import {PlaySpeed} from "@/types/play-speed.ts";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group.tsx";
@@ -35,6 +35,7 @@ interface SettingsProps {
 const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange }: SettingsProps) => {
   const {language, setLanguage, cardDeck, setCardDeck, playSpeed, setPlaySpeed} = useSettingsStore();
   const isAuthenticated = usePlayerStore(state => state.isAuthenticated)
+  const isAnon = usePlayerStore(state => state.isAnon)
   const name = usePlayerStore(state => state.name)
   const gameUuid = useGameStateStore(state => state.gameUuid)
   const code = useGameStateStore(state => state.code)
@@ -125,6 +126,19 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
                 </div>
                 <Logout/>
               </div>
+              {isAnon && (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    setOpen(false)
+                    navigate('/signup')
+                  }}
+                >
+                  <UserPlus className="h-4 w-4"/>
+                  {t("auth.upgrade.title")}
+                </Button>
+              )}
               <Separator/>
             </>
           )}

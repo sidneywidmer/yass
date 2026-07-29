@@ -42,6 +42,7 @@
   },
   "errors": {
     "title": "Ooops",
+    "upgradeFailed": "Your account could not be upgraded. Please try again later.",
     "ory": {
       "4000006": "E-Mail or password incorrect",
       "4000007": "Please use a different E-Mail",
@@ -161,6 +162,13 @@
       "guestProfile": "Guest-Profile",
       "submit": "Let's play",
       "guestProfileInfo": "The Guest-Profile ist only on this device available.\n Can be converted to a real account at any time."
+    },
+    "upgrade": {
+      "title": "Upgrade account",
+      "description": "Add an email and a password to your guest profile. Your name, games and stats stay the same.",
+      "usernameHint": "Your name stays the same.",
+      "submit": "Upgrade account",
+      "cancel": "Not now"
     }
   },
   "weisen": {

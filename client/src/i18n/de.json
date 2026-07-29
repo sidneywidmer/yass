@@ -43,6 +43,7 @@
   "errors": {
     "title": "Fehler",
     "anonSignup": "Muss zwischen 3 und 15 Zeichen lang sein und darf nur Buchstaben und Zahlen enthalten",
+    "upgradeFailed": "Dein Konto konnte nicht umgewandelt werden. Bitte versuche es später erneut.",
     "ory": {
       "4000006": "E-Mail oder Passwort falsch",
       "4000007": "Bitte verwende eine andere E-Mail",
@@ -161,6 +162,13 @@
       "guestProfile": "Gast-Profil",
       "submit": "Los geht's",
       "guestProfileInfo": "Das Gast-Profil ist nur auf diesem Gerät verfügbar,\n kann jedoch zu jedem Zeitpunkt in einen richtigen \nAccount umgewandelt werden."
+    },
+    "upgrade": {
+      "title": "Konto umwandeln",
+      "description": "Ergänze dein Gast-Profil mit E-Mail und Passwort. Name, Spiele und Statistiken bleiben erhalten.",
+      "usernameHint": "Dein Name bleibt bestehen.",
+      "submit": "Konto umwandeln",
+      "cancel": "Später"
     }
   },
   "weisen": {
