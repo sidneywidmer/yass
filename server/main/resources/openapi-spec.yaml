@@ -155,6 +155,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessfulActionResponse'
+  /game/daily:
+    post:
+      summary: Join or create today's daily challenge
+      description: >
+        Returns the code of today's daily challenge game for the current player. Creates the game on
+        the first call of the day, returns the already running (or finished) game on every later call.
+        Only available for signed up players.
+      responses:
+        '200':
+          description: Daily challenge joined successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateDailyChallengeResponse'
+
   /auth/whoami:
     get:
       summary: Get current user information
@@ -444,6 +459,14 @@ components:
 
     CreateCustomGameResponse:
       type: object
+      properties:
+        code:
+          type: string
+
+    CreateDailyChallengeResponse:
+      type: object
+      required:
+        - code
       properties:
         code:
           type: string
