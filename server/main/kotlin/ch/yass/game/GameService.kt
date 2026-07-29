@@ -26,7 +26,6 @@ import ch.yass.game.pubsub.*
 import ch.yass.identity.helper.isAnon
 import kotlinx.coroutines.*
 import org.slf4j.MDC
-import ch.yass.game.engine.swissDay
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
@@ -91,11 +90,11 @@ class GameService(
     fun createDaily(player: InternalPlayer): String {
         r.ensure(!isAnon(player)) { SignedUpPlayersOnly(player) }
 
-        val day = swissDay(LocalDateTime.now(ZoneOffset.UTC));
-        val (start, end) = swissDayWindowUTC(day);
+        val day = swissDay(LocalDateTime.now(ZoneOffset.UTC))
+        val (start, end) = swissDayWindowUTC(day)
 
         // Already has a game of type DAILY today, meaning they already joined the daily challenge. We'll return
-        // the code of that game which either results in an autoamtic rejoin if not finished or the analysis view.
+        // the code of that game which either results in an automatic rejoin if not finished or the analysis view.
         repo.getDailyGameForPlayer(player, start, end)?.let { return it.code }
 
         val challenge = repo.getOrCreateDailyChallengeForDay(day)
@@ -479,6 +478,5 @@ class GameService(
         }
         return generateHand(seed = game.seed, handNumber = handNumber, forcedDeck = forcedDeck)
     }
-
 
 }

@@ -2,7 +2,7 @@ import '@/App.css'
 import Landing from "@/routes/landing.tsx";
 import Lobby from "@/routes/lobby.tsx";
 import Login from "@/routes/login.tsx";
-import {createBrowserRouter, RouterProvider} from "react-router-dom";
+import {createBrowserRouter, Navigate, RouterProvider} from "react-router-dom";
 import {AuthGuard} from "@/auth/auth-guard.tsx";
 import '@/i18n';
 import {MainWrapper} from "@/components/main-wrapper.tsx";
@@ -24,6 +24,10 @@ const router = createBrowserRouter([
   },
   {
     path: "/lobby",
+    element: <Navigate to="/lobby/daily" replace/>,
+  },
+  {
+    path: "/lobby/:section",
     element: <AuthGuard><MainWrapper><Lobby/></MainWrapper></AuthGuard>,
   },
   {
