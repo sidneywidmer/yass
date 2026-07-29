@@ -4,7 +4,7 @@ import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 import {ory} from "@/api/ory.ts";
 import {api} from "@/api/client.ts";
 import {ErrorMessage, getOryErrorMessage} from "@/api/helpers.ts";
-import {UiNode} from "@ory/client";
+import {UiNode, UiText} from "@ory/client";
 import {useState} from "react";
 import {useTranslation} from "react-i18next";
 
@@ -103,7 +103,14 @@ export const useOry = () => {
       setOryPlayer(identity!.id, identity!.traits.name)
       navigate(redirectTo || '/')
     } catch (error) {
-      const response = (error as { response?: { data?: { ui?: unknown } } }).response
+      const response = (error as { response?: { status?: number, data?: { ui?: { messages?: UiText[], nodes?: UiNode[] } } } }).response
+
+      // The server answers 409 when the ory identity already belongs to another player
+      if (response?.status === 409) {
+        setSignupError({id: 0, text: t("errors.upgradeExists")})
+        return
+      }
+
       if (response?.data?.ui) {
         setSignupError(getOryErrorMessage(response.data, t))
       } else {

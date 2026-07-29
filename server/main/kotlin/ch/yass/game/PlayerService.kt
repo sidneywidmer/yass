@@ -2,7 +2,7 @@ package ch.yass.game
 
 import arrow.core.raise.Raise
 import arrow.core.raise.ensure
-import ch.yass.core.error.CanNotLinkAnonAccount
+import ch.yass.core.error.OryAccountAlreadyLinked
 import ch.yass.core.error.OryIdentityWithoutName
 import ch.yass.core.error.StringNoValidUUID
 import ch.yass.core.helper.hashToken
@@ -90,11 +90,11 @@ class PlayerService(private val db: DSLContext) {
         )
     }
 
-    context(r: Raise<CanNotLinkAnonAccount>)
-    fun linkAnonAccount(player: InternalPlayer, oryUuid: UUID, orySession: String): InternalPlayer {
+    context(r: Raise<OryAccountAlreadyLinked>)
+    fun linkAnonAccount(player: InternalPlayer, oryUuid: UUID): InternalPlayer {
         // Just make sure no funky stuff is going on and we don't have an existing player with this ory uuid already set
         val existingOryUuids = db.fetchCount(PLAYER, PLAYER.ORY_UUID.eq(oryUuid.toString()))
-        r.ensure(existingOryUuids == 0) { CanNotLinkAnonAccount(player, orySession) }
+        r.ensure(existingOryUuids == 0) { OryAccountAlreadyLinked(player.uuid, oryUuid) }
 
         return db.update(PLAYER)
             .setNull(PLAYER.ANON_TOKEN)

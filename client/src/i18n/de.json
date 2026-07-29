@@ -42,8 +42,9 @@
   },
   "errors": {
     "title": "Fehler",
-    "anonSignup": "Muss zwischen 3 und 15 Zeichen lang sein und darf nur Buchstaben und Zahlen enthalten",
+    "anonSignup": "Muss zwischen 3 und 15 Zeichen lang sein und darf nur Buchstaben (a-z) und Zahlen enthalten",
     "upgradeFailed": "Dein Konto konnte nicht umgewandelt werden. Bitte versuche es später erneut.",
+    "upgradeExists": "Für diese E-Mail gibt es bereits ein Konto. Bitte melde dich stattdessen an.",
     "ory": {
       "4000006": "E-Mail oder Passwort falsch",
       "4000007": "Bitte verwende eine andere E-Mail",
@@ -166,7 +167,7 @@
     "upgrade": {
       "title": "Konto umwandeln",
       "description": "Ergänze dein Gast-Profil mit E-Mail und Passwort. Name, Spiele und Statistiken bleiben erhalten.",
-      "usernameHint": "Dein Name bleibt bestehen.",
+      "usernameHint": "Dein Name wird übernommen, du kannst ihn hier aber noch anpassen.",
       "submit": "Konto umwandeln",
       "cancel": "Später"
     }

@@ -54,13 +54,18 @@ class AuthController(
      */
     private fun anonLink(ctx: Context) {
         either {
-            val sessionCookie = ctx.cookieMap()["ory_kratos_session"] ?: ""
             val player = player(ctx)
 
-            ensureNotNull(player.anonToken) { CanNotLinkAnonAccount(player, sessionCookie) }
+            // Both credentials are ambient cookies, so this POST is only safe from our own client
+            ensureExpectedOrigin(ctx)
+
+            ensureNotNull(player.anonToken) { CanNotLinkAnonAccount(player.uuid) }
+            val sessionCookie = ensureNotNull(ctx.cookieMap()["ory_kratos_session"]) {
+                CanNotLinkAnonAccount(player.uuid)
+            }
 
             val orySession = getSession(player, sessionCookie)
-            playerService.linkAnonAccount(player, orySession.identity!!.id.toUUID(), sessionCookie)
+            playerService.linkAnonAccount(player, orySession.identity!!.id.toUUID())
 
             // The anon token is gone from the DB now, so the client has to stop sending it. Otherwise
             // AuthMiddleware would keep preferring it over the ory session and reject every request.
@@ -153,6 +158,12 @@ class AuthController(
     private fun getSession(player: InternalPlayer, sessionCookie: String): Session =
         try {
             oryClient.frontend.toSession(null, "ory_kratos_session=$sessionCookie", null)
-        } catch (_: ApiException) { r.raise(CanNotLinkAnonAccount(player, sessionCookie)) }
+        } catch (_: ApiException) { r.raise(CanNotLinkAnonAccount(player.uuid)) }
+
+    context(r: Raise<UnexpectedOrigin>)
+    private fun ensureExpectedOrigin(ctx: Context) {
+        val origin = ctx.header("Origin") ?: return // Non-browser clients don't send one
+        r.ensure(origin == config.getString("server.cors")) { UnexpectedOrigin(origin) }
+    }
 
 }

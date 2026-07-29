@@ -42,7 +42,7 @@ export function SignupForm() {
   const {execute: executeSignup, isLoading, hasError, reset} = useAsyncAction(async (data: {username: string, email?: string, password?: string}) => {
     if (isUpgrade) {
       return upgradeGuest({
-        username: guestName!,
+        username: data.username,
         email: data.email!,
         password: data.password!
       }, redirectTo || '/lobby')
@@ -105,7 +105,6 @@ export function SignupForm() {
                 id="username"
                 type="text"
                 defaultValue={isUpgrade ? guestName : undefined}
-                readOnly={isUpgrade}
                 required
               />
               {isUpgrade && (

@@ -42,7 +42,9 @@
   },
   "errors": {
     "title": "Ooops",
+    "anonSignup": "Must be between 3 and 15 characters long and may only contain letters (a-z) and numbers",
     "upgradeFailed": "Your account could not be upgraded. Please try again later.",
+    "upgradeExists": "An account with this email already exists. Please log in instead.",
     "ory": {
       "4000006": "E-Mail or password incorrect",
       "4000007": "Please use a different E-Mail",
@@ -166,7 +168,7 @@
     "upgrade": {
       "title": "Upgrade account",
       "description": "Add an email and a password to your guest profile. Your name, games and stats stay the same.",
-      "usernameHint": "Your name stays the same.",
+      "usernameHint": "Your name carries over, but you can still adjust it here.",
       "submit": "Upgrade account",
       "cancel": "Not now"
     }

@@ -29,5 +29,6 @@ export const usePlayerStore = create<PlayerState>((set) => ({
     uuid: undefined,
     name: undefined,
     isAuthenticated: false,
+    isAnon: false,
   })
 }))
