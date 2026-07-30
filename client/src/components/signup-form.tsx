@@ -15,26 +15,39 @@ import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
 import {useAnon} from "@/hooks/use-anon.tsx";
 import {useAsyncAction} from "@/hooks/use-async-action";
 import {useAuth} from "@/hooks/use-auth.tsx";
+import {usePlayerStore} from "@/store/player.ts";
 
 export function SignupForm() {
   const location = useLocation()
   const navigate = useNavigate()
-  const [isGuest, setIsGuest] = useState(location.state?.isGuest || false)
+  const [isAnonSignup, setIsAnonSignup] = useState(location.state?.isAnonSignup || false)
   const {t} = useTranslation()
-  const {signup, signupError} = useOry()
+  const {signup, upgradeAnon, signupError} = useOry()
   const {anonSignup, anonSignupError} = useAnon()
   const {isAuthenticated, initialized} = useAuth()
+  const isAnon = usePlayerStore(state => state.isAnon)
+  const anonName = usePlayerStore(state => state.name)
+
+  // A logged in anon player lands here to upgrade the existing profile instead of creating a new one.
+  const isUpgrade = isAuthenticated && isAnon
 
   const redirectTo = getValidRedirectPath(location.state?.from)
 
   useEffect(() => {
-    if (initialized && isAuthenticated) {
+    if (initialized && isAuthenticated && !isAnon) {
       navigate('/lobby', {replace: true})
     }
-  }, [initialized, isAuthenticated, navigate])
-  
+  }, [initialized, isAuthenticated, isAnon, navigate])
+
   const {execute: executeSignup, isLoading, hasError, reset} = useAsyncAction(async (data: {username: string, email?: string, password?: string}) => {
-    if (isGuest) {
+    if (isUpgrade) {
+      return upgradeAnon({
+        username: data.username,
+        email: data.email!,
+        password: data.password!
+      }, redirectTo || '/lobby')
+    }
+    if (isAnonSignup) {
       return anonSignup(data.username, redirectTo)
     }
     return signup({
@@ -66,7 +79,10 @@ export function SignupForm() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">{t('auth.signup.title')}</CardTitle>
+        <CardTitle className="text-xl">{t(isUpgrade ? 'auth.upgrade.title' : 'auth.signup.title')}</CardTitle>
+        {isUpgrade && (
+          <p className="text-sm text-muted-foreground">{t('auth.upgrade.description')}</p>
+        )}
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit}>
@@ -88,8 +104,12 @@ export function SignupForm() {
                 name="username"
                 id="username"
                 type="text"
+                defaultValue={isUpgrade ? anonName : undefined}
                 required
               />
+              {isUpgrade && (
+                <p className="text-xs text-muted-foreground">{t('auth.upgrade.usernameHint')}</p>
+              )}
               {(signupError?.field == "traits.name" || anonSignupError) && (
                 <p className="text-sm font-medium text-destructive">
                   {signupError?.text || anonSignupError?.text}
@@ -97,25 +117,27 @@ export function SignupForm() {
               )}
             </div>
 
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="guest-mode"
-                checked={isGuest}
-                onCheckedChange={setIsGuest}
-              />
-              <Label htmlFor="guest-mode">{t('auth.signup.guestProfile')}</Label>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <HelpCircle className="h-4 w-4 text-muted-foreground"/>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="whitespace-pre-line">{t('auth.signup.guestProfileInfo')}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            {!isGuest && (
+            {!isUpgrade && (
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="anon-mode"
+                  checked={isAnonSignup}
+                  onCheckedChange={setIsAnonSignup}
+                />
+                <Label htmlFor="anon-mode">{t('auth.signup.anonProfile')}</Label>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground"/>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="whitespace-pre-line">{t('auth.signup.anonProfileInfo')}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            )}
+            {(!isAnonSignup || isUpgrade) && (
               <>
                 <div className="grid gap-2">
                   <Label htmlFor="email">{t('auth.form.email')}</Label>
@@ -158,15 +180,21 @@ export function SignupForm() {
               variant={hasError ? "destructive" : "default"}
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {t('auth.signup.submit')}
+              {t(isUpgrade ? 'auth.upgrade.submit' : 'auth.signup.submit')}
             </Button>
 
-            <div className="text-center text-sm">
-              {t("auth.login.prompt")}&nbsp;
-              <Link to="/login" state={{from: location.state?.from}} className="underline underline-offset-4">
-                {t("auth.login.link")}
-              </Link>
-            </div>
+            {isUpgrade ? (
+              <Button type="button" variant="ghost" onClick={() => navigate('/lobby')}>
+                {t("auth.upgrade.cancel")}
+              </Button>
+            ) : (
+              <div className="text-center text-sm">
+                {t("auth.login.prompt")}&nbsp;
+                <Link to="/login" state={{from: location.state?.from}} className="underline underline-offset-4">
+                  {t("auth.login.link")}
+                </Link>
+              </div>
+            )}
           </div>
         </form>
       </CardContent>

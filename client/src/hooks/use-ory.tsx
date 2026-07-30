@@ -2,8 +2,10 @@ import {useNavigate} from "react-router-dom"
 import {usePlayerStore} from "@/store/player.ts";
 import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 import {ory} from "@/api/ory.ts";
+import {api} from "@/api/client.ts";
 import {ErrorMessage, getOryErrorMessage} from "@/api/helpers.ts";
-import {UiNode} from "@ory/client";
+import {UiNode, UiText} from "@ory/client";
+import {AxiosError} from "axios";
 import {useState} from "react";
 import {useTranslation} from "react-i18next";
 
@@ -46,7 +48,7 @@ export const useOry = () => {
         logout()
       })
 
-  const signup = (credentials: { email: string; password: string; username: string }, redirectTo?: string) =>
+  const register = (credentials: { email: string; password: string; username: string }) =>
     ory.createBrowserRegistrationFlow()
       .then(flow => ory.updateRegistrationFlow({
         flow: flow.data.id,
@@ -60,6 +62,9 @@ export const useOry = () => {
           csrf_token: getCsrfToken(flow.data)
         }
       }))
+
+  const signup = (credentials: { email: string; password: string; username: string }, redirectTo?: string) =>
+    register(credentials)
       .then(response => {
         const oryUuid = response.data.identity.id
         const username = response.data.identity.traits.name
@@ -71,5 +76,44 @@ export const useOry = () => {
         handleError(error)
       })
 
-  return {login, loginError, signup, signupError}
+  const currentIdentity = () =>
+    ory.toSession().then(response => response.data.identity).catch(() => undefined)
+
+  const oryLogout = () =>
+    ory.createBrowserLogoutFlow().then(flow => ory.updateLogoutFlow({token: flow.data.logout_token}))
+
+  /**
+   * Turns the current anon player into a real account. Ory registration gives us the session cookie, the
+   * link call then moves the existing player row over to that identity so uuid, name and game
+   * history are kept.
+   *
+   * An anon player can still be holding an ory session, since AuthMiddleware prefers the anon token over it.
+   * Kratos refuses to register while a session exists, so we either reuse that session when it is the
+   * account being created (an upgrade that registered but never linked) or drop it and start over.
+   */
+  const upgradeAnon = async (credentials: { email: string; password: string; username: string }, redirectTo?: string) => {
+    try {
+      let identity = await currentIdentity()
+
+      if (identity?.traits.email !== credentials.email) {
+        if (identity) await oryLogout()
+        identity = (await register(credentials)).data.identity
+      }
+
+      await api.anonLink()
+      setOryPlayer(identity!.id, identity!.traits.name)
+      navigate(redirectTo || '/')
+    } catch (error) {
+      const axiosError = error as AxiosError<{ ui?: { messages?: UiText[], nodes?: UiNode[] } }>
+
+      if (axiosError.response?.data?.ui) {
+        setSignupError(getOryErrorMessage(axiosError.response.data, t))
+      } else {
+        setSignupError({id: 0, text: t("errors.upgradeFailed")})
+      }
+      handleError(axiosError)
+    }
+  }
+
+  return {login, loginError, signup, upgradeAnon, signupError}
 }

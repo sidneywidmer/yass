@@ -201,14 +201,13 @@ export const anonSignup = <ThrowOnError extends boolean = false>(options: Option
 
 /**
  * Link anonymous account to Ory account
+ *
+ * Links the anon player of the anon_token cookie to the Ory identity of the ory_kratos_session cookie. Both cookies have to be present, the anon_token cookie gets cleared on success.
+ *
  */
-export const anonLink = <ThrowOnError extends boolean = false>(options: Options<AnonLinkData, ThrowOnError>) => (options.client ?? client).post<AnonLinkResponses, AnonLinkErrors, ThrowOnError>({
+export const anonLink = <ThrowOnError extends boolean = false>(options?: Options<AnonLinkData, ThrowOnError>) => (options?.client ?? client).post<AnonLinkResponses, AnonLinkErrors, ThrowOnError>({
     responseType: 'json',
     security: [{ name: 'X-Anon-Token', type: 'apiKey' }],
     url: '/auth/anon/link',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
+    ...options
 });

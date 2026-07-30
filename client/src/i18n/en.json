@@ -42,6 +42,8 @@
   },
   "errors": {
     "title": "Ooops",
+    "anonSignup": "Must be between 3 and 15 characters long and may only contain letters, numbers and «-» or «_»",
+    "upgradeFailed": "Your account could not be upgraded. Please try again later.",
     "ory": {
       "4000006": "E-Mail or password incorrect",
       "4000007": "Please use a different E-Mail",
@@ -150,7 +152,7 @@
     },
     "login": {
       "title": "Welcome back",
-      "guestPlay": "Play as guest",
+      "anonPlay": "Play as guest",
       "prompt": "Already signed up?",
       "link": "Login"
     },
@@ -158,9 +160,16 @@
       "prompt": "Don't have an account?",
       "link": "Sign up",
       "title": "Sign-up",
-      "guestProfile": "Guest-Profile",
+      "anonProfile": "Guest-Profile",
       "submit": "Let's play",
-      "guestProfileInfo": "The Guest-Profile ist only on this device available.\n Can be converted to a real account at any time."
+      "anonProfileInfo": "The Guest-Profile ist only on this device available.\n Can be converted to a real account at any time."
+    },
+    "upgrade": {
+      "title": "Upgrade account",
+      "description": "Add an email and a password to your guest profile. Your name, games and stats stay the same.",
+      "usernameHint": "Your name carries over, but you can still adjust it here.",
+      "submit": "Upgrade account",
+      "cancel": "Not now"
     }
   },
   "weisen": {
@@ -245,7 +254,7 @@
       "title": "Our beloved national cardgame — modernized",
       "description": "No installation, no ads and free. Or as we say in swissgerman: De Foiver und s'Weggli",
       "signUp": "Sign Up",
-      "playAsGuest": "play as guest"
+      "playAsAnon": "play as guest"
     },
     "features": {
       "title": "Yass Features",

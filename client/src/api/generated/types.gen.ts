@@ -239,13 +239,6 @@ export type AnonSignupResponse = {
     name: string;
 };
 
-export type AnonLinkRequest = {
-    /**
-     * Ory session token to link with anonymous account
-     */
-    orySession: string;
-};
-
 export type MessageRequest = {
     /**
      * The feedback or message content
@@ -528,7 +521,7 @@ export type AnonSignupResponses = {
 export type AnonSignupResponse2 = AnonSignupResponses[keyof AnonSignupResponses];
 
 export type AnonLinkData = {
-    body: AnonLinkRequest;
+    body?: never;
     path?: never;
     query?: never;
     url: '/auth/anon/link';

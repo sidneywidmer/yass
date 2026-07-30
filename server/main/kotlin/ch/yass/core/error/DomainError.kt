@@ -27,7 +27,7 @@ data class OryIdentityWithoutName(val identity: Identity) : AuthError
 data class UnauthorizedSubscription(val error: DomainError) : AuthError
 data class InvalidAnonToken(val token: String) : AuthError
 data class CanNotImpersonate(val player: InternalPlayer, val impersonateUuid: UUID) : AuthError
-data class CanNotLinkAnonAccount(val player: InternalPlayer, val orySession: String) : AuthError
+data class CanNotLinkAnonAccount(val playerUuid: UUID) : AuthError
 
 // Game or Game-State related Errors
 sealed interface GameError : DomainError
