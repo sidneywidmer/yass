@@ -27,10 +27,7 @@ data class OryIdentityWithoutName(val identity: Identity) : AuthError
 data class UnauthorizedSubscription(val error: DomainError) : AuthError
 data class InvalidAnonToken(val token: String) : AuthError
 data class CanNotImpersonate(val player: InternalPlayer, val impersonateUuid: UUID) : AuthError
-
-// Carry only the player uuid, these errors end up in the logs and InternalPlayer holds the anon token
 data class CanNotLinkAnonAccount(val playerUuid: UUID) : AuthError
-data class OryAccountAlreadyLinked(val playerUuid: UUID, val oryUuid: UUID) : AuthError
 
 // Game or Game-State related Errors
 sealed interface GameError : DomainError

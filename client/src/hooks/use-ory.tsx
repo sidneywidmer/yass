@@ -105,13 +105,6 @@ export const useOry = () => {
     } catch (error) {
       const response = (error as { response?: { status?: number, data?: { ui?: { messages?: UiText[], nodes?: UiNode[] } } } }).response
 
-      // The server answers 409 when the ory identity of the reused session already belongs to another
-      // player row. A fresh registration can't hit this, ory rejects a duplicate email before we link.
-      if (response?.status === 409) {
-        setSignupError({id: 0, text: t("errors.upgradeExists")})
-        return
-      }
-
       if (response?.data?.ui) {
         setSignupError(getOryErrorMessage(response.data, t))
       } else {

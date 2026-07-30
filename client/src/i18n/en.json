@@ -44,7 +44,6 @@
     "title": "Ooops",
     "anonSignup": "Must be between 3 and 15 characters long and may only contain letters, numbers and «-» or «_»",
     "upgradeFailed": "Your account could not be upgraded. Please try again later.",
-    "upgradeExists": "An account with this email already exists. Please log in instead.",
     "ory": {
       "4000006": "E-Mail or password incorrect",
       "4000007": "Please use a different E-Mail",

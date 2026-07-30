@@ -44,7 +44,6 @@
     "title": "Fehler",
     "anonSignup": "Muss zwischen 3 und 15 Zeichen lang sein und darf nur Buchstaben, Zahlen sowie «-» und «_» enthalten",
     "upgradeFailed": "Dein Konto konnte nicht umgewandelt werden. Bitte versuche es später erneut.",
-    "upgradeExists": "Für diese E-Mail gibt es bereits ein Konto. Bitte melde dich stattdessen an.",
     "ory": {
       "4000006": "E-Mail oder Passwort falsch",
       "4000007": "Bitte verwende eine andere E-Mail",

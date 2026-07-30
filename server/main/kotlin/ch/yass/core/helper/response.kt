@@ -42,10 +42,6 @@ fun errorResponse(ctx: Context, error: DomainError): Context {
             val error = CentrifugoErrorResponse(403, "denied")
         })
 
-        is CanNotLinkAnonAccount -> ctx.status(400).json(ErrorResponse("can not link anon account"))
-
-        is OryAccountAlreadyLinked -> ctx.status(409).json(ErrorResponse("ory account is already linked to a player"))
-
         is GameWithCodeNotFound -> ctx.status(404).json(ErrorResponse("no game with code ${error.code} found"))
         else -> {
             logger().error("DomainError `${error.javaClass.name}` encountered: $error")
