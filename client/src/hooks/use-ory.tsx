@@ -82,15 +82,15 @@ export const useOry = () => {
     ory.createBrowserLogoutFlow().then(flow => ory.updateLogoutFlow({token: flow.data.logout_token}))
 
   /**
-   * Turns the current guest into a real account. Ory registration gives us the session cookie, the
+   * Turns the current anon player into a real account. Ory registration gives us the session cookie, the
    * link call then moves the existing player row over to that identity so uuid, name and game
    * history are kept.
    *
-   * A guest can still be holding an ory session, since AuthMiddleware prefers the anon token over it.
+   * An anon player can still be holding an ory session, since AuthMiddleware prefers the anon token over it.
    * Kratos refuses to register while a session exists, so we either reuse that session when it is the
    * account being created (an upgrade that registered but never linked) or drop it and start over.
    */
-  const upgradeGuest = async (credentials: { email: string; password: string; username: string }, redirectTo?: string) => {
+  const upgradeAnon = async (credentials: { email: string; password: string; username: string }, redirectTo?: string) => {
     try {
       let identity = await currentIdentity()
 
@@ -105,7 +105,8 @@ export const useOry = () => {
     } catch (error) {
       const response = (error as { response?: { status?: number, data?: { ui?: { messages?: UiText[], nodes?: UiNode[] } } } }).response
 
-      // The server answers 409 when the ory identity already belongs to another player
+      // The server answers 409 when the ory identity of the reused session already belongs to another
+      // player row. A fresh registration can't hit this, ory rejects a duplicate email before we link.
       if (response?.status === 409) {
         setSignupError({id: 0, text: t("errors.upgradeExists")})
         return
@@ -120,5 +121,5 @@ export const useOry = () => {
     }
   }
 
-  return {login, loginError, signup, upgradeGuest, signupError}
+  return {login, loginError, signup, upgradeAnon, signupError}
 }

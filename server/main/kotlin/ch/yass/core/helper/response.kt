@@ -46,8 +46,6 @@ fun errorResponse(ctx: Context, error: DomainError): Context {
 
         is OryAccountAlreadyLinked -> ctx.status(409).json(ErrorResponse("ory account is already linked to a player"))
 
-        is UnexpectedOrigin -> ctx.status(403).json(ErrorResponse("unexpected origin"))
-
         is GameWithCodeNotFound -> ctx.status(404).json(ErrorResponse("no game with code ${error.code} found"))
         else -> {
             logger().error("DomainError `${error.javaClass.name}` encountered: $error")

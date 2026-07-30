@@ -39,10 +39,10 @@ export function Header() {
               <Button
                 variant="outline"
                 size="lg"
-                onClick={() => navigate("/signup", { state: { isGuest: true } })}
+                onClick={() => navigate("/signup", { state: { isAnonSignup: true } })}
                 className="font-normal px-8"
               >
-                {t("landing.header.playAsGuest")}
+                {t("landing.header.playAsAnon")}
               </Button>
             )}
           </div>

@@ -42,7 +42,7 @@
   },
   "errors": {
     "title": "Fehler",
-    "anonSignup": "Muss zwischen 3 und 15 Zeichen lang sein und darf nur Buchstaben (a-z) und Zahlen enthalten",
+    "anonSignup": "Muss zwischen 3 und 15 Zeichen lang sein und darf nur Buchstaben, Zahlen sowie «-» und «_» enthalten",
     "upgradeFailed": "Dein Konto konnte nicht umgewandelt werden. Bitte versuche es später erneut.",
     "upgradeExists": "Für diese E-Mail gibt es bereits ein Konto. Bitte melde dich stattdessen an.",
     "ory": {
@@ -151,7 +151,7 @@
       "username": "Nickname"
     },
     "login": {
-      "guestPlay": "Als Gast spielen",
+      "anonPlay": "Als Gast spielen",
       "title": "Hallo!",
       "prompt": "Bereits registriert?",
       "link": "Login"
@@ -160,9 +160,9 @@
       "title": "Registrieren",
       "prompt": "Noch kein Konto?",
       "link": "Registrieren",
-      "guestProfile": "Gast-Profil",
+      "anonProfile": "Gast-Profil",
       "submit": "Los geht's",
-      "guestProfileInfo": "Das Gast-Profil ist nur auf diesem Gerät verfügbar,\n kann jedoch zu jedem Zeitpunkt in einen richtigen \nAccount umgewandelt werden."
+      "anonProfileInfo": "Das Gast-Profil ist nur auf diesem Gerät verfügbar,\n kann jedoch zu jedem Zeitpunkt in einen richtigen \nAccount umgewandelt werden."
     },
     "upgrade": {
       "title": "Konto umwandeln",
@@ -254,7 +254,7 @@
       "title": "Unser liebstes Nationalspiel — modern umgesetzt",
       "description": "Keine Installation, keine Werbung und gratis. Den Foiver unds s'Weggli halt.",
       "signUp": "Registrieren",
-      "playAsGuest": "als Gast spielen"
+      "playAsAnon": "als Gast spielen"
     },
     "features": {
       "title": "Yass Features",

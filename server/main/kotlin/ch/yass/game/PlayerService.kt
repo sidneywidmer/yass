@@ -92,7 +92,7 @@ class PlayerService(private val db: DSLContext) {
 
     context(r: Raise<OryAccountAlreadyLinked>)
     fun linkAnonAccount(player: InternalPlayer, oryUuid: UUID): InternalPlayer {
-        // Just make sure no funky stuff is going on and we don't have an existing player with this ory uuid already set
+        // Make sure no funky stuff is going on and no other player of ours claimed this ory uuid already
         val existingOryUuids = db.fetchCount(PLAYER, PLAYER.ORY_UUID.eq(oryUuid.toString()))
         r.ensure(existingOryUuids == 0) { OryAccountAlreadyLinked(player.uuid, oryUuid) }
 

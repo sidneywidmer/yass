@@ -67,7 +67,7 @@ export function LoginForm() {
                     type="button"
                     variant="outline"
                     className="w-full"
-                    onClick={() => navigate('/signup', {state: {isGuest: true, from: location.state?.from}})}
+                    onClick={() => navigate('/signup', {state: {isAnonSignup: true, from: location.state?.from}})}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
@@ -75,7 +75,7 @@ export function LoginForm() {
                       <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
                       <circle cx="12" cy="7" r="4"/>
                     </svg>
-                    {t("auth.login.guestPlay")}
+                    {t("auth.login.anonPlay")}
                   </Button>
                 </div>
                 <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0

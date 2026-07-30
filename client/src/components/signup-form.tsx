@@ -20,15 +20,15 @@ import {usePlayerStore} from "@/store/player.ts";
 export function SignupForm() {
   const location = useLocation()
   const navigate = useNavigate()
-  const [isGuest, setIsGuest] = useState(location.state?.isGuest || false)
+  const [isAnonSignup, setIsAnonSignup] = useState(location.state?.isAnonSignup || false)
   const {t} = useTranslation()
-  const {signup, upgradeGuest, signupError} = useOry()
+  const {signup, upgradeAnon, signupError} = useOry()
   const {anonSignup, anonSignupError} = useAnon()
   const {isAuthenticated, initialized} = useAuth()
   const isAnon = usePlayerStore(state => state.isAnon)
-  const guestName = usePlayerStore(state => state.name)
+  const anonName = usePlayerStore(state => state.name)
 
-  // A logged in guest lands here to upgrade the existing profile instead of creating a new one.
+  // A logged in anon player lands here to upgrade the existing profile instead of creating a new one.
   const isUpgrade = isAuthenticated && isAnon
 
   const redirectTo = getValidRedirectPath(location.state?.from)
@@ -41,13 +41,13 @@ export function SignupForm() {
 
   const {execute: executeSignup, isLoading, hasError, reset} = useAsyncAction(async (data: {username: string, email?: string, password?: string}) => {
     if (isUpgrade) {
-      return upgradeGuest({
+      return upgradeAnon({
         username: data.username,
         email: data.email!,
         password: data.password!
       }, redirectTo || '/lobby')
     }
-    if (isGuest) {
+    if (isAnonSignup) {
       return anonSignup(data.username, redirectTo)
     }
     return signup({
@@ -104,7 +104,7 @@ export function SignupForm() {
                 name="username"
                 id="username"
                 type="text"
-                defaultValue={isUpgrade ? guestName : undefined}
+                defaultValue={isUpgrade ? anonName : undefined}
                 required
               />
               {isUpgrade && (
@@ -120,24 +120,24 @@ export function SignupForm() {
             {!isUpgrade && (
               <div className="flex items-center space-x-2">
                 <Switch
-                  id="guest-mode"
-                  checked={isGuest}
-                  onCheckedChange={setIsGuest}
+                  id="anon-mode"
+                  checked={isAnonSignup}
+                  onCheckedChange={setIsAnonSignup}
                 />
-                <Label htmlFor="guest-mode">{t('auth.signup.guestProfile')}</Label>
+                <Label htmlFor="anon-mode">{t('auth.signup.anonProfile')}</Label>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
                       <HelpCircle className="h-4 w-4 text-muted-foreground"/>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p className="whitespace-pre-line">{t('auth.signup.guestProfileInfo')}</p>
+                      <p className="whitespace-pre-line">{t('auth.signup.anonProfileInfo')}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               </div>
             )}
-            {(!isGuest || isUpgrade) && (
+            {(!isAnonSignup || isUpgrade) && (
               <>
                 <div className="grid gap-2">
                   <Label htmlFor="email">{t('auth.form.email')}</Label>

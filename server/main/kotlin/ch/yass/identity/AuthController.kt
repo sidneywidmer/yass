@@ -56,9 +56,6 @@ class AuthController(
         either {
             val player = player(ctx)
 
-            // Both credentials are ambient cookies, so this POST is only safe from our own client
-            ensureExpectedOrigin(ctx)
-
             ensureNotNull(player.anonToken) { CanNotLinkAnonAccount(player.uuid) }
             val sessionCookie = ensureNotNull(ctx.cookieMap()["ory_kratos_session"]) {
                 CanNotLinkAnonAccount(player.uuid)
@@ -87,7 +84,7 @@ class AuthController(
             val player = playerService.create(NewAnonPlayer(request.name, hashToken(token)))
 
             ctx.cookie(anonTokenCookie(token, 60 * 60 * 24 * 365)) // 1 year
-            logger().info("trigger_alert: New guest user signed up ${player.name} (${player.uuid})")
+            logger().info("trigger_alert: New anon user signed up ${player.name} (${player.uuid})")
             AnonSignupResponse(player.uuid, player.name)
         }.fold(
             { errorResponse(ctx, it) },
@@ -159,11 +156,4 @@ class AuthController(
         try {
             oryClient.frontend.toSession(null, "ory_kratos_session=$sessionCookie", null)
         } catch (_: ApiException) { r.raise(CanNotLinkAnonAccount(player.uuid)) }
-
-    context(r: Raise<UnexpectedOrigin>)
-    private fun ensureExpectedOrigin(ctx: Context) {
-        val origin = ctx.header("Origin") ?: return // Non-browser clients don't send one
-        r.ensure(origin == config.getString("server.cors")) { UnexpectedOrigin(origin) }
-    }
-
 }

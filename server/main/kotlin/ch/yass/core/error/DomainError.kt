@@ -31,7 +31,6 @@ data class CanNotImpersonate(val player: InternalPlayer, val impersonateUuid: UU
 // Carry only the player uuid, these errors end up in the logs and InternalPlayer holds the anon token
 data class CanNotLinkAnonAccount(val playerUuid: UUID) : AuthError
 data class OryAccountAlreadyLinked(val playerUuid: UUID, val oryUuid: UUID) : AuthError
-data class UnexpectedOrigin(val origin: String) : AuthError
 
 // Game or Game-State related Errors
 sealed interface GameError : DomainError
