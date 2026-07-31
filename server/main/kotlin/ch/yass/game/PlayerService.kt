@@ -65,12 +65,12 @@ class PlayerService(private val db: DSLContext) {
      * Special handling for bots: we don't create an actual entry in the db and just map the id to the
      * position. When loading the game state again in GameRepository.getState we again fake the player object.
      */
-    fun create(name: String, position: Position): InternalPlayer {
+    fun createBot(position: Position): InternalPlayer {
         return InternalPlayer(
             id = botId(position),
             uuid = UUID.randomUUID(),
             oryUuid = null,
-            name = name,
+            name = "Bot",
             bot = true,
             anonToken = null,
             createdAt = LocalDateTime.now(),

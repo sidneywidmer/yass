@@ -55,7 +55,6 @@
       "4000034": "The password has been found in data breaches and must no longer be used.",
       "4010001": "The login flow expired {expired_at_unix_since_minutes} minutes ago, please try again."
     },
-
     "gameFull": {
       "title": "Game full",
       "description": "The game is already full"
@@ -95,11 +94,32 @@
     }
   },
   "main": {
-    "title": "Hello",
     "game": {
       "codePlaceholder": "ABCDE",
+      "join": "Join"
+    }
+  },
+  "lobby": {
+    "tabs": {
+      "daily": "Daily",
       "join": "Join",
-      "create": "Create game"
+      "create": "Create"
+    },
+    "daily": {
+      "title": "Daily challenge",
+      "countdown": "until the next challenge",
+      "play": "Play challenge",
+      "explanation": "What is this?",
+      "rules": {
+        "sameCards": "Everyone plays the exact same shuffle",
+        "oncePerDay": "One shot every day",
+        "opponents": "You and a bot partner against two bots, first to 1000 points"
+      },
+      "signedUpOnly": "Guest profiles can't play the daily challenge."
+    },
+    "join": {
+      "title": "Join a game",
+      "description": "Got a code from a friend? Enter it here to take a seat."
     }
   },
   "create": {

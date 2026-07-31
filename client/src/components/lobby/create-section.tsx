@@ -1,4 +1,4 @@
-import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog"
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import {Button} from "@/components/ui/button"
 import {AlertCircle, Bot, Loader2, Plus, User} from "lucide-react"
 import {useTranslation} from "react-i18next"
@@ -9,7 +9,6 @@ import {api} from "@/api/client"
 import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler"
 import {useAsyncAction} from "@/hooks/use-async-action"
 import {CreateCustomGameRequest} from "@/api/generated";
-import {DialogDescription} from "@radix-ui/react-dialog";
 import {useState} from "react";
 import {isAxiosError} from "axios";
 import {useNavigate} from "react-router-dom";
@@ -52,10 +51,9 @@ const TeamButton = ({team, selected, onClick}: { team: TeamComposition, selected
   )
 }
 
-export function CreateGameOverlay() {
+export function CreateSection() {
   const {t} = useTranslation()
   const handleAxiosError = useAxiosErrorHandler()
-  const [open, setOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
   const [nsTeam, setNsTeam] = useState<TeamComposition>('player-bot')
@@ -80,7 +78,6 @@ export function CreateGameOverlay() {
     reset()
     try {
       const response = await executeCreateGame(settings)
-      setOpen(false)
       navigate(`/game/${response.data?.code}`)
     } catch (error: unknown) {
       if (isAxiosError(error) && error.response?.status === 422) {
@@ -146,115 +143,111 @@ export function CreateGameOverlay() {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="w-full" variant="outline">
-          <Plus className="mr-2 h-4 w-4"/>
-          {t("main.game.create")}
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-sm">
-        <DialogHeader>
-          <DialogTitle>{t("create.title")}</DialogTitle>
-          <DialogDescription>{t("create.description")}</DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          {error && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4"/>
-              <AlertTitle>{t("errors.title")}</AlertTitle>
-              <AlertDescription>
-                {error}
-              </AlertDescription>
-            </Alert>
-          )}
-          <div className="grid gap-2">
-            <div>
-              <Label>{t("create.players")}</Label>
-              <p className="text-xs italic text-muted-foreground mt-1">
-                {t(`create.configDescription.${getConfigDescriptionKey()}`)}
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
-                <TeamButton
-                  team="player-player"
-                  selected={nsTeam === 'player-player'}
-                  onClick={() => handleTeamSelection('NS', 'player-player')}
-                />
-                <TeamButton
-                  team="player-bot"
-                  selected={nsTeam === 'player-bot'}
-                  onClick={() => handleTeamSelection('NS', 'player-bot')}
-                />
-                <TeamButton
-                  team="bot-bot"
-                  selected={nsTeam === 'bot-bot'}
-                  onClick={() => handleTeamSelection('NS', 'bot-bot')}
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <TeamButton
-                  team="player-player"
-                  selected={ewTeam === 'player-player'}
-                  onClick={() => handleTeamSelection('EW', 'player-player')}
-                />
-                <TeamButton
-                  team="player-bot"
-                  selected={ewTeam === 'player-bot'}
-                  onClick={() => handleTeamSelection('EW', 'player-bot')}
-                />
-                <TeamButton
-                  team="bot-bot"
-                  selected={ewTeam === 'bot-bot'}
-                  onClick={() => handleTeamSelection('EW', 'bot-bot')}
-                />
-              </div>
-            </div>
+    <Card className="h-full">
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <Plus className="h-5 w-5 text-primary"/>
+          <CardTitle className="text-lg">{t("create.title")}</CardTitle>
+        </div>
+        <CardDescription>{t("create.description")}</CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4"/>
+            <AlertTitle>{t("errors.title")}</AlertTitle>
+            <AlertDescription>
+              {error}
+            </AlertDescription>
+          </Alert>
+        )}
+        <div className="grid gap-2">
+          <div>
+            <Label>{t("create.players")}</Label>
+            <p className="text-xs italic text-muted-foreground mt-1">
+              {t(`create.configDescription.${getConfigDescriptionKey()}`)}
+            </p>
           </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <TeamButton
+                team="player-player"
+                selected={nsTeam === 'player-player'}
+                onClick={() => handleTeamSelection('NS', 'player-player')}
+              />
+              <TeamButton
+                team="player-bot"
+                selected={nsTeam === 'player-bot'}
+                onClick={() => handleTeamSelection('NS', 'player-bot')}
+              />
+              <TeamButton
+                team="bot-bot"
+                selected={nsTeam === 'bot-bot'}
+                onClick={() => handleTeamSelection('NS', 'bot-bot')}
+              />
+            </div>
 
-          <div className="grid gap-2">
-            <Label>{t("create.winningCondition")}</Label>
-            <RadioGroup
-              value={settings.winningConditionType}
-              onValueChange={(value) => handleConditionTypeChange(value as 'POINTS' | 'HANDS')}
-              className="flex gap-4"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="POINTS" id="points"/>
-                <Label htmlFor="points">{t("create.points")}</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="HANDS" id="hands"/>
-                <Label htmlFor="hands">{t("create.hands")}</Label>
-              </div>
-            </RadioGroup>
-          </div>
-
-          <div className="grid gap-2">
-            <Label>{t("create.value")}</Label>
-            <Input
-              type="number"
-              min="1"
-              max="9999"
-              value={settings.winningConditionValue}
-              onChange={(e) => setSettings(s => ({
-                ...s,
-                winningConditionValue: parseInt(e.target.value) || 0
-              }))}
-            />
+            <div className="flex flex-col gap-2">
+              <TeamButton
+                team="player-player"
+                selected={ewTeam === 'player-player'}
+                onClick={() => handleTeamSelection('EW', 'player-player')}
+              />
+              <TeamButton
+                team="player-bot"
+                selected={ewTeam === 'player-bot'}
+                onClick={() => handleTeamSelection('EW', 'player-bot')}
+              />
+              <TeamButton
+                team="bot-bot"
+                selected={ewTeam === 'bot-bot'}
+                onClick={() => handleTeamSelection('EW', 'bot-bot')}
+              />
+            </div>
           </div>
         </div>
+
+        <div className="grid gap-2">
+          <Label>{t("create.winningCondition")}</Label>
+          <RadioGroup
+            value={settings.winningConditionType}
+            onValueChange={(value) => handleConditionTypeChange(value as 'POINTS' | 'HANDS')}
+            className="flex gap-4"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="POINTS" id="points"/>
+              <Label htmlFor="points">{t("create.points")}</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="HANDS" id="hands"/>
+              <Label htmlFor="hands">{t("create.hands")}</Label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div className="grid gap-2">
+          <Label>{t("create.value")}</Label>
+          <Input
+            type="number"
+            min="1"
+            max="9999"
+            value={settings.winningConditionValue}
+            onChange={(e) => setSettings(s => ({
+              ...s,
+              winningConditionValue: parseInt(e.target.value) || 0
+            }))}
+          />
+        </div>
+
         <Button
           onClick={handleCreate}
           disabled={isLoading}
           variant={hasError ? "destructive" : "default"}
         >
-          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+          {isLoading && <Loader2 className="h-4 w-4 animate-spin"/>}
           {t("create.submit")}
         </Button>
-      </DialogContent>
-    </Dialog>
+      </CardContent>
+    </Card>
   )
 }

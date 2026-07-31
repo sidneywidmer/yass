@@ -33,7 +33,7 @@ fun inMemoryGame(lambda: GameStateBuilder.() -> Unit): GameState {
         createdAt = now,
         updatedAt = now,
         code = (1..5).map { ('A'..'Z').random() }.joinToString(""),
-        seed = Random.nextInt(100_000, 1_000_000),
+        seed = Random.nextLong(),
         settings = GameSettings(false, false, false, false, state.settings.wcType, state.settings.wcValue, state.settings.forcedDecks),
         status = GameStatus.RUNNING,
         kind = GameKind.CUSTOM

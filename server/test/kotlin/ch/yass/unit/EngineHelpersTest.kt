@@ -59,7 +59,7 @@ class EngineHelpersTest {
      */
     @Test
     fun testGenerateHandIsStableForAFixedSeed() {
-        val hand = generateHand(seed = 123456, handNumber = 0)
+        val hand = generateHand(seed = 123456L, handNumber = 0)
 
         assertTrue(hand.getValue(Position.NORTH) == interpretCards("C10,CK,D6,DJ,DA,HJ,HA,S8,SJ"))
         assertTrue(hand.getValue(Position.WEST) == interpretCards("C7,CQ,H6,H7,H9,H10,HQ,S10,SK"))

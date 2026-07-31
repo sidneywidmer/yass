@@ -18,6 +18,7 @@ import ch.yass.game.engine.botName
 import ch.yass.game.engine.randomFreePosition
 import org.jooq.DSLContext
 import org.jooq.Records.mapping
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
@@ -25,14 +26,24 @@ import kotlin.random.Random
 
 class GameRepository(private val db: DSLContext) {
 
-    fun createGame(settings: GameSettings, kind: GameKind): Game {
-        return db.insertInto(GAME, GAME.UUID, GAME.CODE, GAME.CREATED_AT, GAME.UPDATED_AT, GAME.SEED, GAME.SETTINGS, GAME.STATUS, GAME.KIND)
+    fun createGame(settings: GameSettings, kind: GameKind, seed: Long = Random.nextLong()): Game {
+        return db.insertInto(
+            GAME,
+            GAME.UUID,
+            GAME.CODE,
+            GAME.CREATED_AT,
+            GAME.UPDATED_AT,
+            GAME.SEED,
+            GAME.SETTINGS,
+            GAME.STATUS,
+            GAME.KIND
+        )
             .values(
                 UUID.randomUUID().toString(),
                 (1..5).map { ('A'..'Z').random() }.joinToString(""), // TODO: Handle collisions
                 LocalDateTime.now(ZoneOffset.UTC),
                 LocalDateTime.now(ZoneOffset.UTC),
-                Random.nextInt(100_000, 1_000_000),
+                seed,
                 toDbJson(settings),
                 GameStatus.RUNNING.name,
                 kind.name
@@ -107,6 +118,16 @@ class GameRepository(private val db: DSLContext) {
 
         return game ?: r.raise(GameNotFound(uuid))
     }
+
+    fun getDailyGameForPlayer(player: InternalPlayer, start: LocalDateTime, end: LocalDateTime): Game? =
+        db.select(GAME)
+            .from(SEAT)
+            .join(GAME).on(SEAT.GAME_ID.eq(GAME.ID))
+            .where(GAME.KIND.eq(GameKind.DAILY.name))
+            .and(GAME.CREATED_AT.ge(start))
+            .and(GAME.CREATED_AT.lt(end))
+            .and(SEAT.PLAYER_ID.eq(player.id))
+            .fetchOne(mapping(Game::fromRecord))
 
     fun refresh(game: Game): Game {
         return db.selectFrom(GAME)
@@ -214,6 +235,33 @@ class GameRepository(private val db: DSLContext) {
             .returningResult(GAME)
             .fetchOneInto(Game::class.java)!!
     }
+
+    fun getOrCreateDailyChallengeForDay(day: LocalDate): DailyChallenge {
+        getDailyChallenge(day)?.let { return it }
+
+        return db.insertInto(
+            DAILY_CHALLENGE,
+            DAILY_CHALLENGE.UUID,
+            DAILY_CHALLENGE.CREATED_AT,
+            DAILY_CHALLENGE.UPDATED_AT,
+            DAILY_CHALLENGE.DAY,
+            DAILY_CHALLENGE.SEED
+        )
+            .values(
+                UUID.randomUUID().toString(),
+                LocalDateTime.now(ZoneOffset.UTC),
+                LocalDateTime.now(ZoneOffset.UTC),
+                day,
+                Random.nextLong()
+            )
+            .returningResult(DAILY_CHALLENGE)
+            .fetchOne(mapping(DailyChallenge::fromRecord))!!
+    }
+
+    private fun getDailyChallenge(day: LocalDate): DailyChallenge? =
+        db.selectFrom(DAILY_CHALLENGE)
+            .where(DAILY_CHALLENGE.DAY.eq(day))
+            .fetchOne(DailyChallenge::fromRecord)
 
     private fun createSeat(seat: NewSeat): Seat {
         return db

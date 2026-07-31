@@ -121,11 +121,32 @@
     "submit": "Erstellen"
   },
   "main": {
-    "title": "Hallo",
     "game": {
       "codePlaceholder": "ABCDE",
+      "join": "Beitreten"
+    }
+  },
+  "lobby": {
+    "tabs": {
+      "daily": "Tagestrumpf",
       "join": "Beitreten",
-      "create": "Spiel erstellen"
+      "create": "Erstellen"
+    },
+    "daily": {
+      "title": "Tagestrumpf",
+      "countdown": "bis zum nächsten Tagestrumpf",
+      "play": "Jetzt spielen",
+      "explanation": "Was ist das?",
+      "rules": {
+        "sameCards": "Alle spielen mit den exakt gleich gemischten Karten",
+        "oncePerDay": "Jeden Tag eine Chance",
+        "opponents": "Du und ein Bot-Partner gegen zwei Bots auf 1000 Punkte"
+      },
+      "signedUpOnly": "Mit einem Gast-Profil kannst du den Tagestrumpf nicht spielen."
+    },
+    "join": {
+      "title": "Spiel beitreten",
+      "description": "Falls du einen Code erhalten hast kannst du ihn hier eingeben."
     }
   },
   "logout": {

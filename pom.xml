@@ -353,6 +353,7 @@
                                 | seat
                                 | trick
                                 | message
+                                | daily_challenge
                             </includes>
                             <excludes/>
                             <inputSchema>public</inputSchema>

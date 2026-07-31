@@ -59,6 +59,10 @@ export type CreateCustomGameResponse = {
     code?: string;
 };
 
+export type CreateDailyChallengeResponse = {
+    code: string;
+};
+
 export type JoinGameRequest = {
     code: string;
 };
@@ -399,6 +403,22 @@ export type PostGamePingResponses = {
 };
 
 export type PostGamePingResponse = PostGamePingResponses[keyof PostGamePingResponses];
+
+export type PostGameDailyData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/game/daily';
+};
+
+export type PostGameDailyResponses = {
+    /**
+     * Daily challenge joined successfully
+     */
+    200: CreateDailyChallengeResponse;
+};
+
+export type PostGameDailyResponse = PostGameDailyResponses[keyof PostGameDailyResponses];
 
 export type WhoamiData = {
     body?: never;

@@ -5,6 +5,7 @@
 package ch.yass.db.tables.references
 
 
+import ch.yass.db.tables.DailyChallenge
 import ch.yass.db.tables.Game
 import ch.yass.db.tables.Hand
 import ch.yass.db.tables.Message
@@ -13,6 +14,11 @@ import ch.yass.db.tables.Seat
 import ch.yass.db.tables.Trick
 
 
+
+/**
+ * The table <code>public.daily_challenge</code>.
+ */
+val DAILY_CHALLENGE: DailyChallenge = DailyChallenge.DAILY_CHALLENGE
 
 /**
  * The table <code>public.game</code>.

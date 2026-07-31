@@ -5,12 +5,14 @@
 package ch.yass.db.keys
 
 
+import ch.yass.db.tables.DailyChallenge
 import ch.yass.db.tables.Game
 import ch.yass.db.tables.Hand
 import ch.yass.db.tables.Message
 import ch.yass.db.tables.Player
 import ch.yass.db.tables.Seat
 import ch.yass.db.tables.Trick
+import ch.yass.db.tables.records.DailyChallengeRecord
 import ch.yass.db.tables.records.GameRecord
 import ch.yass.db.tables.records.HandRecord
 import ch.yass.db.tables.records.MessageRecord
@@ -30,6 +32,8 @@ import org.jooq.impl.QOM.ForeignKeyRule
 // UNIQUE and PRIMARY KEY definitions
 // -------------------------------------------------------------------------
 
+val DAILY_CHALLENGE_DAY_KEY: UniqueKey<DailyChallengeRecord> = Internal.createUniqueKey(DailyChallenge.DAILY_CHALLENGE, DSL.name("daily_challenge_day_key"), arrayOf(DailyChallenge.DAILY_CHALLENGE.DAY), true)
+val DAILY_CHALLENGE_PKEY: UniqueKey<DailyChallengeRecord> = Internal.createUniqueKey(DailyChallenge.DAILY_CHALLENGE, DSL.name("daily_challenge_pkey"), arrayOf(DailyChallenge.DAILY_CHALLENGE.ID), true)
 val GAME_PKEY: UniqueKey<GameRecord> = Internal.createUniqueKey(Game.GAME, DSL.name("game_pkey"), arrayOf(Game.GAME.ID), true)
 val HAND_PKEY: UniqueKey<HandRecord> = Internal.createUniqueKey(Hand.HAND, DSL.name("hand_pkey"), arrayOf(Hand.HAND.ID), true)
 val MESSAGE_PKEY: UniqueKey<MessageRecord> = Internal.createUniqueKey(Message.MESSAGE, DSL.name("message_pkey"), arrayOf(Message.MESSAGE.ID), true)

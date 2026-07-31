@@ -23,9 +23,13 @@ import ch.yass.game.dto.db.InternalPlayer
 import ch.yass.game.dto.db.Seat
 import ch.yass.game.engine.*
 import ch.yass.game.pubsub.*
+import ch.yass.identity.helper.isAnon
 import kotlinx.coroutines.*
 import org.slf4j.MDC
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
+import kotlin.random.Random
 import kotlinx.coroutines.channels.Channel as EventChannel
 
 class GameService(
@@ -79,19 +83,53 @@ class GameService(
         r.ensure(settings.botPositions().size < 4) { GameSettingsMaxBots(settings) }
         r.ensure(validWcValue) { GameSettingsInvalidValue(settings) }
 
-        val game = repo.createGame(settings, GameKind.CUSTOM)
+        return startGame(settings, GameKind.CUSTOM, player).code
+    }
 
-        settings.botPositions().map { position ->
-            val botPlayer = playerService.create("Bot", position)
-            repo.takeASeat(game, botPlayer, position)
+    context(r: Raise<DomainError>)
+    fun createDaily(player: InternalPlayer): String {
+        r.ensure(!isAnon(player)) { SignedUpPlayersOnly(player) }
+
+        val day = swissDay(LocalDateTime.now(ZoneOffset.UTC))
+        val (start, end) = swissDayWindowUTC(day)
+
+        // Already has a game of type DAILY today, meaning they already joined the daily challenge. We'll return
+        // the code of that game which either results in an automatic rejoin if not finished or the analysis view.
+        repo.getDailyGameForPlayer(player, start, end)?.let { return it.code }
+
+        val challenge = repo.getOrCreateDailyChallengeForDay(day)
+        val settings = GameSettings(
+            botNorth = true, botEast = true, botSouth = false, botWest = true, // player will sit south
+            winningConditionType = WinningConditionType.POINTS, // daily challenge is always to 1000 points for now
+            winningConditionValue = 1000,
+            forcedDecks = challenge.forcedDecks
+        )
+        return startGame(settings, GameKind.DAILY, player, Position.SOUTH, challenge.seed).code
+    }
+
+    /**
+     * Creates the game, seats all configured bots and the player (at [position] or a random free
+     * one), then deals the first hand and starts its first trick.
+     */
+    context(_: Raise<GameAlreadyFull>)
+    private fun startGame(
+        settings: GameSettings,
+        kind: GameKind,
+        player: InternalPlayer,
+        position: Position? = null,
+        seed: Long = Random.nextLong(),
+    ): Game {
+        val game = repo.createGame(settings, kind, seed)
+
+        settings.botPositions().forEach { botPosition ->
+            repo.takeASeat(game, playerService.createBot(botPosition), botPosition)
         }
-        val newSeat = repo.takeASeat(game, player)
+        val seat = repo.takeASeat(game, player, position)
 
-        // Creating player always starts game
-        val hand = repo.createHand(NewHand(game, newSeat.position, dealHand(game, handNumber = 0)))
+        val hand = repo.createHand(NewHand(game, seat.position, dealHand(game, handNumber = 0)))
         repo.createTrick(hand)
 
-        return game.code
+        return game
     }
 
     context(_: Raise<GameError>, _: Raise<DbError>)
@@ -106,6 +144,10 @@ class GameService(
         gameLoop(game)
 
         return repo.getState(game)
+    }
+
+    context(_: Raise<GameError>)
+    fun dailyLeaderboard(now: LocalDateTime) {
     }
 
     context(_: Raise<GameWithCodeNotFound>)

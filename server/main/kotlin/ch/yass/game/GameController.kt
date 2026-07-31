@@ -17,6 +17,7 @@ import ch.yass.game.engine.*
 import ch.yass.game.pubsub.GameFinished
 import ch.yass.game.pubsub.gameFinishedActions
 import ch.yass.identity.helper.player
+import io.javalin.apibuilder.ApiBuilder.get
 import io.javalin.apibuilder.ApiBuilder.post
 import io.javalin.apibuilder.EndpointGroup
 import io.javalin.http.Context
@@ -34,6 +35,8 @@ class GameController(private val service: GameService, private val repo: GameRep
         post("/weisen", ::weisen)
         post("/schiebe", ::schiebe)
         post("/ping", ::ping)
+        post("/daily", ::daily)
+//        get("/daily-leaderboard", ::dailyLeaderboard)
     }
 
     private fun ping(ctx: Context) = either {
@@ -157,4 +160,16 @@ class GameController(private val service: GameService, private val repo: GameRep
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }
     )
+
+    private fun daily(ctx: Context) = either {
+        val code = service.createDaily(player(ctx))
+        logger().info("trigger_alert: New daily challenge just started $code")
+
+        CreateDailyChallengeResponse(code)
+    }.fold({ errorResponse(ctx, it) }, { successResponse(ctx, it) })
+
+//    private fun dailyLeaderboard(ctx: Context) = either {
+//        TODO()
+//        service.dailyLeaderboard(LocalDateTime.now(ZoneOffset.UTC))
+//    }.fold({ errorResponse(ctx, it) }, { successResponse(ctx, it) })
 }

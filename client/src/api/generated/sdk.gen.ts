@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AnonLinkData, AnonLinkErrors, AnonLinkResponses, AnonLogoutData, AnonLogoutResponses, AnonSignupData, AnonSignupErrors, AnonSignupResponses, ConnectData, ConnectErrors, ConnectResponses, GetAdminAnalyzeGameByCodeData, GetAdminAnalyzeGameByCodeResponses, PostAdminMessageData, PostAdminMessageResponses, PostGameCreateData, PostGameCreateResponses, PostGameJoinData, PostGameJoinResponses, PostGamePingData, PostGamePingResponses, PostGamePlayData, PostGamePlayResponses, PostGameSchiebeData, PostGameSchiebeResponses, PostGameTrumpData, PostGameTrumpResponses, PostGameWeisenData, PostGameWeisenResponses, SubscribeData, SubscribeErrors, SubscribeResponses, WhoamiData, WhoamiErrors, WhoamiResponses } from './types.gen';
+import type { AnonLinkData, AnonLinkErrors, AnonLinkResponses, AnonLogoutData, AnonLogoutResponses, AnonSignupData, AnonSignupErrors, AnonSignupResponses, ConnectData, ConnectErrors, ConnectResponses, GetAdminAnalyzeGameByCodeData, GetAdminAnalyzeGameByCodeResponses, PostAdminMessageData, PostAdminMessageResponses, PostGameCreateData, PostGameCreateResponses, PostGameDailyData, PostGameDailyResponses, PostGameJoinData, PostGameJoinResponses, PostGamePingData, PostGamePingResponses, PostGamePlayData, PostGamePlayResponses, PostGameSchiebeData, PostGameSchiebeResponses, PostGameTrumpData, PostGameTrumpResponses, PostGameWeisenData, PostGameWeisenResponses, SubscribeData, SubscribeErrors, SubscribeResponses, WhoamiData, WhoamiErrors, WhoamiResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -129,6 +129,18 @@ export const postGamePing = <ThrowOnError extends boolean = false>(options: Opti
         'Content-Type': 'application/json',
         ...options.headers
     }
+});
+
+/**
+ * Join or create today's daily challenge
+ *
+ * Returns the code of today's daily challenge game for the current player. Creates the game on the first call of the day, returns the already running (or finished) game on every later call. Only available for signed up players.
+ *
+ */
+export const postGameDaily = <ThrowOnError extends boolean = false>(options?: Options<PostGameDailyData, ThrowOnError>) => (options?.client ?? client).post<PostGameDailyResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    url: '/game/daily',
+    ...options
 });
 
 /**

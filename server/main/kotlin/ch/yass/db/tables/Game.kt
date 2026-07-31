@@ -115,12 +115,17 @@ open class Game(
     /**
      * The column <code>public.game.seed</code>.
      */
-    val SEED: TableField<GameRecord, Int?> = createField(DSL.name("seed"), SQLDataType.INTEGER.nullable(false), this, "")
+    val SEED: TableField<GameRecord, Long?> = createField(DSL.name("seed"), SQLDataType.BIGINT.nullable(false), this, "")
 
     /**
      * The column <code>public.game.kind</code>.
      */
     val KIND: TableField<GameRecord, String?> = createField(DSL.name("kind"), SQLDataType.VARCHAR(255).nullable(false), this, "")
+
+    /**
+     * The column <code>public.game.finished_state</code>.
+     */
+    val FINISHED_STATE: TableField<GameRecord, JSON?> = createField(DSL.name("finished_state"), SQLDataType.JSON, this, "")
 
     private constructor(alias: Name, aliased: Table<GameRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<GameRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)

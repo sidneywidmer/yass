@@ -39,7 +39,7 @@ fun allOfSuit(suit: Suit): List<Pair<Rank, Suit>> = cartesianProduct(Rank.regula
  * always deal the exact same cards), unless [forcedDeck] is given to replicate errors or for
  * testing.
  */
-fun generateHand(seed: Int, handNumber: Int, forcedDeck: List<Card>? = null): EnumMap<Position, List<Card>> {
+fun generateHand(seed: Long, handNumber: Int, forcedDeck: List<Card>? = null): EnumMap<Position, List<Card>> {
     val deck = forcedDeck?.map { Pair(it.rank, it.suit) } ?: seededDeck(seed, handNumber)
 
     return mapOf(
@@ -50,7 +50,7 @@ fun generateHand(seed: Int, handNumber: Int, forcedDeck: List<Card>? = null): En
     ).toEnumMap()
 }
 
-private fun seededDeck(seed: Int, handNumber: Int): List<Pair<Rank, Suit>> {
+private fun seededDeck(seed: Long, handNumber: Int): List<Pair<Rank, Suit>> {
     val random = Random(seed)
     repeat(handNumber) { random.nextLong() }
 
