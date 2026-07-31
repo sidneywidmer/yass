@@ -104,8 +104,8 @@ class AuthController(
         Cookie("anon_token", token).apply {
             isHttpOnly = true
             path = "/"
-            sameSite = SameSite.NONE
-            secure = true
+            secure = config.getBoolean("server.cookieSecure")
+            sameSite = if (secure) SameSite.NONE else SameSite.LAX
             domain = config.getString("server.cookieDomain")
             this.maxAge = maxAge
         }
