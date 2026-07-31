@@ -42,7 +42,7 @@ services:
     image: oryd/kratos-selfservice-ui-node:v26.2.0
     environment:
       - KRATOS_PUBLIC_URL=http://kratos:4433/
-      - KRATOS_BROWSER_URL=http://127.0.0.1:4433/
+      - KRATOS_BROWSER_URL=http://${YASS_HOST:-127.0.0.1}:4433/
       - COOKIE_SECRET=changeme
       - CSRF_COOKIE_NAME=ory_csrf_ui
       - CSRF_COOKIE_SECRET=changeme
@@ -60,6 +60,12 @@ services:
       - '4434:4434' # admin
     environment:
       - DSN=postgres://postgres:postgres@db:5432/yass
+      # Browser-facing origin: scopes the session cookie and passes CORS for the
+      # SPA, which drives the Kratos APIs directly.
+      - SERVE_PUBLIC_BASE_URL=http://${YASS_HOST:-127.0.0.1}:4433/
+      - SERVE_PUBLIC_CORS_ALLOWED_ORIGINS=http://${YASS_HOST:-127.0.0.1}:5173
+      - SELFSERVICE_DEFAULT_BROWSER_RETURN_URL=http://${YASS_HOST:-127.0.0.1}:5173/
+      - SELFSERVICE_ALLOWED_RETURN_URLS=http://${YASS_HOST:-127.0.0.1}:5173
     command: serve -c /etc/config/kratos/kratos.yml --dev --watch-courier
     volumes:
       - type: bind
@@ -73,6 +79,8 @@ services:
       - "host.docker.internal:host-gateway"
     container_name: centrifugo
     image: centrifugo/centrifugo:v6.7.2
+    environment:
+      - CENTRIFUGO_CLIENT_ALLOWED_ORIGINS=http://${YASS_HOST:-127.0.0.1}:5173
     volumes:
       - ./.docker/centrifugo/config.json:/centrifugo/config.json
     command: centrifugo -c config.json
