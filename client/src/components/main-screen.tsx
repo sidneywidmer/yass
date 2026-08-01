@@ -4,12 +4,12 @@ import {Navigate, useNavigate, useParams} from "react-router-dom";
 import {motion} from "motion/react";
 import {CalendarDays, LogIn, Plus} from "lucide-react";
 import {cn} from "@/lib/utils";
-import {DailySection} from "@/components/lobby/daily-section.tsx";
+import {DailyTab} from "@/components/lobby/daily-tab.tsx";
 import {JoinSection} from "@/components/lobby/join-section.tsx";
 import {CreateSection} from "@/components/lobby/create-section.tsx";
 
 const sections = [
-  {id: "daily" as const, icon: CalendarDays, Section: DailySection},
+  {id: "daily" as const, icon: CalendarDays, Section: DailyTab},
   {id: "join" as const, icon: LogIn, Section: JoinSection},
   {id: "create" as const, icon: Plus, Section: CreateSection},
 ]

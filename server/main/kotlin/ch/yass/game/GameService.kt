@@ -100,8 +100,8 @@ class GameService(
         val challenge = repo.getOrCreateDailyChallengeForDay(day)
         val settings = GameSettings(
             botNorth = true, botEast = true, botSouth = false, botWest = true, // player will sit south
-            winningConditionType = WinningConditionType.POINTS, // daily challenge is always to 1000 points for now
-            winningConditionValue = 1000,
+            winningConditionType = WinningConditionType.HANDS,
+            winningConditionValue = 5,
             forcedDecks = challenge.forcedDecks
         )
         return startGame(settings, GameKind.DAILY, player, Position.SOUTH, challenge.seed).code
@@ -146,8 +146,25 @@ class GameService(
         return repo.getState(game)
     }
 
-    context(_: Raise<GameError>)
-    fun dailyLeaderboard(now: LocalDateTime) {
+    /**
+     * The best runs at today's daily challenge, ranked by the points the team of the player made. Only games
+     * that were played to the end count, so the board stays empty until the first player of the day is through.
+     */
+    fun dailyLeaderboard(now: LocalDateTime): DailyLeaderboardResponse {
+        val day = swissDay(now)
+        val (start, end) = swissDayWindowUTC(day)
+
+        val entries = repo.getFinishedDailyGames(start, end)
+            .map { daily ->
+                val points = pointsByPositionTotal(daily.hands, daily.tricks)
+                val team = Team.entries.first { daily.position in it.positions }
+
+                DailyLeaderboardEntry(daily.player, getTeamPoints(points, team))
+            }
+            .sortedByDescending { it.points }
+            .take(15)
+
+        return DailyLeaderboardResponse(day, entries)
     }
 
     context(_: Raise<GameWithCodeNotFound>)

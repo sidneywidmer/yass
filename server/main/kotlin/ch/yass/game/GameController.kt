@@ -3,6 +3,7 @@ package ch.yass.game
 import arrow.core.raise.either
 import arrow.core.raise.ensure
 import ch.yass.core.contract.Controller
+import ch.yass.core.error.DomainError
 import ch.yass.core.error.PlayerDoesNotOwnSeat
 import ch.yass.core.helper.errorResponse
 import ch.yass.core.helper.logger
@@ -36,7 +37,7 @@ class GameController(private val service: GameService, private val repo: GameRep
         post("/schiebe", ::schiebe)
         post("/ping", ::ping)
         post("/daily", ::daily)
-//        get("/daily-leaderboard", ::dailyLeaderboard)
+        get("/daily-leaderboard", ::dailyLeaderboard)
     }
 
     private fun ping(ctx: Context) = either {
@@ -168,8 +169,10 @@ class GameController(private val service: GameService, private val repo: GameRep
         CreateDailyChallengeResponse(code)
     }.fold({ errorResponse(ctx, it) }, { successResponse(ctx, it) })
 
-//    private fun dailyLeaderboard(ctx: Context) = either {
-//        TODO()
-//        service.dailyLeaderboard(LocalDateTime.now(ZoneOffset.UTC))
-//    }.fold({ errorResponse(ctx, it) }, { successResponse(ctx, it) })
+    private fun dailyLeaderboard(ctx: Context) = either<DomainError, _> {
+        service.dailyLeaderboard(LocalDateTime.now(ZoneOffset.UTC))
+    }.fold(
+        { errorResponse(ctx, it) },
+        { successResponse(ctx, it) }
+    )
 }
