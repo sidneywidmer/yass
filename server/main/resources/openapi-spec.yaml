@@ -184,6 +184,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/DailyLeaderboardResponse'
 
+  /game/info:
+    get:
+      summary: Game info for the current player
+      description: >
+        Everything the lobby needs about the current player: the games they are seated at and could
+        rejoin, and whether they already played today's daily challenge to the end.
+      responses:
+        '200':
+          description: Info retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameInfoResponse'
+
   /auth/whoami:
     get:
       summary: Get current user information
@@ -509,6 +523,42 @@ components:
           type: string
         points:
           type: integer
+
+    GameInfoResponse:
+      type: object
+      required:
+        - runningGames
+        - dailyChallengePlayed
+      properties:
+        runningGames:
+          type: array
+          items:
+            $ref: '#/components/schemas/RunningGame'
+        dailyChallengePlayed:
+          type: boolean
+
+    RunningGame:
+      type: object
+      required:
+        - uuid
+        - code
+        - kind
+        - startedAt
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        code:
+          type: string
+        kind:
+          $ref: '#/components/schemas/GameKind'
+        startedAt:
+          type: string
+          format: date-time
+
+    GameKind:
+      type: string
+      enum: [ QUEUE, CUSTOM, DAILY ]
 
     JoinGameRequest:
       type: object

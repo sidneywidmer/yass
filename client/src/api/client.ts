@@ -44,6 +44,7 @@ export const api = {
   createGame: (data: CreateCustomGameRequest) => generatedApi.postGameCreate({client: customClient, body: data}),
   dailyChallenge: () => generatedApi.postGameDaily({client: customClient}),
   dailyLeaderboard: () => generatedApi.getGameDailyLeaderboard({client: customClient}),
+  gameInfo: () => generatedApi.getGameInfo({client: customClient}),
   joinGame: (data: JoinGameRequest) => generatedApi.postGameJoin({client: customClient, body: data}),
   playCard: (data: PlayCardRequest) => generatedApi.postGamePlay({client: customClient, body: data}),
   chooseTrump: (data: ChooseTrumpRequest) => generatedApi.postGameTrump({client: customClient, body: data}),

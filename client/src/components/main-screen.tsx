@@ -5,12 +5,13 @@ import {motion} from "motion/react";
 import {CalendarDays, LogIn, Plus} from "lucide-react";
 import {cn} from "@/lib/utils";
 import {DailyTab} from "@/components/lobby/daily-tab.tsx";
-import {JoinSection} from "@/components/lobby/join-section.tsx";
+import {JoinTab} from "@/components/lobby/join-tab.tsx";
 import {CreateSection} from "@/components/lobby/create-section.tsx";
+import {useGameInfoStore} from "@/store/game-info.ts";
 
 const sections = [
   {id: "daily" as const, icon: CalendarDays, Section: DailyTab},
-  {id: "join" as const, icon: LogIn, Section: JoinSection},
+  {id: "join" as const, icon: LogIn, Section: JoinTab},
   {id: "create" as const, icon: Plus, Section: CreateSection},
 ]
 
@@ -22,8 +23,14 @@ export function MainScreen() {
   const alignedRef = useRef(false)
   const fromScrollRef = useRef(false)
   const targetRef = useRef<number | null>(null)
+  const refreshGameInfo = useGameInfoStore(state => state.refresh)
 
   const active = sections.find(s => s.id === section)?.id
+
+  // Fetched once per lobby mount, so coming back from a game picks up the game that just finished.
+  useEffect(() => {
+    refreshGameInfo()
+  }, [refreshGameInfo])
 
   // Aligns the carousel whenever the section changes through the URL, be it a tab click, a browser
   // back or a deep link. The first alignment jumps so a deep link does not animate on load.

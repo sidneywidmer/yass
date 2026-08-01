@@ -109,6 +109,8 @@
       "title": "Daily challenge",
       "countdown": "until the next challenge",
       "play": "Play challenge",
+      "finish": "Finish challenge",
+      "alreadyPlayed": "You already played today's challenge.",
       "explanation": "What is this?",
       "rules": {
         "sameCards": "Everyone plays the exact same shuffle",
@@ -125,6 +127,15 @@
     "join": {
       "title": "Join a game",
       "description": "Got a code from a friend? Enter it here to take a seat."
+    },
+    "running": {
+      "title": "Running games",
+      "description": "Games you still have a seat at. Tap one to keep playing.",
+      "kind": {
+        "DAILY": "Daily challenge",
+        "CUSTOM": "Custom game",
+        "QUEUE": "Quick game"
+      }
     }
   },
   "create": {

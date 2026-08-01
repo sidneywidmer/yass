@@ -38,6 +38,7 @@ class GameController(private val service: GameService, private val repo: GameRep
         post("/ping", ::ping)
         post("/daily", ::daily)
         get("/daily-leaderboard", ::dailyLeaderboard)
+        get("/info", ::info)
     }
 
     private fun ping(ctx: Context) = either {
@@ -171,6 +172,13 @@ class GameController(private val service: GameService, private val repo: GameRep
 
     private fun dailyLeaderboard(ctx: Context) = either<DomainError, _> {
         service.dailyLeaderboard(LocalDateTime.now(ZoneOffset.UTC))
+    }.fold(
+        { errorResponse(ctx, it) },
+        { successResponse(ctx, it) }
+    )
+
+    private fun info(ctx: Context) = either<DomainError, _> {
+        service.info(player(ctx), LocalDateTime.now(ZoneOffset.UTC))
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }
