@@ -140,9 +140,14 @@
       "rules": {
         "sameCards": "Alle spielen mit den exakt gleich gemischten Karten",
         "oncePerDay": "Jeden Tag eine Chance",
-        "opponents": "Du und ein Bot-Partner gegen zwei Bots auf 1000 Punkte"
+        "opponents": "Du und ein Bot-Partner gegen zwei Bots über 5 Hände"
       },
-      "signedUpOnly": "Mit einem Gast-Profil kannst du den Tagestrumpf nicht spielen."
+      "signedUpOnly": "Mit einem Gast-Profil kannst du den Tagestrumpf nicht spielen.",
+      "leaderboard": {
+        "title": "Rangliste von heute",
+        "empty": "Heute hat noch niemand fertig gespielt. Mach den Anfang!",
+        "error": "Die Rangliste konnte nicht geladen werden."
+      }
     },
     "join": {
       "title": "Spiel beitreten",

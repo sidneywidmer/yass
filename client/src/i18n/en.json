@@ -113,9 +113,14 @@
       "rules": {
         "sameCards": "Everyone plays the exact same shuffle",
         "oncePerDay": "One shot every day",
-        "opponents": "You and a bot partner against two bots, first to 1000 points"
+        "opponents": "You and a bot partner against two bots over 5 hands"
       },
-      "signedUpOnly": "Guest profiles can't play the daily challenge."
+      "signedUpOnly": "Guest profiles can't play the daily challenge.",
+      "leaderboard": {
+        "title": "Today's leaderboard",
+        "empty": "Nobody finished today's challenge yet. Be the first!",
+        "error": "The leaderboard could not be loaded."
+      }
     },
     "join": {
       "title": "Join a game",

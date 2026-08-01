@@ -7,6 +7,7 @@ import ch.yass.core.error.GameWithCodeNotFound
 import ch.yass.core.error.SeatNotFound
 import ch.yass.core.helper.toDbJson
 import ch.yass.db.tables.references.*
+import ch.yass.game.api.internal.DailyGame
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.api.internal.NewHand
 import ch.yass.game.api.internal.NewSeat
@@ -128,6 +129,54 @@ class GameRepository(private val db: DSLContext) {
             .and(GAME.CREATED_AT.lt(end))
             .and(SEAT.PLAYER_ID.eq(player.id))
             .fetchOne(mapping(Game::fromRecord))
+
+    /**
+     * Every daily challenge that was played to the end within the given window, abandoned runs never make it
+     * onto the leaderboard. Only the seat of the human player is looked up, the bots around them are
+     * irrelevant. Hands and tricks come back in the same order as in [getState] since the engine expects the
+     * newest one first.
+     */
+    fun getFinishedDailyGames(start: LocalDateTime, end: LocalDateTime): List<DailyGame> {
+        val games = db.selectFrom(GAME)
+            .where(GAME.KIND.eq(GameKind.DAILY.name))
+            .and(GAME.STATUS.eq(GameStatus.FINISHED.name))
+            .and(GAME.CREATED_AT.ge(start))
+            .and(GAME.CREATED_AT.lt(end))
+            .fetch(Game::fromRecord)
+
+        if (games.isEmpty()) return emptyList()
+
+        val gameIds = games.map { it.id }
+
+        // Bot seats have no player id, so the join already leaves us with one row per game
+        val seated = db.select(SEAT.GAME_ID, SEAT.POSITION, PLAYER.NAME)
+            .from(SEAT)
+            .join(PLAYER).on(SEAT.PLAYER_ID.eq(PLAYER.ID))
+            .where(SEAT.GAME_ID.`in`(gameIds))
+            .fetch()
+            .associateBy { it[SEAT.GAME_ID] }
+
+        val handsByGame = db.selectFrom(HAND)
+            .where(HAND.GAME_ID.`in`(gameIds))
+            .orderBy(HAND.CREATED_AT.desc())
+            .fetch(Hand::fromRecord)
+            .groupBy { it.gameId }
+
+        val tricksByHand = getTricks(handsByGame.values.flatten().map { it.id }).groupBy { it.handId }
+
+        return games.mapNotNull { game ->
+            val seat = seated[game.id] ?: return@mapNotNull null
+            val hands = handsByGame[game.id].orEmpty()
+
+            DailyGame(
+                game,
+                seat[PLAYER.NAME]!!,
+                Position.valueOf(seat[SEAT.POSITION]!!),
+                hands,
+                hands.flatMap { tricksByHand[it.id].orEmpty() }
+            )
+        }
+    }
 
     fun refresh(game: Game): Game {
         return db.selectFrom(GAME)

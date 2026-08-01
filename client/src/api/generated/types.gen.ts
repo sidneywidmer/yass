@@ -63,6 +63,16 @@ export type CreateDailyChallengeResponse = {
     code: string;
 };
 
+export type DailyLeaderboardResponse = {
+    day: string;
+    entries: Array<DailyLeaderboardEntry>;
+};
+
+export type DailyLeaderboardEntry = {
+    player: string;
+    points: number;
+};
+
 export type JoinGameRequest = {
     code: string;
 };
@@ -419,6 +429,22 @@ export type PostGameDailyResponses = {
 };
 
 export type PostGameDailyResponse = PostGameDailyResponses[keyof PostGameDailyResponses];
+
+export type GetGameDailyLeaderboardData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/game/daily-leaderboard';
+};
+
+export type GetGameDailyLeaderboardResponses = {
+    /**
+     * Leaderboard retrieved successfully
+     */
+    200: DailyLeaderboardResponse;
+};
+
+export type GetGameDailyLeaderboardResponse = GetGameDailyLeaderboardResponses[keyof GetGameDailyLeaderboardResponses];
 
 export type WhoamiData = {
     body?: never;
