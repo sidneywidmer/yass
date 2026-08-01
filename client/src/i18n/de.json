@@ -136,6 +136,8 @@
       "title": "Tagestrumpf",
       "countdown": "bis zum nächsten Tagestrumpf",
       "play": "Jetzt spielen",
+      "finish": "Spiel abschliessen",
+      "alreadyPlayed": "Du hast den Tagestrumpf von heute schon gespielt.",
       "explanation": "Was ist das?",
       "rules": {
         "sameCards": "Alle spielen mit den exakt gleich gemischten Karten",
@@ -152,6 +154,15 @@
     "join": {
       "title": "Spiel beitreten",
       "description": "Falls du einen Code erhalten hast kannst du ihn hier eingeben."
+    },
+    "running": {
+      "title": "Laufende Spiele",
+      "description": "Spiele, an denen du noch am Tisch sitzt. Tippe drauf, um weiterzuspielen.",
+      "kind": {
+        "DAILY": "Tagestrumpf",
+        "CUSTOM": "Eigenes Spiel",
+        "QUEUE": "Schnelles Spiel"
+      }
     }
   },
   "logout": {

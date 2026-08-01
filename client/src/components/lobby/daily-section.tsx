@@ -12,6 +12,7 @@ import {useAsyncAction} from "@/hooks/use-async-action"
 import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler"
 import {useMidnightCountdown} from "@/hooks/use-midnight-countdown"
 import {usePlayerStore} from "@/store/player.ts"
+import {useGameInfoStore} from "@/store/game-info.ts"
 
 const rules = ["sameCards", "oncePerDay", "opponents"]
 
@@ -21,6 +22,8 @@ export function DailySection() {
   const handleAxiosError = useAxiosErrorHandler()
   const isAnon = usePlayerStore(state => state.isAnon)
   const remaining = useMidnightCountdown()
+  const played = useGameInfoStore(state => state.dailyChallengePlayed)
+  const runningDaily = useGameInfoStore(state => state.runningGames.find(game => game.kind === "DAILY"))
   const [error, setError] = useState<string | null>(null)
 
   const {execute: executeDaily, isLoading, hasError, reset} = useAsyncAction(async () => {
@@ -73,15 +76,20 @@ export function DailySection() {
             </Button>
           </div>
         ) : (
-          <Button
-            className="w-full"
-            onClick={handlePlay}
-            disabled={isLoading}
-            variant={hasError ? "destructive" : "default"}
-          >
-            {isLoading && <Loader2 className="h-4 w-4 animate-spin"/>}
-            {t("lobby.daily.play")}
-          </Button>
+          <div className="flex flex-col gap-2">
+            <Button
+              className="w-full"
+              onClick={handlePlay}
+              disabled={isLoading || (played && !runningDaily)}
+              variant={hasError ? "destructive" : "default"}
+            >
+              {isLoading && <Loader2 className="h-4 w-4 animate-spin"/>}
+              {t(runningDaily ? "lobby.daily.finish" : "lobby.daily.play")}
+            </Button>
+            {played && !runningDaily && (
+              <p className="text-center text-sm text-muted-foreground">{t("lobby.daily.alreadyPlayed")}</p>
+            )}
+          </div>
         )}
 
         <Accordion type="single" collapsible>

@@ -73,6 +73,20 @@ export type DailyLeaderboardEntry = {
     points: number;
 };
 
+export type GameInfoResponse = {
+    runningGames: Array<RunningGame>;
+    dailyChallengePlayed: boolean;
+};
+
+export type RunningGame = {
+    uuid: string;
+    code: string;
+    kind: GameKind;
+    startedAt: string;
+};
+
+export type GameKind = 'QUEUE' | 'CUSTOM' | 'DAILY';
+
 export type JoinGameRequest = {
     code: string;
 };
@@ -445,6 +459,22 @@ export type GetGameDailyLeaderboardResponses = {
 };
 
 export type GetGameDailyLeaderboardResponse = GetGameDailyLeaderboardResponses[keyof GetGameDailyLeaderboardResponses];
+
+export type GetGameInfoData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/game/info';
+};
+
+export type GetGameInfoResponses = {
+    /**
+     * Info retrieved successfully
+     */
+    200: GameInfoResponse;
+};
+
+export type GetGameInfoResponse = GetGameInfoResponses[keyof GetGameInfoResponses];
 
 export type WhoamiData = {
     body?: never;

@@ -167,6 +167,20 @@ class GameService(
         return DailyLeaderboardResponse(day, entries)
     }
 
+    /**
+     * What the lobby needs to know about the player: the games they can rejoin and whether today's
+     * daily challenge is already behind them.
+     */
+    fun info(player: InternalPlayer, now: LocalDateTime): GameInfoResponse {
+        val (start, end) = swissDayWindowUTC(swissDay(now))
+        val daily = repo.getDailyGameForPlayer(player, start, end)
+
+        return GameInfoResponse(
+            repo.getRunningGamesForPlayer(player).map(RunningGame::from),
+            daily?.status == GameStatus.FINISHED
+        )
+    }
+
     context(_: Raise<GameWithCodeNotFound>)
     fun getStateByCode(code: String): GameState {
         val game = repo.getByCode(code)

@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AnonLinkData, AnonLinkErrors, AnonLinkResponses, AnonLogoutData, AnonLogoutResponses, AnonSignupData, AnonSignupErrors, AnonSignupResponses, ConnectData, ConnectErrors, ConnectResponses, GetAdminAnalyzeGameByCodeData, GetAdminAnalyzeGameByCodeResponses, GetGameDailyLeaderboardData, GetGameDailyLeaderboardResponses, PostAdminMessageData, PostAdminMessageResponses, PostGameCreateData, PostGameCreateResponses, PostGameDailyData, PostGameDailyResponses, PostGameJoinData, PostGameJoinResponses, PostGamePingData, PostGamePingResponses, PostGamePlayData, PostGamePlayResponses, PostGameSchiebeData, PostGameSchiebeResponses, PostGameTrumpData, PostGameTrumpResponses, PostGameWeisenData, PostGameWeisenResponses, SubscribeData, SubscribeErrors, SubscribeResponses, WhoamiData, WhoamiErrors, WhoamiResponses } from './types.gen';
+import type { AnonLinkData, AnonLinkErrors, AnonLinkResponses, AnonLogoutData, AnonLogoutResponses, AnonSignupData, AnonSignupErrors, AnonSignupResponses, ConnectData, ConnectErrors, ConnectResponses, GetAdminAnalyzeGameByCodeData, GetAdminAnalyzeGameByCodeResponses, GetGameDailyLeaderboardData, GetGameDailyLeaderboardResponses, GetGameInfoData, GetGameInfoResponses, PostAdminMessageData, PostAdminMessageResponses, PostGameCreateData, PostGameCreateResponses, PostGameDailyData, PostGameDailyResponses, PostGameJoinData, PostGameJoinResponses, PostGamePingData, PostGamePingResponses, PostGamePlayData, PostGamePlayResponses, PostGameSchiebeData, PostGameSchiebeResponses, PostGameTrumpData, PostGameTrumpResponses, PostGameWeisenData, PostGameWeisenResponses, SubscribeData, SubscribeErrors, SubscribeResponses, WhoamiData, WhoamiErrors, WhoamiResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -152,6 +152,18 @@ export const postGameDaily = <ThrowOnError extends boolean = false>(options?: Op
 export const getGameDailyLeaderboard = <ThrowOnError extends boolean = false>(options?: Options<GetGameDailyLeaderboardData, ThrowOnError>) => (options?.client ?? client).get<GetGameDailyLeaderboardResponses, unknown, ThrowOnError>({
     responseType: 'json',
     url: '/game/daily-leaderboard',
+    ...options
+});
+
+/**
+ * Game info for the current player
+ *
+ * Everything the lobby needs about the current player: the games they are seated at and could rejoin, and whether they already played today's daily challenge to the end.
+ *
+ */
+export const getGameInfo = <ThrowOnError extends boolean = false>(options?: Options<GetGameInfoData, ThrowOnError>) => (options?.client ?? client).get<GetGameInfoResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    url: '/game/info',
     ...options
 });
 

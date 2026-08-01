@@ -120,6 +120,19 @@ class GameRepository(private val db: DSLContext) {
         return game ?: r.raise(GameNotFound(uuid))
     }
 
+    /**
+     * Games the player is seated at and could still rejoin. STALE ones count as well, they are only
+     * waiting for someone to come back (see [rejoinSeat]).
+     */
+    fun getRunningGamesForPlayer(player: InternalPlayer): List<Game> =
+        db.select(GAME)
+            .from(SEAT)
+            .join(GAME).on(SEAT.GAME_ID.eq(GAME.ID))
+            .where(SEAT.PLAYER_ID.eq(player.id))
+            .and(GAME.STATUS.`in`(GameStatus.RUNNING.name, GameStatus.STALE.name))
+            .orderBy(GAME.CREATED_AT.desc())
+            .fetch(mapping(Game::fromRecord))
+
     fun getDailyGameForPlayer(player: InternalPlayer, start: LocalDateTime, end: LocalDateTime): Game? =
         db.select(GAME)
             .from(SEAT)
