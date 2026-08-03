@@ -6,12 +6,10 @@ import useGameActions from "@/hooks/use-game-actions.tsx";
 export function WebSocketHandler() {
   const gameUuid = useGameStateStore(state => state.gameUuid)
   const uuid = useGameStateStore(state => state.uuid)
-  const {addActions, clearActions} = useGameActions()
+  const {addActions} = useGameActions()
 
   useEffect(() => {
     if (!gameUuid) return
-
-    clearActions()
 
     const transports = [
       {
@@ -38,7 +36,7 @@ export function WebSocketHandler() {
       sub.unsubscribe()
       centrifuge.disconnect()
     }
-  }, [gameUuid, uuid, addActions, clearActions])
+  }, [gameUuid, uuid, addActions])
 
   return null
 }

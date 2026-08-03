@@ -377,6 +377,7 @@ components:
         - gameUuid
         - winners
         - losers
+        - status
       properties:
         hands:
           type: array
@@ -393,6 +394,8 @@ components:
           $ref: '#/components/schemas/TeamWithPoints'
         losers:
           $ref: '#/components/schemas/TeamWithPoints'
+        status:
+          $ref: '#/components/schemas/GameStatus'
 
     AnalyzeHand:
       type: object
@@ -579,6 +582,10 @@ components:
     GameKind:
       type: string
       enum: [ QUEUE, CUSTOM, DAILY ]
+
+    GameStatus:
+      type: string
+      enum: [ RUNNING, FINISHED, CANCELED ]
 
     JoinGameRequest:
       type: object

@@ -250,6 +250,7 @@
   "canceled": {
     "title": "Game ended",
     "description": "{{name}} ended this game.",
+    "analyze": "Analyze",
     "back": "Back to lobby"
   },
   "analysis": {
@@ -265,7 +266,8 @@
     "teams": {
       "northSouth": "N/S",
       "eastWest": "E/W"
-    }
+    },
+    "canceled": "This game was ended before it was played out."
   },
   "trumps": {
     "french": {

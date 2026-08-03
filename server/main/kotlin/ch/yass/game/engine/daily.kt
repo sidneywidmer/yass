@@ -6,7 +6,7 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
-private val zurich = ZoneId.of("Europe/Zurich")
+val zurich: ZoneId = ZoneId.of("Europe/Zurich")
 
 /**
  * Since this is the SWISS national game, daily challenges are aligned with the time in Switzerland. If you're two hours

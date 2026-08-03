@@ -40,6 +40,7 @@ data class SeatNotFound(val uuid: String) : GameError
 data class PlayerNotInGame(val player: InternalPlayer, val state: GameState) : GameError
 data class PlayerDidNotCreateGame(val player: InternalPlayer, val state: GameState) : GameError
 data class GameNotCancelable(val game: Game) : GameError
+data class GameAlreadyCanceled(val game: Game) : GameError
 data class PlayerDoesNotOwnSeat(val player: InternalPlayer, val seatUuid: String, val state: GameState) : GameError
 data class PlayerIsLocked(val player: InternalPlayer, val state: GameState) : GameError
 data class PlayerDoesNotOwnCard(val player: InternalPlayer, val card: Card, val state: GameState) : GameError

@@ -12,6 +12,7 @@ export type AnalyzeGameStateResponse = {
     gameUuid: string;
     winners: TeamWithPoints;
     losers: TeamWithPoints;
+    status: GameStatus;
 };
 
 export type AnalyzeHand = {
@@ -86,6 +87,8 @@ export type RunningGame = {
 };
 
 export type GameKind = 'QUEUE' | 'CUSTOM' | 'DAILY';
+
+export type GameStatus = 'RUNNING' | 'FINISHED' | 'CANCELED';
 
 export type JoinGameRequest = {
     code: string;

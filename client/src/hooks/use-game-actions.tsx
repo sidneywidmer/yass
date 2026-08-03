@@ -13,7 +13,7 @@ type UpdateGschobeAction = { type: 'UpdateGschobe'; position: Position }
 type UpdateActiveAction = { type: 'UpdateActive'; position: Position }
 type UpdatePossibleWeiseAction = { type: 'UpdatePossibleWeise'; weise: WeisWithPoints[] }
 type GameFinishedAction = { type: 'GameFinished' } & GameFinished
-type GameCanceledAction = { type: 'GameCanceled'; game: string; player: Player }
+type GameCanceledAction = { type: 'GameCanceled'; game: string; canceledBy: Player }
 type UpdatePointsAction = { type: 'UpdatePoints'; points: Record<string, TotalPoints> }
 type DeclareWeisAction = { type: 'DeclareWeis'; position: Position; points: number }
 type ShowWeiseAction = { type: 'ShowWeise'; weiseByPosition: { [position: string]: WeisWithPoints[] } }
@@ -89,7 +89,7 @@ const useGameActions = () => {
     }),
     // A late action from a table we already left must never end the game we are sitting at now
     GameCanceled: async (action: GameCanceledAction) => useGameStateStore.setState(state =>
-      action.game === state.gameUuid ? {canceledBy: action.player} : {}
+      action.game === state.gameUuid ? {canceledBy: action.canceledBy} : {}
     ),
     UpdatePoints: async (action: UpdatePointsAction) => {
       useGameStateStore.setState({points: action.points})
@@ -156,12 +156,6 @@ const useGameActions = () => {
     setActionQueue(queue => [...queue, ...actions])
   }, [])
 
-  // Switching tables must not leave the previous game's actions waiting in the queue
-  const clearActions = useCallback(() => {
-    setActionQueue([])
-    setIsPaused(false)
-  }, [])
-
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     processNextAction()
@@ -183,7 +177,7 @@ const useGameActions = () => {
     return unsubscribe
   }, [isPaused, processNextAction])
 
-  return {addActions, clearActions}
+  return {addActions}
 }
 
 export default useGameActions

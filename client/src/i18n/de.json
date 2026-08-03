@@ -250,6 +250,7 @@
   "canceled": {
     "title": "Spiel beendet",
     "description": "{{name}} hat dieses Spiel beendet.",
+    "analyze": "Analyse",
     "back": "Zurück zur Lobby"
   },
   "analysis": {
@@ -265,7 +266,8 @@
     "teams": {
       "northSouth": "N/S",
       "eastWest": "O/W"
-    }
+    },
+    "canceled": "Dieses Spiel wurde vorzeitig beendet."
   },
   "trumps": {
     "french": {

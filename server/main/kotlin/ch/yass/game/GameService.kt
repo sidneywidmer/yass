@@ -135,7 +135,7 @@ class GameService(
     context(r: Raise<GameError>, _: Raise<DbError>)
     fun join(request: JoinGameRequest, player: InternalPlayer): GameState {
         val game = repo.getByCode(request.code)
-        r.ensure(!gameIsCanceled(game)) { GameNotCancelable(game) }
+        r.ensure(!gameIsCanceled(game)) { GameAlreadyCanceled(game) }
 
         val joinedAtSeat = repo.takeASeat(game, player)
         val state = repo.getState(game)
@@ -159,8 +159,9 @@ class GameService(
 
         val canceled = repo.cancelGame(game) ?: r.raise(GameNotCancelable(game))
 
-        val actions = gameCanceledActions(game, player)
-        publishForSeats(state.seats) { actions }
+        publishForSeats(state.seats) { seat ->
+            if (seat.playerId == player.id) emptyList() else gameCanceledActions(game, player)
+        }
 
         return canceled
     }
@@ -213,8 +214,8 @@ class GameService(
         val playedCard = Card.from(request.card)
         val nextState = nextState(state)
 
-        r.ensure(!gameIsCanceled(state.game)) { GameNotCancelable(state.game) }
         r.ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
+        r.ensure(!gameIsCanceled(state.game)) { GameAlreadyCanceled(state.game) }
         r.ensure(expectedState(listOf(State.PLAY_CARD, State.PLAY_CARD_BOT), nextState)) {
             InvalidState(nextState, state)
         }
@@ -252,8 +253,8 @@ class GameService(
         val nextState = nextState(state)
         val position = state.seats.first { it.playerId == player.id }.position
 
-        r.ensure(!gameIsCanceled(state.game)) { GameNotCancelable(state.game) }
         r.ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
+        r.ensure(!gameIsCanceled(state.game)) { GameAlreadyCanceled(state.game) }
         r.ensure(expectedState(listOf(State.TRUMP, State.TRUMP_BOT), nextState)) { InvalidState(nextState, state) }
         r.ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
         r.ensure(Trump.playable().contains(chosenTrump)) { TrumpInvalid(chosenTrump) }
@@ -276,8 +277,8 @@ class GameService(
         val hand = currentHand(state.hands)
         val seat = playerSeat(player, state.seats)
 
-        r.ensure(!gameIsCanceled(state.game)) { GameNotCancelable(state.game) }
         r.ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
+        r.ensure(!gameIsCanceled(state.game)) { GameAlreadyCanceled(state.game) }
         r.ensure(expectedState(listOf(State.WEISEN_FIRST, State.WEISEN_FIRST_BOT), nextState)) {
             InvalidState(nextState, state)
         }
@@ -328,8 +329,8 @@ class GameService(
         val currentHand = currentHand(state.hands)
         val position = state.seats.first { it.playerId == player.id }.position
 
-        r.ensure(!gameIsCanceled(state.game)) { GameNotCancelable(state.game) }
         r.ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
+        r.ensure(!gameIsCanceled(state.game)) { GameAlreadyCanceled(state.game) }
         r.ensure(expectedState(listOf(State.SCHIEBE, State.SCHIEBE_BOT), nextState)) { InvalidState(nextState, state) }
         r.ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
 
@@ -395,9 +396,6 @@ class GameService(
     @OptIn(DelicateCoroutinesApi::class)
     private fun gameLoop(game: Game) {
         val updatedState = repo.getState(game)
-
-        if (updatedState.game.status != GameStatus.RUNNING) return
-
         when (val nextStateLoop = nextState(updatedState)) {
             State.WAITING_FOR_PLAYERS -> {}
             State.FINISHED -> {

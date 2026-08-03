@@ -39,6 +39,9 @@ export function GameInstance({tryCode}: GameInstanceProps) {
         setIsLoading(false)
       })
       .catch(error => {
+        if (error.response?.data?.payload?.domainError == "GameAlreadyCanceled") {
+          return navigate(`/game/${tryCode}/analyze`)
+        }
         if (error.response?.status === 404) {
           navigate('/lobby')
           return addError({
@@ -53,6 +56,7 @@ export function GameInstance({tryCode}: GameInstanceProps) {
             description: t('errors.gameFull.description')
           })
         }
+        setIsLoading(false)
         return handleAxiosError(error)
       })
 

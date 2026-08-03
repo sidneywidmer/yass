@@ -6,8 +6,10 @@ import ch.yass.core.helper.toUUID
 import ch.yass.db.tables.references.GAME
 import ch.yass.db.tables.references.PLAYER
 import ch.yass.db.tables.references.SEAT
+import ch.yass.game.dto.GameKind
 import ch.yass.game.dto.GameStatus
 import ch.yass.game.dto.SeatStatus
+import ch.yass.game.engine.zurich
 import com.typesafe.config.Config
 import org.jobrunr.scheduling.JobScheduler
 import org.jobrunr.scheduling.RecurringJobBuilder.aRecurringJob
@@ -36,7 +38,20 @@ class JobsService(
                 .withInterval(Duration.ofSeconds(10))
                 .withJobLambda { playerPing() }
 
+            val cancelStaleGames = aRecurringJob()
+                .withId("CANCEL_STALE_GAMES_JOB")
+                .withInterval(Duration.ofHours(1))
+                .withJobLambda { cancelStaleGames() }
+
+            val cancelDailyGames = aRecurringJob()
+                .withId("CANCEL_DAILY_GAMES_JOB")
+                .withCron("0 0 * * *")
+                .withZoneId(zurich)
+                .withJobLambda { cancelDailyGames() }
+
             scheduler.createRecurrently(playerPing)
+            scheduler.createRecurrently(cancelStaleGames)
+            scheduler.createRecurrently(cancelDailyGames)
         }
     }
 
@@ -67,5 +82,46 @@ class JobsService(
         }
 
         logger().info("Job [Player Ping]: Done! Dispatched PlayerDisconnected events to ${dcRecords.size} seats.")
+    }
+
+    /**
+     * Needs to be public for JobRunr to pick it up
+     */
+    fun cancelStaleGames() {
+        logger().info("Job [Cancel Stale Games]: Start canceling abandoned games")
+
+        val fortyEightHoursAgo = LocalDateTime.now(ZoneOffset.UTC).minusHours(48)
+        val canceled: Int = db
+            .update(GAME)
+            .set(GAME.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
+            .set(GAME.STATUS, GameStatus.CANCELED.name)
+            .whereNotExists(
+                db
+                    .selectOne()
+                    .from(SEAT)
+                    .where(SEAT.GAME_ID.eq(GAME.ID))
+                    .and(SEAT.PLAYER_PING.ge(fortyEightHoursAgo))
+            )
+            .and(GAME.STATUS.eq(GameStatus.RUNNING.name))
+            .execute()
+
+        logger().info("Job [Cancel Stale Games]: Done! Canceled $canceled abandoned games.")
+    }
+
+    /**
+     * Needs to be public for JobRunr to pick it up
+     */
+    fun cancelDailyGames() {
+        logger().info("Job [Cancel Daily Games]: Start canceling unfinished daily challenges")
+
+        val canceled: Int = db
+            .update(GAME)
+            .set(GAME.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
+            .set(GAME.STATUS, GameStatus.CANCELED.name)
+            .where(GAME.KIND.eq(GameKind.DAILY.name))
+            .and(GAME.STATUS.eq(GameStatus.RUNNING.name))
+            .execute()
+
+        logger().info("Job [Cancel Daily Games]: Done! Canceled $canceled unfinished daily challenges.")
     }
 }

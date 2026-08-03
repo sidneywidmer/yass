@@ -50,6 +50,7 @@ export function AnalyzeInstance({code, analysis}: AnalyzeInstanceProps) {
             loserPoints={analysis.losers.points}
             playerInGame={playerInGame}
             winner={winner}
+            status={analysis.status}
           />
           <CardContent>
             <Accordion type="single" collapsible className="w-full">

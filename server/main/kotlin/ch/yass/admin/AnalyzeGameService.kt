@@ -33,14 +33,23 @@ class AnalyzeGameService(private val gameService: GameService) {
         val state = gameService.getStateByCode(code)
 
         inGame.ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
-        finished.ensure(state.game.status == GameStatus.FINISHED) { GameNotFinished(state.game.uuid.toString()) }
+        finished.ensure(state.game.status in listOf(GameStatus.FINISHED, GameStatus.CANCELED)) {
+            GameNotFinished(state.game.uuid.toString())
+        }
 
         val hands = state.hands.reversed().map { mapHand(it, state) }
         val points = pointsByPositionTotal(state.hands, state.tricks)
         val winners = getWinningTeam(points)
         val losers = getLosingTeam(points)
 
-        return AnalyzeGameStateResponse(hands, points, state.game.uuid, winners, losers)
+        return AnalyzeGameStateResponse(
+            hands,
+            points,
+            state.game.uuid,
+            winners,
+            losers,
+            state.game.status
+        )
     }
 
     private fun mapHand(hand: Hand, state: GameState): AnalyzeHand {

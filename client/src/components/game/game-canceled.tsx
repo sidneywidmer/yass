@@ -11,6 +11,7 @@ import {useNavigate} from "react-router-dom";
  */
 export function GameCanceled() {
   const canceledBy = useGameStateStore(state => state.canceledBy)
+  const code = useGameStateStore(state => state.code)
   const {t} = useTranslation()
   const navigate = useNavigate()
 
@@ -26,7 +27,15 @@ export function GameCanceled() {
           <p className="text-center text-sm text-muted-foreground">
             {t("canceled.description", {name: canceledBy.name})}
           </p>
-          <Button onClick={() => navigate('/lobby')}>{t("canceled.back")}</Button>
+          <div className="grid w-full grid-cols-2 gap-4">
+            <Button type="submit"
+                    onClick={() => navigate(`/game/${code}/analyze`)}
+            >
+              {t("canceled.analyze")}</Button>
+            <Button variant={"outline"} type="submit"
+                    onClick={() => navigate('/lobby')}
+            >{t("canceled.back")}</Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
