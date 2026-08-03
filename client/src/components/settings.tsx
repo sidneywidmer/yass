@@ -1,4 +1,4 @@
-import {Gauge, Languages, LogOut, SettingsIcon, Spade, User, UserPlus} from 'lucide-react';
+import {Gauge, Languages, LogOut, SettingsIcon, Spade, User, UserPlus, XCircle} from 'lucide-react';
 import {useSettingsStore} from "@/store/settings.ts";
 import {PlaySpeed} from "@/types/play-speed.ts";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group.tsx";
@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/alert-dialog.tsx"; // For leave game dialog
 import CodeWithCopy from "@/components/code-with-copy.tsx";
 import MessageDialog from "@/components/message-dialog.tsx";
+import {api} from "@/api/client.ts";
+import {useAxiosErrorHandler} from "@/hooks/use-axios-error-handler.tsx";
 
 interface SettingsProps {
   triggerVariant?: 'fixed' | 'inline' | 'none';
@@ -39,10 +41,13 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
   const name = usePlayerStore(state => state.name)
   const gameUuid = useGameStateStore(state => state.gameUuid)
   const code = useGameStateStore(state => state.code)
+  const canCancel = useGameStateStore(state => state.canCancel)
   const {t} = useTranslation();
   const navigate = useNavigate();
+  const handleAxiosError = useAxiosErrorHandler();
   const [internalOpen, setInternalOpen] = useState(false);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const [showEndDialog, setShowEndDialog] = useState(false);
   const [showMessageDialog, setShowMessageDialog] = useState(false);
   const [messageText, setMessageText] = useState("");
   const location = useLocation();
@@ -79,6 +84,19 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
   const handleLeaveGame = () => {
     navigate('/lobby');
     setShowLeaveDialog(false);
+  };
+
+  const handleOpenEndDialog = () => {
+    setShowEndDialog(true);
+    setOpen(false); // Close the settings sheet
+  };
+
+  // Everyone else at the table is told via the GameCanceled action, we can head back right away
+  const handleEndGame = () => {
+    api.cancelGame({game: gameUuid!})
+      .then(() => navigate('/lobby'))
+      .catch(handleAxiosError);
+    setShowEndDialog(false);
   };
 
   const handleOpenMessageDialog = () => {
@@ -148,14 +166,26 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
             {gameUuid && (
               <div>
                 <h3 className="text-sm font-medium mb-3">{t("settings.game")}</h3>
-                <Button
-                  variant="destructive"
-                  className="w-full"
-                  onClick={handleOpenLeaveDialog}
-                >
-                  <LogOut className="mr-2 h-4 w-4"/>
-                  {t("settings.leaveGame")}
-                </Button>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Button
+                    variant="outline"
+                    className="w-full sm:flex-1"
+                    onClick={handleOpenLeaveDialog}
+                  >
+                    <LogOut className="mr-2 h-4 w-4"/>
+                    {t("settings.leaveGame")}
+                  </Button>
+                  {canCancel && (
+                    <Button
+                      variant="destructive"
+                      className="w-full sm:flex-1"
+                      onClick={handleOpenEndDialog}
+                    >
+                      <XCircle className="mr-2 h-4 w-4"/>
+                      {t("settings.endGame")}
+                    </Button>
+                  )}
+                </div>
               </div>
             )}
 
@@ -284,6 +314,26 @@ const Settings = ({ triggerVariant = 'fixed', open: controlledOpen, onOpenChange
           <AlertDialogCancel>{t("settings.leaveGameConfirm.cancel")}</AlertDialogCancel>
           <AlertDialogAction onClick={handleLeaveGame}>
             {t("settings.leaveGameConfirm.confirm")}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+
+    <AlertDialog open={showEndDialog} onOpenChange={setShowEndDialog}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t("settings.endGameConfirm.title")}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {t("settings.endGameConfirm.description")}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>{t("settings.endGameConfirm.cancel")}</AlertDialogCancel>
+          <AlertDialogAction
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            onClick={handleEndGame}
+          >
+            {t("settings.endGameConfirm.confirm")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

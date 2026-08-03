@@ -3,6 +3,7 @@ package ch.yass.game.pubsub
 import ch.yass.core.pubsub.Action
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.*
+import ch.yass.game.dto.db.Game
 import ch.yass.game.dto.db.Hand
 import ch.yass.game.dto.Player
 import ch.yass.game.dto.db.InternalPlayer
@@ -51,6 +52,9 @@ fun gameFinishedActions(state: GameState): List<Action> {
         )
     )
 }
+
+fun gameCanceledActions(game: Game, canceledBy: InternalPlayer): List<Action> =
+    listOf(GameCanceled(game.uuid, Player.from(canceledBy)))
 
 fun newTrickActions(state: GameState, seat: Seat): List<Action> {
     val hand = currentHand(state.hands)

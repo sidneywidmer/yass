@@ -3,6 +3,7 @@ import {
   CardInHand,
   CardOnTable,
   JoinGameResponse,
+  Player,
   PlayerAtTable,
   Position,
   State,
@@ -29,6 +30,7 @@ type FlatGameState = Omit<JoinGameResponse, 'seat'> & {
   declaredWeisPoints: { [position: string]: number }
   weisWinners?: Position[]
   shownWeise?: { [position: string]: WeisWithPoints[] }
+  canceledBy?: Player
 }
 
 interface GameStateActions {
@@ -63,7 +65,9 @@ const initialState: FlatGameState = {
   shownWeise: undefined,
   cardsPlayed: [],
   otherPlayers: [],
-  isConnected: false
+  isConnected: false,
+  canCancel: false,
+  canceledBy: undefined
 }
 
 export const useGameStateStore = create<FlatGameState & GameStateActions>((set) => ({

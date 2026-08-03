@@ -5,9 +5,11 @@ import arrow.core.raise.ensure
 import ch.yass.core.error.CardNotPlayable
 import ch.yass.core.error.CardUndertrumps
 import ch.yass.core.error.GameError
+import ch.yass.core.error.GameNotCancelable
 import ch.yass.core.error.PlayerDoesNotOwnCard
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.*
+import ch.yass.game.dto.db.Game
 import ch.yass.game.dto.db.Hand
 import ch.yass.game.dto.db.InternalPlayer
 import ch.yass.game.dto.db.Seat
@@ -86,6 +88,18 @@ fun playerInGame(player: InternalPlayer, seats: List<Seat>): Boolean = seats.any
 
 fun playerOwnsSeat(player: InternalPlayer, seatUuid: String, seats: List<Seat>): Boolean =
     seats.firstOrNull { it.playerId == player.id }?.uuid.toString() == seatUuid
+
+/**
+ * We don't store who created a game, but the creator is always the first human to be seated: bots are
+ * seated upfront by [ch.yass.game.GameService.startGame] and everyone else only ever joins later.
+ */
+fun playerCreatedGame(player: InternalPlayer, seats: List<Seat>): Boolean =
+    seats.filter { it.status != SeatStatus.BOT }.minByOrNull { it.id }?.playerId == player.id
+
+fun gameIsCancelable(game: Game): Boolean =
+    game.kind == GameKind.CUSTOM && game.status == GameStatus.RUNNING
+
+fun gameIsCanceled(game: Game): Boolean = game.status == GameStatus.CANCELED
 
 /**
  * Check if the current player was ever dealt and has not yet played the given card.

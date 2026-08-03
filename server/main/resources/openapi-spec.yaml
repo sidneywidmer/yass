@@ -139,6 +139,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/SuccessfulActionResponse'
 
+  /game/cancel:
+    post:
+      summary: End a game
+      description: >
+        Ends a running custom game for everyone at the table. Only the player who created the game may
+        do so. Canceling a daily challenge is not supported yet.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelGameRequest'
+      responses:
+        '200':
+          description: Game ended successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessfulActionResponse'
+
   /game/ping:
     post:
       summary: Ping seat
@@ -590,6 +610,17 @@ components:
         finished:
           $ref: '#/components/schemas/GameFinished'
           nullable: true
+        canCancel:
+          type: boolean
+
+    CancelGameRequest:
+      type: object
+      required:
+        - game
+      properties:
+        game:
+          type: string
+          format: uuid
 
     PlayCardRequest:
       type: object

@@ -24,6 +24,13 @@
       "cancel": "Abbrechen",
       "confirm": "Verlassen"
     },
+    "endGame": "Spiel beenden",
+    "endGameConfirm": {
+      "title": "Spiel beenden",
+      "description": "Damit ist das Spiel für alle am Tisch vorbei. Es kann danach nicht mehr betreten werden.",
+      "cancel": "Abbrechen",
+      "confirm": "Beenden"
+    },
     "game": "Spiel",
     "feedback": "Feedback",
     "sendMessage": "Nachricht senden",
@@ -239,6 +246,11 @@
     "losers": "Verlierer",
     "analyze": "Analyse",
     "back": "Zurück"
+  },
+  "canceled": {
+    "title": "Spiel beendet",
+    "description": "{{name}} hat dieses Spiel beendet.",
+    "back": "Zurück zur Lobby"
   },
   "analysis": {
     "title": "Analysis",

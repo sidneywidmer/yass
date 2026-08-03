@@ -12,5 +12,6 @@ data class JoinGameResponse(
     val seat: SeatState,
     val cardsPlayed: List<CardOnTable>,
     val otherPlayers: List<PlayerAtTable>,
-    val finished: GameFinished?
+    val finished: GameFinished?,
+    val canCancel: Boolean
 )

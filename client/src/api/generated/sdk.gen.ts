@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AnonLinkData, AnonLinkErrors, AnonLinkResponses, AnonLogoutData, AnonLogoutResponses, AnonSignupData, AnonSignupErrors, AnonSignupResponses, ConnectData, ConnectErrors, ConnectResponses, GetAdminAnalyzeGameByCodeData, GetAdminAnalyzeGameByCodeResponses, GetGameDailyLeaderboardData, GetGameDailyLeaderboardResponses, GetGameInfoData, GetGameInfoResponses, PostAdminMessageData, PostAdminMessageResponses, PostGameCreateData, PostGameCreateResponses, PostGameDailyData, PostGameDailyResponses, PostGameJoinData, PostGameJoinResponses, PostGamePingData, PostGamePingResponses, PostGamePlayData, PostGamePlayResponses, PostGameSchiebeData, PostGameSchiebeResponses, PostGameTrumpData, PostGameTrumpResponses, PostGameWeisenData, PostGameWeisenResponses, SubscribeData, SubscribeErrors, SubscribeResponses, WhoamiData, WhoamiErrors, WhoamiResponses } from './types.gen';
+import type { AnonLinkData, AnonLinkErrors, AnonLinkResponses, AnonLogoutData, AnonLogoutResponses, AnonSignupData, AnonSignupErrors, AnonSignupResponses, ConnectData, ConnectErrors, ConnectResponses, GetAdminAnalyzeGameByCodeData, GetAdminAnalyzeGameByCodeResponses, GetGameDailyLeaderboardData, GetGameDailyLeaderboardResponses, GetGameInfoData, GetGameInfoResponses, PostAdminMessageData, PostAdminMessageResponses, PostGameCancelData, PostGameCancelResponses, PostGameCreateData, PostGameCreateResponses, PostGameDailyData, PostGameDailyResponses, PostGameJoinData, PostGameJoinResponses, PostGamePingData, PostGamePingResponses, PostGamePlayData, PostGamePlayResponses, PostGameSchiebeData, PostGameSchiebeResponses, PostGameTrumpData, PostGameTrumpResponses, PostGameWeisenData, PostGameWeisenResponses, SubscribeData, SubscribeErrors, SubscribeResponses, WhoamiData, WhoamiErrors, WhoamiResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -111,6 +111,22 @@ export const postGameWeisen = <ThrowOnError extends boolean = false>(options: Op
 export const postGameSchiebe = <ThrowOnError extends boolean = false>(options: Options<PostGameSchiebeData, ThrowOnError>) => (options.client ?? client).post<PostGameSchiebeResponses, unknown, ThrowOnError>({
     responseType: 'json',
     url: '/game/schiebe',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * End a game
+ *
+ * Ends a running custom game for everyone at the table. Only the player who created the game may do so. Canceling a daily challenge is not supported yet.
+ *
+ */
+export const postGameCancel = <ThrowOnError extends boolean = false>(options: Options<PostGameCancelData, ThrowOnError>) => (options.client ?? client).post<PostGameCancelResponses, unknown, ThrowOnError>({
+    responseType: 'json',
+    url: '/game/cancel',
     ...options,
     headers: {
         'Content-Type': 'application/json',

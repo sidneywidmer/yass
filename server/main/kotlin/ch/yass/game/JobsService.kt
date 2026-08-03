@@ -36,13 +36,7 @@ class JobsService(
                 .withInterval(Duration.ofSeconds(10))
                 .withJobLambda { playerPing() }
 
-            val gameStatus = aRecurringJob()
-                .withId("GAMES_STATUS_JOB")
-                .withInterval(Duration.ofSeconds(30))
-                .withJobLambda { gameStatus() }
-
             scheduler.createRecurrently(playerPing)
-            scheduler.createRecurrently(gameStatus)
         }
     }
 
@@ -73,28 +67,5 @@ class JobsService(
         }
 
         logger().info("Job [Player Ping]: Done! Dispatched PlayerDisconnected events to ${dcRecords.size} seats.")
-    }
-
-    /**
-     * Needs to be public for JobRunr to pick it up
-     */
-    fun gameStatus() {
-        logger().info("Job [Game Status]: Start updating game status")
-
-        val fiveMinutesAgo = LocalDateTime.now(ZoneOffset.UTC).minusMinutes(5)
-        val update: Int = db
-            .update(GAME)
-            .set(GAME.STATUS, GameStatus.STALE.name)
-            .whereNotExists(
-                db
-                    .selectOne()
-                    .from(SEAT)
-                    .where(SEAT.GAME_ID.eq(GAME.ID))
-                    .and(SEAT.PLAYER_PING.ge(fiveMinutesAgo))
-            )
-            .and(GAME.STATUS.eq(GameStatus.RUNNING.name))
-            .execute()
-
-        logger().info("Job [Game Status]: Done! Set game status STALE for $update game entries.")
     }
 }
