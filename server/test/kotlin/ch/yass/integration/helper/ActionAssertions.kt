@@ -50,4 +50,8 @@ class ActionAssertions(private val actions: List<Action>) {
     fun hasWinner(player: InternalPlayer) {
         assertTrue(actions.any { it is GameFinished && it.winners.contains(Player.from(player)) })
     }
+
+    fun hasCanceledBy(player: InternalPlayer) {
+        assertTrue(actions.any { it is GameCanceled && it.canceledBy == Player.from(player) })
+    }
 }
