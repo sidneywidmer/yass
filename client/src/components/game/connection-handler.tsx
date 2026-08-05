@@ -7,6 +7,7 @@ import {DialogDescription} from '@radix-ui/react-dialog'
 import {Button} from '@/components/ui/button'
 import {useTranslation} from 'react-i18next'
 import {WifiOff} from 'lucide-react'
+import {useNavigate} from 'react-router-dom'
 
 const PING_INTERVAL_MS = 5000
 const RETRY_COUNTDOWN_SECONDS = 5
@@ -18,6 +19,7 @@ export function ConnectionHandler() {
   const code = useGameStateStore(state => state.code)
   const setGameState = useGameStateStore(state => state.setGameState)
   const {t} = useTranslation()
+  const navigate = useNavigate()
 
   const [offline, setOffline] = useState(false)
   const [countdown, setCountdown] = useState(RETRY_COUNTDOWN_SECONDS)
@@ -31,9 +33,18 @@ export function ConnectionHandler() {
   }, [])
 
   const refreshGameState = useCallback(async () => {
-    const response = await api.joinGame({code: code!})
-    setGameState(response.data!)
-  }, [code, setGameState])
+    try {
+      const response = await api.joinGame({code: code!})
+      setGameState(response.data!)
+    } catch (error) {
+      const domainError = (error as AxiosError<{ payload?: { domainError?: string } }>).response?.data?.payload?.domainError
+      if (domainError === 'GameAlreadyCanceled') {
+        navigate(`/game/${code}/analyze`)
+        return
+      }
+      throw error
+    }
+  }, [code, setGameState, navigate])
 
   const reconnect = useCallback(async () => {
     if (reconnectingRef.current) return

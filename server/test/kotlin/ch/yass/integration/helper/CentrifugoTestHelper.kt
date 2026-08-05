@@ -3,6 +3,7 @@ package ch.yass.integration.helper
 import ch.yass.core.pubsub.Action
 import ch.yass.game.pubsub.CardPlayed
 import ch.yass.game.pubsub.ClearPlayedCards
+import ch.yass.game.pubsub.GameCanceled
 import ch.yass.game.pubsub.GameFinished
 import ch.yass.game.pubsub.PlayerDisconnected
 import ch.yass.game.pubsub.PlayerJoined
@@ -47,6 +48,7 @@ class CentrifugoTestHelper(val mapper: ObjectMapper) {
             "PlayerJoined" -> mapper.treeToValue(node, PlayerJoined::class.java)
             "PlayerDisconnected" -> mapper.treeToValue(node, PlayerDisconnected::class.java)
             "GameFinished" -> mapper.treeToValue(node, GameFinished::class.java)
+            "GameCanceled" -> mapper.treeToValue(node, GameCanceled::class.java)
             "UpdateGschobe" -> mapper.treeToValue(node, UpdateGschobe::class.java)
             else -> throw IllegalArgumentException("Unknown action type: ${node["type"].asText()}")
         }

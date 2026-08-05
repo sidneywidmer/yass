@@ -24,6 +24,13 @@
       "cancel": "Cancel",
       "confirm": "Leave"
     },
+    "endGame": "End Game",
+    "endGameConfirm": {
+      "title": "End Game",
+      "description": "This ends the game for everyone at the table. It can not be rejoined afterwards.",
+      "cancel": "Cancel",
+      "confirm": "End Game"
+    },
     "game": "Game",
     "feedback": "Feedback",
     "sendMessage": "Send Feedback",
@@ -240,6 +247,12 @@
     "analyze": "Analyze",
     "back": "Back"
   },
+  "canceled": {
+    "title": "Game ended",
+    "description": "{{name}} ended this game.",
+    "analyze": "Analyze",
+    "back": "Back to lobby"
+  },
   "analysis": {
     "title": "Analysis",
     "code": "Code",
@@ -253,7 +266,8 @@
     "teams": {
       "northSouth": "N/S",
       "eastWest": "E/W"
-    }
+    },
+    "canceled": "This game was ended before it was played out."
   },
   "trumps": {
     "french": {

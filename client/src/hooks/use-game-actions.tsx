@@ -2,7 +2,7 @@ import {useCallback, useEffect, useRef, useState} from 'react'
 import {useGameStateStore} from '@/store/game-state'
 import {useSettingsStore} from '@/store/settings'
 import {GameDelay, playSpeedTimings} from '@/types/play-speed'
-import {CardInHand, CardOnTable, GameFinished, PlayerAtTable, Position, State, TotalPoints, Trump, WeisWithPoints} from '@/api/generated'
+import {CardInHand, CardOnTable, GameFinished, Player, PlayerAtTable, Position, State, TotalPoints, Trump, WeisWithPoints} from '@/api/generated'
 
 type CardPlayedAction = { type: 'CardPlayed'; card: CardOnTable }
 type UpdateHandAction = { type: 'UpdateHand'; cards: CardInHand[]; newCards?: boolean }
@@ -13,6 +13,7 @@ type UpdateGschobeAction = { type: 'UpdateGschobe'; position: Position }
 type UpdateActiveAction = { type: 'UpdateActive'; position: Position }
 type UpdatePossibleWeiseAction = { type: 'UpdatePossibleWeise'; weise: WeisWithPoints[] }
 type GameFinishedAction = { type: 'GameFinished' } & GameFinished
+type GameCanceledAction = { type: 'GameCanceled'; game: string; canceledBy: Player }
 type UpdatePointsAction = { type: 'UpdatePoints'; points: Record<string, TotalPoints> }
 type DeclareWeisAction = { type: 'DeclareWeis'; position: Position; points: number }
 type ShowWeiseAction = { type: 'ShowWeise'; weiseByPosition: { [position: string]: WeisWithPoints[] } }
@@ -29,6 +30,7 @@ export type GameAction =
   | UpdateActiveAction
   | UpdatePossibleWeiseAction
   | GameFinishedAction
+  | GameCanceledAction
   | UpdatePointsAction
   | DeclareWeisAction
   | ShowWeiseAction
@@ -85,6 +87,10 @@ const useGameActions = () => {
         loserPoints: action.loserPoints
       }
     }),
+    // A late action from a table we already left must never end the game we are sitting at now
+    GameCanceled: async (action: GameCanceledAction) => useGameStateStore.setState(state =>
+      action.game === state.gameUuid ? {canceledBy: action.canceledBy} : {}
+    ),
     UpdatePoints: async (action: UpdatePointsAction) => {
       useGameStateStore.setState({points: action.points})
     },

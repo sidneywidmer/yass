@@ -12,6 +12,7 @@ import Analyze from "@/routes/analyze.tsx";
 import BetaRoadmapBlog from "@/routes/blog/beta-roadmap.tsx";
 import { useEffect } from 'react';
 import {preloadAssets} from "@/lib/utils.ts";
+import {Toaster} from "@/components/ui/sonner.tsx";
 
 const router = createBrowserRouter([
   {
@@ -54,6 +55,9 @@ export default function App() {
     preloadAssets();
   }, []);
   return (
-    <RouterProvider router={router}/>
+    <>
+      <Toaster richColors theme="light" duration={10000} closeButton={true}/>
+      <RouterProvider router={router}/>
+    </>
   );
 }

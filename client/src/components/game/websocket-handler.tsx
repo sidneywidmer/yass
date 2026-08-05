@@ -20,44 +20,21 @@ export function WebSocketHandler() {
 
     const centrifuge = new Centrifuge(transports, {});
 
-    const connectToWs = async () => {
-      try {
-        console.log("Connecting to Centrifugo...")
-        centrifuge.connect()
+    console.log("Connecting to Centrifugo...")
+    centrifuge.connect()
 
-        const sub = centrifuge.newSubscription(`seat:#${uuid}`)
-        sub.on('publication', (ctx) => {
-          addActions(ctx.data)
-        })
-
-        sub.subscribe()
-        console.log("Connected and subscribed to seat:#" + uuid)
-
-        return () => {
-          console.log("Cleaning up connection...")
-          sub.unsubscribe()
-          centrifuge.disconnect()
-        }
-      } catch (error) {
-        console.error("WebSocket connection error:", error)
-        return () => {
-          centrifuge.disconnect()
-        }
-      }
-    }
-
-    let cleanup: (() => void) | undefined
-
-    connectToWs().then(cleanupFn => {
-      cleanup = cleanupFn
-    }).catch(error => {
-      console.error("Failed to connect to WebSocket:", error)
+    const sub = centrifuge.newSubscription(`seat:#${uuid}`)
+    sub.on('publication', (ctx) => {
+      addActions(ctx.data)
     })
 
+    sub.subscribe()
+    console.log("Connected and subscribed to seat:#" + uuid)
+
     return () => {
-      if (cleanup) {
-        cleanup()
-      }
+      console.log("Cleaning up connection...")
+      sub.unsubscribe()
+      centrifuge.disconnect()
     }
   }, [gameUuid, uuid, addActions])
 

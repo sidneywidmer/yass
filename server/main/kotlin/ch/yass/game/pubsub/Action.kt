@@ -3,6 +3,7 @@ package ch.yass.game.pubsub
 import ch.yass.core.pubsub.Action
 import ch.yass.game.dto.*
 import ch.yass.game.dto.Player
+import java.util.UUID
 
 data class CardPlayed(val card: CardOnTable) : Action
 data class ClearPlayedCards(val position: Position) : Action
@@ -17,6 +18,7 @@ data class DeclareWeis(val position: Position, val points: Int) : Action
 data class ShowWeise(val weiseByPosition: Map<Position, List<WeisWithPoints>>) : Action
 data class PlayerJoined(val player: PlayerAtTable) : Action
 data class PlayerDisconnected(val player: PlayerAtTable) : Action
+data class GameCanceled(val game: UUID, val canceledBy: Player) : Action
 data class GameFinished(
     val winners: List<Player>,
     val losers: List<Player>,

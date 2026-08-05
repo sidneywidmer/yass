@@ -2,6 +2,7 @@ package ch.yass.core.error
 
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.*
+import ch.yass.game.dto.db.Game
 import ch.yass.game.dto.db.InternalPlayer
 import org.valiktor.ConstraintViolation
 import sh.ory.ApiException
@@ -37,6 +38,9 @@ data class GameNotFound(val uuid: String) : GameError
 data class GameNotFinished(val uuid: String) : GameError
 data class SeatNotFound(val uuid: String) : GameError
 data class PlayerNotInGame(val player: InternalPlayer, val state: GameState) : GameError
+data class PlayerDidNotCreateGame(val player: InternalPlayer, val state: GameState) : GameError
+data class GameNotCancelable(val game: Game) : GameError
+data class GameAlreadyCanceled(val game: Game) : GameError
 data class PlayerDoesNotOwnSeat(val player: InternalPlayer, val seatUuid: String, val state: GameState) : GameError
 data class PlayerIsLocked(val player: InternalPlayer, val state: GameState) : GameError
 data class PlayerDoesNotOwnCard(val player: InternalPlayer, val card: Card, val state: GameState) : GameError

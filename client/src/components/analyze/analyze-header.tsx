@@ -1,8 +1,8 @@
 import {CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
-import {Frown, Trophy} from "lucide-react"
+import {Frown, OctagonX, Trophy} from "lucide-react"
 import {cn} from "@/lib/utils.ts"
 import {useTranslation} from "react-i18next"
-import {PlayerWithCards} from "@/api/generated"
+import {GameStatus, PlayerWithCards} from "@/api/generated"
 
 interface AnalyzeHeaderProps {
   code: string
@@ -10,10 +10,12 @@ interface AnalyzeHeaderProps {
   loserPoints: number | undefined
   playerInGame: PlayerWithCards | null
   winner: boolean
+  status: GameStatus
 }
 
-export function AnalyzeHeader({code, winnerPoints, loserPoints, playerInGame, winner}: AnalyzeHeaderProps) {
+export function AnalyzeHeader({code, winnerPoints, loserPoints, playerInGame, winner, status}: AnalyzeHeaderProps) {
   const {t} = useTranslation()
+  const canceled = status === 'CANCELED'
 
   return (
     <>
@@ -24,11 +26,18 @@ export function AnalyzeHeader({code, winnerPoints, loserPoints, playerInGame, wi
             <CardDescription>{t('analysis.code')} {code}</CardDescription>
           </div>
         </div>
+        {canceled &&
+            <div
+                className="flex items-center gap-2 rounded-md bg-amber-500/10 px-4 py-3 text-sm text-amber-600 dark:text-amber-500">
+                <OctagonX className="w-4 h-4 shrink-0"/>
+              {t('analysis.canceled')}
+            </div>
+        }
         <div className="mb-6 text-center space-y-2">
           <div className="text-4xl font-bold">
             {winnerPoints} - {loserPoints}
           </div>
-          {playerInGame &&
+          {playerInGame && !canceled &&
               <div className={cn(
                 "inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm",
                 winner ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"

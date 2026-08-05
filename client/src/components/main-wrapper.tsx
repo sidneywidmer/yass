@@ -1,5 +1,4 @@
 import React from "react";
-import {Toaster} from "@/components/ui/sonner.tsx";
 import Settings from "@/components/settings.tsx";
 import {useAuth} from "@/hooks/use-auth.tsx";
 import { useLocation } from "react-router-dom";
@@ -16,7 +15,6 @@ export function MainWrapper({children}: WrapperProps) {
 
   return (
     <>
-      <Toaster richColors theme="light" duration={10000} closeButton={true}/>
       {!isLandingPage && !isBlogPage && <Settings triggerVariant="fixed"/>}
       {children}
     </>

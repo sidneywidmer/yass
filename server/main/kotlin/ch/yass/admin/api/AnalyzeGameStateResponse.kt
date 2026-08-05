@@ -1,6 +1,7 @@
 package ch.yass.admin.api
 
 import ch.yass.admin.api.analzye.Hand
+import ch.yass.game.dto.GameStatus
 import ch.yass.game.dto.Points
 import ch.yass.game.dto.TeamWithPoints
 import java.util.*
@@ -10,5 +11,6 @@ data class AnalyzeGameStateResponse(
     val points: Points,
     val gameUuid: UUID,
     val winners: TeamWithPoints,
-    val losers: TeamWithPoints
+    val losers: TeamWithPoints,
+    val status: GameStatus
 )

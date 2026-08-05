@@ -35,6 +35,7 @@ class GameController(private val service: GameService, private val repo: GameRep
         post("/trump", ::trump)
         post("/weisen", ::weisen)
         post("/schiebe", ::schiebe)
+        post("/cancel", ::cancel)
         post("/ping", ::ping)
         post("/daily", ::daily)
         get("/daily-leaderboard", ::dailyLeaderboard)
@@ -99,7 +100,9 @@ class GameController(private val service: GameService, private val repo: GameRep
             ?.filterIsInstance<GameFinished>()
             ?.firstOrNull()
 
-        JoinGameResponse(state.game.uuid, state.game.code, seat, playedCards, otherPlayers, finish)
+        val canCancel = gameIsCancelable(state.game) && playerCreatedGame(player, state.seats)
+
+        JoinGameResponse(state.game.uuid, state.game.code, seat, playedCards, otherPlayers, finish, canCancel)
     }.fold(
         { errorResponse(ctx, it) },
         { successResponse(ctx, it) }
@@ -157,6 +160,19 @@ class GameController(private val service: GameService, private val repo: GameRep
         val player = player(ctx)
 
         service.schiebe(request, player)
+        SuccessfulActionResponse()
+    }.fold(
+        { errorResponse(ctx, it) },
+        { successResponse(ctx, it) }
+    )
+
+    private fun cancel(ctx: Context) = either {
+        val request = validate<CancelGameRequest>(ctx.body())
+        val player = player(ctx)
+        val game = service.cancel(request, player)
+
+        logger().info("trigger_alert: Game canceled ${game.code}")
+
         SuccessfulActionResponse()
     }.fold(
         { errorResponse(ctx, it) },

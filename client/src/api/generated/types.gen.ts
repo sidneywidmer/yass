@@ -12,6 +12,7 @@ export type AnalyzeGameStateResponse = {
     gameUuid: string;
     winners: TeamWithPoints;
     losers: TeamWithPoints;
+    status: GameStatus;
 };
 
 export type AnalyzeHand = {
@@ -87,6 +88,8 @@ export type RunningGame = {
 
 export type GameKind = 'QUEUE' | 'CUSTOM' | 'DAILY';
 
+export type GameStatus = 'RUNNING' | 'FINISHED' | 'CANCELED';
+
 export type JoinGameRequest = {
     code: string;
 };
@@ -98,6 +101,11 @@ export type JoinGameResponse = {
     cardsPlayed?: Array<CardOnTable>;
     otherPlayers?: Array<PlayerAtTable>;
     finished?: GameFinished;
+    canCancel?: boolean;
+};
+
+export type CancelGameRequest = {
+    game: string;
 };
 
 export type PlayCardRequest = {
@@ -411,6 +419,22 @@ export type PostGameSchiebeResponses = {
 };
 
 export type PostGameSchiebeResponse = PostGameSchiebeResponses[keyof PostGameSchiebeResponses];
+
+export type PostGameCancelData = {
+    body: CancelGameRequest;
+    path?: never;
+    query?: never;
+    url: '/game/cancel';
+};
+
+export type PostGameCancelResponses = {
+    /**
+     * Game ended successfully
+     */
+    200: SuccessfulActionResponse;
+};
+
+export type PostGameCancelResponse = PostGameCancelResponses[keyof PostGameCancelResponses];
 
 export type PostGamePingData = {
     body: PingSeatRequest;

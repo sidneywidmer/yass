@@ -121,15 +121,15 @@ class GameRepository(private val db: DSLContext) {
     }
 
     /**
-     * Games the player is seated at and could still rejoin. STALE ones count as well, they are only
-     * waiting for someone to come back (see [rejoinSeat]).
+     * Games the player is seated at and could still rejoin. Nobody has to be at the table right now, a
+     * game stays around until it is played to the end or canceled by whoever created it.
      */
     fun getRunningGamesForPlayer(player: InternalPlayer): List<Game> =
         db.select(GAME)
             .from(SEAT)
             .join(GAME).on(SEAT.GAME_ID.eq(GAME.ID))
             .where(SEAT.PLAYER_ID.eq(player.id))
-            .and(GAME.STATUS.`in`(GameStatus.RUNNING.name, GameStatus.STALE.name))
+            .and(GAME.STATUS.eq(GameStatus.RUNNING.name))
             .orderBy(GAME.CREATED_AT.desc())
             .fetch(mapping(Game::fromRecord))
 
@@ -298,6 +298,15 @@ class GameRepository(private val db: DSLContext) {
             .fetchOneInto(Game::class.java)!!
     }
 
+    fun cancelGame(game: Game): Game? {
+        return db.update(GAME)
+            .set(GAME.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
+            .set(GAME.STATUS, GameStatus.CANCELED.name)
+            .where(GAME.ID.eq(game.id).and(GAME.STATUS.eq(GameStatus.RUNNING.name)))
+            .returningResult(GAME)
+            .fetchOneInto(Game::class.java)
+    }
+
     fun getOrCreateDailyChallengeForDay(day: LocalDate): DailyChallenge {
         getDailyChallenge(day)?.let { return it }
 
@@ -375,13 +384,6 @@ class GameRepository(private val db: DSLContext) {
             .fetch(Hand::fromRecord)
 
     private fun rejoinSeat(seat: Seat): Seat {
-        // In case the game was set to STALE in the meantime...
-        db.update(GAME)
-            .set(GAME.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
-            .set(GAME.STATUS, GameStatus.RUNNING.name)
-            .where(GAME.ID.eq(seat.gameId))
-            .execute()
-
         return db.update(SEAT)
             .set(SEAT.UPDATED_AT, LocalDateTime.now(ZoneOffset.UTC))
             .set(SEAT.REJOINED_AT, LocalDateTime.now(ZoneOffset.UTC))

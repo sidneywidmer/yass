@@ -1,6 +1,6 @@
 import * as generatedApi from './generated';
 import {
-  AnonSignupData, ChooseTrumpRequest,
+  AnonSignupData, CancelGameRequest, ChooseTrumpRequest,
   CreateCustomGameRequest,
   JoinGameRequest, MessageRequest, PingSeatRequest,
   PlayCardRequest, SchiebeRequest,
@@ -51,6 +51,7 @@ export const api = {
   weisen: (data: WeisenRequest) => generatedApi.postGameWeisen({client: customClient, body: data}),
   schiebe: (data: SchiebeRequest) => generatedApi.postGameSchiebe({client: customClient, body: data}),
   pingSeat: (data: PingSeatRequest) => generatedApi.postGamePing({client: customClient, body: data}),
+  cancelGame: (data: CancelGameRequest) => generatedApi.postGameCancel({client: customClient, body: data}),
 
   // Admin
   analyzeGame: (code: string) => generatedApi.getAdminAnalyzeGameByCode({

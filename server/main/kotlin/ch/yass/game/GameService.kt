@@ -132,9 +132,11 @@ class GameService(
         return game
     }
 
-    context(_: Raise<GameError>, _: Raise<DbError>)
+    context(r: Raise<GameError>, _: Raise<DbError>)
     fun join(request: JoinGameRequest, player: InternalPlayer): GameState {
         val game = repo.getByCode(request.code)
+        r.ensure(!gameIsCanceled(game)) { GameAlreadyCanceled(game) }
+
         val joinedAtSeat = repo.takeASeat(game, player)
         val state = repo.getState(game)
 
@@ -144,6 +146,24 @@ class GameService(
         gameLoop(game)
 
         return repo.getState(game)
+    }
+
+    context(r: Raise<GameError>)
+    fun cancel(request: CancelGameRequest, player: InternalPlayer): Game {
+        val game = repo.getByUUID(request.game)
+        val state = repo.getState(game)
+
+        r.ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
+        r.ensure(gameIsCancelable(game)) { GameNotCancelable(game) }
+        r.ensure(playerCreatedGame(player, state.seats)) { PlayerDidNotCreateGame(player, state) }
+
+        val canceled = repo.cancelGame(game) ?: r.raise(GameNotCancelable(game))
+
+        publishForSeats(state.seats) { seat ->
+            if (seat.playerId == player.id) emptyList() else gameCanceledActions(game, player)
+        }
+
+        return canceled
     }
 
     /**
@@ -195,6 +215,7 @@ class GameService(
         val nextState = nextState(state)
 
         r.ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
+        r.ensure(!gameIsCanceled(state.game)) { GameAlreadyCanceled(state.game) }
         r.ensure(expectedState(listOf(State.PLAY_CARD, State.PLAY_CARD_BOT), nextState)) {
             InvalidState(nextState, state)
         }
@@ -233,6 +254,7 @@ class GameService(
         val position = state.seats.first { it.playerId == player.id }.position
 
         r.ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
+        r.ensure(!gameIsCanceled(state.game)) { GameAlreadyCanceled(state.game) }
         r.ensure(expectedState(listOf(State.TRUMP, State.TRUMP_BOT), nextState)) { InvalidState(nextState, state) }
         r.ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
         r.ensure(Trump.playable().contains(chosenTrump)) { TrumpInvalid(chosenTrump) }
@@ -256,6 +278,7 @@ class GameService(
         val seat = playerSeat(player, state.seats)
 
         r.ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
+        r.ensure(!gameIsCanceled(state.game)) { GameAlreadyCanceled(state.game) }
         r.ensure(expectedState(listOf(State.WEISEN_FIRST, State.WEISEN_FIRST_BOT), nextState)) {
             InvalidState(nextState, state)
         }
@@ -307,6 +330,7 @@ class GameService(
         val position = state.seats.first { it.playerId == player.id }.position
 
         r.ensure(playerInGame(player, state.seats)) { PlayerNotInGame(player, state) }
+        r.ensure(!gameIsCanceled(state.game)) { GameAlreadyCanceled(state.game) }
         r.ensure(expectedState(listOf(State.SCHIEBE, State.SCHIEBE_BOT), nextState)) { InvalidState(nextState, state) }
         r.ensure(playerHasActivePosition(player, state)) { PlayerIsLocked(player, state) }
 

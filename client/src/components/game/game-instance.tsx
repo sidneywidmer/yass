@@ -12,6 +12,7 @@ import {ChooseTrump} from "@/components/game/choose-trump.tsx";
 import {Weisen} from "@/components/game/weisen.tsx";
 import OtherPlayers from "@/components/game/other-players.tsx";
 import {GameFinished} from "@/components/game/game-finished.tsx";
+import {GameCanceled} from "@/components/game/game-canceled.tsx";
 import {useErrorStore} from "@/store/error.ts";
 import {useTranslation} from "react-i18next";
 import {useNavigate} from "react-router-dom";
@@ -38,6 +39,9 @@ export function GameInstance({tryCode}: GameInstanceProps) {
         setIsLoading(false)
       })
       .catch(error => {
+        if (error.response?.data?.payload?.domainError == "GameAlreadyCanceled") {
+          return navigate(`/game/${tryCode}/analyze`)
+        }
         if (error.response?.status === 404) {
           navigate('/lobby')
           return addError({
@@ -52,6 +56,7 @@ export function GameInstance({tryCode}: GameInstanceProps) {
             description: t('errors.gameFull.description')
           })
         }
+        setIsLoading(false)
         return handleAxiosError(error)
       })
 
@@ -79,6 +84,7 @@ export function GameInstance({tryCode}: GameInstanceProps) {
         <Weisen/>
         <WeisAnnouncement/>
         <GameFinished/>
+        <GameCanceled/>
         <ConnectionHandler/>
         <WebSocketHandler/>
         <Share/>
