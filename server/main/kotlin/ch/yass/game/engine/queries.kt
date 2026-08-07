@@ -8,6 +8,7 @@ import ch.yass.core.error.GameError
 import ch.yass.core.error.PlayerDoesNotOwnCard
 import ch.yass.core.helper.associateWithToEnum
 import ch.yass.core.helper.mapValuesToEnum
+import ch.yass.game.api.internal.DailyGame
 import ch.yass.game.api.internal.GameState
 import ch.yass.game.dto.*
 import ch.yass.game.dto.db.Hand
@@ -333,6 +334,23 @@ fun remainingWeise(hand: Hand): EnumMap<Position, List<Weis>> {
 }
 
 fun getTeamPoints(points: Points, team: Team): Int = team.positions.sumOf { points[it]!!.total() }
+
+/**
+ * Ranks the finished runs at a daily challenge by the points the team of the player made. Beating the bots is
+ * the whole point of the challenge, so a run that was lost is worth nothing and lands at the bottom with 0
+ * points instead of the points that were collected on the way.
+ */
+fun dailyLeaderboardEntries(games: List<DailyGame>, limit: Int = 15): List<DailyLeaderboardEntry> =
+    games
+        .map { daily ->
+            val points = pointsByPositionTotal(daily.hands, daily.tricks)
+            val team = Team.entries.first { daily.position in it.positions }
+            val won = getWinningTeam(points).team == team
+
+            DailyLeaderboardEntry(daily.player, if (won) getTeamPoints(points, team) else 0)
+        }
+        .sortedByDescending { it.points }
+        .take(limit)
 
 fun getWinningTeam(points: Points): TeamWithPoints =
     Team.entries

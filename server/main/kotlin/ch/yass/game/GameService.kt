@@ -167,24 +167,14 @@ class GameService(
     }
 
     /**
-     * The best runs at today's daily challenge, ranked by the points the team of the player made. Only games
-     * that were played to the end count, so the board stays empty until the first player of the day is through.
+     * The best runs at today's daily challenge. Only games that were played to the end count, so the board
+     * stays empty until the first player of the day is through.
      */
     fun dailyLeaderboard(now: LocalDateTime): DailyLeaderboardResponse {
         val day = swissDay(now)
         val (start, end) = swissDayWindowUTC(day)
 
-        val entries = repo.getFinishedDailyGames(start, end)
-            .map { daily ->
-                val points = pointsByPositionTotal(daily.hands, daily.tricks)
-                val team = Team.entries.first { daily.position in it.positions }
-
-                DailyLeaderboardEntry(daily.player, getTeamPoints(points, team))
-            }
-            .sortedByDescending { it.points }
-            .take(15)
-
-        return DailyLeaderboardResponse(day, entries)
+        return DailyLeaderboardResponse(day, dailyLeaderboardEntries(repo.getFinishedDailyGames(start, end)))
     }
 
     /**
