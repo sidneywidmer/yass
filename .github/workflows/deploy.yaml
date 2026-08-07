@@ -1,0 +1,119 @@
+name: Deploy
+
+# Manual trigger only. GitHub restricts workflow_dispatch to users with write
+# access, the `production` environment restricts the secrets to the master
+# branch, and the job-level actor check is a third layer.
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: What to deploy
+        type: choice
+        options:
+          - both
+          - backend
+          - frontend
+        default: both
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    if: github.actor == 'sidneywidmer'
+    runs-on: ubuntu-latest
+    environment: production
+
+    env:
+      SERVICE_NAME: yass
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: version
+        run: echo "sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up JDK 21
+        if: inputs.target != 'frontend'
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build backend
+        if: inputs.target != 'frontend'
+        run: ./mvnw clean package -DskipTests -DserverVersion=${{ steps.version.outputs.sha }}
+
+      - name: Set up Node 26
+        if: inputs.target != 'backend'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Build frontend
+        if: inputs.target != 'backend'
+        working-directory: client
+        run: |
+          npm ci
+          npm run build
+
+      # Inlined rather than using a third-party SSH action: this job holds a
+      # root credential for the droplet, so it runs no code we don't control.
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          install -m 600 /dev/null ~/.ssh/deploy_key
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          echo "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+          cat > ~/.ssh/config <<EOF
+          Host deploy-target
+            HostName ${{ secrets.DEPLOY_HOST }}
+            User ${{ secrets.DEPLOY_USER }}
+            IdentityFile ~/.ssh/deploy_key
+            IdentitiesOnly yes
+          EOF
+          chmod 600 ~/.ssh/config
+
+      - name: Deploy backend
+        if: inputs.target != 'frontend'
+        run: |
+          rsync -avz target/server-latest.jar deploy-target:/opt/yass/yass.jar
+          ssh deploy-target "systemctl restart $SERVICE_NAME"
+
+      - name: Deploy frontend
+        if: inputs.target != 'backend'
+        run: |
+          rsync -avz --delete client/dist/ deploy-target:/var/www/frontend/
+
+      # X-serverversion comes from the filtered serverVersion property, so a
+      # matching value proves the new jar is live, not just that the port is up.
+      - name: Verify backend
+        if: inputs.target != 'frontend'
+        run: |
+          expected="${{ steps.version.outputs.sha }}"
+          for attempt in $(seq 1 15); do
+            actual=$(curl -sS -o /dev/null -D - https://api.yass.gg/admin/ping \
+              | grep -i '^x-serverversion:' | tr -d '\r' | cut -d' ' -f2 || true)
+            if [ "$actual" = "$expected" ]; then
+              echo "Backend is up on $actual"
+              exit 0
+            fi
+            echo "Attempt $attempt: got '$actual', want '$expected'"
+            sleep 4
+          done
+          echo "Backend did not report version $expected in time"
+          exit 1
+
+      - name: Verify frontend
+        if: inputs.target != 'backend'
+        run: curl -fsS -o /dev/null https://yass.gg
